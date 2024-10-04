@@ -9,9 +9,20 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import com.android.shelfLife.ui.navigation.NavigationActions
+
+@Composable
+fun BarcodeScannerScreen(navigationActions: NavigationActions) {
+  val context = LocalContext.current
+
+  CameraPreviewView(modifier = Modifier.fillMaxSize()) { previewView ->
+    startCamera(context, previewView) // This will initialize CameraX
+  }
+}
 
 @Composable
 fun CameraPreviewView(modifier: Modifier = Modifier, startCamera: (PreviewView) -> Unit) {

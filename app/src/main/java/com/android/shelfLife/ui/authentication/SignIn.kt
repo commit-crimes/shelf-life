@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -50,87 +51,71 @@ fun SignInScreen(navigationActions: NavigationActions) {
           onAuthComplete = { result ->
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-            //                navigationActions.navigateTo(Route.OVERVIEW)
+            navigationActions.navigateTo(Route.OVERVIEW) // Navigate to the camera after sign-in
           },
           onAuthError = {
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
             Toast.makeText(context, "Login Failed!", Toast.LENGTH_LONG).show()
           })
-  val token = stringResource(R.string.default_web_client_id)
-  // The main container for the screen
 
-  Scaffold(
-      modifier = Modifier.fillMaxSize(),
-      content = { padding ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(padding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ) {
-          // App Logo Image
+  val token = stringResource(R.string.default_web_client_id)
+
+  Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
+    Column(
+        modifier = Modifier.fillMaxSize().padding(padding),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center) {
           Image(
-              painter = painterResource(id = R.drawable.app_logo), // Ensure this drawable exists
+              painter = painterResource(id = R.drawable.app_logo),
               contentDescription = "App Logo",
               modifier = Modifier.size(250.dp))
 
           Spacer(modifier = Modifier.height(16.dp))
 
-          // Welcome Text
           Text(
               modifier = Modifier.testTag("loginTitle"),
               text = "Welcome",
               style =
                   MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
               fontWeight = FontWeight.Bold,
-              // center the text
-
               textAlign = TextAlign.Center)
 
           Spacer(modifier = Modifier.height(48.dp))
 
-          // Authenticate With Google Button
-          GoogleSignInButton(
-              onSignInClick = {
-                val gso =
-                    GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(token)
-                        .requestEmail()
-                        .build()
-                val googleSignInClient = GoogleSignIn.getClient(context, gso)
-                launcher.launch(googleSignInClient.signInIntent)
-              })
+          GoogleSignInButton {
+            val gso =
+                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(token)
+                    .requestEmail()
+                    .build()
+            val googleSignInClient = GoogleSignIn.getClient(context, gso)
+            launcher.launch(googleSignInClient.signInIntent)
+          }
         }
-      })
+  }
 }
 
 @Composable
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
   Button(
       onClick = onSignInClick,
-      colors = ButtonDefaults.buttonColors(containerColor = Color.White), // Button color
-      shape = RoundedCornerShape(50), // Circular edges for the button
+      colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+      shape = RoundedCornerShape(50),
       border = BorderStroke(1.dp, Color.LightGray),
-      modifier =
-          Modifier.padding(8.dp)
-              .height(48.dp) // Adjust height as needed
-              .testTag("loginButton")) {
+      modifier = Modifier.padding(8.dp).height(48.dp).testTag("loginButton")) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxWidth()) {
-              // Load the Google logo from resources
               Image(
                   painter = painterResource(id = R.drawable.google_logo),
                   contentDescription = "Google Logo",
-                  modifier =
-                      Modifier.size(30.dp) // Size of the Google logo
-                          .padding(end = 8.dp))
+                  modifier = Modifier.size(30.dp).padding(end = 8.dp))
 
-              // Text for the button
               Text(
                   text = "Sign in with Google",
-                  color = Color.Gray, // Text color
-                  fontSize = 16.sp, // Font size
+                  color = Color.Gray,
+                  fontSize = 16.sp,
                   fontWeight = FontWeight.Medium)
             }
       }
