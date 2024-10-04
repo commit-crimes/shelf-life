@@ -1,4 +1,5 @@
 package com.android.shelfLife.model.foodItem
+
 import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -22,7 +23,10 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
                     if (task.isSuccessful) {
                         onSuccess()
                     } else {
-                        Log.e("FoodItemRepoFire", "init failed: could not get collection : ${task.exception}")
+                        Log.e(
+                            "FoodItemRepoFire",
+                            "init failed: could not get collection : ${task.exception}"
+                        )
                     }
                 }
             } else {
@@ -53,7 +57,11 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
             }
     }
 
-    override fun addFoodItem(foodItem: FoodItem, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    override fun addFoodItem(
+        foodItem: FoodItem,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         db.collection(collectionPath)
             .document(foodItem.uid)
             .set(foodItem)
@@ -64,7 +72,11 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
             }
     }
 
-    override fun updateFoodItem(foodItem: FoodItem, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    override fun updateFoodItem(
+        foodItem: FoodItem,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         db.collection(collectionPath)
             .document(foodItem.uid)
             .set(foodItem)
@@ -75,7 +87,11 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
             }
     }
 
-    override fun deleteFoodItemById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+    override fun deleteFoodItemById(
+        id: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
         db.collection(collectionPath)
             .document(id)
             .delete()
@@ -97,26 +113,28 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
             val buyDate = doc.getTimestamp("buyDate") ?: Timestamp.now()
             val status = doc.getString("status") ?: FoodItemStatus.CLOSED.name
 
-            val quantityMap = doc.get("quantity") as? Map<*,*> ?: return null
-            val quantity = Quantity(
-                amount = quantityMap["amount"] as? Double ?: 0.0,
-                unit = Unit.valueOf(quantityMap["unit"] as? String ?: "GRAM")
-            )
+            val quantityMap = doc.get("quantity") as? Map<*, *> ?: return null
+            val quantity =
+                Quantity(
+                    amount = quantityMap["amount"] as? Double ?: 0.0,
+                    unit = FoodUnit.valueOf(quantityMap["unit"] as? String ?: "GRAM")
+                )
 
             val nutritionMap = doc.get("nutritionFacts") as? Map<*, *>
-            val nutritionFacts = if (nutritionMap != null) {
-                NutritionFacts(
-                    energyKcal = (nutritionMap["energyKcal"] as? Long)?.toInt() ?: 0,
-                    fat = (nutritionMap["fat"] as? Double) ?: 0.0,
-                    saturatedFat = (nutritionMap["saturatedFat"] as? Double) ?: 0.0,
-                    carbohydrates = (nutritionMap["carbohydrates"] as? Double) ?: 0.0,
-                    sugars = (nutritionMap["sugars"] as? Double) ?: 0.0,
-                    proteins = (nutritionMap["proteins"] as? Double) ?: 0.0,
-                    salt = (nutritionMap["salt"] as? Double) ?: 0.0,
-                )
-            } else {
-                NutritionFacts() // default empty values
-            }
+            val nutritionFacts =
+                if (nutritionMap != null) {
+                    NutritionFacts(
+                        energyKcal = (nutritionMap["energyKcal"] as? Long)?.toInt() ?: 0,
+                        fat = (nutritionMap["fat"] as? Double) ?: 0.0,
+                        saturatedFat = (nutritionMap["saturatedFat"] as? Double) ?: 0.0,
+                        carbohydrates = (nutritionMap["carbohydrates"] as? Double) ?: 0.0,
+                        sugars = (nutritionMap["sugars"] as? Double) ?: 0.0,
+                        proteins = (nutritionMap["proteins"] as? Double) ?: 0.0,
+                        salt = (nutritionMap["salt"] as? Double) ?: 0.0,
+                    )
+                } else {
+                    NutritionFacts() // default empty values
+                }
 
             FoodItem(
                 uid = uid,
