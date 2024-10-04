@@ -9,6 +9,7 @@ ktfmt = "0.17.0"
 # Barcode Scanner
 mlkit-barcode-scanning = "17.0.2"
 camerax = "1.0.2"
+guava = "31.1-jre"
 
 
 
@@ -126,7 +127,7 @@ mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning"
 camerax-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "camerax" }
 camerax-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
 camerax-view = { group = "androidx.camera", name = "camera-view", version = "1.0.0-alpha27" }
-
+guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
