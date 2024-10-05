@@ -2,6 +2,7 @@ import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
+    jacoco
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.ktfmt)
@@ -94,6 +95,14 @@ android {
         java.setSrcDirs(emptyList<File>())
         res.setSrcDirs(emptyList<File>())
         resources.setSrcDirs(emptyList<File>())
+    }
+}
+
+tasks.withType<Test> {
+    // Configure Jacoco for each tests
+    configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
     }
 }
 
