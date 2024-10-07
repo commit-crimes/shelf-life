@@ -2,12 +2,16 @@ package com.android.shelflife.model.foodItem
 
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
+import com.android.shelfLife.model.foodFacts.FoodCategory
+import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodFacts.NutritionFacts
+import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
+import com.android.shelfLife.model.foodItem.FoodLocation
 import com.android.shelfLife.model.foodItem.FoodStatus
-import com.android.shelfLife.model.foodItem.FoodUnit
-import com.android.shelfLife.model.foodItem.NutritionFacts
-import com.android.shelfLife.model.foodItem.Quantity
+import com.android.shelfLife.model.foodItem.FoodStorageLocation
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
@@ -45,16 +49,22 @@ class FoodItemRepositoryFirestoreTest {
 
   private lateinit var foodItemRepositoryFirestore: FoodItemRepositoryFirestore
 
-  private val foodItem =
-      FoodItem(
-          uid = "1",
-          name = "Almond Butter",
-          barcode = "123456789",
-          quantity = Quantity(1.0, FoodUnit.GRAM),
-          expiryDate = Timestamp.now(),
-          buyDate = Timestamp.now(),
-          status = FoodStatus.CLOSED,
-          nutritionFacts = NutritionFacts())
+  private val foodFacts = FoodFacts(
+    name = "Almond Butter",
+    barcode = "123456789",
+    quantity = Quantity(1.0, FoodUnit.GRAM),
+    category = FoodCategory.OTHER,
+    nutritionFacts = NutritionFacts(),
+  )
+
+  private val foodItem = FoodItem(
+    uid = "1",
+    foodFacts = foodFacts,
+    location = FoodLocation(0, FoodStorageLocation.PANTRY),
+    expiryDate = Timestamp.now(),
+    buyDate = Timestamp.now(),
+    status = FoodStatus.CLOSED,
+  )
 
   @Before
   fun setUp() {
@@ -102,25 +112,38 @@ class FoodItemRepositoryFirestoreTest {
   fun addFoodItem_shouldCallFirestoreCollection() {
     `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null)) // Simulate success
 
-    // This test verifies that when we add a new FoodItem, the Firestore `collection()` method is
-    // called.
+    // This test verifies that when we add a new FoodItem, the Firestore `collection()` method is called.
     foodItemRepositoryFirestore.addFoodItem(foodItem, onSuccess = {}, onFailure = {})
 
     shadowOf(Looper.getMainLooper()).idle()
-      val foodItemCaptor = argumentCaptor<FoodItem>()
+    val foodItemCaptor = argumentCaptor<FoodItem>()
 
-    // Ensure Firestore collection method was called to reference the "foodItems" collection
+    // Ensure Firestore's documentReference `set` method was called with the correct FoodItem.
     verify(mockDocumentReference).set(foodItemCaptor.capture())
 
     // Assert the captured values match the expected values
     val capturedFoodItem = foodItemCaptor.firstValue
+
+    // Assertions for FoodFacts properties
+    assert(capturedFoodItem.foodFacts.name == "Almond Butter")
+    assert(capturedFoodItem.foodFacts.barcode == "123456789")
+    assert(capturedFoodItem.foodFacts.quantity.amount == 1.0)
+    assert(capturedFoodItem.foodFacts.quantity.unit == FoodUnit.GRAM)
+
+    // Assertions for FoodItem-specific properties
     assert(capturedFoodItem.uid == "1")
-    assert(capturedFoodItem.name == "Almond Butter")
-    assert(capturedFoodItem.barcode == "123456789")
-    assert(capturedFoodItem.quantity.amount == 1.0)
-    assert(capturedFoodItem.quantity.unit == FoodUnit.GRAM)
     assert(capturedFoodItem.status == FoodStatus.CLOSED)
+
+    // Check the location of the food item
+    assert(capturedFoodItem.location.householdNumber == 0)
+    assert(capturedFoodItem.location.storageLocation == FoodStorageLocation.PANTRY)
+
+    // Check the timestamp values
+    assert(capturedFoodItem.expiryDate != null)  // Make sure expiry date is not null
+    assert(capturedFoodItem.buyDate != null)  // Make sure buy date is set
+    assert(capturedFoodItem.openDate == null)  // Verify open date is null by default
   }
+
 
   @Test
   fun deleteFoodItemById_shouldCallDocumentReferenceDelete() {
