@@ -20,7 +20,9 @@ object Route {
 object Screen {
   const val OVERVIEW = "Overview Screen"
   const val AUTH = "Auth Screen"
-  const val SCANNER = "Scanner Screen"
+  const val BARCODE_SCANNER = "Barcode Scanner Screen"
+  const val PERMISSION_HANDLER = "Permission Handler Screen"
+  const val PERMISSION_DENIED = "Permission Denied Screen"
   const val ADD_FOOD = "Add food Screen"
   const val RECIPES = "Recipes"
   const val PROFILE = "Profile Screen"
