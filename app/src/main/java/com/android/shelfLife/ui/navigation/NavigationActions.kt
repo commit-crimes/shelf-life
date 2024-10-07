@@ -5,6 +5,7 @@ import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PhotoCamera
+import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 
@@ -42,14 +43,14 @@ object TopLevelDestinations {
   val SCANNER =
       TopLevelDestination(
           route = Route.SCANNER,
-          icon = Icons.Outlined.PhotoCamera, // Icon for the scanner
+          icon = Icons.Outlined.Videocam, // Icon for the scanner
           textId = "Scanner" // Text label for the scanner
           )
   val RECIPES =
       TopLevelDestination(
           route = Route.RECIPES,
           icon = Icons.Outlined.Bookmark, // Icon for the profile
-          textId = "Profile" // Text label for the profile
+          textId = "Recipes" // Text label for the profile
           )
   val PROFILE =
       TopLevelDestination(
