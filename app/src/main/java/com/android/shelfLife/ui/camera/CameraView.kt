@@ -2,6 +2,8 @@ package com.android.shelfLife.ui.camera
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
@@ -15,73 +17,65 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
-import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
-import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.navigation.TopLevelDestination
-import android.net.Uri
-import android.provider.Settings
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.android.shelfLife.model.camera.BarcodeScannerViewModel
-import com.android.shelfLife.ui.navigation.Screen
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.shelfLife.model.camera.BarcodeScannerViewModel
+import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Screen
 
 @Composable
-fun BarcodeScannerScreen(navigationActions: NavigationActions, viewModel: BarcodeScannerViewModel = viewModel()) {
-    val context = LocalContext.current
+fun BarcodeScannerScreen(
+    navigationActions: NavigationActions,
+    viewModel: BarcodeScannerViewModel = viewModel()
+) {
+  val context = LocalContext.current
+  val permissionGranted = viewModel.permissionGranted
 
-    // Observe permissionGranted state from ViewModel
-    val permissionGranted = viewModel.permissionGranted
+  // Observe lifecycle to detect when the app resumes
+  val lifecycleOwner = LocalLifecycleOwner.current
 
-    // Observe lifecycle to detect when the app resumes
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                // Re-check the permission status when the app resumes
-                viewModel.checkCameraPermission()
-            }
-        }
-
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+  DisposableEffect(lifecycleOwner) {
+    val observer = LifecycleEventObserver { _, event ->
+      if (event == Lifecycle.Event.ON_RESUME) {
+        // Re-check the permission status when the app resumes
+        viewModel.checkCameraPermission()
+      }
     }
 
-    // If permission is not granted, navigate back to the PermissionDeniedScreen
-    LaunchedEffect(permissionGranted) {
-        if (!permissionGranted) {
-            navigationActions.navigateTo(Screen.PERMISSION_HANDLER)
-        }
-    }
+    lifecycleOwner.lifecycle.addObserver(observer)
 
-    // Rest of your BarcodeScannerScreen UI
-    if (permissionGranted) {
-        // Display the camera preview
-        CameraPreviewView(modifier = Modifier.fillMaxSize()) { previewView ->
-            startCamera(context, previewView)
-        }
-    } else {
-        // Optionally, display a message or placeholder
-        Text("Camera permission is required.")
+    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+  }
+
+  // If permission is not granted, navigate back to the PermissionHandler
+  LaunchedEffect(permissionGranted) {
+    if (!permissionGranted) {
+      navigationActions.navigateTo(Screen.PERMISSION_HANDLER)
     }
+  }
+
+  // Rest of your BarcodeScannerScreen UI
+  if (permissionGranted) {
+    // Display the camera preview
+    CameraPreviewView(modifier = Modifier.fillMaxSize()) { previewView ->
+      startCamera(context, previewView)
+    }
+  } else {
+    // Optionally, display a message or placeholder
+    Text("Camera permission is required.")
+  }
 }
-
 
 @Composable
 fun CameraPreviewView(modifier: Modifier = Modifier, startCamera: (PreviewView) -> Unit) {
@@ -118,25 +112,24 @@ fun startCamera(context: Context, previewView: PreviewView) {
 
 @Composable
 fun PermissionDeniedScreen() {
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+  Column(
+      modifier = Modifier.fillMaxSize(),
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = "Camera permission is required to scan barcodes.")
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                // Open app settings
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+              // Open app settings
+              val intent =
+                  Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.fromParts("package", context.packageName, null)
-                }
-                context.startActivity(intent)
+                  }
+              context.startActivity(intent)
+            }) {
+              Text(text = "Open Settings")
             }
-        ) {
-            Text(text = "Open Settings")
-        }
-    }
+      }
 }
