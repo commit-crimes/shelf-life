@@ -115,13 +115,13 @@ fun FoodItemCard(foodItem : FoodItem, listFoodItemsViewModel: ListFoodItemsViewM
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = foodItem.name,
+                text = foodItem.foodFacts.name,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
-                text = foodItem.quantity.toString() + "in stock"
+                text = foodItem.foodFacts.quantity.toString() + "in stock"
             )
             // Display the due date on the left
             Text(text = formattedExpiryDate, fontSize = 12.sp, color = Color.Black)
