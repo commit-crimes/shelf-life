@@ -53,13 +53,13 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically as CenterVertica
 @Composable
 fun RecipesScreen(
     navigationActions: NavigationActions
-){
-
+) {
+    // Initial list of recipes
     val listOfRecipes = listOf(
         recipe(name= "Paella",
             instructions = "cook",
             servings = 4,
-            time = Timestamp(5400,0)),
+            time = Timestamp(5400, 0)),
         recipe(name = "Fideua",
             instructions = "cry",
             servings = 3,
@@ -67,7 +67,7 @@ fun RecipesScreen(
         recipe(name= "Tortilla de patata",
             instructions = "cook",
             servings = 4,
-            time = Timestamp(5400,0)),
+            time = Timestamp(5400, 0)),
         recipe(name = "Costillas a la brasa",
             instructions = "cry",
             servings = 3,
@@ -75,35 +75,50 @@ fun RecipesScreen(
         recipe(name= "Curry rojo",
             instructions = "cook",
             servings = 4,
-            time = Timestamp(5400,0)),
+            time = Timestamp(5400, 0)),
         recipe(name = "Butifarra con boniato",
             instructions = "cry",
             servings = 3,
             time = Timestamp(3600, 0))
-    ) // this is to test for the moment, we will later use the firebase and GPT-API
+    )
+
+    // State for the search query
+    var query by remember { mutableStateOf("") }
+
+    // Filter the recipes based on the search query
+    val filteredRecipes = if (query.isEmpty()) {
+        listOfRecipes
+    } else {
+        listOfRecipes.filter { recipe ->
+            recipe.name.contains(query, ignoreCase = true) // Filter by recipe name
+        }
+    }
 
     Scaffold(
-        modifier = Modifier, // todo we will place a testTag
-        topBar = { TopNavigationBar()},
+        modifier = Modifier.padding(horizontal = 8.dp),
+        topBar = { TopNavigationBar() },
         bottomBar = {
             BottomNavigationMenu(
-                onTabSelect = {destination -> navigationActions.navigateTo(destination)},
-                tabList =  LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.RECIPES)
+                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                tabList = LIST_TOP_LEVEL_DESTINATION,
+                selectedItem = Route.RECIPES
+            )
         },
         content = { paddingValues ->
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
-                    .fillMaxSize() // Fill the available size
+                    .fillMaxSize()
             ) {
-                RecipesSearchBar() // Search bar at the top
+                RecipesSearchBar(query) { newQuery ->
+                    query = newQuery // Update the query when user types
+                } // Pass query and update function to the search bar
 
-                // LazyColumn for displaying the list of recipes
+                // LazyColumn for displaying the list of filtered recipes
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize() // Fill remaining space
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    items(listOfRecipes) { recipe ->
+                    items(filteredRecipes) { recipe ->
                         RecipeItem(recipe)
                     }
                 }
@@ -114,44 +129,42 @@ fun RecipesScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RecipesSearchBar() {
-    // State to track the current query and whether the search bar is active
-    var query by remember { mutableStateOf("") }
+fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
     var isActive by remember { mutableStateOf(false) }
 
-    SearchBar(
-        query = query, // The current query string
-        onQueryChange = { newQuery ->
-            query = newQuery // Update the query when user types
-        },
-        placeholder = {
-            Text("Search recipes") // Placeholder when query is empty
-        },
-        onSearch = {
-            // You can handle search logic here if needed
-        },
-        active = isActive, // Track if the search bar is active
-        onActiveChange = { active ->
-            isActive = active // Update the active state
-        },
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(25.dp),
-        leadingIcon = {
-            // You can customize the leading icon here if needed
-        },
-        trailingIcon = {
-            IconButton(onClick = { /* Trigger search action if needed */ }) {
-                Icon(
-                    Icons.Default.Search,
-                    contentDescription = "icon for recipes search bar"
-                )
+            .height(125.dp) // Set a fixed height for the search bar
+    ){
+        SearchBar(
+            query = query, // The current query string
+            onQueryChange = { newQuery -> onQueryChange(newQuery) }, // Use the passed function to update the query
+            placeholder = {
+                Text("Search recipes")
+            },
+            onSearch = {
+                // Handle search logic if needed
+            },
+            active = isActive,
+            onActiveChange = { active -> isActive = active },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(25.dp),
+            leadingIcon = {},
+            trailingIcon = {
+                IconButton(onClick = { isActive = false }) {
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = "icon for recipes search bar"
+                    )
+                }
             }
-        }
-    ) {
-        // Additional content can be added here if required
+        ) {}
     }
-} // todo finish this
+
+
+}
 
 @Preview
 @Composable
