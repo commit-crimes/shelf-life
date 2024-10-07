@@ -4,15 +4,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.shelfLife.ui.authentication.SignInScreen
+import com.android.shelfLife.ui.camera.BarcodeScannerScreen
+import com.android.shelfLife.ui.camera.CameraPermissionHandler
+import com.android.shelfLife.ui.camera.PermissionDeniedScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
-    setContent { ShelfLifeTheme { Surface(modifier = Modifier.fillMaxSize()) { ShelfLifeApp() } } }
+    setContent { ShelfLifeTheme { ShelfLifeApp() } }
   }
 }
 
@@ -32,22 +32,20 @@ fun ShelfLifeApp() {
   val navigationActions = NavigationActions(navController)
 
   NavHost(navController = navController, startDestination = Route.AUTH) {
-
-    // Route for AUTH screen
-    composable(Route.AUTH) { SignInScreen(navigationActions) }
-
-    // Route for OVERVIEW screen
+    // Authentication route
     navigation(
-        startDestination = Screen.OVERVIEW,
-        route = Route.OVERVIEW,
+        startDestination = Screen.AUTH,
+        route = Route.AUTH,
     ) {
-      composable(Screen.OVERVIEW) {}
+      composable(Screen.AUTH) { SignInScreen(navigationActions) }
     }
 
-    // Route for Scanner
-    composable(Screen.SCANNER) {}
-
-    // Route for Profile
-    composable(Screen.PROFILE) {}
+    navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
+      composable(Screen.PERMISSION_HANDLER) { CameraPermissionHandler(navigationActions) }
+      composable(Screen.BARCODE_SCANNER) { BarcodeScannerScreen(navigationActions) }
+      composable(Screen.PERMISSION_DENIED) {
+        PermissionDeniedScreen(navigationActions)
+      } // For handling denied permission
+    }
   }
 }
