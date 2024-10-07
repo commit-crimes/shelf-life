@@ -1,6 +1,11 @@
 package com.android.shelfLife.model.foodItem
 
 import android.util.Log
+import com.android.shelfLife.model.foodFacts.FoodCategory
+import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodFacts.NutritionFacts
+import com.android.shelfLife.model.foodFacts.Quantity
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -101,54 +106,77 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
                 onFailure(exception)
             }
     }
-
     // Helper function to convert Firestore DocumentSnapshot into a FoodItem object
     private fun convertToFoodItem(doc: DocumentSnapshot): FoodItem? {
         return try {
             val uid = doc.getString("uid") ?: return null
+
+            // Extract FoodFacts properties from the Firestore document
             val name = doc.getString("name") ?: return null
             val barcode = doc.getString("barcode") ?: return null
 
-            val expiryDate = doc.getTimestamp("expiryDate") ?: Timestamp.now()
-            val buyDate = doc.getTimestamp("buyDate") ?: Timestamp.now()
-            val status = doc.getString("status") ?: FoodStatus.CLOSED.name
-
             val quantityMap = doc.get("quantity") as? Map<*, *> ?: return null
-            val quantity =
-                Quantity(
-                    amount = quantityMap["amount"] as? Double ?: 0.0,
-                    unit = FoodUnit.valueOf(quantityMap["unit"] as? String ?: "GRAM")
-                )
+            val quantity = Quantity(
+                amount = quantityMap["amount"] as? Double ?: 0.0,
+                unit = FoodUnit.valueOf(quantityMap["unit"] as? String ?: "GRAM")
+            )
 
             val nutritionMap = doc.get("nutritionFacts") as? Map<*, *>
-            val nutritionFacts =
-                if (nutritionMap != null) {
-                    NutritionFacts(
-                        energyKcal = (nutritionMap["energyKcal"] as? Long)?.toInt() ?: 0,
-                        fat = (nutritionMap["fat"] as? Double) ?: 0.0,
-                        saturatedFat = (nutritionMap["saturatedFat"] as? Double) ?: 0.0,
-                        carbohydrates = (nutritionMap["carbohydrates"] as? Double) ?: 0.0,
-                        sugars = (nutritionMap["sugars"] as? Double) ?: 0.0,
-                        proteins = (nutritionMap["proteins"] as? Double) ?: 0.0,
-                        salt = (nutritionMap["salt"] as? Double) ?: 0.0,
-                    )
-                } else {
-                    NutritionFacts() // default empty values
-                }
+            val nutritionFacts = if (nutritionMap != null) {
+                NutritionFacts(
+                    energyKcal = (nutritionMap["energyKcal"] as? Long)?.toInt() ?: 0,
+                    fat = (nutritionMap["fat"] as? Double) ?: 0.0,
+                    saturatedFat = (nutritionMap["saturatedFat"] as? Double) ?: 0.0,
+                    carbohydrates = (nutritionMap["carbohydrates"] as? Double) ?: 0.0,
+                    sugars = (nutritionMap["sugars"] as? Double) ?: 0.0,
+                    proteins = (nutritionMap["proteins"] as? Double) ?: 0.0,
+                    salt = (nutritionMap["salt"] as? Double) ?: 0.0
+                )
+            } else {
+                NutritionFacts() // default empty values
+            }
 
-            FoodItem(
-                uid = uid,
+            val categoryString = doc.getString("category") ?: FoodCategory.OTHER.name
+            val foodCategory = FoodCategory.valueOf(categoryString)
+
+            // Create the FoodFacts object
+            val foodFacts = FoodFacts(
                 name = name,
                 barcode = barcode,
                 quantity = quantity,
-                expiryDate = expiryDate,
-                buyDate = buyDate,
-                status = FoodStatus.valueOf(status),
+                category = foodCategory,
                 nutritionFacts = nutritionFacts
+            )
+
+            // Extract FoodItem-specific properties
+            val expiryDate = doc.getTimestamp("expiryDate") ?: Timestamp.now()
+            val buyDate = doc.getTimestamp("buyDate") ?: Timestamp.now()
+            val status = doc.getString("status") ?: FoodStatus.CLOSED.name
+            val foodStatus = FoodStatus.valueOf(status)
+
+            val locationMap = doc.get("location") as? Map<*, *>
+            val foodLocation = if (locationMap != null) {
+                FoodLocation(
+                    householdNumber = (locationMap["householdNumber"] as? Long)?.toInt() ?: 0,
+                    storageLocation = FoodStorageLocation.valueOf(locationMap["location"] as? String ?: FoodStorageLocation.PANTRY.name)
+                )
+            } else {
+                FoodLocation(0, FoodStorageLocation.PANTRY) // Default location
+            }
+
+            // Create the FoodItem object using FoodFacts
+            FoodItem(
+                uid = uid,
+                foodFacts = foodFacts,
+                status = foodStatus,
+                location = foodLocation,
+                expiryDate = expiryDate,
+                buyDate = buyDate
             )
         } catch (e: Exception) {
             Log.e("FoodItemRepository", "Error converting document to FoodItem", e)
             null
         }
     }
+
 }
