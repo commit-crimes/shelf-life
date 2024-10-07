@@ -1,6 +1,7 @@
 package com.android.shelfLife.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PhotoCamera
@@ -11,6 +12,7 @@ object Route {
   const val OVERVIEW = "Overview"
   const val SCANNER = "Scanner"
   const val PROFILE = "Profile"
+  const val RECIPES = "Recipes"
   const val AUTH = "Auth"
 }
 
@@ -19,6 +21,7 @@ object Screen {
   const val AUTH = "Auth Screen"
   const val SCANNER = "Scanner Screen"
   const val ADD_FOOD = "Add food Screen"
+  const val RECIPES = "Recipes"
   const val PROFILE = "Profile Screen"
   // Add other screens as needed
 }
@@ -42,6 +45,12 @@ object TopLevelDestinations {
           icon = Icons.Outlined.PhotoCamera, // Icon for the scanner
           textId = "Scanner" // Text label for the scanner
           )
+  val RECIPES =
+      TopLevelDestination(
+          route = Route.RECIPES,
+          icon = Icons.Outlined.Bookmark, // Icon for the profile
+          textId = "Profile" // Text label for the profile
+          )
   val PROFILE =
       TopLevelDestination(
           route = Route.PROFILE,
@@ -52,7 +61,10 @@ object TopLevelDestinations {
 
 val LIST_TOP_LEVEL_DESTINATION =
     listOf(
-        TopLevelDestinations.OVERVIEW, TopLevelDestinations.SCANNER, TopLevelDestinations.PROFILE)
+        TopLevelDestinations.OVERVIEW,
+        TopLevelDestinations.SCANNER,
+        TopLevelDestinations.RECIPES,
+        TopLevelDestinations.PROFILE)
 
 open class NavigationActions(
     private val navController: NavHostController,
