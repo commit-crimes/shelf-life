@@ -135,7 +135,7 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(125.dp) // Set a fixed height for the search bar
+            .height(85.dp) // Set a fixed height for the search bar
     ){
         SearchBar(
             query = query, // The current query string
@@ -150,7 +150,7 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
             onActiveChange = { active -> isActive = active },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(25.dp),
+                .padding(8.dp),
             leadingIcon = {},
             trailingIcon = {
                 IconButton(onClick = { isActive = false }) {
@@ -164,7 +164,7 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
     }
 
 
-}
+} // todo ask Paul where does the filter management comes into to play, the screen or the top bar
 
 @Preview
 @Composable

@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.internal.composableLambda
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -16,6 +18,7 @@ import com.android.shelfLife.ui.camera.PermissionDeniedScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.theme.ShelfLifeTheme
 
 class MainActivity : ComponentActivity() {
@@ -46,6 +49,13 @@ fun ShelfLifeApp() {
       composable(Screen.PERMISSION_DENIED) {
         PermissionDeniedScreen(navigationActions)
       } // For handling denied permission
+    }
+
+    navigation(
+      startDestination = Screen.RECIPES,
+      route = Route.RECIPES,
+    ){
+      composable(Screen.RECIPES){ RecipesScreen(navigationActions) }
     }
   }
 }
