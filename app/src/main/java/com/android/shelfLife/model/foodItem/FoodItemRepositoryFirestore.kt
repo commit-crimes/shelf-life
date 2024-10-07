@@ -111,7 +111,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
 
             val expiryDate = doc.getTimestamp("expiryDate") ?: Timestamp.now()
             val buyDate = doc.getTimestamp("buyDate") ?: Timestamp.now()
-            val status = doc.getString("status") ?: FoodItemStatus.CLOSED.name
+            val status = doc.getString("status") ?: FoodStatus.CLOSED.name
 
             val quantityMap = doc.get("quantity") as? Map<*, *> ?: return null
             val quantity =
@@ -143,7 +143,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
                 quantity = quantity,
                 expiryDate = expiryDate,
                 buyDate = buyDate,
-                status = FoodItemStatus.valueOf(status),
+                status = FoodStatus.valueOf(status),
                 nutritionFacts = nutritionFacts
             )
         } catch (e: Exception) {

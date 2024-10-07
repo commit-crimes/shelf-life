@@ -8,7 +8,7 @@ data class FoodItem(
     val barcode: String = "", // Barcode number, default to an empty string if not provided
     val quantity: Quantity, // Quantity of the food item
     val status: FoodStatus = FoodStatus.CLOSED, // Default status is CLOSED
-    val nutritionFacts: NutritionFacts = NutritionFacts() // Default empty NutritionFacts object,
+    val nutritionFacts: NutritionFacts = NutritionFacts(), // Default empty NutritionFacts object
     val foodCategory: FoodCategory = FoodCategory.OTHER, // Default category is OTHER
     val location: FoodLocation = FoodLocation(0, _Location.PANTRY), // Default location is PANTRY
     val expiryDate: Timestamp? = null, // Expiry date can be null if not provided
@@ -18,7 +18,7 @@ data class FoodItem(
 
 data class Quantity(
     val amount: Double, // Amount of the quantity
-    val unit: _Unit = _Unit.GRAM // Unit of the quantity
+    val unit: FoodUnit = FoodUnit.GRAM // Unit of the quantity
 )
 
 data class FoodLocation(
@@ -65,7 +65,7 @@ enum class _Location {
     FREEZER, // Freezer location
 }
 
-enum class _Unit {
+enum class FoodUnit {
     GRAM, // Gram unit
     ML, // Milliliter unit
     COUNT // Item count (2 pineapples, 3 apples, etc.)
