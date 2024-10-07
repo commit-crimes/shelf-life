@@ -4,7 +4,7 @@ import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
-import com.android.shelfLife.model.foodItem.FoodItemStatus
+import com.android.shelfLife.model.foodItem.FoodStatus
 import com.android.shelfLife.model.foodItem.FoodUnit
 import com.android.shelfLife.model.foodItem.NutritionFacts
 import com.android.shelfLife.model.foodItem.Quantity
@@ -53,7 +53,7 @@ class FoodItemRepositoryFirestoreTest {
           quantity = Quantity(1.0, FoodUnit.GRAM),
           expiryDate = Timestamp.now(),
           buyDate = Timestamp.now(),
-          status = FoodItemStatus.CLOSED,
+          status = FoodStatus.CLOSED,
           nutritionFacts = NutritionFacts())
 
   @Before
@@ -119,7 +119,7 @@ class FoodItemRepositoryFirestoreTest {
     assert(capturedFoodItem.barcode == "123456789")
     assert(capturedFoodItem.quantity.amount == 1.0)
     assert(capturedFoodItem.quantity.unit == FoodUnit.GRAM)
-    assert(capturedFoodItem.status == FoodItemStatus.CLOSED)
+    assert(capturedFoodItem.status == FoodStatus.CLOSED)
   }
 
   @Test
