@@ -40,7 +40,7 @@ fun ShelfLifeApp() {
       composable(Screen.AUTH) { SignInScreen(navigationActions) }
     }
 
-    navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.OVERVIEW) {
+    navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
       composable(Screen.PERMISSION_HANDLER) { CameraPermissionHandler(navigationActions) }
       composable(Screen.BARCODE_SCANNER) { BarcodeScannerScreen(navigationActions) }
       composable(Screen.PERMISSION_DENIED) {
