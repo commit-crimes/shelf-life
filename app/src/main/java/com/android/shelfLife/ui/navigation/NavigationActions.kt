@@ -16,8 +16,10 @@ object Screen {
   const val OVERVIEW = "Overview Screen"
   const val ADD_TODO = "Add ToDo Screen"
   const val AUTH = "Auth Screen"
-  const val MAP = "Map Screen"
+  const val BARCODE_SCANNER = "Barcode Scanner Screen"
+  const val PERMISSION_HANDLER = "Permission Handler Screen"
   const val EDIT_TODO = "Edit ToDo Screen"
+  const val PERMISSION_DENIED = "Permission Denied Screen"
   // Add other screens as needed
 }
 
