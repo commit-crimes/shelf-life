@@ -2,6 +2,7 @@ import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
+    jacoco
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.ktfmt)
@@ -11,7 +12,6 @@ plugins {
 android {
     namespace = "com.android.shelfLife"
     compileSdk = 34
-
 
     // Load the API key from local.properties
     val localProperties = Properties()
@@ -32,7 +32,11 @@ android {
             useSupportLibrary = true
         }
     }
-
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -48,11 +52,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
     buildFeatures {
         compose = true
@@ -91,6 +95,14 @@ android {
         java.setSrcDirs(emptyList<File>())
         res.setSrcDirs(emptyList<File>())
         resources.setSrcDirs(emptyList<File>())
+    }
+}
+
+tasks.withType<Test> {
+    // Configure Jacoco for each tests
+    configure<JacocoTaskExtension> {
+        isIncludeNoLocationClasses = true
+        excludes = listOf("jdk.internal.*")
     }
 }
 

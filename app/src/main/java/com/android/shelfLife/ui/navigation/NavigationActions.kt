@@ -1,25 +1,30 @@
 package com.android.shelfLife.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Language
+import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 
 object Route {
   const val OVERVIEW = "Overview"
-  const val MAP = "Map"
+  const val SCANNER = "Scanner"
+  const val PROFILE = "Profile"
+  const val RECIPES = "Recipes"
   const val AUTH = "Auth"
 }
 
 object Screen {
   const val OVERVIEW = "Overview Screen"
-  const val ADD_TODO = "Add ToDo Screen"
   const val AUTH = "Auth Screen"
   const val BARCODE_SCANNER = "Barcode Scanner Screen"
   const val PERMISSION_HANDLER = "Permission Handler Screen"
-  const val EDIT_TODO = "Edit ToDo Screen"
   const val PERMISSION_DENIED = "Permission Denied Screen"
+  const val ADD_FOOD = "Add food Screen"
+  const val RECIPES = "Recipes"
+  const val PROFILE = "Profile Screen"
   // Add other screens as needed
 }
 
@@ -36,15 +41,32 @@ object TopLevelDestinations {
           icon = Icons.Outlined.Menu, // Icon for the overview
           textId = "Overview" // Text label for the overview
           )
-  val MAP =
+  val SCANNER =
       TopLevelDestination(
-          route = Route.MAP,
-          icon = Icons.Outlined.Language, // Icon for the map
-          textId = "Map" // Text label for the map
+          route = Route.SCANNER,
+          icon = Icons.Outlined.PhotoCamera, // Icon for the scanner
+          textId = "Scanner" // Text label for the scanner
+          )
+  val RECIPES =
+      TopLevelDestination(
+          route = Route.RECIPES,
+          icon = Icons.Outlined.Bookmark, // Icon for the profile
+          textId = "Profile" // Text label for the profile
+          )
+  val PROFILE =
+      TopLevelDestination(
+          route = Route.PROFILE,
+          icon = Icons.Outlined.Person, // Icon for the profile
+          textId = "Profile" // Text label for the profile
           )
 }
 
-val LIST_TOP_LEVEL_DESTINATION = listOf(TopLevelDestinations.OVERVIEW, TopLevelDestinations.MAP)
+val LIST_TOP_LEVEL_DESTINATION =
+    listOf(
+        TopLevelDestinations.OVERVIEW,
+        TopLevelDestinations.SCANNER,
+        TopLevelDestinations.RECIPES,
+        TopLevelDestinations.PROFILE)
 
 open class NavigationActions(
     private val navController: NavHostController,
