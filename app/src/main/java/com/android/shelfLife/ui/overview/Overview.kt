@@ -46,7 +46,6 @@ import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
-import com.android.shelfLife.ui.component.AddHouseholdDialogContent
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -114,7 +113,7 @@ fun ListFoodItems(foodItems : List <FoodItem>, listFoodItemsViewModel: ListFoodI
             Text(text = "No food available")
         }
     } else {
-        // Display the full list of to-dos
+        // Display the full list
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(foodItems) { item ->
                 // Call a composable that renders each individual to-do item

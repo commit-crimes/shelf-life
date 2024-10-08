@@ -37,7 +37,13 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
         }
     }
 
-
+    /**
+     * Adds a new household to the repository.
+     *
+     * @param household - The household to be added.
+     * @param onSuccess - The callback to be invoked on success.
+     * @param onFailure - The callback to be invoked on failure.
+     */
     override fun addHousehold(
         household: HouseHold,
         onSuccess: () -> Unit,
@@ -67,6 +73,7 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
             Log.e("HouseholdRepository", "User not logged in")
             onFailure(Exception("User not logged in"))
         }
+        getHouseholds({}, {})
     }
 
     override fun updateHousehold(

@@ -22,6 +22,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -38,7 +39,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.android.shelfLife.model.household.HouseHold
-import com.android.shelfLife.ui.component.AddHouseholdDialogContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,7 +113,38 @@ fun HouseHoldSelector(onClose: () -> Unit, selectedHousehold: HouseHold,
     val drawerState = rememberDrawerState(DrawerValue.Open)
     LaunchedEffect(Unit) { drawerState.open()}
     var showDialog by remember { mutableStateOf(false) }
-    AddHouseHoldDialogue(showDialog, householdViewModel)
+    var newHouseHoldName by remember { mutableStateOf("") }
+    if (showDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Add New Household") },
+            text = {
+                Column {
+                    Text(text = "Enter the name of the new household:")
+                    TextField(
+                        value = newHouseHoldName,
+                        onValueChange = { newHouseHoldName = it },
+                        placeholder = { Text("Household Name") }
+                    )
+                }
+            },
+            confirmButton = {
+                androidx.compose.material3.Button(
+                    onClick = {
+                        householdViewModel.addNewHousehold(newHouseHoldName)
+                        showDialog = false
+                    }
+                ) {
+                    Text("Add")
+                }
+            },
+            dismissButton = {
+                androidx.compose.material3.Button(onClick = { showDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
     // List of HouseHolds needs to be fetched from the server
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -158,16 +189,6 @@ fun HouseHoldSelector(onClose: () -> Unit, selectedHousehold: HouseHold,
     )
 }
 
-@Composable
-fun AddHouseHoldDialogue(showDialog: Boolean, householdViewModel: HouseholdViewModel) {
-    AddHouseholdDialogContent(
-        showDialog = showDialog,
-        onDismiss = { /* Logic to dismiss the dialog, handled externally */ },
-        onAddHousehold = { householdName ->
-            householdViewModel.addNewHousehold(householdName)
-        }
-    )
-}
 
 @Composable
 fun HouseHoldElement(
