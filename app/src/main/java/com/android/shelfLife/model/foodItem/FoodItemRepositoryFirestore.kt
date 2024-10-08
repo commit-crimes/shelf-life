@@ -77,6 +77,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
             }
     }
 
+
     override fun updateFoodItem(
         foodItem: FoodItem,
         onSuccess: () -> Unit,
@@ -155,13 +156,10 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
             val foodStatus = FoodStatus.valueOf(status)
 
             val locationMap = doc.get("location") as? Map<*, *>
-            val foodLocation = if (locationMap != null) {
-                FoodLocation(
-                    householdNumber = (locationMap["householdNumber"] as? Long)?.toInt() ?: 0,
-                    storageLocation = FoodStorageLocation.valueOf(locationMap["location"] as? String ?: FoodStorageLocation.PANTRY.name)
-                )
+            val foodStorageLocation = if (locationMap != null) {
+                FoodStorageLocation.valueOf(locationMap["location"] as? String ?: FoodStorageLocation.PANTRY.name)
             } else {
-                FoodLocation(0, FoodStorageLocation.PANTRY) // Default location
+                FoodStorageLocation.PANTRY
             }
 
             // Create the FoodItem object using FoodFacts
@@ -169,7 +167,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
                 uid = uid,
                 foodFacts = foodFacts,
                 status = foodStatus,
-                location = foodLocation,
+                location = foodStorageLocation,
                 expiryDate = expiryDate,
                 buyDate = buyDate
             )
@@ -179,4 +177,27 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
         }
     }
 
+    fun convertToFoodItemFromMap(map: Map<String, Any>): FoodItem? {
+        return try {
+            val uid = map["uid"] as? String ?: return null
+            val name = map["name"] as? String ?: return null
+            val barcode = map["barcode"] as? String ?: ""
+            val quantityMap = map["quantity"] as? Map<*, *>
+
+            val quantity = Quantity(
+                amount = quantityMap?.get("amount") as? Double ?: 0.0,
+                unit = FoodUnit.valueOf(quantityMap?.get("unit") as? String ?: "GRAM")
+            )
+
+            val foodFacts = FoodFacts(name = name, barcode = barcode, quantity = quantity)
+            val expiryDate = map["expiryDate"] as? Timestamp ?: Timestamp.now()
+            val status = map["status"] as? String ?: FoodStatus.CLOSED.name
+            val foodStatus = FoodStatus.valueOf(status)
+
+            FoodItem(uid = uid, foodFacts = foodFacts, expiryDate = expiryDate, status = foodStatus)
+        } catch (e: Exception) {
+            Log.e("FoodItemRepository", "Error converting map to FoodItem", e)
+            null
+        }
+    }
 }

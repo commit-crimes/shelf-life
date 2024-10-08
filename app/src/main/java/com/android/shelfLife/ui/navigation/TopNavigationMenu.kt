@@ -29,18 +29,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.android.shelfLife.model.household.HouseHold
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopNavigationBar(
-    onFilterClick: () -> Unit = {}
+    onFilterClick: () -> Unit = {},
+    onAddHouseholdClick: () -> Unit = {},
+    houseHold: HouseHold,
+    onHouseholdChange: (HouseHold) -> Unit,
+    userHouseholds: List<HouseHold>
 ) {
     var isDrawerOpen by remember { mutableStateOf(false) }
-    var selectedHousehold by remember { mutableStateOf("Household 1") }
-    // HouseHold variables
-    val householdName = "Household 1"
+    var selectedHousehold by remember { mutableStateOf(houseHold) }
+
     TopAppBar(
         navigationIcon = {
             IconButton(onClick = {
@@ -59,7 +62,7 @@ fun TopNavigationBar(
                     .padding(end = 8.dp)
             ) {
                 Text(
-                    text = householdName,
+                    text = selectedHousehold.name,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = Color.White
@@ -87,13 +90,16 @@ fun TopNavigationBar(
             onHouseholdSelected = { household ->
                 selectedHousehold = household
                 isDrawerOpen = false // Close the drawer after selecting
-            })
+                onHouseholdChange(household)
+            },
+            userHouseholds = userHouseholds)
     }
 }
 
 @Composable
-fun HouseHoldSelector(onClose: () -> Unit, selectedHousehold: String,
-                      onHouseholdSelected: (String) -> Unit,){
+fun HouseHoldSelector(onClose: () -> Unit, selectedHousehold: HouseHold,
+                      onHouseholdSelected: (HouseHold) -> Unit,
+                      userHouseholds: List<HouseHold>){
     val drawerState = rememberDrawerState(DrawerValue.Open)
     LaunchedEffect(Unit) { drawerState.open()}
     // List of HouseHolds needs to be fetched from the server
@@ -108,10 +114,13 @@ fun HouseHoldSelector(onClose: () -> Unit, selectedHousehold: String,
                         .padding(horizontal = 12.dp),
                     style = MaterialTheme.typography.labelMedium
                 )
-                HouseHoldElement("Household 1", selectedHousehold, onHouseholdSelected)
-                HouseHoldElement("Household 2", selectedHousehold, onHouseholdSelected)
-                HouseHoldElement("Household 3", selectedHousehold, onHouseholdSelected)
-                HouseHoldElement("Household 4", selectedHousehold, onHouseholdSelected)
+                userHouseholds.forEach { household ->
+                    HouseHoldElement(
+                        household = household,
+                        selectedHousehold = selectedHousehold,
+                        onHouseholdSelected = onHouseholdSelected
+                    )
+                }
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
             }
         }, content = {
@@ -123,25 +132,21 @@ fun HouseHoldSelector(onClose: () -> Unit, selectedHousehold: String,
 }
 
 @Composable
-fun HouseHoldElement(householdName : String, selectedHousehold: String, onHouseholdSelected: (String) -> Unit){
+fun HouseHoldElement(
+    household: HouseHold,
+    selectedHousehold: HouseHold,
+    onHouseholdSelected: (HouseHold) -> Unit
+) {
     NavigationDrawerItem(
         label = {
             Text(
-                text = householdName,
-                fontWeight = if (householdName == selectedHousehold) FontWeight.Bold else FontWeight.Normal,
-                color = if (householdName == selectedHousehold) MaterialTheme.colorScheme.primary else Color.Unspecified
+                text = household.name,
+                fontWeight = if (household == selectedHousehold) FontWeight.Bold else FontWeight.Normal,
+                color = if (household == selectedHousehold) MaterialTheme.colorScheme.primary else Color.Unspecified
             )
         },
-        selected = selectedHousehold == householdName,
-        onClick = {
-            onHouseholdSelected(householdName)
-        },
+        selected = household == selectedHousehold,
+        onClick = { onHouseholdSelected(household) },
         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CustomTopAppBarPreview() {
-    TopNavigationBar()
 }

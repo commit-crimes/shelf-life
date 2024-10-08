@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.overview
 
+import HouseholdViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,11 +49,19 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
-fun OverviewScreen(navigationActions : NavigationActions, listFoodItemsViewModel: ListFoodItemsViewModel) {
-    val foodItems by listFoodItemsViewModel.foodItems.collectAsState()
+fun OverviewScreen(navigationActions : NavigationActions,
+                   listFoodItemsViewModel: ListFoodItemsViewModel,
+                   householdViewModel: HouseholdViewModel) {
+    val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
+    val foodItems = selectedHousehold?.foodItems ?: emptyList()
+
     Scaffold(
         modifier = Modifier.testTag("overviewScreen"),
-        topBar = { TopNavigationBar() },
+        topBar = { TopNavigationBar(
+            userHouseholds = householdViewModel.households.collectAsState().value,
+            onHouseholdChange = { household -> householdViewModel.selectHousehold(household) },
+            houseHold = selectedHousehold!!
+        ) },
         bottomBar = {
             BottomNavigationMenu(
                 onTabSelect = { destination -> navigationActions.navigateTo(destination) },
@@ -180,5 +189,6 @@ fun OverviewScreenPreview() {
     val firebaseFirestore = FirebaseFirestore.getInstance()
     val foodItemRepositry = FoodItemRepositoryFirestore(firebaseFirestore)
     val listFoodItemViewModel = ListFoodItemsViewModel(foodItemRepositry)
-    OverviewScreen(navigationActions, listFoodItemViewModel)
+    val householdViewModel = HouseholdViewModel()
+    OverviewScreen(navigationActions, listFoodItemViewModel, householdViewModel)
 }

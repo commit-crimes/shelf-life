@@ -1,5 +1,6 @@
 package com.android.shelfLife
 
+import HouseholdViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -47,7 +48,7 @@ fun ShelfLifeApp() {
       composable(Screen.AUTH) { SignInScreen(navigationActions) }
     }
     navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
-      composable(Screen.OVERVIEW) { OverviewScreen(navigationActions, listFoodItemViewModel) }
+      composable(Screen.OVERVIEW) { OverviewScreen(navigationActions, listFoodItemViewModel, HouseholdViewModel()) }
     }
 
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
