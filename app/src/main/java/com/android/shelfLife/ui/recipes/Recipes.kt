@@ -1,6 +1,7 @@
 package com.android.shelfLife.ui.recipes
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
 import com.android.shelfLife.model.recipe.recipe
@@ -45,9 +47,11 @@ import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
 import com.google.firebase.Timestamp
 import androidx.compose.ui.Alignment.Companion.CenterVertically as CenterVertically1
+import androidx.compose.ui.window.Popup as Popup1
 
 
 @Composable
@@ -119,7 +123,7 @@ fun RecipesScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(filteredRecipes) { recipe ->
-                        RecipeItem(recipe)
+                        RecipeItem(recipe, navigationActions)
                     }
                 }
             }
@@ -175,11 +179,13 @@ fun RecipesScreenOverview() {
 }
 
 @Composable
-fun RecipeItem(recipe: recipe) {
+fun RecipeItem(recipe: recipe, navigationActions: NavigationActions) {
+    var clickOnRecipe by remember { mutableStateOf(false) }
 
     Card(modifier = Modifier
         .fillMaxWidth() // Fill the available width
-        .padding(8.dp), // Add padding around the card
+        .padding(8.dp) // Add padding around the card
+        .clickable(onClick = {clickOnRecipe = true})
     ){
         Row(modifier = Modifier
             .fillMaxWidth()
@@ -219,6 +225,10 @@ fun RecipeItem(recipe: recipe) {
                 contentScale = ContentScale.Fit // Fit the image to fit the size
                 )
         }
+    }
+
+    if(clickOnRecipe){
+        navigationActions.navigateTo(Screen.INDIVIDUAL_RECIPE)
     }
 
 }
