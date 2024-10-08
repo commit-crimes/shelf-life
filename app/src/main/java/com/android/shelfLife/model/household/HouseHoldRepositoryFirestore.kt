@@ -21,7 +21,7 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
         val currentUser = auth.currentUser
         if (currentUser != null) {
             db.collection(collectionPath)
-                .whereArrayContains("members", currentUser.uid) // Assuming you filter by user ID
+                .whereArrayContains("members", currentUser.uid)
                 .get()
                 .addOnSuccessListener { result ->
                     val householdList = result.documents.mapNotNull { convertToHousehold(it) }
@@ -54,7 +54,7 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
             val householdData = mapOf(
                 "uid" to household.uid,
                 "name" to household.name,
-                "members" to household.members,
+                "members" to household.members.plus(currentUser.uid),
                 "foodItems" to household.foodItems.map { foodItem ->
                     foodItemRepository.convertFoodItemToMap(foodItem)
                 }
