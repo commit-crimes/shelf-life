@@ -2,7 +2,7 @@ package com.android.shelfLife.model.foodFacts
 
 // Sealed class to represent different types of search inputs
 sealed class FoodSearchInput {
-    data class Barcode(val barcode: Int) : FoodSearchInput()
+    data class Barcode(val barcode: Long) : FoodSearchInput()
     data class Query(val searchQuery: String) : FoodSearchInput()
 }
 

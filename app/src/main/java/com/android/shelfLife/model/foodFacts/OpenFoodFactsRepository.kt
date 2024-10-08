@@ -8,10 +8,9 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 
-class OpenFoodFactsRepository(private val client: OkHttpClient) : FoodFactsRepository {
+class OpenFoodFactsRepository(private val client: OkHttpClient, private val baseUrl: String = "https://world.openfoodfacts.net") : FoodFactsRepository {
 
-    private val BASE_URL = "https://world.openfoodfacts.net"
-    private val MAX_RESULTS = 10  // Adjust the number of results as needed
+    private val MAX_RESULTS = 7  // Adjust the number of results as needed
 
     override fun searchFoodFacts(
         searchInput: FoodSearchInput,
@@ -19,8 +18,8 @@ class OpenFoodFactsRepository(private val client: OkHttpClient) : FoodFactsRepos
         onFailure: (Exception) -> Unit
     ) {
         val url = when (searchInput) {
-            is FoodSearchInput.Barcode -> "$BASE_URL/api/v0/product/${searchInput.barcode}.json"
-            is FoodSearchInput.Query -> "$BASE_URL/cgi/search.pl?search_terms=${searchInput.searchQuery}&page_size=$MAX_RESULTS&json=true"
+            is FoodSearchInput.Barcode -> "$baseUrl/api/v0/product/${searchInput.barcode}.json"
+            is FoodSearchInput.Query -> "$baseUrl/cgi/search.pl?search_terms=${searchInput.searchQuery}&page_size=$MAX_RESULTS&json=true"
         }
 
         val request = Request.Builder().url(url).build()
@@ -32,7 +31,7 @@ class OpenFoodFactsRepository(private val client: OkHttpClient) : FoodFactsRepos
 
             override fun onResponse(call: okhttp3.Call, response: Response) {
                 if (!response.isSuccessful) {
-                    onFailure(IOException("Unexpected code $response"))
+                    onFailure(IOException("Server error: HTTP ${response.code} - ${response.message}"))
                     return
                 }
 
