@@ -1,7 +1,7 @@
 package com.android.shelfLife.model.household
 
 import android.util.Log
-import com.android.shelfLife.model.foodItem.FoodItem
+import android.widget.Toast
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -81,7 +81,30 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        TODO("Not yet implemented")
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val householdData = mapOf(
+                "uid" to household.uid,
+                "name" to household.name,
+                "members" to household.members,
+                "foodItems" to household.foodItems.map { foodItem ->
+                    foodItemRepository.convertFoodItemToMap(foodItem)
+                }
+            )
+            db.collection(collectionPath)
+                .document(household.uid)
+                .update(householdData)
+                .addOnSuccessListener {
+                    onSuccess()
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("HouseholdRepository", "Error updating household", exception)
+                    onFailure(exception)
+                }
+        } else {
+            Log.e("HouseholdRepository", "User not logged in")
+            onFailure(Exception("User not logged in"))
+        }
     }
 
     override fun deleteHouseholdById(
@@ -89,7 +112,22 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        TODO("Not yet implemented")
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            db.collection(collectionPath)
+                .document(id)
+                .delete()
+                .addOnSuccessListener {
+                    onSuccess()
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("HouseholdRepository", "Error deleting household", exception)
+                    onFailure(exception)
+                }
+        } else {
+            Log.e("HouseholdRepository", "User not logged in")
+            onFailure(Exception("User not logged in"))
+        }
     }
 
     private fun convertToHousehold(doc: DocumentSnapshot): HouseHold? {

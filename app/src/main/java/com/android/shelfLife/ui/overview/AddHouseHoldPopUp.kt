@@ -1,7 +1,7 @@
 package com.android.shelfLife.ui.overview
 
-import HouseholdViewModel
 import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -9,10 +9,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.android.shelfLife.model.household.HouseholdViewModel
 
 @Composable
 fun AddHouseHoldPopUp(showDialog: Boolean, onDismiss: () -> Unit,
-                      householdViewModel: HouseholdViewModel) {
+                      householdViewModel: HouseholdViewModel
+) {
 
     var newHouseHoldName by remember { mutableStateOf("") }
 
@@ -31,7 +33,7 @@ fun AddHouseHoldPopUp(showDialog: Boolean, onDismiss: () -> Unit,
                 }
             },
             confirmButton = {
-                androidx.compose.material3.Button(
+                Button(
                     onClick = {
                         householdViewModel.addNewHousehold(newHouseHoldName)
                         onDismiss()
@@ -41,7 +43,7 @@ fun AddHouseHoldPopUp(showDialog: Boolean, onDismiss: () -> Unit,
                 }
             },
             dismissButton = {
-                androidx.compose.material3.Button(onClick = { onDismiss() }) {
+                Button(onClick = { onDismiss() }) {
                     Text("Cancel")
                 }
             }

@@ -1,14 +1,15 @@
 package com.android.shelfLife.ui.overview
 
-import HouseholdViewModel
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -27,11 +29,13 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,7 +58,9 @@ import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
+import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
+import com.android.shelfLife.ui.navigation.HouseHoldElement
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
@@ -64,34 +71,14 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-@Composable
-fun HouseHoldElement(
-    household: HouseHold,
-    selectedHousehold: HouseHold,
-    onHouseholdSelected: (HouseHold) -> Unit
-) {
-    NavigationDrawerItem(
-        label = {
-            Text(
-                text = household.name,
-                fontWeight = if (household == selectedHousehold) FontWeight.Bold else FontWeight.Normal,
-                color = if (household == selectedHousehold) MaterialTheme.colorScheme.primary else Color.Unspecified
-            )
-        },
-        selected = household == selectedHousehold,
-        onClick = { onHouseholdSelected(household) },
-        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-    )
-}
-
-
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun OverviewScreen(navigationActions : NavigationActions,
                    listFoodItemsViewModel: ListFoodItemsViewModel,
-                   householdViewModel: HouseholdViewModel) {
-
+                   householdViewModel: HouseholdViewModel
+) {
     val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }
     val foodItems = selectedHousehold?.foodItems ?: emptyList()
     val userHouseholds = householdViewModel.households.collectAsState().value
 
@@ -102,7 +89,7 @@ fun OverviewScreen(navigationActions : NavigationActions,
 
     AddHouseHoldPopUp(
         showDialog = showDialog,
-        onDismiss = { showDialog = false},
+        onDismiss = { showDialog = false },
         householdViewModel = householdViewModel,
     )
 
@@ -122,8 +109,10 @@ fun OverviewScreen(navigationActions : NavigationActions,
                         HouseHoldElement(
                             household = household,
                             selectedHousehold = it,
-                            onHouseholdSelected = {household ->
-                                if(household != selectedHousehold) {householdViewModel.selectHousehold(household) }
+                            onHouseholdSelected = { household ->
+                                if (household != selectedHousehold) {
+                                    householdViewModel.selectHousehold(household)
+                                }
                                 scope.launch { drawerState.close() }
                             }
                         )
@@ -147,148 +136,242 @@ fun OverviewScreen(navigationActions : NavigationActions,
                 }
             }
         },
-    ){
-        Scaffold(
-            modifier = Modifier.testTag("overviewScreen"),
-            topBar = { TopNavigationBar(
-                houseHold =  selectedHousehold ?: HouseHold(
-                    uid = "default",
-                    name = "No Household Selected",
-                    members = emptyList(),
-                    foodItems = emptyList()
-                ), // Safely handle the null case,
-                householdViewModel = householdViewModel,
-                onHamburgerClick = { scope.launch { drawerState.open() } }
-            ) },
-            bottomBar = {
-                BottomNavigationMenu(
-                    onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                    tabList = LIST_TOP_LEVEL_DESTINATION,
-                    selectedItem = Route.OVERVIEW
-                )
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
-                    content = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                    modifier = Modifier.testTag("AddFoodFab"),
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer
-                )
-            },
-            content = { paddingValues ->
-                Box(modifier = Modifier.padding(paddingValues)) {
-                    FoodSearchBar()
-                }
-                Box(modifier = Modifier.padding(paddingValues)) {
-                    ListFoodItems(foodItems, listFoodItemsViewModel, navigationActions)
-                }
-            }
-        )
-    }
-}
-
-@Composable
-fun ListFoodItems(foodItems : List <FoodItem>, listFoodItemsViewModel: ListFoodItemsViewModel, navigationActions : NavigationActions) {
-    if (foodItems.isEmpty()) {
-        // Display a prompt when there are no todos
-        Box(
-            modifier = Modifier.fillMaxSize().testTag("NoFoodItems"),
-            contentAlignment = androidx.compose.ui.Alignment.Center) {
-            Text(text = "No food available")
-        }
-    } else {
-        // Display the full list
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(foodItems) { item ->
-                // Call a composable that renders each individual to-do item
-                FoodItemCard(foodItem = item, listFoodItemsViewModel = listFoodItemsViewModel, navigationActions = navigationActions)
-            }
-        }
-    }
-}
-
-@Composable
-fun FoodItemCard(foodItem : FoodItem, listFoodItemsViewModel: ListFoodItemsViewModel, navigationActions : NavigationActions){
-    val expiryDate = foodItem.expiryDate
-    val formattedExpiryDate = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(expiryDate)
-    Column(
-        modifier =
-        Modifier.fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp)
-            .background(Color.White) // Add background color if needed
-            .padding(16.dp)) {
-        // First Row for Date and Status
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = foodItem.foodFacts.name,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = foodItem.foodFacts.quantity.toString() + "in stock"
-            )
-            // Display the due date on the left
-            Text(text = formattedExpiryDate, fontSize = 12.sp, color = Color.Black)
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            // Display the remaining days until expiry in the middle
-            Text(text = "Expires on $formattedExpiryDate", fontSize = 12.sp, color = Color.Black)
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun FoodSearchBar(
-    query : String = "Search food item",
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp), // Outer padding for spacing
-        contentAlignment = Alignment.Center  // Center the SearchBar within the Box
     ) {
-        SearchBar(
-            query = "",
-            onQueryChange = {},
-            placeholder = {
-                Text(query)
-            },
-            onSearch = {},
-            active = false,
-            onActiveChange = {},
-            leadingIcon = {},
-            trailingIcon = {
-                IconButton(onClick = {}) {
-                    Icon(
-                        Icons.Default.Search,
-                        contentDescription = "" // Add a valid content description
+        val filteredFoodItems = foodItems.filter {
+            it.foodFacts.name.contains(searchQuery, ignoreCase = true)
+        }
+
+        if (selectedHousehold == null) {
+            FirstTimeWelcomeScreen(householdViewModel)
+        } else {
+            Scaffold(
+                modifier = Modifier.testTag("overviewScreen"),
+                topBar = {
+
+                    selectedHousehold?.let {
+                        TopNavigationBar(
+                            userHouseholds = householdViewModel.households.collectAsState().value,
+                            onHouseholdChange = { household ->
+                                if (household != selectedHousehold) {
+                                    householdViewModel.selectHousehold(household)
+                                }
+                            },
+                            houseHold = it,
+                            householdViewModel = householdViewModel,
+                            onHamburgerClick = { scope.launch { drawerState.open() } }
+                        )
+                    }
+                },
+                bottomBar = {
+                    BottomNavigationMenu(
+                        onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                        tabList = LIST_TOP_LEVEL_DESTINATION,
+                        selectedItem = Route.OVERVIEW
+                    )
+                },
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
+                        content = { Icon(Icons.Default.Add, contentDescription = "Add") },
+                        modifier = Modifier.testTag("AddFoodFab"),
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                },
+                content = { paddingValues ->
+                    Column(modifier = Modifier.padding(paddingValues)) {
+                        FoodSearchBar(
+                            query = searchQuery,
+                            onQueryChange = {
+                                searchQuery = it
+                            } // Update the query state when the user types
+                        )
+                        ListFoodItems(filteredFoodItems, listFoodItemsViewModel, navigationActions)
+                    }
+                }
+            )
+        }
+    }
+}
+
+    @Composable
+    fun ListFoodItems(
+        foodItems: List<FoodItem>,
+        listFoodItemsViewModel: ListFoodItemsViewModel,
+        navigationActions: NavigationActions
+    ) {
+        if (foodItems.isEmpty()) {
+            // Display a prompt when there are no todos
+            Box(
+                modifier = Modifier.fillMaxSize().testTag("NoFoodItems"),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "No food available")
+            }
+        } else {
+            // Display the full list
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(foodItems) { item ->
+                    // Call a composable that renders each individual to-do item
+                    FoodItemCard(
+                        foodItem = item,
+                        listFoodItemsViewModel = listFoodItemsViewModel,
+                        navigationActions = navigationActions
                     )
                 }
-            },
-            modifier = Modifier
-                .widthIn(max = 600.dp) // Restrict max width to prevent over-stretching on large screens
-                .fillMaxWidth(0.9f)   // Make it responsive and occupy 90% of available width
-        ) { }
+            }
+        }
     }
-}
+
+    @Composable
+    fun FoodItemCard(
+        foodItem: FoodItem,
+        listFoodItemsViewModel: ListFoodItemsViewModel,
+        navigationActions: NavigationActions
+    ) {
+        val expiryDate = foodItem.expiryDate
+        val formattedExpiryDate =
+            SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(expiryDate)
+        Column(
+            modifier =
+            Modifier.fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 16.dp)
+                .background(Color.White) // Add background color if needed
+                .padding(16.dp)
+        ) {
+            // First Row for Date and Status
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = foodItem.foodFacts.name,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = foodItem.foodFacts.quantity.toString() + "in stock"
+                )
+                // Display the due date on the left
+                Text(text = formattedExpiryDate, fontSize = 12.sp, color = Color.Black)
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                // Display the remaining days until expiry in the middle
+                Text(
+                    text = "Expires on $formattedExpiryDate",
+                    fontSize = 12.sp,
+                    color = Color.Black
+                )
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun FoodSearchBar(
+        query: String,
+        onQueryChange: (String) -> Unit
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp), // Outer padding for spacing
+            contentAlignment = Alignment.Center  // Center the SearchBar within the Box
+        ) {
+            SearchBar(
+                query = query,
+                onQueryChange = onQueryChange,
+                placeholder = {
+                    Text("Search food item")
+                },
+                onSearch = { /* Optional: Handle search action if needed */ },
+                active = false,
+                onActiveChange = {},
+                leadingIcon = {},
+                trailingIcon = {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = "Search Icon"
+                        )
+                    }
+                },
+                modifier = Modifier
+                    .widthIn(max = 600.dp) // Restrict max width to prevent over-stretching on large screens
+                    .fillMaxWidth(0.9f)   // Make it responsive and occupy 90% of available width
+            ) {}
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun FirstTimeWelcomeScreen(householdViewModel: HouseholdViewModel) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Welcome Text
+            Text(
+                text = "Welcome to ShelfLife!",
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Subtitle Text
+            Text(
+                text = "Get started by naming your Household",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(horizontal = 16.dp),
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // State for household name
+            var householdName by remember { mutableStateOf("") }
+
+            // Text Field for entering household name
+            OutlinedTextField(
+                value = householdName,
+                onValueChange = { newValue -> householdName = newValue },
+                label = { Text("Enter Household name") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
+                singleLine = true,
+                shape = MaterialTheme.shapes.medium,
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Create Household Button
+            Button(
+                onClick = { householdViewModel.addNewHousehold(householdName) },
+                enabled = householdName.isNotBlank(),
+                modifier = Modifier
+                    .fillMaxWidth(0.6f)
+                    .height(48.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text(
+                    text = "Create Household",
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
+        }
+    }
 
 
-@Preview
-@Composable
-fun OverviewScreenPreview() {
-    val navController = rememberNavController()
-    val navigationActions = NavigationActions(navController)
-    val firebaseFirestore = FirebaseFirestore.getInstance()
-    val foodItemRepositry = FoodItemRepositoryFirestore(firebaseFirestore)
-    val listFoodItemViewModel = ListFoodItemsViewModel(foodItemRepositry)
-    val householdViewModel = HouseholdViewModel(HouseholdRepositoryFirestore(firebaseFirestore), listFoodItemViewModel)
-    OverviewScreen(navigationActions, listFoodItemViewModel, householdViewModel)
-}
