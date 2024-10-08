@@ -12,6 +12,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
+import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
@@ -36,8 +37,9 @@ fun ShelfLifeApp() {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
   val firebaseFirestore = FirebaseFirestore.getInstance()
-  val foodItemRepositry = FoodItemRepositoryFirestore(firebaseFirestore)
-  val listFoodItemViewModel = ListFoodItemsViewModel(foodItemRepositry)
+  val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
+  val listFoodItemViewModel = ListFoodItemsViewModel(foodItemRepository)
+  val householdViewModel = HouseholdViewModel(HouseholdRepositoryFirestore(firebaseFirestore), listFoodItemViewModel)
 
   NavHost(navController = navController, startDestination = Route.AUTH) {
     // Authentication route
@@ -48,7 +50,7 @@ fun ShelfLifeApp() {
       composable(Screen.AUTH) { SignInScreen(navigationActions) }
     }
     navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
-      composable(Screen.OVERVIEW) { OverviewScreen(navigationActions, listFoodItemViewModel, HouseholdViewModel()) }
+      composable(Screen.OVERVIEW) { OverviewScreen(navigationActions, listFoodItemViewModel, householdViewModel) }
     }
 
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {

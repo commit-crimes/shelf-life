@@ -7,13 +7,17 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
-class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) {
+class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHoldRepository{
 
     private val collectionPath = "households"
     private val auth = FirebaseAuth.getInstance()
     private val foodItemRepository = FoodItemRepositoryFirestore(db)
 
-    fun getHouseholds(onSuccess: (List<HouseHold>) -> Unit, onFailure: (Exception) -> Unit) {
+    override fun getNewUid(): String {
+        return db.collection(collectionPath).document().id
+    }
+
+    override fun getHouseholds(onSuccess: (List<HouseHold>) -> Unit, onFailure: (Exception) -> Unit) {
         val currentUser = auth.currentUser
         if (currentUser != null) {
             db.collection(collectionPath)
@@ -31,6 +35,54 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) {
             Log.e("HouseholdRepository", "User not logged in")
             onFailure(Exception("User not logged in"))
         }
+    }
+
+
+    override fun addHousehold(
+        household: HouseHold,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val householdData = mapOf(
+                "uid" to household.uid,
+                "name" to household.name,
+                "members" to household.members,
+                "foodItems" to household.foodItems.map { foodItem ->
+                    foodItemRepository.convertFoodItemToMap(foodItem)
+                }
+            )
+            db.collection(collectionPath)
+                .document(household.uid)
+                .set(householdData)
+                .addOnSuccessListener {
+                    onSuccess()
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("HouseholdRepository", "Error adding household", exception)
+                    onFailure(exception)
+                }
+        } else {
+            Log.e("HouseholdRepository", "User not logged in")
+            onFailure(Exception("User not logged in"))
+        }
+    }
+
+    override fun updateHousehold(
+        household: HouseHold,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteHouseholdById(
+        id: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        TODO("Not yet implemented")
     }
 
     private fun convertToHousehold(doc: DocumentSnapshot): HouseHold? {

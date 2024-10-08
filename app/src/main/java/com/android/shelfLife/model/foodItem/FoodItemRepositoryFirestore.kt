@@ -200,4 +200,30 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
             null
         }
     }
+
+    fun convertFoodItemToMap(foodItem: FoodItem): Map<String, Any?> {
+        return mapOf(
+            "uid" to foodItem.uid,
+            "name" to foodItem.foodFacts.name,
+            "barcode" to foodItem.foodFacts.barcode,
+            "quantity" to mapOf(
+                "amount" to foodItem.foodFacts.quantity.amount,
+                "unit" to foodItem.foodFacts.quantity.unit.name
+            ),
+            "expiryDate" to foodItem.expiryDate,
+            "buyDate" to foodItem.buyDate,
+            "status" to foodItem.status.name,
+            "location" to foodItem.location.name,
+            "nutritionFacts" to mapOf(
+                "energyKcal" to foodItem.foodFacts.nutritionFacts.energyKcal,
+                "fat" to foodItem.foodFacts.nutritionFacts.fat,
+                "saturatedFat" to foodItem.foodFacts.nutritionFacts.saturatedFat,
+                "carbohydrates" to foodItem.foodFacts.nutritionFacts.carbohydrates,
+                "sugars" to foodItem.foodFacts.nutritionFacts.sugars,
+                "proteins" to foodItem.foodFacts.nutritionFacts.proteins,
+                "salt" to foodItem.foodFacts.nutritionFacts.salt
+            ),
+            "category" to foodItem.foodFacts.category.name
+        )
+    }
 }

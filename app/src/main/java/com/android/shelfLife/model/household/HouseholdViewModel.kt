@@ -9,9 +9,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import android.util.Log
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
+import com.android.shelfLife.model.household.HouseHoldRepository
 
 class HouseholdViewModel(
-    private val repository: HouseholdRepositoryFirestore,
+    private val repository: HouseHoldRepository,
     private val listFoodItemsViewModel: ListFoodItemsViewModel
 ) : ViewModel() {
     private val _households = MutableStateFlow<List<HouseHold>>(emptyList())
@@ -41,6 +42,27 @@ class HouseholdViewModel(
         household?.let {
             listFoodItemsViewModel.setFoodItems(it.foodItems)
         }
+    }
+
+    /**
+     * Adds a new household to the repository and updates the household list.
+     *
+     * @param householdName - The name of the household to be added.
+     */
+    fun addNewHousehold(householdName: String) {
+        val household = HouseHold(repository.getNewUid(), householdName, emptyList(), emptyList())
+        repository.addHousehold(
+            household,
+            onSuccess = {
+                // Refresh the household list after successful addition
+                loadHouseholds()
+                Log.d("HouseholdViewModel", "Household added successfully")
+            },
+            onFailure = { exception ->
+                Log.e("HouseholdViewModel", "Error adding household: $exception")
+            }
+        )
+        loadHouseholds()
     }
 
     // Factory for creating HouseholdViewModel instances

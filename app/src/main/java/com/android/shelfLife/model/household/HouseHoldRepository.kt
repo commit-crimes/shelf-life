@@ -1,6 +1,10 @@
 package com.android.shelfLife.model.household
 
 interface HouseHoldRepository {
+
+    /** Generates a new unique ID for a household. */
+    fun getNewUid(): String
+
     /**
      * Fetches all households from the repository associated with the current user.
      *
