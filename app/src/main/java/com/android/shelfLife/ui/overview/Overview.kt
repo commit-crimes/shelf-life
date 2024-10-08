@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,15 +18,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,7 +50,6 @@ import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
-import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -53,7 +58,6 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.newSingleThreadContext
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -64,43 +68,51 @@ fun OverviewScreen(navigationActions : NavigationActions,
                    householdViewModel: HouseholdViewModel) {
     val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
     val foodItems = selectedHousehold?.foodItems ?: emptyList()
-    Scaffold(
-        modifier = Modifier.testTag("overviewScreen"),
-        topBar = { TopNavigationBar(
-            userHouseholds = householdViewModel.households.collectAsState().value,
-            onHouseholdChange = { household -> householdViewModel.selectHousehold(household) },
-            houseHold =  selectedHousehold ?: HouseHold(
-                uid = "default",
-                name = "No Household Selected",
-                members = emptyList(),
-                foodItems = emptyList()
-            ), // Safely handle the null case,
-            householdViewModel = householdViewModel
-        ) },
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.OVERVIEW
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
-                content = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                modifier = Modifier.testTag("AddFoodFab"),
-                containerColor = MaterialTheme.colorScheme.secondaryContainer
-            )
-        },
-        content = { paddingValues ->
-            Box(modifier = Modifier.padding(paddingValues)) {
-                FoodSearchBar()
+    if (selectedHousehold == null) {
+        FirstTimeWelcomeScreen(householdViewModel)
+    } else {
+        Scaffold(
+            modifier = Modifier.testTag("overviewScreen"),
+            topBar = {
+
+                selectedHousehold?.let {
+                    TopNavigationBar(
+                        userHouseholds = householdViewModel.households.collectAsState().value,
+                        onHouseholdChange = { household ->
+                            if (household != selectedHousehold) {
+                                householdViewModel.selectHousehold(household)
+                            }
+                        },
+                        houseHold = it,
+                        householdViewModel = householdViewModel
+                    )
+                }
+            },
+            bottomBar = {
+                BottomNavigationMenu(
+                    onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                    tabList = LIST_TOP_LEVEL_DESTINATION,
+                    selectedItem = Route.OVERVIEW
+                )
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
+                    content = { Icon(Icons.Default.Add, contentDescription = "Add") },
+                    modifier = Modifier.testTag("AddFoodFab"),
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                )
+            },
+            content = { paddingValues ->
+                Box(modifier = Modifier.padding(paddingValues)) {
+                    FoodSearchBar()
+                }
+                Box(modifier = Modifier.padding(paddingValues)) {
+                    ListFoodItems(foodItems, listFoodItemsViewModel, navigationActions)
+                }
             }
-            Box(modifier = Modifier.padding(paddingValues)) {
-                ListFoodItems(foodItems, listFoodItemsViewModel, navigationActions)
-            }
-        }
-    )
+        )
+    }
 }
 
 @Composable
@@ -129,10 +141,10 @@ fun FoodItemCard(foodItem : FoodItem, listFoodItemsViewModel: ListFoodItemsViewM
     val formattedExpiryDate = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(expiryDate)
     Column(
         modifier =
-        Modifier.fillMaxWidth()
-            .padding(vertical = 8.dp, horizontal = 16.dp)
-            .background(Color.White) // Add background color if needed
-            .padding(16.dp)) {
+            Modifier.fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 16.dp)
+                .background(Color.White) // Add background color if needed
+                .padding(16.dp)) {
         // First Row for Date and Status
         Row(
             modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
@@ -196,6 +208,73 @@ fun FoodSearchBar(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FirstTimeWelcomeScreen(householdViewModel: HouseholdViewModel) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Welcome Text
+        Text(
+            text = "Welcome to ShelfLife!",
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.primary,
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Subtitle Text
+        Text(
+            text = "Get started by naming your Household",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(horizontal = 16.dp),
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // State for household name
+        var householdName by remember { mutableStateOf("") }
+
+        // Text Field for entering household name
+        OutlinedTextField(
+            value = householdName,
+            onValueChange = { newValue -> householdName = newValue },
+            label = { Text("Enter Household name") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp),
+            singleLine = true,
+            shape = MaterialTheme.shapes.medium,
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Create Household Button
+        Button(
+            onClick = { householdViewModel.addNewHousehold(householdName) },
+            enabled = householdName.isNotBlank(),
+            modifier = Modifier
+                .fillMaxWidth(0.6f)
+                .height(48.dp),
+            shape = MaterialTheme.shapes.medium
+        ) {
+            Text(
+                text = "Create Household",
+                style = MaterialTheme.typography.labelLarge
+            )
+        }
+    }
+}
 
 @Preview
 @Composable

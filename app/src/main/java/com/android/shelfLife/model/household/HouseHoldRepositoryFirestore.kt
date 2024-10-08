@@ -99,7 +99,7 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
             val members = doc.get("members") as? List<String> ?: emptyList()
             val foodItems = doc.get("foodItems") as? List<Map<String, Any>>
 
-            // Convert the list of food items from Firestore into a list of FoodItem objects
+            // Convert the list of food items from firestore into a list of FoodItem objects
             val foodItemList = foodItems?.mapNotNull { foodItemMap ->
                 foodItemRepository.convertToFoodItemFromMap(foodItemMap)
             } ?: emptyList()
