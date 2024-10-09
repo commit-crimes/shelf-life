@@ -25,18 +25,14 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito
-import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.timeout
 import org.mockito.kotlin.verify
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows.shadowOf
-import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 class FoodItemRepositoryFirestoreTest {
@@ -49,22 +45,24 @@ class FoodItemRepositoryFirestoreTest {
 
   private lateinit var foodItemRepositoryFirestore: FoodItemRepositoryFirestore
 
-  private val foodFacts = FoodFacts(
-    name = "Almond Butter",
-    barcode = "123456789",
-    quantity = Quantity(1.0, FoodUnit.GRAM),
-    category = FoodCategory.OTHER,
-    nutritionFacts = NutritionFacts(),
-  )
+  private val foodFacts =
+      FoodFacts(
+          name = "Almond Butter",
+          barcode = "123456789",
+          quantity = Quantity(1.0, FoodUnit.GRAM),
+          category = FoodCategory.OTHER,
+          nutritionFacts = NutritionFacts(),
+      )
 
-  private val foodItem = FoodItem(
-    uid = "1",
-    foodFacts = foodFacts,
-    location = FoodLocation(0, FoodStorageLocation.PANTRY),
-    expiryDate = Timestamp.now(),
-    buyDate = Timestamp.now(),
-    status = FoodStatus.CLOSED,
-  )
+  private val foodItem =
+      FoodItem(
+          uid = "1",
+          foodFacts = foodFacts,
+          location = FoodLocation(0, FoodStorageLocation.PANTRY),
+          expiryDate = Timestamp.now(),
+          buyDate = Timestamp.now(),
+          status = FoodStatus.CLOSED,
+      )
 
   @Before
   fun setUp() {
@@ -112,7 +110,8 @@ class FoodItemRepositoryFirestoreTest {
   fun addFoodItem_shouldCallFirestoreCollection() {
     `when`(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null)) // Simulate success
 
-    // This test verifies that when we add a new FoodItem, the Firestore `collection()` method is called.
+    // This test verifies that when we add a new FoodItem, the Firestore `collection()` method is
+    // called.
     foodItemRepositoryFirestore.addFoodItem(foodItem, onSuccess = {}, onFailure = {})
 
     shadowOf(Looper.getMainLooper()).idle()
@@ -139,11 +138,10 @@ class FoodItemRepositoryFirestoreTest {
     assert(capturedFoodItem.location.storageLocation == FoodStorageLocation.PANTRY)
 
     // Check the timestamp values
-    assert(capturedFoodItem.expiryDate != null)  // Make sure expiry date is not null
-    assert(capturedFoodItem.buyDate != null)  // Make sure buy date is set
-    assert(capturedFoodItem.openDate == null)  // Verify open date is null by default
+    assert(capturedFoodItem.expiryDate != null) // Make sure expiry date is not null
+    assert(capturedFoodItem.buyDate != null) // Make sure buy date is set
+    assert(capturedFoodItem.openDate == null) // Verify open date is null by default
   }
-
 
   @Test
   fun deleteFoodItemById_shouldCallDocumentReferenceDelete() {
@@ -155,5 +153,4 @@ class FoodItemRepositoryFirestoreTest {
 
     verify(mockDocumentReference).delete()
   }
-
 }

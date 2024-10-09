@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
+import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
@@ -18,6 +19,7 @@ import com.android.shelfLife.ui.camera.PermissionDeniedScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.overview.AddFoodItemScreen
 import com.android.shelfLife.ui.theme.ShelfLifeTheme
 
 class MainActivity : ComponentActivity() {
@@ -34,6 +36,8 @@ fun ShelfLifeApp() {
   val navigationActions = NavigationActions(navController)
 
   val barcodeScannerViewModel: BarcodeScannerViewModel = viewModel()
+  val listFoodItemViewModel: ListFoodItemsViewModel =
+      viewModel(factory = ListFoodItemsViewModel.Factory)
 
   NavHost(navController = navController, startDestination = Route.AUTH) {
     // Authentication route
@@ -51,9 +55,8 @@ fun ShelfLifeApp() {
       composable(Screen.BARCODE_SCANNER) {
         BarcodeScannerScreen(navigationActions, barcodeScannerViewModel)
       }
-      composable(Screen.PERMISSION_DENIED) {
-        PermissionDeniedScreen()
-      }
+      composable(Screen.PERMISSION_DENIED) { PermissionDeniedScreen() }
+      composable(Screen.ADD_FOOD) { AddFoodItemScreen(navigationActions, listFoodItemViewModel) }
     }
   }
 }

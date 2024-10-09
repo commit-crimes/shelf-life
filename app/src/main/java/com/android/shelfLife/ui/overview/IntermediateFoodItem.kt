@@ -30,62 +30,45 @@ import com.android.shelfLife.R
 @Preview
 @Composable
 fun IntermediateScanScreen() {
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
+  Column(
+      modifier = Modifier.fillMaxSize().padding(16.dp),
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Center) {
 
         // Scan Barcode Text
         Text(
             text = "Scan Barcode",
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
+            modifier = Modifier.padding(bottom = 24.dp))
 
         // Barcode Image
         Image(
             painter = painterResource(id = R.drawable.scan_logo),
             contentDescription = "scan logo",
             contentScale = ContentScale.Fit,
-            modifier = Modifier
-                .size(250.dp)
-                .padding(bottom = 24.dp)
-        )
+            modifier = Modifier.size(250.dp).padding(bottom = 24.dp))
 
         // Scan Button
         Button(
-            onClick = {
-                Toast.makeText(context, "Scan Button Clicked", Toast.LENGTH_SHORT).show()
-            },
+            onClick = { Toast.makeText(context, "Scan Button Clicked", Toast.LENGTH_SHORT).show() },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)), // Green color
             shape = RoundedCornerShape(8.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-                .padding(horizontal = 32.dp)
-        ) {
-            Text(text = "Scan", color = Color.White, fontSize = 16.sp)
-        }
+            modifier = Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 32.dp)) {
+              Text(text = "Scan", color = Color.White, fontSize = 16.sp)
+            }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
-                Toast.makeText(context, "Manual Entry Clicked", Toast.LENGTH_SHORT).show()
+              Toast.makeText(context, "Manual Entry Clicked", Toast.LENGTH_SHORT).show()
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
             shape = RoundedCornerShape(8.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-                .padding(horizontal = 32.dp)
-        ) {
-            Text(text = "Or manually enter", color = Color.White, fontSize = 16.sp)
-        }
-    }
+            modifier = Modifier.fillMaxWidth().height(48.dp).padding(horizontal = 32.dp)) {
+              Text(text = "Or manually enter", color = Color.White, fontSize = 16.sp)
+            }
+      }
 }
