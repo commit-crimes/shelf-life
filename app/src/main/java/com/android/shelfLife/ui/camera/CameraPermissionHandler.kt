@@ -18,8 +18,8 @@ import com.android.shelfLife.ui.navigation.Screen
 
 @Composable
 fun CameraPermissionHandler(
-  navigationActions: NavigationActions,
-  viewModel: BarcodeScannerViewModel = viewModel()
+    navigationActions: NavigationActions,
+    viewModel: BarcodeScannerViewModel = viewModel()
 ) {
   val context = LocalContext.current
   val activity = context as Activity
@@ -27,11 +27,11 @@ fun CameraPermissionHandler(
   val permissionGranted = viewModel.permissionGranted
 
   // For triggering permission requests
-  val launcher = rememberLauncherForActivityResult(
-    ActivityResultContracts.RequestPermission()
-  ) { isGranted: Boolean ->
-    viewModel.onPermissionResult(isGranted) // Update permission result in ViewModel
-  }
+  val launcher =
+      rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+          isGranted: Boolean ->
+        viewModel.onPermissionResult(isGranted) // Update permission result in ViewModel
+      }
 
   // Observe lifecycle to detect when the app resumes
   val lifecycleOwner = LocalLifecycleOwner.current
@@ -45,19 +45,15 @@ fun CameraPermissionHandler(
 
     lifecycleOwner.lifecycle.addObserver(observer)
 
-    onDispose {
-      lifecycleOwner.lifecycle.removeObserver(observer)
-    }
+    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
   }
 
   // Check if we should show a rationale for the permission
   var shouldShowRationale by remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
-    shouldShowRationale = ActivityCompat.shouldShowRequestPermissionRationale(
-      activity,
-      Manifest.permission.CAMERA
-    )
+    shouldShowRationale =
+        ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.CAMERA)
   }
 
   // Core logic for handling permission states
@@ -66,10 +62,8 @@ fun CameraPermissionHandler(
       // If permission is granted, navigate to the camera screen
       navigationActions.navigateTo(Screen.BARCODE_SCANNER)
     } else {
-      val currentPermissionStatus = ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.CAMERA
-      )
+      val currentPermissionStatus =
+          ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
 
       when {
         // "Don't allow" state (no pop-up, just show PermissionDeniedScreen)

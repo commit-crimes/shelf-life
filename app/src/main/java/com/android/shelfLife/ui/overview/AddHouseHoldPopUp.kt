@@ -12,41 +12,36 @@ import androidx.compose.runtime.setValue
 import com.android.shelfLife.model.household.HouseholdViewModel
 
 @Composable
-fun AddHouseHoldPopUp(showDialog: Boolean, onDismiss: () -> Unit,
-                      householdViewModel: HouseholdViewModel
+fun AddHouseHoldPopUp(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    householdViewModel: HouseholdViewModel
 ) {
 
-    var newHouseHoldName by remember { mutableStateOf("") }
+  var newHouseHoldName by remember { mutableStateOf("") }
 
-    if (showDialog) {
-        androidx.compose.material3.AlertDialog(
-            onDismissRequest = { onDismiss()},
-            title = { Text("Add New Household") },
-            text = {
-                Column {
-                    Text(text = "Enter the name of the new household:")
-                    TextField(
-                        value = newHouseHoldName,
-                        onValueChange = { newHouseHoldName = it },
-                        placeholder = { Text("Household Name") }
-                    )
-                }
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        householdViewModel.addNewHousehold(newHouseHoldName)
-                        onDismiss()
-                    }
-                ) {
-                    Text("Add")
-                }
-            },
-            dismissButton = {
-                Button(onClick = { onDismiss() }) {
-                    Text("Cancel")
-                }
-            }
-        )
-    }
+  if (showDialog) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = { Text("Add New Household") },
+        text = {
+          Column {
+            Text(text = "Enter the name of the new household:")
+            TextField(
+                value = newHouseHoldName,
+                onValueChange = { newHouseHoldName = it },
+                placeholder = { Text("Household Name") })
+          }
+        },
+        confirmButton = {
+          Button(
+              onClick = {
+                householdViewModel.addNewHousehold(newHouseHoldName)
+                onDismiss()
+              }) {
+                Text("Add")
+              }
+        },
+        dismissButton = { Button(onClick = { onDismiss() }) { Text("Cancel") } })
+  }
 }
