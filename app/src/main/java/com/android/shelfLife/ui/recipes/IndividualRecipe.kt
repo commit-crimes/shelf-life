@@ -163,7 +163,9 @@ fun IndividualRecipeScreen(
                   },
                   houseHold = it,
                   householdViewModel = householdViewModel,
-                  onHamburgerClick = { scope.launch { drawerState.open() } })
+                  onHamburgerClick = { scope.launch { drawerState.open() } },
+                  filters = emptyList()
+              )
             }
           },
           bottomBar = {

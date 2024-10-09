@@ -5,18 +5,13 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,7 +22,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,6 +32,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.ui.utils.FilterBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +41,8 @@ fun TopNavigationBar(
     onHouseholdChange: (HouseHold) -> Unit,
     onHamburgerClick: () -> Unit = {},
     userHouseholds: List<HouseHold>,
-    householdViewModel: HouseholdViewModel
+    householdViewModel: HouseholdViewModel,
+    filters : List<String>
 ) {
   var showFilterBar by remember { mutableStateOf(false) }
   Column {
@@ -69,73 +65,29 @@ fun TopNavigationBar(
           }
         },
         actions = {
-          IconButton(onClick = { showFilterBar = !showFilterBar }) { // Toggle filter bar visibility
-            Icon(
-                imageVector = Icons.Default.FilterList,
-                contentDescription = "Filter Icon",
-                tint = Color.White)
-          }
+            if(filters.isNotEmpty()){
+                IconButton(onClick = { showFilterBar = !showFilterBar }) { // Toggle filter bar visibility
+                    Icon(
+                        imageVector = Icons.Default.FilterList,
+                        contentDescription = "Filter Icon",
+                        tint = Color.White)
+                }
+            }
         },
         colors =
             TopAppBarDefaults.mediumTopAppBarColors(
                 containerColor = MaterialTheme.colorScheme.secondary,
                 titleContentColor = Color.White))
 
-    AnimatedVisibility(
-        visible = showFilterBar,
-        enter = fadeIn() + expandVertically(),
-        exit = fadeOut() + shrinkVertically()) {
-          FilterBar()
-        }
-  }
-}
-
-@Composable
-fun FilterBar() {
-  // State to track the selection of each filter chip
-  val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
-  val selectedFilters = remember { mutableStateListOf<String>() }
-  val scrollState = rememberScrollState()
-
-  Row(
-      modifier =
-          Modifier.horizontalScroll(scrollState) // Enables horizontal scrolling
-              .padding(horizontal = 8.dp, vertical = 4.dp)) {
-        filters.forEach { filter ->
-          val isSelected = selectedFilters.contains(filter)
-          FilterChipItem(
-              text = filter,
-              isSelected = isSelected,
-              onClick = {
-                if (isSelected) {
-                  selectedFilters.remove(filter)
-                } else {
-                  selectedFilters.add(filter)
-                }
-              })
-        }
+      if(filters.isNotEmpty()){
+          AnimatedVisibility(
+              visible = showFilterBar,
+              enter = fadeIn() + expandVertically(),
+              exit = fadeOut() + shrinkVertically()) {
+              FilterBar(filters)
+          }
       }
-}
-
-@Composable
-fun FilterChipItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
-  FilterChip(
-      selected = isSelected,
-      onClick = onClick,
-      label = { Text(text = text) },
-      leadingIcon =
-          if (isSelected) {
-            { Icon(imageVector = Icons.Default.Check, contentDescription = "Selected") }
-          } else null,
-      colors =
-          FilterChipDefaults.filterChipColors(
-              selectedContainerColor = MaterialTheme.colorScheme.secondary,
-              selectedLabelColor = Color.White,
-              selectedLeadingIconColor = Color.White,
-              containerColor = Color.White,
-              labelColor = Color.Black),
-      modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp) // Add padding between chips
-      )
+  }
 }
 
 @Composable

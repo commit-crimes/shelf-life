@@ -89,6 +89,9 @@ fun RecipesScreen(
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
 
+    val filters = listOf("No missing ingredients", "Vegan", "Vegetarian", "Easy", "Spicy",
+        "Dessert", "Appetizer", "Snack", "Breakfast")
+
   AddHouseHoldPopUp(
       showDialog = showDialog,
       onDismiss = { showDialog = false },
@@ -171,7 +174,8 @@ fun RecipesScreen(
                   },
                   houseHold = it,
                   householdViewModel = householdViewModel,
-                  onHamburgerClick = { scope.launch { drawerState.open() } })
+                  onHamburgerClick = { scope.launch { drawerState.open() } },
+                  filters = filters)
             }
           },
           bottomBar = {
