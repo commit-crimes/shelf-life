@@ -38,7 +38,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseholdViewModel
-import com.android.shelfLife.ui.navigation.FilterBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -119,24 +118,23 @@ fun HouseHoldElement(
 
 @Composable
 fun FilterChipItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
-    FilterChip(
-        selected = isSelected,
-        onClick = onClick,
-        label = { Text(text = text) },
-        leadingIcon =
-        if (isSelected) {
+  FilterChip(
+      selected = isSelected,
+      onClick = onClick,
+      label = { Text(text = text) },
+      leadingIcon =
+          if (isSelected) {
             { Icon(imageVector = Icons.Default.Check, contentDescription = "Selected") }
-        } else null,
-        colors =
-        FilterChipDefaults.filterChipColors(
-            selectedContainerColor = MaterialTheme.colorScheme.secondary,
-            selectedLabelColor = Color.White,
-            selectedLeadingIconColor = Color.White,
-            containerColor = Color.White,
-            labelColor = Color.Black
-        ),
-        modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp) // Add padding between chips
-    )
+          } else null,
+      colors =
+          FilterChipDefaults.filterChipColors(
+              selectedContainerColor = MaterialTheme.colorScheme.secondary,
+              selectedLabelColor = Color.White,
+              selectedLeadingIconColor = Color.White,
+              containerColor = Color.White,
+              labelColor = Color.Black),
+      modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp) // Add padding between chips
+      )
 }
 
 @Composable
@@ -145,23 +143,22 @@ fun FilterBar(filters: List<String>) {
   val selectedFilters = remember { mutableStateListOf<String>() }
   val scrollState = rememberScrollState()
 
-    Row(
-        modifier =
-        Modifier.horizontalScroll(scrollState) // Enables horizontal scrolling
-            .padding(horizontal = 8.dp, vertical = 4.dp)
-    ) {
+  Row(
+      modifier =
+          Modifier.horizontalScroll(scrollState) // Enables horizontal scrolling
+              .padding(horizontal = 8.dp, vertical = 4.dp)) {
         filters.forEach { filter ->
-            val isSelected = selectedFilters.contains(filter)
-            FilterChipItem(
-                text = filter,
-                isSelected = isSelected,
-                onClick = {
-                    if (isSelected) {
-                        selectedFilters.remove(filter)
-                    } else {
-                        selectedFilters.add(filter)
-                    }
-                })
+          val isSelected = selectedFilters.contains(filter)
+          FilterChipItem(
+              text = filter,
+              isSelected = isSelected,
+              onClick = {
+                if (isSelected) {
+                  selectedFilters.remove(filter)
+                } else {
+                  selectedFilters.add(filter)
+                }
+              })
         }
-    }
+      }
 }
