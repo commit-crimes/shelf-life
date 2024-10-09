@@ -70,22 +70,21 @@ fun BarcodeScannerScreen(
     }
   }
 
-    Scaffold(
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { selected -> navigationActions.navigateTo(selected) },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.SCANNER)
-        }
-    ) {
-        paddingValues ->
+  Scaffold(
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { selected -> navigationActions.navigateTo(selected) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = Route.SCANNER)
+      }) { paddingValues ->
         if (permissionGranted) {
-            // Display the camera preview
-            CameraPreviewView(modifier = Modifier.fillMaxSize().padding(paddingValues)) { previewView ->
-                startCamera(context, previewView)
-            }
+          // Display the camera preview
+          CameraPreviewView(modifier = Modifier.fillMaxSize().padding(paddingValues)) { previewView
+            ->
+            startCamera(context, previewView)
+          }
         }
-    }
+      }
 }
 
 @Composable
@@ -124,31 +123,30 @@ fun startCamera(context: Context, previewView: PreviewView) {
 @Composable
 fun PermissionDeniedScreen(navigationActions: NavigationActions) {
   val context = LocalContext.current
-    Scaffold(
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { selected -> navigationActions.navigateTo(selected) },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.SCANNER)
-        }
-    ) { paddingVals ->
+  Scaffold(
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { selected -> navigationActions.navigateTo(selected) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = Route.SCANNER)
+      }) { paddingVals ->
         Column(
             modifier = Modifier.fillMaxSize().padding(paddingVals),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "Camera permission is required to scan barcodes.")
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = {
+              Text(text = "Camera permission is required to scan barcodes.")
+              Spacer(modifier = Modifier.height(16.dp))
+              Button(
+                  onClick = {
                     // Open app settings
                     val intent =
                         Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                    data = Uri.fromParts("package", context.packageName, null)
+                          data = Uri.fromParts("package", context.packageName, null)
                         }
                     context.startActivity(intent)
-                }) {
-                Text(text = "Open Settings")
+                  }) {
+                    Text(text = "Open Settings")
+                  }
             }
-        }
-    }
+      }
 }

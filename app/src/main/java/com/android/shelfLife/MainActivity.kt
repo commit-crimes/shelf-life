@@ -14,7 +14,6 @@ import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
-import com.android.shelfLife.ui.camera.PermissionDeniedScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
