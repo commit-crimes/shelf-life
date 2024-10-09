@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -71,7 +72,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-@SuppressLint("StateFlowValueCalledInComposition")
+
 @Composable
 fun OverviewScreen(navigationActions : NavigationActions,
                    listFoodItemsViewModel: ListFoodItemsViewModel,
@@ -83,6 +84,7 @@ fun OverviewScreen(navigationActions : NavigationActions,
     val userHouseholds = householdViewModel.households.collectAsState().value
 
     var showDialog by remember { mutableStateOf(false) }
+    var showEdit by remember { mutableStateOf(false) }
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -91,6 +93,12 @@ fun OverviewScreen(navigationActions : NavigationActions,
         showDialog = showDialog,
         onDismiss = { showDialog = false },
         householdViewModel = householdViewModel,
+    )
+
+    EditHouseHoldPopUp(
+        showDialog = showEdit,
+        onDismiss = { showEdit = false},
+        householdViewModel = householdViewModel
     )
 
     ModalNavigationDrawer(
@@ -131,6 +139,14 @@ fun OverviewScreen(navigationActions : NavigationActions,
                             imageVector = Icons.Default.Add,
                             contentDescription = "Add Household Icon",
                             modifier = Modifier.testTag("addHouseholdIcon")
+                        )
+                    }
+
+                    IconButton(onClick = { showEdit = true }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Edit,
+                            contentDescription = "Edit Household Icon",
+                            modifier = Modifier.testTag("editHouseholdIcon")
                         )
                     }
                 }
@@ -202,7 +218,9 @@ fun OverviewScreen(navigationActions : NavigationActions,
         if (foodItems.isEmpty()) {
             // Display a prompt when there are no todos
             Box(
-                modifier = Modifier.fillMaxSize().testTag("NoFoodItems"),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .testTag("NoFoodItems"),
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = "No food available")
@@ -233,14 +251,17 @@ fun OverviewScreen(navigationActions : NavigationActions,
             SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(expiryDate)
         Column(
             modifier =
-            Modifier.fillMaxWidth()
+            Modifier
+                .fillMaxWidth()
                 .padding(vertical = 8.dp, horizontal = 16.dp)
                 .background(Color.White) // Add background color if needed
                 .padding(16.dp)
         ) {
             // First Row for Date and Status
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
@@ -256,7 +277,9 @@ fun OverviewScreen(navigationActions : NavigationActions,
                 Text(text = formattedExpiryDate, fontSize = 12.sp, color = Color.Black)
             }
             Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
                 horizontalArrangement = Arrangement.Center
             ) {
                 // Display the remaining days until expiry in the middle
@@ -373,5 +396,3 @@ fun OverviewScreen(navigationActions : NavigationActions,
             }
         }
     }
-
-

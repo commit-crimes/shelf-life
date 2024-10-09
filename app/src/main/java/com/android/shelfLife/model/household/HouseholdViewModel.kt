@@ -64,6 +64,34 @@ class HouseholdViewModel(
         loadHouseholds()
     }
 
+    fun updateHousehold(household: HouseHold) {
+        repository.updateHousehold(
+            household,
+            onSuccess = {
+                // Refresh the household list after successful update
+                loadHouseholds()
+                Log.d("HouseholdViewModel", "Household updated successfully")
+            },
+            onFailure = { exception ->
+                Log.e("HouseholdViewModel", "Error updating household: $exception")
+            }
+        )
+    }
+
+    fun deleteHouseholdById(householdId: String) {
+        repository.deleteHouseholdById(
+            householdId,
+            onSuccess = {
+                // Refresh the household list after successful deletion
+                loadHouseholds()
+                Log.d("HouseholdViewModel", "Household deleted successfully")
+            },
+            onFailure = { exception ->
+                Log.e("HouseholdViewModel", "Error deleting household: $exception")
+            }
+        )
+    }
+
     // Factory for creating HouseholdViewModel instances
     companion object {
         val Factory: ViewModelProvider.Factory =
