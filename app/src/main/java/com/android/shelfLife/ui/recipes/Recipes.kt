@@ -37,10 +37,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
@@ -51,7 +49,6 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
 import com.google.firebase.Timestamp
-import kotlinx.coroutines.flow.filter
 
 
 @Composable
@@ -110,97 +107,151 @@ fun RecipesScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+        /**
+         * A composable function that displays a search bar for filtering recipes.
+         *
+         * @param query The current search query as a string.
+         * @param onQueryChange A callback function that gets triggered whenever the query changes,
+         *                      updating the query state in the parent composable.
+         *
+         * This search bar provides a text input field where users can type to search for recipes.
+         * The UI layout consists of a box container that holds the search bar. It uses a `SearchBar`
+         * from the Material3 library, with options for managing its active state and search behavior.
+         *
+         * - The `query` parameter represents the current text in the search bar.
+         * - The `onQueryChange` function is invoked each time the user updates the search query,
+         *   allowing the parent composable to filter recipes based on user input.
+         * - The search bar displays a placeholder "Search recipes" when the query is empty.
+         * - The trailing icon (search icon) allows users to toggle the search bar's active state.
+         */
 fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
-    var isActive by remember { mutableStateOf(false) }
+    var isActive by remember { mutableStateOf(false) }  // State to manage whether the search bar is active
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp) // Set a fixed height for the search bar
-    ){
+            .height(100.dp) // Set a fixed height for the search bar container
+    ) {
         SearchBar(
-            query = query, // The current query string
-            onQueryChange = { newQuery -> onQueryChange(newQuery) }, // Use the passed function to update the query
+            query = query, // The current query string displayed in the search bar
+            onQueryChange = { newQuery -> onQueryChange(newQuery) }, // Updates the query when the user types
             placeholder = {
-                Text("Search recipes")
+                Text("Search recipes") // Placeholder text shown when the query is empty
             },
-            onSearch = {},
-            active = isActive,
-            onActiveChange = { active -> isActive = active },
+            onSearch = {
+                // Logic to handle the search action can be added here if necessary
+            },
+            active = isActive,  // Determines whether the search bar is in an active state
+            onActiveChange = { active -> isActive = active },  // Callback to update the active state
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp),
+                .padding(horizontal = 8.dp),  // Padding around the search bar
             trailingIcon = {
-                IconButton(onClick = { isActive = false }) {
+                IconButton(onClick = { isActive = false }) { // Button to deactivate the search bar
                     Icon(
                         Icons.Default.Search,
-                        contentDescription = "icon for recipes search bar"
+                        contentDescription = "icon for recipes search bar" // Accessibility description for the search icon
                     )
                 }
             }
         ) {}
     }
-} // todo ask Paul where does the filter management comes into to play, the screen or the top bar
+}
+ // todo ask Paul where does the filter management comes into to play, the screen or the top bar
 
 @Composable
-fun RecipeItem(recipe: Recipe, navigationActions: NavigationActions, listRecipesViewModel: ListRecipesViewModel) {
-    var clickOnRecipe by remember { mutableStateOf(false) }
+        /**
+         * Displays a recipe item as a card that the user can click to navigate to the recipe's details.
+         *
+         * @param recipe The recipe object that contains the recipe data (name, servings, time, etc.).
+         * @param navigationActions A navigation controller to handle navigation events (e.g., navigating to the individual recipe screen).
+         * @param listRecipesViewModel The ViewModel that manages the state and logic for the recipe list.
+         */
+fun RecipeItem(recipe: Recipe, navigationActions: NavigationActions,
+               listRecipesViewModel: ListRecipesViewModel) {
+    var clickOnRecipe by remember { mutableStateOf(false) }  // State to track if the recipe is clicked
 
-    Card(modifier = Modifier
-        .fillMaxWidth() // Fill the available width
-        .padding(8.dp) // Add padding around the card
-        .clickable(onClick = {clickOnRecipe = true})
-    ){
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(18.dp), // Padding inside the card
-        ){
+    // The card that visually represents the recipe item
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()  // Make the card fill the available width
+            .padding(8.dp)  // Add padding around the card
+            .clickable(onClick = { clickOnRecipe = true })  // Handle clicks on the card
+    ) {
+        // Layout for the content inside the card
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()  // Fill the width inside the card
+                .padding(18.dp)  // Add padding inside the card for layout spacing
+        ) {
+            // Column for recipe details: name, servings, and time
             Column(
                 modifier = Modifier
-                    .width(275.dp)
-                    .size(80.dp)
-                    .padding(vertical = 14.dp)
-                    .padding(horizontal = 18.dp)
+                    .width(275.dp)  // Set the width of the column
+                    .size(80.dp)  // Set the size of the column
+                    .padding(vertical = 14.dp)  // Add vertical padding inside the column
+                    .padding(horizontal = 18.dp)  // Add horizontal padding inside the column
             ) {
-                Text(text = recipe.name,
+                // Display the recipe name with a specific font size, weight, and overflow handling
+                Text(
+                    text = recipe.name,
                     fontSize = 24.sp,
                     lineHeight = 24.sp,
                     fontWeight = FontWeight(500),
-                    overflow = TextOverflow.Ellipsis)
+                    overflow = TextOverflow.Ellipsis  // If the text is too long, show ellipsis (...)
+                )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(4.dp))  // Add a small vertical space between elements
 
-                Row(modifier = Modifier.fillMaxWidth().fillMaxHeight()){
-                    Text("Servings : ${recipe.servings}",
-                        overflow = TextOverflow.Ellipsis)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Time : ${getTotalMinutes(recipe.time)} min",
-                        overflow = TextOverflow.Ellipsis)
+                // Row for servings and time information
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()  // Fill the available width for the row
+                        .fillMaxHeight()  // Fill the available height for the row
+                ) {
+                    // Display the servings information
+                    Text(
+                        "Servings : ${recipe.servings}",
+                        overflow = TextOverflow.Ellipsis  // Show ellipsis if the text overflows
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))  // Add a horizontal space between servings and time
+
+                    // Display the total cooking time
+                    Text(
+                        "Time : ${getTotalMinutes(recipe.time)} min",
+                        overflow = TextOverflow.Ellipsis  // Show ellipsis if the text overflows
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(16.dp))  // Add space between the text and the image
 
-            Image(painter = painterResource(R.drawable.google_logo),
-                contentDescription = "Recipe Image",
+            // Display an image for the recipe (using a placeholder image)
+            Image(
+                painter = painterResource(R.drawable.google_logo),  // Placeholder image resource
+                contentDescription = "Recipe Image",  // Content description for accessibility
                 modifier = Modifier
-                    .size(80.dp) // Fixed size for the image
-                    .clip(RoundedCornerShape(4.dp)),// Optional: clip the image to rounded corners
-                contentScale = ContentScale.Fit // Fit the image to fit the size
-                )
+                    .size(80.dp)  // Set the size for the image
+                    .clip(RoundedCornerShape(4.dp)),  // Optionally clip the image with rounded corners
+                contentScale = ContentScale.Fit  // Fit the image to the available space
+            )
         }
     }
 
-
-
-    if(clickOnRecipe){
-        clickOnRecipe = false // If I don't return the value to false, it would navigate twice to the IndividualRecipeScreen
-        listRecipesViewModel.selectRecipe(recipe)
-        navigationActions.navigateTo(Screen.INDIVIDUAL_RECIPE)
+    // Handle navigation to the individual recipe screen when the card is clicked
+    if (clickOnRecipe) {
+        clickOnRecipe = false  // Reset the click state to prevent multiple navigations
+        listRecipesViewModel.selectRecipe(recipe)  // Select the clicked recipe in the ViewModel
+        navigationActions.navigateTo(Screen.INDIVIDUAL_RECIPE)  // Navigate to the individual recipe screen
     }
-
 }
 
+/**
+ * converts a Timestamp into an Int representing the minutes
+ *
+ * @param timestamp: the timestamp we want to convert
+ */
 fun getTotalMinutes(timestamp: Timestamp): Int {
     return (timestamp.seconds / 60).toInt() // Convert seconds to minutes
 }

@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 open class ListRecipesViewModel() : ViewModel() {
+    //list of the recipes, for the moment I have filled up manually
     private val recipes_ = MutableStateFlow<List<Recipe>>(
         listOf(
             Recipe(name= "Paella",
