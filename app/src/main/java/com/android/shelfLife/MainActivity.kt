@@ -51,9 +51,6 @@ fun ShelfLifeApp() {
       composable(Screen.BARCODE_SCANNER) {
         BarcodeScannerScreen(navigationActions, barcodeScannerViewModel)
       }
-      composable(Screen.PERMISSION_DENIED) {
-        PermissionDeniedScreen()
-      }
     }
   }
 }

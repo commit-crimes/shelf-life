@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -13,7 +14,10 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
+import com.android.shelfLife.ui.navigation.BottomNavigationMenu
+import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 
 @Composable
@@ -90,7 +94,8 @@ fun CameraPermissionHandler(
   }
 
   // Show the PermissionDeniedScreen if permission is not granted
+
   if (!permissionGranted) {
-    PermissionDeniedScreen()
+    PermissionDeniedScreen(navigationActions)
   }
 }

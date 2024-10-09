@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -31,7 +33,10 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
+import com.android.shelfLife.ui.navigation.BottomNavigationMenu
+import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 
 @Composable
@@ -65,16 +70,22 @@ fun BarcodeScannerScreen(
     }
   }
 
-  // Rest of your BarcodeScannerScreen UI
-  if (permissionGranted) {
-    // Display the camera preview
-    CameraPreviewView(modifier = Modifier.fillMaxSize()) { previewView ->
-      startCamera(context, previewView)
+    Scaffold(
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelect = { selected -> navigationActions.navigateTo(selected) },
+                tabList = LIST_TOP_LEVEL_DESTINATION,
+                selectedItem = Route.SCANNER)
+        }
+    ) {
+        paddingValues ->
+        if (permissionGranted) {
+            // Display the camera preview
+            CameraPreviewView(modifier = Modifier.fillMaxSize().padding(paddingValues)) { previewView ->
+                startCamera(context, previewView)
+            }
+        }
     }
-  } else {
-    // Optionally, display a message or placeholder
-    Text("Camera permission is required.")
-  }
 }
 
 @Composable
@@ -111,25 +122,33 @@ fun startCamera(context: Context, previewView: PreviewView) {
 }
 
 @Composable
-fun PermissionDeniedScreen() {
+fun PermissionDeniedScreen(navigationActions: NavigationActions) {
   val context = LocalContext.current
-
-  Column(
-      modifier = Modifier.fillMaxSize(),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = "Camera permission is required to scan barcodes.")
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = {
-              // Open app settings
-              val intent =
-                  Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+    Scaffold(
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelect = { selected -> navigationActions.navigateTo(selected) },
+                tabList = LIST_TOP_LEVEL_DESTINATION,
+                selectedItem = Route.SCANNER)
+        }
+    ) { paddingVals ->
+        Column(
+            modifier = Modifier.fillMaxSize().padding(paddingVals),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = "Camera permission is required to scan barcodes.")
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = {
+                    // Open app settings
+                    val intent =
+                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.fromParts("package", context.packageName, null)
-                  }
-              context.startActivity(intent)
-            }) {
-              Text(text = "Open Settings")
+                        }
+                    context.startActivity(intent)
+                }) {
+                Text(text = "Open Settings")
             }
-      }
+        }
+    }
 }
