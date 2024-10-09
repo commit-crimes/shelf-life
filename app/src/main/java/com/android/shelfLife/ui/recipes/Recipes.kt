@@ -116,7 +116,7 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(85.dp) // Set a fixed height for the search bar
+            .height(100.dp) // Set a fixed height for the search bar
     ){
         SearchBar(
             query = query, // The current query string
@@ -124,15 +124,12 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
             placeholder = {
                 Text("Search recipes")
             },
-            onSearch = {
-                // Handle search logic if needed
-            },
+            onSearch = {},
             active = isActive,
             onActiveChange = { active -> isActive = active },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            leadingIcon = {},
+                .padding(horizontal = 8.dp),
             trailingIcon = {
                 IconButton(onClick = { isActive = false }) {
                     Icon(
@@ -193,6 +190,8 @@ fun RecipeItem(recipe: Recipe, navigationActions: NavigationActions, listRecipes
                 )
         }
     }
+
+
 
     if(clickOnRecipe){
         clickOnRecipe = false // If I don't return the value to false, it would navigate twice to the IndividualRecipeScreen
