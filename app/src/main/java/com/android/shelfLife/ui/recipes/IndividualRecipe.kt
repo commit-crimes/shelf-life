@@ -1,7 +1,6 @@
 package com.android.shelfLife.ui.recipes
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,10 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -24,28 +21,30 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
-import com.android.shelfLife.model.recipe.recipe
+import com.android.shelfLife.model.recipe.ListRecipesViewModel
+import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.TopNavigationBar
-import com.google.firebase.Timestamp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IndividualRecipeScreen(navigationActions: NavigationActions, selectedRecipe: recipe) {
+fun IndividualRecipeScreen(navigationActions: NavigationActions, listRecipesViewModel: ListRecipesViewModel) {
+
+    val selectedRecipe =
+        listRecipesViewModel.selectedRecipe.collectAsState().value
+            ?: return Text(text = "No ToDo selected. Should not happen", color = Color.Red)
 
     Scaffold(
         topBar = { TopNavigationBar()},
@@ -115,13 +114,13 @@ fun IndividualRecipeScreen(navigationActions: NavigationActions, selectedRecipe:
         }
     )
 }
-
+/*
 @Preview
 @Composable
 fun IndividualRecipeScreenOverview() {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
-    IndividualRecipeScreen(navigationActions, recipe(name= "Paella",
+    IndividualRecipeScreen(navigationActions, Recipe(name= "Paella",
         instructions = "Prepare the Saffron Broth:\n" +
                 "\n" +
                 "In a small bowl, soak the saffron threads in 2 tablespoons of warm water and set aside.\n" +
@@ -156,3 +155,5 @@ fun IndividualRecipeScreenOverview() {
         time = Timestamp(5400, 0)
     ))
 }
+
+ */

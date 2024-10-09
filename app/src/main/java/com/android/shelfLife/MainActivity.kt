@@ -5,13 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.internal.composableLambda
+import androidx.compose.runtime.collectAsState
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.android.shelfLife.model.recipe.recipe
+import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
@@ -22,7 +21,6 @@ import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.theme.ShelfLifeTheme
-import com.google.firebase.Timestamp
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,7 +34,7 @@ class MainActivity : ComponentActivity() {
 fun ShelfLifeApp() {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
-  val selectedRecipe = recipe("","",0, Timestamp(0,0))
+  val listRecipesViewModel = ListRecipesViewModel()
 
   NavHost(navController = navController, startDestination = Route.AUTH) {
     // Authentication route
@@ -59,8 +57,8 @@ fun ShelfLifeApp() {
       startDestination = Screen.RECIPES,
       route = Route.RECIPES,
     ){
-      composable(Screen.RECIPES){ RecipesScreen(navigationActions) }
-      composable(Screen.INDIVIDUAL_RECIPE){ IndividualRecipeScreen(navigationActions,selectedRecipe) }
+      composable(Screen.RECIPES){ RecipesScreen(navigationActions, listRecipesViewModel) }
+      composable(Screen.INDIVIDUAL_RECIPE){ IndividualRecipeScreen(navigationActions, listRecipesViewModel) }
     }
   }
 }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,11 +26,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -39,10 +40,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.PopupProperties
 import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
-import com.android.shelfLife.model.recipe.recipe
+import com.android.shelfLife.model.recipe.ListRecipesViewModel
+import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -50,50 +51,26 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
 import com.google.firebase.Timestamp
-import androidx.compose.ui.Alignment.Companion.CenterVertically as CenterVertically1
-import androidx.compose.ui.window.Popup as Popup1
+import kotlinx.coroutines.flow.filter
 
 
 @Composable
 fun RecipesScreen(
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    listRecipesViewModel: ListRecipesViewModel
 ) {
-    // Initial list of recipes
-    val listOfRecipes = listOf(
-        recipe(name= "Paella",
-            instructions = "cook",
-            servings = 4,
-            time = Timestamp(5400, 0)),
-        recipe(name = "Fideua",
-            instructions = "cry",
-            servings = 3,
-            time = Timestamp(3600, 0)),
-        recipe(name= "Tortilla de patata",
-            instructions = "cook",
-            servings = 4,
-            time = Timestamp(5400, 0)),
-        recipe(name = "Costillas a la brasa",
-            instructions = "cry",
-            servings = 3,
-            time = Timestamp(3600, 0)),
-        recipe(name= "Curry rojo",
-            instructions = "cook",
-            servings = 4,
-            time = Timestamp(5400, 0)),
-        recipe(name = "Butifarra con boniato",
-            instructions = "cry",
-            servings = 3,
-            time = Timestamp(3600, 0))
-    )
+    // Collect the recipes StateFlow as a composable state
+    val recipeList by listRecipesViewModel.recipes.collectAsState()
+
 
     // State for the search query
     var query by remember { mutableStateOf("") }
 
     // Filter the recipes based on the search query
     val filteredRecipes = if (query.isEmpty()) {
-        listOfRecipes
+        recipeList // Use the collected recipe list
     } else {
-        listOfRecipes.filter { recipe ->
+        recipeList.filter { recipe ->
             recipe.name.contains(query, ignoreCase = true) // Filter by recipe name
         }
     }
@@ -123,7 +100,7 @@ fun RecipesScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(filteredRecipes) { recipe ->
-                        RecipeItem(recipe, navigationActions)
+                        RecipeItem(recipe, navigationActions, listRecipesViewModel)
                     }
                 }
             }
@@ -175,11 +152,12 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
 fun RecipesScreenOverview() {
     val navController = rememberNavController()
     val navigationActions = NavigationActions(navController)
-    RecipesScreen(navigationActions)
+    val listRecipesViewModel = ListRecipesViewModel()
+    RecipesScreen(navigationActions, listRecipesViewModel)
 }
 
 @Composable
-fun RecipeItem(recipe: recipe, navigationActions: NavigationActions) {
+fun RecipeItem(recipe: Recipe, navigationActions: NavigationActions, listRecipesViewModel: ListRecipesViewModel) {
     var clickOnRecipe by remember { mutableStateOf(false) }
 
     Card(modifier = Modifier
@@ -189,13 +167,13 @@ fun RecipeItem(recipe: recipe, navigationActions: NavigationActions) {
     ){
         Row(modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp), // Padding inside the card
+            .padding(18.dp), // Padding inside the card
         ){
             Column(
                 modifier = Modifier
                     .width(275.dp)
                     .size(80.dp)
-                    .padding(vertical = 16.dp)
+                    .padding(vertical = 14.dp)
                     .padding(horizontal = 18.dp)
             ) {
                 Text(text = recipe.name,
@@ -206,7 +184,7 @@ fun RecipeItem(recipe: recipe, navigationActions: NavigationActions) {
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                Row(modifier = Modifier.fillMaxWidth()){
+                Row(modifier = Modifier.fillMaxWidth().fillMaxHeight()){
                     Text("Servings : ${recipe.servings}",
                         overflow = TextOverflow.Ellipsis)
                     Spacer(modifier = Modifier.width(8.dp))
@@ -228,6 +206,7 @@ fun RecipeItem(recipe: recipe, navigationActions: NavigationActions) {
     }
 
     if(clickOnRecipe){
+        listRecipesViewModel.selectRecipe(recipe)
         navigationActions.navigateTo(Screen.INDIVIDUAL_RECIPE)
     }
 

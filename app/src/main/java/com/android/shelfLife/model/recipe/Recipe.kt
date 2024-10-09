@@ -2,7 +2,7 @@ package com.android.shelfLife.model.recipe
 
 import com.google.firebase.Timestamp
 
-data class recipe(
+data class Recipe(
     val name : String, // name of recipe
     //val ingredients : List<FoodItem>, // ingredients in recipe todo check with Alex about this
     val instructions : String, // instructions of recipes
