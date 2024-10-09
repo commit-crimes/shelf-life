@@ -168,6 +168,9 @@ dependencies {
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
     testImplementation(libs.json)
+    // Testing mock web server for OkHttp
+    testImplementation(libs.mockwebserver)
+
 
     // Test UI
     androidTestImplementation(libs.androidx.junit)

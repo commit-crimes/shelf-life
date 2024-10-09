@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -13,6 +14,7 @@ import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
@@ -41,6 +43,8 @@ fun ShelfLifeApp() {
   val listFoodItemViewModel = ListFoodItemsViewModel(foodItemRepository)
   val householdViewModel = HouseholdViewModel(HouseholdRepositoryFirestore(firebaseFirestore), listFoodItemViewModel)
 
+  val barcodeScannerViewModel: BarcodeScannerViewModel = viewModel()
+
   NavHost(navController = navController, startDestination = Route.AUTH) {
     // Authentication route
     navigation(
@@ -54,11 +58,15 @@ fun ShelfLifeApp() {
     }
 
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
-      composable(Screen.PERMISSION_HANDLER) { CameraPermissionHandler(navigationActions) }
-      composable(Screen.BARCODE_SCANNER) { BarcodeScannerScreen(navigationActions) }
+      composable(Screen.PERMISSION_HANDLER) {
+        CameraPermissionHandler(navigationActions, barcodeScannerViewModel)
+      }
+      composable(Screen.BARCODE_SCANNER) {
+        BarcodeScannerScreen(navigationActions, barcodeScannerViewModel)
+      }
       composable(Screen.PERMISSION_DENIED) {
-        PermissionDeniedScreen(navigationActions)
-      } // For handling denied permission
+        PermissionDeniedScreen()
+      }
     }
   }
 }
