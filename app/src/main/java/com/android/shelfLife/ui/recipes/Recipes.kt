@@ -48,7 +48,7 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
-import com.google.firebase.Timestamp
+import com.android.shelfLife.ui.utils.getTotalMinutes
 
 
 @Composable
@@ -246,13 +246,3 @@ fun RecipeItem(recipe: Recipe, navigationActions: NavigationActions,
         navigationActions.navigateTo(Screen.INDIVIDUAL_RECIPE)  // Navigate to the individual recipe screen
     }
 }
-
-/**
- * converts a Timestamp into an Int representing the minutes
- *
- * @param timestamp: the timestamp we want to convert
- */
-fun getTotalMinutes(timestamp: Timestamp): Int {
-    return (timestamp.seconds / 60).toInt() // Convert seconds to minutes
-}
-

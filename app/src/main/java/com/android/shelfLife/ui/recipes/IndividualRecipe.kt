@@ -36,6 +36,7 @@ import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.TopNavigationBar
+import com.android.shelfLife.ui.utils.getTotalMinutes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
