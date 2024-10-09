@@ -1,6 +1,9 @@
 package com.android.shelfLife.ui.camera
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
@@ -14,26 +17,63 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.navigation.TopLevelDestination
+import com.android.shelfLife.ui.navigation.Screen
 
 @Composable
-fun BarcodeScannerScreen(navigationActions: NavigationActions) {
-  // Get the context in a Composable way
+fun BarcodeScannerScreen(
+    navigationActions: NavigationActions,
+    viewModel: BarcodeScannerViewModel = viewModel()
+) {
   val context = LocalContext.current
+  val permissionGranted = viewModel.permissionGranted
 
-  // Pass the context and start the camera in the lambda
-  CameraPreviewView(modifier = Modifier.fillMaxSize()) { previewView ->
-    startCamera(context, previewView) // Now using the context outside the lambda
+  // Observe lifecycle to detect when the app resumes
+  val lifecycleOwner = LocalLifecycleOwner.current
+
+  DisposableEffect(lifecycleOwner) {
+    val observer = LifecycleEventObserver { _, event ->
+      if (event == Lifecycle.Event.ON_RESUME) {
+        // Re-check the permission status when the app resumes
+        viewModel.checkCameraPermission()
+      }
+    }
+
+    lifecycleOwner.lifecycle.addObserver(observer)
+
+    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+  }
+
+  // If permission is not granted, navigate back to the PermissionHandler
+  LaunchedEffect(permissionGranted) {
+    if (!permissionGranted) {
+      navigationActions.navigateTo(Screen.PERMISSION_HANDLER)
+    }
+  }
+
+  // Rest of your BarcodeScannerScreen UI
+  if (permissionGranted) {
+    // Display the camera preview
+    CameraPreviewView(modifier = Modifier.fillMaxSize()) { previewView ->
+      startCamera(context, previewView)
+    }
+  } else {
+    // Optionally, display a message or placeholder
+    Text("Camera permission is required.")
   }
 }
 
@@ -71,19 +111,25 @@ fun startCamera(context: Context, previewView: PreviewView) {
 }
 
 @Composable
-fun PermissionDeniedScreen(navigationActions: NavigationActions) {
+fun PermissionDeniedScreen() {
+  val context = LocalContext.current
+
   Column(
       modifier = Modifier.fillMaxSize(),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = "Camera permission is required to scan barcodes. Go to Settings -> ShelfLife -> Camera Permission and enable it. ")
+        Text(text = "Camera permission is required to scan barcodes.")
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-              // Optionally prompt user to go to settings to enable permissions
-              navigationActions.navigateTo(Route.AUTH)
+              // Open app settings
+              val intent =
+                  Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", context.packageName, null)
+                  }
+              context.startActivity(intent)
             }) {
-              Text(text = "Go Back")
+              Text(text = "Open Settings")
             }
       }
 }
