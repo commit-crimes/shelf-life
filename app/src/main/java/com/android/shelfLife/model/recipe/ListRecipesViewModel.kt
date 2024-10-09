@@ -48,7 +48,7 @@ open class ListRecipesViewModel() : ViewModel() {
     open val selectedRecipe: StateFlow<Recipe?> = selectedRecipe_.asStateFlow()
 
     /**
-     * Selects a ToDo document.
+     * Selects a recipe.
      *
      * @param recipe The Recipe to be selected.
      */

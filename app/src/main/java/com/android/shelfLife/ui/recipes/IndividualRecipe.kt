@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
-import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -114,46 +113,3 @@ fun IndividualRecipeScreen(navigationActions: NavigationActions, listRecipesView
         }
     )
 }
-/*
-@Preview
-@Composable
-fun IndividualRecipeScreenOverview() {
-    val navController = rememberNavController()
-    val navigationActions = NavigationActions(navController)
-    IndividualRecipeScreen(navigationActions, Recipe(name= "Paella",
-        instructions = "Prepare the Saffron Broth:\n" +
-                "\n" +
-                "In a small bowl, soak the saffron threads in 2 tablespoons of warm water and set aside.\n" +
-                "Heat the broth in a separate pot and keep it warm for later.\n" +
-                "Cook the Chicken and Chorizo:\n" +
-                "\n" +
-                "In a large paella pan (or a large skillet), heat some olive oil over medium heat.\n" +
-                "Add the chicken thighs and cook until browned on all sides. Remove and set aside.\n" +
-                "Add the chorizo slices to the pan and cook until browned, then remove and set aside with the chicken.\n" +
-                "Sauté the Vegetables:\n" +
-                "\n" +
-                "In the same pan, add a little more olive oil if needed. Sauté the chopped onion, garlic, and red bell pepper until softened (about 5 minutes).\n" +
-                "Add the diced tomatoes and smoked paprika, cooking for another 2-3 minutes.\n" +
-                "Cook the Rice:\n" +
-                "\n" +
-                "Stir the rice into the pan with the vegetables, coating it well with the oil and letting it toast for a minute.\n" +
-                "Pour in the saffron water and the warm broth. Stir gently to combine.\n" +
-                "Add the cooked chicken and chorizo back into the pan, distributing evenly.\n" +
-                "Add the Seafood:\n" +
-                "\n" +
-                "Arrange the shrimp, mussels, and clams on top of the rice mixture. Push them slightly into the rice without stirring.\n" +
-                "Let the paella cook over medium-low heat for 15-20 minutes, uncovered, until the rice has absorbed most of the liquid and the seafood is cooked through (mussels and clams should open up). Avoid stirring the rice during this time.\n" +
-                "Final Touches:\n" +
-                "\n" +
-                "If you're adding peas, sprinkle them over the top during the last 5 minutes of cooking.\n" +
-                "Once the rice is done, turn up the heat for a minute or two to develop a crispy layer of rice at the bottom (called socarrat), but be careful not to burn it.\n" +
-                "Serve:\n" +
-                "\n" +
-                "Let the paella rest for 5 minutes, then garnish with lemon wedges.\n" +
-                "Serve directly from the pan for an authentic experience.",
-        servings = 4,
-        time = Timestamp(5400, 0)
-    ))
-}
-
- */

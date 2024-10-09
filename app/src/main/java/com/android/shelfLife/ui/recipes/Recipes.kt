@@ -76,7 +76,7 @@ fun RecipesScreen(
     }
 
     Scaffold(
-        modifier = Modifier.padding(horizontal = 8.dp),
+        modifier = Modifier,
         topBar = { TopNavigationBar() },
         bottomBar = {
             BottomNavigationMenu(
@@ -143,18 +143,7 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
             }
         ) {}
     }
-
-
 } // todo ask Paul where does the filter management comes into to play, the screen or the top bar
-
-@Preview
-@Composable
-fun RecipesScreenOverview() {
-    val navController = rememberNavController()
-    val navigationActions = NavigationActions(navController)
-    val listRecipesViewModel = ListRecipesViewModel()
-    RecipesScreen(navigationActions, listRecipesViewModel)
-}
 
 @Composable
 fun RecipeItem(recipe: Recipe, navigationActions: NavigationActions, listRecipesViewModel: ListRecipesViewModel) {
@@ -206,6 +195,7 @@ fun RecipeItem(recipe: Recipe, navigationActions: NavigationActions, listRecipes
     }
 
     if(clickOnRecipe){
+        clickOnRecipe = false // If I don't return the value to false, it would navigate twice to the IndividualRecipeScreen
         listRecipesViewModel.selectRecipe(recipe)
         navigationActions.navigateTo(Screen.INDIVIDUAL_RECIPE)
     }
