@@ -1,5 +1,7 @@
 package com.android.shelfLife.ui.recipes
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -7,22 +9,32 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
+import com.android.shelfLife.R
 import com.android.shelfLife.model.recipe.recipe
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -36,22 +48,7 @@ import com.google.firebase.Timestamp
 fun IndividualRecipeScreen(navigationActions: NavigationActions, selectedRecipe: recipe) {
 
     Scaffold(
-        modifier = Modifier.padding(horizontal = 8.dp),
-        topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = { navigationActions.goBack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Go back Icon"
-                        )
-                    }
-                },
-                title = {
-                    Text("Recipe Details")
-                }
-            )
-        },
+        topBar = { TopNavigationBar()},
         bottomBar = {
             BottomNavigationMenu(
                 onTabSelect = { destination -> navigationActions.navigateTo(destination) },
@@ -67,8 +64,20 @@ fun IndividualRecipeScreen(navigationActions: NavigationActions, selectedRecipe:
             ) {
                 // Second TopAppBar below the first one
                 TopAppBar(
-                    title = {
-                        Text(selectedRecipe.name)
+                    navigationIcon = {
+                        IconButton(onClick = { navigationActions.goBack() }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Go back Icon"
+                            )
+                        }
+                    },
+                    title = {Text(text = selectedRecipe.name,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
                     }
                 )
 
@@ -79,6 +88,16 @@ fun IndividualRecipeScreen(navigationActions: NavigationActions, selectedRecipe:
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState()) // Add vertical scroll functionality
                 ) {
+
+                    Image(painter = painterResource(R.drawable.google_logo),
+                        contentDescription = "Recipe Image",
+                        modifier = Modifier
+                            .width(537.dp)
+                            .height(100.dp),
+                        contentScale = ContentScale.FillWidth // Fit the image to fit the size
+                    )
+
+
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Text(text = "Servings: ${selectedRecipe.servings}")
                         Spacer(modifier = Modifier.width(16.dp))

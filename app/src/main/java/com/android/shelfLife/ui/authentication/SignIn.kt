@@ -51,7 +51,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
           onAuthComplete = { result ->
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-            navigationActions.navigateTo(Route.SCANNER) // Navigate to the camera after sign-in
+            navigationActions.navigateTo(Route.RECIPES) // Navigate to the camera after sign-in
           },
           onAuthError = {
             Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
