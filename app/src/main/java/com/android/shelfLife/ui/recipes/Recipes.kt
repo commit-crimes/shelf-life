@@ -89,8 +89,17 @@ fun RecipesScreen(
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
 
-    val filters = listOf("No missing ingredients", "Vegan", "Vegetarian", "Easy", "Spicy",
-        "Dessert", "Appetizer", "Snack", "Breakfast")
+  val filters =
+      listOf(
+          "No missing ingredients",
+          "Vegan",
+          "Vegetarian",
+          "Easy",
+          "Spicy",
+          "Dessert",
+          "Appetizer",
+          "Snack",
+          "Breakfast")
 
   AddHouseHoldPopUp(
       showDialog = showDialog,
@@ -250,7 +259,7 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
                     Icons.Default.Search,
                     contentDescription =
                         "icon for recipes search bar" // Accessibility description for the search
-                                                      // icon
+                    // icon
                     )
               }
             }) {}

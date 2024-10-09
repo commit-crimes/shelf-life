@@ -164,8 +164,7 @@ fun IndividualRecipeScreen(
                   houseHold = it,
                   householdViewModel = householdViewModel,
                   onHamburgerClick = { scope.launch { drawerState.open() } },
-                  filters = emptyList()
-              )
+                  filters = emptyList())
             }
           },
           bottomBar = {
@@ -223,9 +222,8 @@ fun IndividualRecipeScreen(
                           Text(text = "Servings: ${selectedRecipe.servings}") // Display servings
                           Spacer(modifier = Modifier.width(16.dp)) // Add space between text
                           Text(
-                              text =
-                                  "Time: ${getTotalMinutes(selectedRecipe.time)} min") // Display
-                                                                                       // total time
+                              text = "Time: ${getTotalMinutes(selectedRecipe.time)} min") // Display
+                          // total time
                         }
 
                         Spacer(modifier = Modifier.height(16.dp)) // Add space before instructions

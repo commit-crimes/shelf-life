@@ -42,7 +42,7 @@ fun TopNavigationBar(
     onHamburgerClick: () -> Unit = {},
     userHouseholds: List<HouseHold>,
     householdViewModel: HouseholdViewModel,
-    filters : List<String>
+    filters: List<String>
 ) {
   var showFilterBar by remember { mutableStateOf(false) }
   Column {
@@ -65,28 +65,29 @@ fun TopNavigationBar(
           }
         },
         actions = {
-            if(filters.isNotEmpty()){
-                IconButton(onClick = { showFilterBar = !showFilterBar }) { // Toggle filter bar visibility
-                    Icon(
-                        imageVector = Icons.Default.FilterList,
-                        contentDescription = "Filter Icon",
-                        tint = Color.White)
+          if (filters.isNotEmpty()) {
+            IconButton(
+                onClick = { showFilterBar = !showFilterBar }) { // Toggle filter bar visibility
+                  Icon(
+                      imageVector = Icons.Default.FilterList,
+                      contentDescription = "Filter Icon",
+                      tint = Color.White)
                 }
-            }
+          }
         },
         colors =
             TopAppBarDefaults.mediumTopAppBarColors(
                 containerColor = MaterialTheme.colorScheme.secondary,
                 titleContentColor = Color.White))
 
-      if(filters.isNotEmpty()){
-          AnimatedVisibility(
-              visible = showFilterBar,
-              enter = fadeIn() + expandVertically(),
-              exit = fadeOut() + shrinkVertically()) {
-              FilterBar(filters)
+    if (filters.isNotEmpty()) {
+      AnimatedVisibility(
+          visible = showFilterBar,
+          enter = fadeIn() + expandVertically(),
+          exit = fadeOut() + shrinkVertically()) {
+            FilterBar(filters)
           }
-      }
+    }
   }
 }
 

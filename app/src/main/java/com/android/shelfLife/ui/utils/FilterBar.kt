@@ -19,50 +19,48 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun FilterBar(filters : List<String>) {
+fun FilterBar(filters: List<String>) {
   // State to track the selection of each filter chip
   val selectedFilters = remember { mutableStateListOf<String>() }
   val scrollState = rememberScrollState()
 
-    Row(
-        modifier =
-        Modifier.horizontalScroll(scrollState) // Enables horizontal scrolling
-            .padding(horizontal = 8.dp, vertical = 4.dp)
-    ) {
+  Row(
+      modifier =
+          Modifier.horizontalScroll(scrollState) // Enables horizontal scrolling
+              .padding(horizontal = 8.dp, vertical = 4.dp)) {
         filters.forEach { filter ->
-            val isSelected = selectedFilters.contains(filter)
-            FilterChipItem(
-                text = filter,
-                isSelected = isSelected,
-                onClick = {
-                    if (isSelected) {
-                        selectedFilters.remove(filter)
-                    } else {
-                        selectedFilters.add(filter)
-                    }
-                })
+          val isSelected = selectedFilters.contains(filter)
+          FilterChipItem(
+              text = filter,
+              isSelected = isSelected,
+              onClick = {
+                if (isSelected) {
+                  selectedFilters.remove(filter)
+                } else {
+                  selectedFilters.add(filter)
+                }
+              })
         }
-    }
+      }
 }
 
 @Composable
 fun FilterChipItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
-    FilterChip(
-        selected = isSelected,
-        onClick = onClick,
-        label = { Text(text = text) },
-        leadingIcon =
-        if (isSelected) {
+  FilterChip(
+      selected = isSelected,
+      onClick = onClick,
+      label = { Text(text = text) },
+      leadingIcon =
+          if (isSelected) {
             { Icon(imageVector = Icons.Default.Check, contentDescription = "Selected") }
-        } else null,
-        colors =
-        FilterChipDefaults.filterChipColors(
-            selectedContainerColor = MaterialTheme.colorScheme.secondary,
-            selectedLabelColor = Color.White,
-            selectedLeadingIconColor = Color.White,
-            containerColor = Color.White,
-            labelColor = Color.Black
-        ),
-        modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp) // Add padding between chips
-    )
+          } else null,
+      colors =
+          FilterChipDefaults.filterChipColors(
+              selectedContainerColor = MaterialTheme.colorScheme.secondary,
+              selectedLabelColor = Color.White,
+              selectedLeadingIconColor = Color.White,
+              containerColor = Color.White,
+              labelColor = Color.Black),
+      modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp) // Add padding between chips
+      )
 }
