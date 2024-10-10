@@ -175,14 +175,7 @@ fun RecipesScreen(
           topBar = {
             selectedHousehold?.let {
               TopNavigationBar(
-                  userHouseholds = householdViewModel.households.collectAsState().value,
-                  onHouseholdChange = { household ->
-                    if (household != selectedHousehold) {
-                      householdViewModel.selectHousehold(household)
-                    }
-                  },
                   houseHold = it,
-                  householdViewModel = householdViewModel,
                   onHamburgerClick = { scope.launch { drawerState.open() } },
                   filters = filters)
             }
