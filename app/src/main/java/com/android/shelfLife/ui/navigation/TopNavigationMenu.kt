@@ -37,7 +37,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.android.shelfLife.model.household.HouseHold
-import com.android.shelfLife.model.household.HouseholdViewModel
 
 /**
  * Composable function for the top navigation bar of the app
@@ -49,10 +48,7 @@ import com.android.shelfLife.model.household.HouseholdViewModel
 @Composable
 fun TopNavigationBar(
     houseHold: HouseHold,
-    onHouseholdChange: (HouseHold) -> Unit,
     onHamburgerClick: () -> Unit = {},
-    userHouseholds: List<HouseHold>,
-    householdViewModel: HouseholdViewModel,
     filters: List<String>
 ) {
   var showFilterBar by remember { mutableStateOf(false) }
