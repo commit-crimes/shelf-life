@@ -3,10 +3,10 @@ package com.android.shelfLife.model.foodFacts
 /**
  * Represents intrinsic details of a food item.
  *
- * This data class encapsulates all the general and unchanging information about a food item,
- * such as its name, barcode, nutritional facts, quantity, and category. The `FoodFacts` class
- * provides a standardized way to handle product-level data that remains consistent across
- * different instances of the same food item.
+ * This data class encapsulates all the general and unchanging information about a food item, such
+ * as its name, barcode, nutritional facts, quantity, and category. The `FoodFacts` class provides a
+ * standardized way to handle product-level data that remains consistent across different instances
+ * of the same food item.
  *
  * @property name The name of the food product.
  * @property barcode The unique barcode identifier for the product.
@@ -14,7 +14,6 @@ package com.android.shelfLife.model.foodFacts
  * @property category The category of the food item (e.g., FRUIT, VEGETABLE, MEAT).
  * @property nutritionFacts Detailed nutritional information per 100g/ml of the product.
  */
-
 data class FoodFacts(
     val name: String, // Name of the food item
     val barcode: String = "", // Barcode number
@@ -29,20 +28,20 @@ data class Quantity(
 )
 
 enum class FoodUnit {
-    GRAM, // Gram unit
-    ML, // Milliliter unit
-    COUNT // Item count (2 pineapples, 3 apples, etc.)
+  GRAM, // Gram unit
+  ML, // Milliliter unit
+  COUNT // Item count (2 pineapples, 3 apples, etc.)
 }
 
 enum class FoodCategory {
-    FRUIT, // Fruit category
-    VEGETABLE, // Vegetable category
-    MEAT, // Meat category
-    DAIRY, // Dairy category
-    GRAIN, // Grain category
-    BEVERAGE, // Beverage category
-    SNACK, // Snack category
-    OTHER // Other category
+  FRUIT, // Fruit category
+  VEGETABLE, // Vegetable category
+  MEAT, // Meat category
+  DAIRY, // Dairy category
+  GRAIN, // Grain category
+  BEVERAGE, // Beverage category
+  SNACK, // Snack category
+  OTHER // Other category
 }
 
 /**
