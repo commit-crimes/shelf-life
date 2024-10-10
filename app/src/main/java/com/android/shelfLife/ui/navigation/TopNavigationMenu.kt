@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -55,12 +56,13 @@ fun TopNavigationBar(
   Column {
     TopAppBar(
         navigationIcon = {
-          IconButton(onClick = { onHamburgerClick() }) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Menu Icon",
-                tint = Color.White)
-          }
+          IconButton(
+              modifier = Modifier.testTag("hamburgerIcon"), onClick = { onHamburgerClick() }) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Menu Icon",
+                    tint = Color.White)
+              }
         },
         title = {
           Row(modifier = Modifier.padding(end = 8.dp)) {
@@ -74,6 +76,7 @@ fun TopNavigationBar(
         actions = {
           if (filters.isNotEmpty()) {
             IconButton(
+                modifier = Modifier.testTag("filterIcon"),
                 onClick = { showFilterBar = !showFilterBar }) { // Toggle filter bar visibility
                   Icon(
                       imageVector = Icons.Default.FilterList,
@@ -111,7 +114,8 @@ fun FilterBar(filters: List<String>) {
   Row(
       modifier =
           Modifier.horizontalScroll(scrollState) // Enables horizontal scrolling
-              .padding(horizontal = 8.dp, vertical = 4.dp)) {
+              .padding(horizontal = 8.dp, vertical = 4.dp)
+              .testTag("filterBar")) {
         filters.forEach { filter ->
           val isSelected = selectedFilters.contains(filter)
           FilterChipItem(
