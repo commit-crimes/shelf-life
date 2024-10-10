@@ -301,7 +301,7 @@ fun RecipeItem(
                   modifier =
                       Modifier.width(275.dp) // Set the width of the column
                           .size(80.dp) // Set the size of the column
-                          .padding(vertical = 14.dp) // Add vertical padding inside the column
+                          .padding(vertical = 12.dp) // Add vertical padding inside the column
                           .padding(horizontal = 18.dp) // Add horizontal padding inside the column
                   ) {
                     // Display the recipe name with a specific font size, weight, and overflow

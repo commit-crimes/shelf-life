@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 open class ListRecipesViewModel() : ViewModel() {
 
   private val instructionsTortillaDePatata = // this is an example to shown the scroll-ability of
-                                             // the IndividualRecipeScreen
+      // the IndividualRecipeScreen
       "Peel and slice the potatoes:\n" +
           "\n" +
           "Peel the potatoes and cut them into thin, even slices (around 3-4 mm thick).\n" +
