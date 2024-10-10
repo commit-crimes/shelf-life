@@ -39,14 +39,17 @@ import androidx.compose.ui.unit.dp
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseholdViewModel
 
+/**
+ * Composable function for the top navigation bar of the app
+ *
+ * @param houseHold The current household
+ * @param onHamburgerClick The lambda to be called when the hamburger icon is clicked
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopNavigationBar(
     houseHold: HouseHold,
-    onHouseholdChange: (HouseHold) -> Unit,
-    onHamburgerClick: () -> Unit = {},
-    userHouseholds: List<HouseHold>,
-    householdViewModel: HouseholdViewModel
+    onHamburgerClick: () -> Unit = {}
 ) {
   var showFilterBar by remember { mutableStateOf(false) }
   Column {
@@ -90,6 +93,10 @@ fun TopNavigationBar(
   }
 }
 
+/**
+ * Composable function for the filter bar in the top navigation bar
+ * This function displays a horizontal list of filter chips that can be selected by the user.
+ */
 @Composable
 fun FilterBar() {
   // State to track the selection of each filter chip
@@ -117,6 +124,14 @@ fun FilterBar() {
       }
 }
 
+/**
+ * Composable function for a filter chip item
+ * This function displays a single filter chip that can be selected by the user.
+ *
+ * @param text The text to display on the filter chip
+ * @param isSelected Whether the filter chip is selected or not
+ * @param onClick The lambda to be called when the filter chip is clicked
+ */
 @Composable
 fun FilterChipItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
   FilterChip(
@@ -138,6 +153,14 @@ fun FilterChipItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
       )
 }
 
+/**
+ * Composable function for a single household element in the navigation drawer
+ * This function displays a single household element in the navigation drawer.
+ *
+ * @param household The household to display
+ * @param selectedHousehold The currently selected household
+ * @param onHouseholdSelected The lambda to be called when the household is selected
+ */
 @Composable
 fun HouseHoldElement(
     household: HouseHold,

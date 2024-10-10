@@ -12,11 +12,22 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
   private val auth = FirebaseAuth.getInstance()
   private val foodItemRepository = FoodItemRepositoryFirestore(db)
 
-  override fun getNewUid(): String {
+    /**
+     * Generates a new unique ID for a household.
+     *
+     * @return A new unique ID.
+     */
+    override fun getNewUid(): String {
     return db.collection(collectionPath).document().id
   }
 
-  override fun getHouseholds(onSuccess: (List<HouseHold>) -> Unit, onFailure: (Exception) -> Unit) {
+    /**
+     * Fetches all households from the repository associated with the current user.
+     *
+     * @param onSuccess - The callback to be invoked on success.
+     * @param onFailure - The callback to be invoked on failure.
+     */
+    override fun getHouseholds(onSuccess: (List<HouseHold>) -> Unit, onFailure: (Exception) -> Unit) {
     val currentUser = auth.currentUser
     if (currentUser != null) {
       db.collection(collectionPath)
@@ -74,7 +85,14 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
     getHouseholds({}, {})
   }
 
-  override fun updateHousehold(
+    /**
+     * Updates an existing household in the repository.
+     *
+     * @param household - The household with updated data.
+     * @param onSuccess - The callback to be invoked on success.
+     * @param onFailure - The callback to be invoked on failure.
+     */
+    override fun updateHousehold(
       household: HouseHold,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
@@ -104,7 +122,14 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
     }
   }
 
-  override fun deleteHouseholdById(
+    /**
+     * Deletes a household by its unique ID.
+     *
+     * @param id - The unique ID of the household to delete.
+     * @param onSuccess - The callback to be invoked on success.
+     * @param onFailure - The callback to be invoked on failure.
+     */
+    override fun deleteHouseholdById(
       id: String,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
@@ -125,7 +150,12 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
     }
   }
 
-  private fun convertToHousehold(doc: DocumentSnapshot): HouseHold? {
+    /**
+     * Converts a Firestore document to a HouseHold object.
+     *
+     * @param doc The Firestore document to convert.
+     */
+    private fun convertToHousehold(doc: DocumentSnapshot): HouseHold? {
     return try {
       val uid = doc.getString("uid") ?: return null
       val name = doc.getString("name") ?: return null

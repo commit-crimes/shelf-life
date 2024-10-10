@@ -11,6 +11,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 
+/**
+ * Composable function for the bottom navigation menu.
+ *
+ * @param onTabSelect The callback to be invoked when a tab is selected.
+ * @param tabList The list of tabs to be displayed.
+ * @param selectedItem The currently selected tab.
+ */
 @Composable
 fun BottomNavigationMenu(
     onTabSelect: (TopLevelDestination) -> Unit,
