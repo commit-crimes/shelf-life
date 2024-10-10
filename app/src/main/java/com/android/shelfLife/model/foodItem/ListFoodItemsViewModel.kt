@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class ListFoodItemsViewModel(private val repository: FoodItemRepository) : ViewModel() {
-
   private val _foodItems = MutableStateFlow<List<FoodItem>>(emptyList())
   val foodItems: StateFlow<List<FoodItem>> = _foodItems.asStateFlow()
 
@@ -22,19 +21,25 @@ class ListFoodItemsViewModel(private val repository: FoodItemRepository) : ViewM
     repository.init(onSuccess = { getFoodItems() })
   }
 
+
   // Error handling function
   private fun _onFail(exception: Exception) {
     Log.e("ListFoodItemsViewModel", "Error fetching FoodItems: $exception")
   }
 
-  // Generates a new UID for a new FoodItem
-  fun getUID(): String {
-    return repository.getNewUid()
-  }
 
-  /** Gets all FoodItem documents */
-  fun getFoodItems() {
-    repository.getFoodItems(onSuccess = { _foodItems.value = it }, onFailure = ::_onFail)
+    fun getUID(): String {
+        return repository.getNewUid()
+    }
+
+    /** Gets all FoodItem documents */
+    fun getFoodItems() {
+        repository.getFoodItems(onSuccess = { _foodItems.value = it }, onFailure = ::_onFail)
+    }
+
+  /** Directly updates the list of FoodItems */
+  fun setFoodItems(foodItems: List<FoodItem>) {
+    _foodItems.value = foodItems
   }
 
   /** Adds a FoodItem document */

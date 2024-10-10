@@ -15,7 +15,6 @@ import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodItem.FoodItem
-import com.android.shelfLife.model.foodItem.FoodLocation
 import com.android.shelfLife.model.foodItem.FoodStatus
 import com.android.shelfLife.model.foodItem.FoodStorageLocation
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
@@ -186,16 +185,11 @@ fun AddFoodItemScreen(
                         // nutritionFacts = NutritionFacts()
                     )
 
-                val act_location =
-                    FoodLocation(
-                        // Eventually this should be fetched from the user's household
-                        householdNumber = 0,
-                        storageLocation = location)
                 listFoodItemViewModel.addFoodItem(
                     FoodItem(
                         uid = listFoodItemViewModel.getUID(),
                         foodFacts = foodFacts,
-                        location = act_location,
+                        location = location,
                         expiryDate = formatDateToTimestamp(expireDate),
                         openDate = formatDateToTimestamp(openDate),
                         buyDate = formatDateToTimestamp(buyDate),
