@@ -13,6 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.android.shelfLife.model.household.HouseholdViewModel
 
+/**
+ * Composable function for the pop-up dialog to add a new household
+ *
+ * @param showDialog A boolean to determine if the dialog should be shown
+ * @param onDismiss The lambda to be called when the dialog is dismissed
+ * @param householdViewModel The view model for the household
+ */
 @Composable
 fun AddHouseHoldPopUp(
     showDialog: Boolean,

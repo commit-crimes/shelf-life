@@ -42,6 +42,11 @@ import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Composable function for the sign-in screen.
+ *
+ * @param navigationActions The navigation actions to be used in the screen
+ */
 @Composable
 fun SignInScreen(navigationActions: NavigationActions) {
   val context = LocalContext.current
@@ -66,7 +71,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
           Image(
-              painter = painterResource(id = R.drawable.app_logo),
+              painter = painterResource(id = R.drawable.shelf_life_logo),
               contentDescription = "App Logo",
               modifier = Modifier.size(250.dp))
 
@@ -74,7 +79,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
 
           Text(
               modifier = Modifier.testTag("loginTitle"),
-              text = "Welcome",
+              text = "Shelf Life",
               style =
                   MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
               fontWeight = FontWeight.Bold,
@@ -121,6 +126,12 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
       }
 }
 
+/**
+ * Creates a [ManagedActivityResultLauncher] for Firebase authentication.
+ *
+ * @param onAuthComplete The lambda to be called when authentication is successful.
+ * @param onAuthError The lambda to be called when authentication fails.
+ */
 @Composable
 fun rememberFirebaseAuthLauncher(
     onAuthComplete: (AuthResult) -> Unit,

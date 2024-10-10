@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.overview
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -62,6 +63,13 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function to display the overview screen
+ *
+ * @param navigationActions The actions to handle navigation
+ * @param listFoodItemsViewModel The ViewModel for the list of food items
+ * @param householdViewModel The ViewModel for the households the user has access to
+ */
 @Composable
 fun OverviewScreen(
     navigationActions: NavigationActions,
@@ -78,6 +86,8 @@ fun OverviewScreen(
 
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
+
+  val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
 
   AddHouseHoldPopUp(
       showDialog = showDialog,
@@ -151,7 +161,9 @@ fun OverviewScreen(
           topBar = {
             selectedHousehold?.let {
               TopNavigationBar(
-                  houseHold = it, onHamburgerClick = { scope.launch { drawerState.open() } })
+                  houseHold = it,
+                  onHamburgerClick = { scope.launch { drawerState.open() } },
+                  filters = filters)
             }
           },
           bottomBar = {
@@ -173,19 +185,20 @@ fun OverviewScreen(
                   query = searchQuery,
                   onQueryChange = { searchQuery = it } // Update the query state when the user types
                   )
-              ListFoodItems(filteredFoodItems, listFoodItemsViewModel, navigationActions)
+              ListFoodItems(filteredFoodItems)
             }
           })
     }
   }
 }
 
+/**
+ * Composable function to display the list of food items
+ *
+ * @param foodItems The list of food items to display
+ */
 @Composable
-fun ListFoodItems(
-    foodItems: List<FoodItem>,
-    listFoodItemsViewModel: ListFoodItemsViewModel,
-    navigationActions: NavigationActions
-) {
+fun ListFoodItems(foodItems: List<FoodItem>) {
   if (foodItems.isEmpty()) {
     // Display a prompt when there are no todos
     Box(
@@ -198,23 +211,24 @@ fun ListFoodItems(
     LazyColumn(modifier = Modifier.fillMaxSize()) {
       items(foodItems) { item ->
         // Call a composable that renders each individual to-do item
-        FoodItemCard(
-            foodItem = item,
-            listFoodItemsViewModel = listFoodItemsViewModel,
-            navigationActions = navigationActions)
+        FoodItemCard(foodItem = item)
       }
     }
   }
 }
 
+/**
+ * Composable function to display a single food item card
+ *
+ * @param foodItem The food item to display
+ */
 @Composable
-fun FoodItemCard(
-    foodItem: FoodItem,
-    listFoodItemsViewModel: ListFoodItemsViewModel,
-    navigationActions: NavigationActions
-) {
+fun FoodItemCard(foodItem: FoodItem) {
   val expiryDate = foodItem.expiryDate
-  val formattedExpiryDate = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(expiryDate)
+  Log.d("FoodItemCard", "Expiry Date: $expiryDate")
+  val formattedExpiryDate =
+      expiryDate?.toDate()?.let { SimpleDateFormat("MM dd, yyyy", Locale.getDefault()).format(it) }
+          ?: "No Expiry Date"
   Column(
       modifier =
           Modifier.fillMaxWidth()
@@ -240,6 +254,12 @@ fun FoodItemCard(
       }
 }
 
+/**
+ * Composable function to display the search bar for filtering food items
+ *
+ * @param query The current query string
+ * @param onQueryChange The callback to update the query string
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FoodSearchBar(query: String, onQueryChange: (String) -> Unit) {
@@ -269,6 +289,11 @@ fun FoodSearchBar(query: String, onQueryChange: (String) -> Unit) {
       }
 }
 
+/**
+ * Composable function to display the first time welcome screen for the user to create a new
+ *
+ * @param householdViewModel The ViewModel for the households the user has access to
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FirstTimeWelcomeScreen(householdViewModel: HouseholdViewModel) {

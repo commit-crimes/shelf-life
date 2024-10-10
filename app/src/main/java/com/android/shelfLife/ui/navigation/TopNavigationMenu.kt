@@ -39,11 +39,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.android.shelfLife.model.household.HouseHold
 
+/**
+ * Composable function for the top navigation bar of the app
+ *
+ * @param houseHold The current household
+ * @param onHamburgerClick The lambda to be called when the hamburger icon is clicked
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopNavigationBar(
     houseHold: HouseHold,
     onHamburgerClick: () -> Unit = {},
+    filters: List<String>
 ) {
   var showFilterBar by remember { mutableStateOf(false) }
   Column {
@@ -67,33 +74,40 @@ fun TopNavigationBar(
           }
         },
         actions = {
-          IconButton(
-              modifier = Modifier.testTag("filterIcon"),
-              onClick = { showFilterBar = !showFilterBar }) { // Toggle filter bar visibility
-                Icon(
-                    imageVector = Icons.Default.FilterList,
-                    contentDescription = "Filter Icon",
-                    tint = Color.White)
-              }
+          if (filters.isNotEmpty()) {
+            IconButton(
+                modifier = Modifier.testTag("filterIcon"),
+                onClick = { showFilterBar = !showFilterBar }) { // Toggle filter bar visibility
+                  Icon(
+                      imageVector = Icons.Default.FilterList,
+                      contentDescription = "Filter Icon",
+                      tint = Color.White)
+                }
+          }
         },
         colors =
             TopAppBarDefaults.mediumTopAppBarColors(
                 containerColor = MaterialTheme.colorScheme.secondary,
                 titleContentColor = Color.White))
 
-    AnimatedVisibility(
-        visible = showFilterBar,
-        enter = fadeIn() + expandVertically(),
-        exit = fadeOut() + shrinkVertically()) {
-          FilterBar()
-        }
+    if (filters.isNotEmpty()) {
+      AnimatedVisibility(
+          visible = showFilterBar,
+          enter = fadeIn() + expandVertically(),
+          exit = fadeOut() + shrinkVertically()) {
+            FilterBar(filters)
+          }
+    }
   }
 }
 
+/**
+ * Composable function for the filter bar in the top navigation bar This function displays a
+ * horizontal list of filter chips that can be selected by the user.
+ */
 @Composable
-fun FilterBar() {
+fun FilterBar(filters: List<String>) {
   // State to track the selection of each filter chip
-  val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
   val selectedFilters = remember { mutableStateListOf<String>() }
   val scrollState = rememberScrollState()
 
@@ -118,6 +132,14 @@ fun FilterBar() {
       }
 }
 
+/**
+ * Composable function for a filter chip item This function displays a single filter chip that can
+ * be selected by the user.
+ *
+ * @param text The text to display on the filter chip
+ * @param isSelected Whether the filter chip is selected or not
+ * @param onClick The lambda to be called when the filter chip is clicked
+ */
 @Composable
 fun FilterChipItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
   FilterChip(
@@ -139,6 +161,14 @@ fun FilterChipItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
       )
 }
 
+/**
+ * Composable function for a single household element in the navigation drawer This function
+ * displays a single household element in the navigation drawer.
+ *
+ * @param household The household to display
+ * @param selectedHousehold The currently selected household
+ * @param onHouseholdSelected The lambda to be called when the household is selected
+ */
 @Composable
 fun HouseHoldElement(
     household: HouseHold,

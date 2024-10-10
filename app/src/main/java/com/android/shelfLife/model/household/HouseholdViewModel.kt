@@ -3,6 +3,7 @@ package com.android.shelfLife.model.household
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.google.firebase.firestore.FirebaseFirestore
@@ -20,10 +21,12 @@ class HouseholdViewModel(
   private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
   val selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
 
+  /** Initializes the HouseholdViewModel by loading the list of households from the repository. */
   init {
     loadHouseholds()
   }
 
+  /** Loads the list of households from the repository and updates the [_households] flow. */
   private fun loadHouseholds() {
     repository.getHouseholds(
         onSuccess = { householdList ->
@@ -35,6 +38,11 @@ class HouseholdViewModel(
         })
   }
 
+  /**
+   * Selects a household and updates the selected household and the list of food items.
+   *
+   * @param household - The household to select.
+   */
   fun selectHousehold(household: HouseHold?) {
     _selectedHousehold.value = household
     household?.let { listFoodItemsViewModel.setFoodItems(it.foodItems) }
@@ -60,6 +68,11 @@ class HouseholdViewModel(
     loadHouseholds()
   }
 
+  /**
+   * Updates an existing household in the repository and refreshes the household list.
+   *
+   * @param household - The updated household.
+   */
   fun updateHousehold(household: HouseHold) {
     repository.updateHousehold(
         household,
@@ -73,6 +86,11 @@ class HouseholdViewModel(
         })
   }
 
+  /**
+   * Deletes a household by its unique ID and refreshes the household list.
+   *
+   * @param householdId - The unique ID of the household to delete.
+   */
   fun deleteHouseholdById(householdId: String) {
     repository.deleteHouseholdById(
         householdId,
@@ -86,7 +104,19 @@ class HouseholdViewModel(
         })
   }
 
-  // Factory for creating HouseholdViewModel instances
+  /**
+   * Factory for creating a [HouseholdViewModel] with a constructor that takes a
+   * [HouseHoldRepository] and a [ListFoodItemsViewModel].
+   */
+
+  fun addFoodItem(foodItem: FoodItem) {
+    val selectedHousehold = selectedHousehold.value
+    if (selectedHousehold != null) {
+      updateHousehold(
+          selectedHousehold.copy(foodItems = selectedHousehold.foodItems.plus(foodItem)))
+    }
+  }
+
   companion object {
     val Factory: ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {
