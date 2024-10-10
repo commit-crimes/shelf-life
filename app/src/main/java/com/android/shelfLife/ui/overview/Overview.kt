@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.overview
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -226,7 +227,10 @@ fun ListFoodItems(foodItems: List<FoodItem>) {
 @Composable
 fun FoodItemCard(foodItem: FoodItem) {
   val expiryDate = foodItem.expiryDate
-  val formattedExpiryDate = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(expiryDate)
+  Log.d("FoodItemCard", "Expiry Date: $expiryDate")
+  val formattedExpiryDate =
+      expiryDate?.toDate()?.let { SimpleDateFormat("MM dd, yyyy", Locale.getDefault()).format(it) }
+          ?: "No Expiry Date"
   Column(
       modifier =
           Modifier.fillMaxWidth()
