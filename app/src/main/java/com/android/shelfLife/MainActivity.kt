@@ -11,6 +11,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
+import com.android.shelfLife.model.foodFacts.FoodFactsRepository
+import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
+import com.android.shelfLife.model.foodFacts.OpenFoodFactsRepository
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
@@ -19,7 +22,6 @@ import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
-import com.android.shelfLife.ui.camera.PermissionDeniedScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
@@ -29,6 +31,7 @@ import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.theme.ShelfLifeTheme
 import com.google.firebase.firestore.FirebaseFirestore
+import okhttp3.OkHttpClient
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +51,8 @@ fun ShelfLifeApp() {
   val listFoodItemViewModel = ListFoodItemsViewModel(foodItemRepository)
   val householdViewModel =
       HouseholdViewModel(HouseholdRepositoryFirestore(firebaseFirestore), listFoodItemViewModel)
+  val foodFactsRepository = OpenFoodFactsRepository(OkHttpClient())
+  val foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)
 
   val barcodeScannerViewModel: BarcodeScannerViewModel = viewModel()
 
@@ -73,9 +78,8 @@ fun ShelfLifeApp() {
         CameraPermissionHandler(navigationActions, barcodeScannerViewModel)
       }
       composable(Screen.BARCODE_SCANNER) {
-        BarcodeScannerScreen(navigationActions, barcodeScannerViewModel)
+        BarcodeScannerScreen(navigationActions, barcodeScannerViewModel, foodFactsViewModel)
       }
-      composable(Screen.PERMISSION_DENIED) { PermissionDeniedScreen() }
     }
 
     navigation(
