@@ -71,7 +71,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
           Image(
-              painter = painterResource(id = R.drawable.app_logo),
+              painter = painterResource(id = R.drawable.shelf_life_logo),
               contentDescription = "App Logo",
               modifier = Modifier.size(250.dp))
 
@@ -79,7 +79,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
 
           Text(
               modifier = Modifier.testTag("loginTitle"),
-              text = "Welcome",
+              text = "Shelf Life",
               style =
                   MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
               fontWeight = FontWeight.Bold,

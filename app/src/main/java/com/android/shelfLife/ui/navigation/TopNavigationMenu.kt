@@ -49,7 +49,11 @@ import com.android.shelfLife.model.household.HouseholdViewModel
 @Composable
 fun TopNavigationBar(
     houseHold: HouseHold,
-    onHamburgerClick: () -> Unit = {}
+    onHouseholdChange: (HouseHold) -> Unit,
+    onHamburgerClick: () -> Unit = {},
+    userHouseholds: List<HouseHold>,
+    householdViewModel: HouseholdViewModel,
+    filters: List<String>
 ) {
   var showFilterBar by remember { mutableStateOf(false) }
   Column {
@@ -72,11 +76,14 @@ fun TopNavigationBar(
           }
         },
         actions = {
-          IconButton(onClick = { showFilterBar = !showFilterBar }) { // Toggle filter bar visibility
-            Icon(
-                imageVector = Icons.Default.FilterList,
-                contentDescription = "Filter Icon",
-                tint = Color.White)
+          if (filters.isNotEmpty()) {
+            IconButton(
+                onClick = { showFilterBar = !showFilterBar }) { // Toggle filter bar visibility
+                  Icon(
+                      imageVector = Icons.Default.FilterList,
+                      contentDescription = "Filter Icon",
+                      tint = Color.White)
+                }
           }
         },
         colors =
@@ -84,12 +91,14 @@ fun TopNavigationBar(
                 containerColor = MaterialTheme.colorScheme.secondary,
                 titleContentColor = Color.White))
 
-    AnimatedVisibility(
-        visible = showFilterBar,
-        enter = fadeIn() + expandVertically(),
-        exit = fadeOut() + shrinkVertically()) {
-          FilterBar()
-        }
+    if (filters.isNotEmpty()) {
+      AnimatedVisibility(
+          visible = showFilterBar,
+          enter = fadeIn() + expandVertically(),
+          exit = fadeOut() + shrinkVertically()) {
+            FilterBar(filters)
+          }
+    }
   }
 }
 
@@ -98,30 +107,29 @@ fun TopNavigationBar(
  * This function displays a horizontal list of filter chips that can be selected by the user.
  */
 @Composable
-fun FilterBar() {
-  // State to track the selection of each filter chip
-  val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
-  val selectedFilters = remember { mutableStateListOf<String>() }
-  val scrollState = rememberScrollState()
+fun FilterBar(filters: List<String>) {
+    // State to track the selection of each filter chip
+    val selectedFilters = remember { mutableStateListOf<String>() }
+    val scrollState = rememberScrollState()
 
-  Row(
-      modifier =
-          Modifier.horizontalScroll(scrollState) // Enables horizontal scrolling
-              .padding(horizontal = 8.dp, vertical = 4.dp)) {
+    Row(
+        modifier =
+        Modifier.horizontalScroll(scrollState) // Enables horizontal scrolling
+            .padding(horizontal = 8.dp, vertical = 4.dp)) {
         filters.forEach { filter ->
-          val isSelected = selectedFilters.contains(filter)
-          FilterChipItem(
-              text = filter,
-              isSelected = isSelected,
-              onClick = {
-                if (isSelected) {
-                  selectedFilters.remove(filter)
-                } else {
-                  selectedFilters.add(filter)
-                }
-              })
+            val isSelected = selectedFilters.contains(filter)
+            FilterChipItem(
+                text = filter,
+                isSelected = isSelected,
+                onClick = {
+                    if (isSelected) {
+                        selectedFilters.remove(filter)
+                    } else {
+                        selectedFilters.add(filter)
+                    }
+                })
         }
-      }
+    }
 }
 
 /**

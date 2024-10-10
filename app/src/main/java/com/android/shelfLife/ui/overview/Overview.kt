@@ -86,6 +86,8 @@ fun OverviewScreen(
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
 
+  val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
+
   AddHouseHoldPopUp(
       showDialog = showDialog,
       onDismiss = { showDialog = false },
@@ -152,9 +154,17 @@ fun OverviewScreen(
           modifier = Modifier.testTag("overviewScreen"),
           topBar = {
             selectedHousehold?.let {
-              TopNavigationBar(
-                  houseHold = it,
-                  onHamburgerClick = { scope.launch { drawerState.open() } })
+                TopNavigationBar(
+                    userHouseholds = householdViewModel.households.collectAsState().value,
+                    onHouseholdChange = { household ->
+                        if (household != selectedHousehold) {
+                            householdViewModel.selectHousehold(household)
+                        }
+                    },
+                    houseHold = it,
+                  householdViewModel = householdViewModel,
+                  onHamburgerClick = { scope.launch { drawerState.open() } },
+                  filters = filters)
             }
           },
           bottomBar = {
