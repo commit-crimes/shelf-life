@@ -55,6 +55,12 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.utilities.BarcodeAnalyzer
 
+/**
+ * Composable function for the barcode scanner screen.
+ *
+ * @param navigationActions The navigation actions to be used in the screen
+ * @param viewModel The ViewModel for the barcode scanner
+ */
 @Composable
 fun BarcodeScannerScreen(
     navigationActions: NavigationActions,

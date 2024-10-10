@@ -10,6 +10,11 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 
+/**
+ * ViewModel for managing the barcode scanner screen.
+ *
+ * @property application The application context
+ */
 class BarcodeScannerViewModel(application: Application) : AndroidViewModel(application) {
 
   private val sharedPreferences =
@@ -37,6 +42,7 @@ class BarcodeScannerViewModel(application: Application) : AndroidViewModel(appli
 
   }
 
+  /** Checks if the camera permission is granted. */
   fun checkCameraPermission() {
     permissionGranted =
         ContextCompat.checkSelfPermission(
@@ -44,6 +50,11 @@ class BarcodeScannerViewModel(application: Application) : AndroidViewModel(appli
             PackageManager.PERMISSION_GRANTED
   }
 
+  /**
+   * Requests the camera permission.
+   *
+   * @param isGranted boolean indicating if the permission is granted
+   */
   fun onPermissionResult(isGranted: Boolean) {
     permissionGranted = isGranted
     permissionRequested = true

@@ -37,16 +37,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.android.shelfLife.model.household.HouseHold
-import com.android.shelfLife.model.household.HouseholdViewModel
 
+/**
+ * Composable function for the top navigation bar of the app
+ *
+ * @param houseHold The current household
+ * @param onHamburgerClick The lambda to be called when the hamburger icon is clicked
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopNavigationBar(
     houseHold: HouseHold,
-    onHouseholdChange: (HouseHold) -> Unit,
     onHamburgerClick: () -> Unit = {},
-    userHouseholds: List<HouseHold>,
-    householdViewModel: HouseholdViewModel,
     filters: List<String>
 ) {
   var showFilterBar by remember { mutableStateOf(false) }
@@ -96,47 +98,10 @@ fun TopNavigationBar(
   }
 }
 
-@Composable
-fun HouseHoldElement(
-    household: HouseHold,
-    selectedHousehold: HouseHold,
-    onHouseholdSelected: (HouseHold) -> Unit
-) {
-  NavigationDrawerItem(
-      label = {
-        Text(
-            text = household.name,
-            fontWeight = if (household == selectedHousehold) FontWeight.Bold else FontWeight.Normal,
-            color =
-                if (household == selectedHousehold) MaterialTheme.colorScheme.primary
-                else Color.Unspecified)
-      },
-      selected = household == selectedHousehold,
-      onClick = { onHouseholdSelected(household) },
-      modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding))
-}
-
-@Composable
-fun FilterChipItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
-  FilterChip(
-      selected = isSelected,
-      onClick = onClick,
-      label = { Text(text = text) },
-      leadingIcon =
-          if (isSelected) {
-            { Icon(imageVector = Icons.Default.Check, contentDescription = "Selected") }
-          } else null,
-      colors =
-          FilterChipDefaults.filterChipColors(
-              selectedContainerColor = MaterialTheme.colorScheme.secondary,
-              selectedLabelColor = Color.White,
-              selectedLeadingIconColor = Color.White,
-              containerColor = Color.White,
-              labelColor = Color.Black),
-      modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp) // Add padding between chips
-      )
-}
-
+/**
+ * Composable function for the filter bar in the top navigation bar This function displays a
+ * horizontal list of filter chips that can be selected by the user.
+ */
 @Composable
 fun FilterBar(filters: List<String>) {
   // State to track the selection of each filter chip
@@ -161,4 +126,61 @@ fun FilterBar(filters: List<String>) {
               })
         }
       }
+}
+
+/**
+ * Composable function for a filter chip item This function displays a single filter chip that can
+ * be selected by the user.
+ *
+ * @param text The text to display on the filter chip
+ * @param isSelected Whether the filter chip is selected or not
+ * @param onClick The lambda to be called when the filter chip is clicked
+ */
+@Composable
+fun FilterChipItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
+  FilterChip(
+      selected = isSelected,
+      onClick = onClick,
+      label = { Text(text = text) },
+      leadingIcon =
+          if (isSelected) {
+            { Icon(imageVector = Icons.Default.Check, contentDescription = "Selected") }
+          } else null,
+      colors =
+          FilterChipDefaults.filterChipColors(
+              selectedContainerColor = MaterialTheme.colorScheme.secondary,
+              selectedLabelColor = Color.White,
+              selectedLeadingIconColor = Color.White,
+              containerColor = Color.White,
+              labelColor = Color.Black),
+      modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp) // Add padding between chips
+      )
+}
+
+/**
+ * Composable function for a single household element in the navigation drawer This function
+ * displays a single household element in the navigation drawer.
+ *
+ * @param household The household to display
+ * @param selectedHousehold The currently selected household
+ * @param onHouseholdSelected The lambda to be called when the household is selected
+ */
+@Composable
+fun HouseHoldElement(
+    household: HouseHold,
+    selectedHousehold: HouseHold,
+    onHouseholdSelected: (HouseHold) -> Unit
+) {
+  NavigationDrawerItem(
+      label = {
+        Text(
+            text = household.name,
+            fontWeight = if (household == selectedHousehold) FontWeight.Bold else FontWeight.Normal,
+            color =
+                if (household == selectedHousehold) MaterialTheme.colorScheme.primary
+                else Color.Unspecified)
+      },
+      selected = household == selectedHousehold,
+      onClick = { onHouseholdSelected(household) },
+      modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding))
 }
