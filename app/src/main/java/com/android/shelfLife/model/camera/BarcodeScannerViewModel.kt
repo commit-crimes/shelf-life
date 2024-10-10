@@ -17,23 +17,36 @@ import androidx.lifecycle.AndroidViewModel
  */
 class BarcodeScannerViewModel(application: Application) : AndroidViewModel(application) {
 
-  private val context = getApplication<Application>().applicationContext
-  private val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+  private val sharedPreferences =
+      getApplication<Application>()
+          .applicationContext
+          .getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
   var permissionGranted by
       mutableStateOf(
-          ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+          ContextCompat.checkSelfPermission(
+              getApplication<Application>().applicationContext, Manifest.permission.CAMERA) ==
               PackageManager.PERMISSION_GRANTED)
     private set
 
-  var permissionRequested by
+  private var permissionRequested by
       mutableStateOf(sharedPreferences.getBoolean("permissionRequested", false))
-    private set
+
+  private var scannedBarcode by mutableStateOf<String?>(null)
+
+  fun onBarcodeScanned(barcode: String) {
+    scannedBarcode = barcode
+    // TODO add additional logic here, such as fetching product info
+    //get food facts
+    //navigate to product info screen and let the user add the product to their list
+
+  }
 
   /** Checks if the camera permission is granted. */
   fun checkCameraPermission() {
     permissionGranted =
-        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+        ContextCompat.checkSelfPermission(
+            getApplication<Application>().applicationContext, Manifest.permission.CAMERA) ==
             PackageManager.PERMISSION_GRANTED
   }
 
