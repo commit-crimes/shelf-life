@@ -26,6 +26,10 @@ class ListFoodItemsViewModel(private val repository: FoodItemRepository) : ViewM
     Log.e("ListFoodItemsViewModel", "Error fetching FoodItems: $exception")
   }
 
+  fun getUID(): String {
+    return repository.getNewUid()
+  }
+
   /** Gets all FoodItem documents */
   fun getFoodItems() {
     repository.getFoodItems(onSuccess = { _foodItems.value = it }, onFailure = ::_onFail)

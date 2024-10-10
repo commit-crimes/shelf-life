@@ -23,6 +23,7 @@ import com.android.shelfLife.ui.camera.PermissionDeniedScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.overview.AddFoodItemScreen
 import com.android.shelfLife.ui.overview.OverviewScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
@@ -61,6 +62,9 @@ fun ShelfLifeApp() {
     navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
       composable(Screen.OVERVIEW) {
         OverviewScreen(navigationActions, listFoodItemViewModel, householdViewModel)
+      }
+      composable(Screen.ADD_FOOD) {
+        AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
       }
     }
 
