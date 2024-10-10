@@ -91,6 +91,7 @@ fun OverviewScreen(
       householdViewModel = householdViewModel)
 
   ModalNavigationDrawer(
+      modifier = Modifier.testTag("householdSelectionDrawer"),
       drawerState = drawerState,
       drawerContent = {
         ModalDrawerSheet {
@@ -118,19 +119,23 @@ fun OverviewScreen(
               modifier = Modifier.fillMaxWidth().padding(16.dp),
               verticalAlignment = Alignment.CenterVertically,
               horizontalArrangement = Arrangement.Center) {
-                IconButton(onClick = { showDialog = true }) {
-                  Icon(
-                      imageVector = Icons.Default.Add,
-                      contentDescription = "Add Household Icon",
-                      modifier = Modifier.testTag("addHouseholdIcon"))
-                }
+                IconButton(
+                    modifier = Modifier.testTag("addHouseholdIcon"),
+                    onClick = { showDialog = true }) {
+                      Icon(
+                          imageVector = Icons.Default.Add,
+                          contentDescription = "Add Household Icon",
+                      )
+                    }
 
-                IconButton(onClick = { showEdit = true }) {
-                  Icon(
-                      imageVector = Icons.Outlined.Edit,
-                      contentDescription = "Edit Household Icon",
-                      modifier = Modifier.testTag("editHouseholdIcon"))
-                }
+                IconButton(
+                    modifier = Modifier.testTag("editHouseholdIcon"),
+                    onClick = { showEdit = true }) {
+                      Icon(
+                          imageVector = Icons.Outlined.Edit,
+                          contentDescription = "Edit Household Icon",
+                      )
+                    }
               }
         }
       },
@@ -146,15 +151,7 @@ fun OverviewScreen(
           topBar = {
             selectedHousehold?.let {
               TopNavigationBar(
-                  userHouseholds = householdViewModel.households.collectAsState().value,
-                  onHouseholdChange = { household ->
-                    if (household != selectedHousehold) {
-                      householdViewModel.selectHousehold(household)
-                    }
-                  },
-                  houseHold = it,
-                  householdViewModel = householdViewModel,
-                  onHamburgerClick = { scope.launch { drawerState.open() } })
+                  houseHold = it, onHamburgerClick = { scope.launch { drawerState.open() } })
             }
           },
           bottomBar = {
@@ -167,7 +164,7 @@ fun OverviewScreen(
             FloatingActionButton(
                 onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
                 content = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                modifier = Modifier.testTag("AddFoodFab"),
+                modifier = Modifier.testTag("addFoodFab"),
                 containerColor = MaterialTheme.colorScheme.secondaryContainer)
           },
           content = { paddingValues ->
@@ -268,7 +265,7 @@ fun FoodSearchBar(query: String, onQueryChange: (String) -> Unit) {
                         max = 600.dp) // Restrict max width to prevent over-stretching on large
                     // screens
                     .fillMaxWidth(0.9f) // Make it responsive and occupy 90% of available width
-            ) {}
+                    .testTag("searchBar")) {}
       }
 }
 
@@ -276,7 +273,7 @@ fun FoodSearchBar(query: String, onQueryChange: (String) -> Unit) {
 @Composable
 fun FirstTimeWelcomeScreen(householdViewModel: HouseholdViewModel) {
   Column(
-      modifier = Modifier.fillMaxSize().padding(16.dp),
+      modifier = Modifier.fillMaxSize().padding(16.dp).testTag("firstTimeWelcomeScreen"),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally) {
         // Welcome Text
@@ -306,7 +303,10 @@ fun FirstTimeWelcomeScreen(householdViewModel: HouseholdViewModel) {
             value = householdName,
             onValueChange = { newValue -> householdName = newValue },
             label = { Text("Enter Household name") },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
+            modifier =
+                Modifier.fillMaxWidth()
+                    .padding(horizontal = 32.dp)
+                    .testTag("householdNameTextField"),
             singleLine = true,
             shape = MaterialTheme.shapes.medium,
             colors =
@@ -320,7 +320,7 @@ fun FirstTimeWelcomeScreen(householdViewModel: HouseholdViewModel) {
         Button(
             onClick = { householdViewModel.addNewHousehold(householdName) },
             enabled = householdName.isNotBlank(),
-            modifier = Modifier.fillMaxWidth(0.6f).height(48.dp),
+            modifier = Modifier.fillMaxWidth(0.6f).height(48.dp).testTag("householdNameSaveButton"),
             shape = MaterialTheme.shapes.medium) {
               Text(text = "Create Household", style = MaterialTheme.typography.labelLarge)
             }
