@@ -4,6 +4,7 @@ import com.android.shelfLife.model.foodItem.FoodItem
 
 /**
  * Data class representing a household.
+ *
  * @property uid Unique ID of the household
  * @property name Name of the household
  * @property members List of members in the household

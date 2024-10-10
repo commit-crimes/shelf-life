@@ -16,21 +16,21 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
   private val collectionPath = "foodItems"
   private val auth = FirebaseAuth.getInstance()
 
-    /**
-     * Generates a new unique ID for a food item.
-     *
-     * @return A new unique ID.
-     */
-    override fun getNewUid(): String {
+  /**
+   * Generates a new unique ID for a food item.
+   *
+   * @return A new unique ID.
+   */
+  override fun getNewUid(): String {
     return db.collection(collectionPath).document().id
   }
 
-    /**
-     * Initializes the repository (e.g., setting up database connections or initial data).
-     *
-     * @param onSuccess - Called when the initialization is successful.
-     */
-    override fun init(onSuccess: () -> Unit) {
+  /**
+   * Initializes the repository (e.g., setting up database connections or initial data).
+   *
+   * @param onSuccess - Called when the initialization is successful.
+   */
+  override fun init(onSuccess: () -> Unit) {
     auth.addAuthStateListener { authVal ->
       val currentUser = authVal.currentUser
       if (currentUser != null) {
@@ -48,13 +48,13 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
     Log.d("FoodItemRepoFire", "init done")
   }
 
-    /**
-     * Fetches all food items from the repository.
-     *
-     * @param onSuccess - Called when the list of food items is successfully retrieved.
-     * @param onFailure - Called when there is an error retrieving the food items.
-     */
-    override fun getFoodItems(onSuccess: (List<FoodItem>) -> Unit, onFailure: (Exception) -> Unit) {
+  /**
+   * Fetches all food items from the repository.
+   *
+   * @param onSuccess - Called when the list of food items is successfully retrieved.
+   * @param onFailure - Called when there is an error retrieving the food items.
+   */
+  override fun getFoodItems(onSuccess: (List<FoodItem>) -> Unit, onFailure: (Exception) -> Unit) {
     db.collection(collectionPath)
         .get()
         .addOnSuccessListener { result ->
@@ -75,14 +75,14 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
         }
   }
 
-    /**
-     * Adds a new food item to the repository.
-     *
-     * @param foodItem - The food item to be added.
-     * @param onSuccess - Called when the food item is successfully added.
-     * @param onFailure - Called when there is an error adding the food item.
-     */
-    override fun addFoodItem(
+  /**
+   * Adds a new food item to the repository.
+   *
+   * @param foodItem - The food item to be added.
+   * @param onSuccess - Called when the food item is successfully added.
+   * @param onFailure - Called when there is an error adding the food item.
+   */
+  override fun addFoodItem(
       foodItem: FoodItem,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
@@ -97,14 +97,14 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
         }
   }
 
-    /**
-     * Updates an existing food item in the repository.
-     *
-     * @param foodItem - The food item with updated data.
-     * @param onSuccess - Called when the food item is successfully updated.
-     * @param onFailure - Called when there is an error updating the food item.
-     */
-    override fun updateFoodItem(
+  /**
+   * Updates an existing food item in the repository.
+   *
+   * @param foodItem - The food item with updated data.
+   * @param onSuccess - Called when the food item is successfully updated.
+   * @param onFailure - Called when there is an error updating the food item.
+   */
+  override fun updateFoodItem(
       foodItem: FoodItem,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
@@ -119,14 +119,14 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
         }
   }
 
-    /**
-     * Deletes a food item by its unique ID.
-     *
-     * @param id - The unique ID of the food item to delete.
-     * @param onSuccess - Called when the food item is successfully deleted.
-     * @param onFailure - Called when there is an error deleting the food item.
-     */
-    override fun deleteFoodItemById(
+  /**
+   * Deletes a food item by its unique ID.
+   *
+   * @param id - The unique ID of the food item to delete.
+   * @param onSuccess - Called when the food item is successfully deleted.
+   * @param onFailure - Called when there is an error deleting the food item.
+   */
+  override fun deleteFoodItemById(
       id: String,
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
@@ -211,13 +211,13 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
     }
   }
 
-    /**
-     * Converts a Firestore document to a FoodItem object.
-     *
-     * @param doc The Firestore document to convert.
-     * @return A FoodItem object.
-     */
-    fun convertToFoodItemFromMap(map: Map<String, Any>): FoodItem? {
+  /**
+   * Converts a Firestore document to a FoodItem object.
+   *
+   * @param doc The Firestore document to convert.
+   * @return A FoodItem object.
+   */
+  fun convertToFoodItemFromMap(map: Map<String, Any>): FoodItem? {
     return try {
       val uid = map["uid"] as? String ?: return null
       val name = map["name"] as? String ?: return null
@@ -241,13 +241,13 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
     }
   }
 
-    /**
-     * Converts a FoodItem object to a Firestore document.
-     *
-     * @param foodItem The FoodItem object to convert.
-     * @return A Firestore document.
-     */
-    fun convertFoodItemToMap(foodItem: FoodItem): Map<String, Any?> {
+  /**
+   * Converts a FoodItem object to a Firestore document.
+   *
+   * @param foodItem The FoodItem object to convert.
+   * @return A Firestore document.
+   */
+  fun convertFoodItemToMap(foodItem: FoodItem): Map<String, Any?> {
     return mapOf(
         "uid" to foodItem.uid,
         "name" to foodItem.foodFacts.name,

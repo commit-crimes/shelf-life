@@ -154,14 +154,14 @@ fun OverviewScreen(
           modifier = Modifier.testTag("overviewScreen"),
           topBar = {
             selectedHousehold?.let {
-                TopNavigationBar(
-                    userHouseholds = householdViewModel.households.collectAsState().value,
-                    onHouseholdChange = { household ->
-                        if (household != selectedHousehold) {
-                            householdViewModel.selectHousehold(household)
-                        }
-                    },
-                    houseHold = it,
+              TopNavigationBar(
+                  userHouseholds = householdViewModel.households.collectAsState().value,
+                  onHouseholdChange = { household ->
+                    if (household != selectedHousehold) {
+                      householdViewModel.selectHousehold(household)
+                    }
+                  },
+                  houseHold = it,
                   householdViewModel = householdViewModel,
                   onHamburgerClick = { scope.launch { drawerState.open() } },
                   filters = filters)
@@ -199,9 +199,7 @@ fun OverviewScreen(
  * @param foodItems The list of food items to display
  */
 @Composable
-fun ListFoodItems(
-    foodItems: List<FoodItem>
-) {
+fun ListFoodItems(foodItems: List<FoodItem>) {
   if (foodItems.isEmpty()) {
     // Display a prompt when there are no todos
     Box(

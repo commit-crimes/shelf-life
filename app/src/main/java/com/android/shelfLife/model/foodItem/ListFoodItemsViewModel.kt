@@ -29,7 +29,6 @@ class ListFoodItemsViewModel(private val repository: FoodItemRepository) : ViewM
     repository.init(onSuccess = { getFoodItems() })
   }
 
-
   /**
    * Handles a failure in fetching FoodItems.
    *

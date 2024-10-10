@@ -30,22 +30,19 @@ class BarcodeScannerViewModel(application: Application) : AndroidViewModel(appli
       mutableStateOf(sharedPreferences.getBoolean("permissionRequested", false))
     private set
 
-    /**
-     * Checks if the camera permission is granted.
-     */
-    fun checkCameraPermission() {
+  /** Checks if the camera permission is granted. */
+  fun checkCameraPermission() {
     permissionGranted =
         ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
             PackageManager.PERMISSION_GRANTED
   }
 
-    /**
-     * Requests the camera permission.
-     *
-     * @param isGranted boolean indicating if the permission is granted
-     *
-     */
-    fun onPermissionResult(isGranted: Boolean) {
+  /**
+   * Requests the camera permission.
+   *
+   * @param isGranted boolean indicating if the permission is granted
+   */
+  fun onPermissionResult(isGranted: Boolean) {
     permissionGranted = isGranted
     permissionRequested = true
     sharedPreferences.edit().putBoolean("permissionRequested", true).apply()
