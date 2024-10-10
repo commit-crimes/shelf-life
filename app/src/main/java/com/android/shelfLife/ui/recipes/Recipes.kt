@@ -306,16 +306,15 @@ fun RecipeItem(
                   ) {
                     // Display the recipe name with a specific font size, weight, and overflow
                     // handling
-                      Text(
-                          text = recipe.name,
-                          fontSize = 24.sp,
-                          lineHeight = 24.sp,
-                          fontWeight = FontWeight(500),
-                          maxLines = 1,  // Ensure only one line is shown
-                          overflow = TextOverflow.Ellipsis, // Show ellipsis when the text is too long
-                          modifier = Modifier
-                              .fillMaxWidth() // Fill available width
-                      )
+                    Text(
+                        text = recipe.name,
+                        fontSize = 24.sp,
+                        lineHeight = 24.sp,
+                        fontWeight = FontWeight(500),
+                        maxLines = 1, // Ensure only one line is shown
+                        overflow = TextOverflow.Ellipsis, // Show ellipsis when the text is too long
+                        modifier = Modifier.fillMaxWidth() // Fill available width
+                        )
 
                     Spacer(
                         modifier =
