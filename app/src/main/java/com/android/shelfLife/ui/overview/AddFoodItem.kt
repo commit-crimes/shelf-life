@@ -9,7 +9,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
@@ -185,17 +184,18 @@ fun AddFoodItemScreen(
                         category = category,
                         // nutritionFacts = NutritionFacts()
                     )
-                val newFoodItem = FoodItem(
-                    uid = foodItemViewModel.getUID(),
-                    foodFacts = foodFacts,
-                    location = location,
-                    expiryDate = formatDateToTimestamp(expireDate),
-                    openDate = formatDateToTimestamp(openDate),
-                    buyDate = formatDateToTimestamp(buyDate),
-                    // Have to add logic to determine status depending on the dates given here/
-                    // should be calculated
-                    status = FoodStatus.CLOSED)
-                  houseHoldViewModel.addFoodItem(newFoodItem)
+                val newFoodItem =
+                    FoodItem(
+                        uid = foodItemViewModel.getUID(),
+                        foodFacts = foodFacts,
+                        location = location,
+                        expiryDate = formatDateToTimestamp(expireDate),
+                        openDate = formatDateToTimestamp(openDate),
+                        buyDate = formatDateToTimestamp(buyDate),
+                        // Have to add logic to determine status depending on the dates given here/
+                        // should be calculated
+                        status = FoodStatus.CLOSED)
+                houseHoldViewModel.addFoodItem(newFoodItem)
                 navigationActions.goBack()
               },
               modifier = Modifier.fillMaxWidth().height(50.dp)) {

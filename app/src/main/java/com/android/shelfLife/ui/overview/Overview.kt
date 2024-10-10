@@ -219,7 +219,9 @@ fun FoodItemCard(
 ) {
   val expiryDate = foodItem.expiryDate
   Log.d("FoodItemCard", "Expiry Date: $expiryDate")
-    val formattedExpiryDate = expiryDate?.toDate()?.let { SimpleDateFormat("MM dd, yyyy", Locale.getDefault()).format(it) } ?: "No Expiry Date"
+  val formattedExpiryDate =
+      expiryDate?.toDate()?.let { SimpleDateFormat("MM dd, yyyy", Locale.getDefault()).format(it) }
+          ?: "No Expiry Date"
   Column(
       modifier =
           Modifier.fillMaxWidth()

@@ -87,12 +87,13 @@ class HouseholdViewModel(
         })
   }
 
-    fun addFoodItem(foodItem: FoodItem) {
-        val selectedHousehold = selectedHousehold.value
-        if (selectedHousehold != null) {
-            updateHousehold(selectedHousehold.copy(foodItems = selectedHousehold.foodItems.plus(foodItem)))
-        }
+  fun addFoodItem(foodItem: FoodItem) {
+    val selectedHousehold = selectedHousehold.value
+    if (selectedHousehold != null) {
+      updateHousehold(
+          selectedHousehold.copy(foodItems = selectedHousehold.foodItems.plus(foodItem)))
     }
+  }
 
   // Factory for creating HouseholdViewModel instances
   companion object {

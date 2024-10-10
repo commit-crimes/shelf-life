@@ -59,7 +59,9 @@ fun ShelfLifeApp() {
       composable(Screen.OVERVIEW) {
         OverviewScreen(navigationActions, listFoodItemViewModel, householdViewModel)
       }
-      composable(Screen.ADD_FOOD) { AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel) }
+      composable(Screen.ADD_FOOD) {
+        AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
+      }
     }
 
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
