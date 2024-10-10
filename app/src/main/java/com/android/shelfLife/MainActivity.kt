@@ -15,6 +15,7 @@ import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
@@ -23,6 +24,8 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.overview.OverviewScreen
+import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
+import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.theme.ShelfLifeTheme
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -38,6 +41,7 @@ class MainActivity : ComponentActivity() {
 fun ShelfLifeApp() {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
+  val listRecipesViewModel = ListRecipesViewModel()
   val firebaseFirestore = FirebaseFirestore.getInstance()
   val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
   val listFoodItemViewModel = ListFoodItemsViewModel(foodItemRepository)
@@ -68,6 +72,18 @@ fun ShelfLifeApp() {
         BarcodeScannerScreen(navigationActions, barcodeScannerViewModel)
       }
       composable(Screen.PERMISSION_DENIED) { PermissionDeniedScreen() }
+    }
+
+    navigation(
+        startDestination = Screen.RECIPES,
+        route = Route.RECIPES,
+    ) {
+      composable(Screen.RECIPES) {
+        RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
+      }
+      composable(Screen.INDIVIDUAL_RECIPE) {
+        IndividualRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)
+      }
     }
   }
 }
