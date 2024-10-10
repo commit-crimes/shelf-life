@@ -31,6 +31,11 @@ class ListFoodItemsViewModel(private val repository: FoodItemRepository) : ViewM
     repository.getFoodItems(onSuccess = { _foodItems.value = it }, onFailure = ::_onFail)
   }
 
+  /** Directly updates the list of FoodItems */
+  fun setFoodItems(foodItems: List<FoodItem>) {
+    _foodItems.value = foodItems
+  }
+
   /** Adds a FoodItem document */
   fun addFoodItem(foodItem: FoodItem) {
     repository.addFoodItem(

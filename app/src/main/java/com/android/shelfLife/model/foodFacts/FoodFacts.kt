@@ -49,11 +49,11 @@ enum class FoodCategory {
  * values.
  */
 data class NutritionFacts(
-    val energyKcal: Int = 0, // Default energy in kilocalories per 100g/ml
-    val fat: Double = 0.0, // Default fat value is 0.0 if not provided
-    val saturatedFat: Double = 0.0, // Default saturated fat value is 0.0 if not provided
-    val carbohydrates: Double = 0.0, // Default carbohydrates is 0.0 if not provided
-    val sugars: Double = 0.0, // Default sugars value is 0.0 if not provided
-    val proteins: Double = 0.0, // Default proteins value is 0.0
-    val salt: Double = 0.0, // Default salt value is 0.0
+    val energyKcal: Int = 0, // Default energy in kilocalories is 0Kcal if not provided
+    val fat: Double = 0.0, // Default fat value is 0.0g if not provided
+    val saturatedFat: Double = 0.0, // Default saturated fat value is 0.0g if not provided
+    val carbohydrates: Double = 0.0, // Default carbohydrates is 0.0g if not provided
+    val sugars: Double = 0.0, // Default sugars value is 0.0g if not provided
+    val proteins: Double = 0.0, // Default proteins value is 0.0g
+    val salt: Double = 0.0, // Default salt value is 0.0g
 )

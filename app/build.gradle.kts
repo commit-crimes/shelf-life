@@ -127,6 +127,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.camera.core)
     testImplementation(libs.test.core.ktx)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
@@ -168,6 +169,9 @@ dependencies {
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
     testImplementation(libs.json)
+    // Testing mock web server for OkHttp
+    testImplementation(libs.mockwebserver)
+
 
     // Test UI
     androidTestImplementation(libs.androidx.junit)

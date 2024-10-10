@@ -22,17 +22,11 @@ import com.google.firebase.Timestamp
 data class FoodItem(
     val uid: String, // Unique ID of the food item
     val foodFacts: FoodFacts, // Food facts of the food item
-    val location: FoodLocation =
-        FoodLocation(0, FoodStorageLocation.PANTRY), // Default location is PANTRY
+    val location: FoodStorageLocation = FoodStorageLocation.PANTRY, // Default location is PANTRY
     val expiryDate: Timestamp? = null, // Expiry date can be null if not provided
     val openDate: Timestamp? = null, // Expiry date can be null if not provided
     val buyDate: Timestamp = Timestamp.now(), // Default buy date is the current time
     val status: FoodStatus = FoodStatus.CLOSED // Default status is CLOSED
-)
-
-data class FoodLocation(
-    val householdNumber: Int, // Household number
-    val storageLocation: FoodStorageLocation // Location can be PANTRY, FRIDGE, or FREEZER
 )
 
 /** This enum class represents the status of a food item. */

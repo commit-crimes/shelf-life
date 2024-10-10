@@ -9,7 +9,6 @@ import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
-import com.android.shelfLife.model.foodItem.FoodLocation
 import com.android.shelfLife.model.foodItem.FoodStatus
 import com.android.shelfLife.model.foodItem.FoodStorageLocation
 import com.google.android.gms.tasks.Tasks
@@ -58,7 +57,7 @@ class FoodItemRepositoryFirestoreTest {
       FoodItem(
           uid = "1",
           foodFacts = foodFacts,
-          location = FoodLocation(0, FoodStorageLocation.PANTRY),
+          location = FoodStorageLocation.PANTRY,
           expiryDate = Timestamp.now(),
           buyDate = Timestamp.now(),
           status = FoodStatus.CLOSED,
@@ -134,8 +133,7 @@ class FoodItemRepositoryFirestoreTest {
     assert(capturedFoodItem.status == FoodStatus.CLOSED)
 
     // Check the location of the food item
-    assert(capturedFoodItem.location.householdNumber == 0)
-    assert(capturedFoodItem.location.storageLocation == FoodStorageLocation.PANTRY)
+    assert(capturedFoodItem.location == FoodStorageLocation.PANTRY)
 
     // Check the timestamp values
     assert(capturedFoodItem.expiryDate != null) // Make sure expiry date is not null
