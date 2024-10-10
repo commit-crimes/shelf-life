@@ -3,6 +3,7 @@ package com.android.shelfLife.model.household
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.google.firebase.firestore.FirebaseFirestore
@@ -85,6 +86,13 @@ class HouseholdViewModel(
           Log.e("HouseholdViewModel", "Error deleting household: $exception")
         })
   }
+
+    fun addFoodItem(foodItem: FoodItem) {
+        val selectedHousehold = selectedHousehold.value
+        if (selectedHousehold != null) {
+            updateHousehold(selectedHousehold.copy(foodItems = selectedHousehold.foodItems.plus(foodItem)))
+        }
+    }
 
   // Factory for creating HouseholdViewModel instances
   companion object {

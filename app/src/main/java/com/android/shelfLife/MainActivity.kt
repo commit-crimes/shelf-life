@@ -22,6 +22,7 @@ import com.android.shelfLife.ui.camera.PermissionDeniedScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.overview.AddFoodItemScreen
 import com.android.shelfLife.ui.overview.OverviewScreen
 import com.android.shelfLife.ui.theme.ShelfLifeTheme
 import com.google.firebase.firestore.FirebaseFirestore
@@ -58,6 +59,7 @@ fun ShelfLifeApp() {
       composable(Screen.OVERVIEW) {
         OverviewScreen(navigationActions, listFoodItemViewModel, householdViewModel)
       }
+      composable(Screen.ADD_FOOD) { AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel) }
     }
 
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {

@@ -18,6 +18,7 @@ import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodStatus
 import com.android.shelfLife.model.foodItem.FoodStorageLocation
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
+import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
@@ -27,8 +28,8 @@ import java.util.*
 @Composable
 fun AddFoodItemScreen(
     navigationActions: NavigationActions,
-    listFoodItemViewModel: ListFoodItemsViewModel =
-        viewModel(factory = ListFoodItemsViewModel.Factory)
+    houseHoldViewModel: HouseholdViewModel,
+    foodItemViewModel: ListFoodItemsViewModel
 ) {
 
   var foodName by remember { mutableStateOf("") }
@@ -184,18 +185,17 @@ fun AddFoodItemScreen(
                         category = category,
                         // nutritionFacts = NutritionFacts()
                     )
-
-                listFoodItemViewModel.addFoodItem(
-                    FoodItem(
-                        uid = listFoodItemViewModel.getUID(),
-                        foodFacts = foodFacts,
-                        location = location,
-                        expiryDate = formatDateToTimestamp(expireDate),
-                        openDate = formatDateToTimestamp(openDate),
-                        buyDate = formatDateToTimestamp(buyDate),
-                        // Have to add logic to determine status depending on the dates given here/
-                        // should be calculated
-                        status = FoodStatus.CLOSED))
+                val newFoodItem = FoodItem(
+                    uid = foodItemViewModel.getUID(),
+                    foodFacts = foodFacts,
+                    location = location,
+                    expiryDate = formatDateToTimestamp(expireDate),
+                    openDate = formatDateToTimestamp(openDate),
+                    buyDate = formatDateToTimestamp(buyDate),
+                    // Have to add logic to determine status depending on the dates given here/
+                    // should be calculated
+                    status = FoodStatus.CLOSED)
+                  houseHoldViewModel.addFoodItem(newFoodItem)
                 navigationActions.goBack()
               },
               modifier = Modifier.fillMaxWidth().height(50.dp)) {
