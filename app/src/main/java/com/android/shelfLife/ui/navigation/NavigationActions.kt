@@ -23,7 +23,8 @@ object Screen {
   const val PERMISSION_HANDLER = "Permission Handler Screen"
   const val PERMISSION_DENIED = "Permission Denied Screen"
   const val ADD_FOOD = "Add food Screen"
-  const val RECIPES = "Recipes"
+  const val RECIPES = "Recipes Screen"
+  const val INDIVIDUAL_RECIPE = "Individual Recipe Screen"
   const val PROFILE = "Profile Screen"
   // Add other screens as needed
 }

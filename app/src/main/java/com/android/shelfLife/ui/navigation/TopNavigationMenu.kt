@@ -46,7 +46,8 @@ fun TopNavigationBar(
     onHouseholdChange: (HouseHold) -> Unit,
     onHamburgerClick: () -> Unit = {},
     userHouseholds: List<HouseHold>,
-    householdViewModel: HouseholdViewModel
+    householdViewModel: HouseholdViewModel,
+    filters: List<String>
 ) {
   var showFilterBar by remember { mutableStateOf(false) }
   Column {
@@ -69,11 +70,14 @@ fun TopNavigationBar(
           }
         },
         actions = {
-          IconButton(onClick = { showFilterBar = !showFilterBar }) { // Toggle filter bar visibility
-            Icon(
-                imageVector = Icons.Default.FilterList,
-                contentDescription = "Filter Icon",
-                tint = Color.White)
+          if (filters.isNotEmpty()) {
+            IconButton(
+                onClick = { showFilterBar = !showFilterBar }) { // Toggle filter bar visibility
+                  Icon(
+                      imageVector = Icons.Default.FilterList,
+                      contentDescription = "Filter Icon",
+                      tint = Color.White)
+                }
           }
         },
         colors =
@@ -81,40 +85,35 @@ fun TopNavigationBar(
                 containerColor = MaterialTheme.colorScheme.secondary,
                 titleContentColor = Color.White))
 
-    AnimatedVisibility(
-        visible = showFilterBar,
-        enter = fadeIn() + expandVertically(),
-        exit = fadeOut() + shrinkVertically()) {
-          FilterBar()
-        }
+    if (filters.isNotEmpty()) {
+      AnimatedVisibility(
+          visible = showFilterBar,
+          enter = fadeIn() + expandVertically(),
+          exit = fadeOut() + shrinkVertically()) {
+            FilterBar(filters)
+          }
+    }
   }
 }
 
 @Composable
-fun FilterBar() {
-  // State to track the selection of each filter chip
-  val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
-  val selectedFilters = remember { mutableStateListOf<String>() }
-  val scrollState = rememberScrollState()
-
-  Row(
-      modifier =
-          Modifier.horizontalScroll(scrollState) // Enables horizontal scrolling
-              .padding(horizontal = 8.dp, vertical = 4.dp)) {
-        filters.forEach { filter ->
-          val isSelected = selectedFilters.contains(filter)
-          FilterChipItem(
-              text = filter,
-              isSelected = isSelected,
-              onClick = {
-                if (isSelected) {
-                  selectedFilters.remove(filter)
-                } else {
-                  selectedFilters.add(filter)
-                }
-              })
-        }
-      }
+fun HouseHoldElement(
+    household: HouseHold,
+    selectedHousehold: HouseHold,
+    onHouseholdSelected: (HouseHold) -> Unit
+) {
+  NavigationDrawerItem(
+      label = {
+        Text(
+            text = household.name,
+            fontWeight = if (household == selectedHousehold) FontWeight.Bold else FontWeight.Normal,
+            color =
+                if (household == selectedHousehold) MaterialTheme.colorScheme.primary
+                else Color.Unspecified)
+      },
+      selected = household == selectedHousehold,
+      onClick = { onHouseholdSelected(household) },
+      modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding))
 }
 
 @Composable
@@ -139,21 +138,27 @@ fun FilterChipItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-fun HouseHoldElement(
-    household: HouseHold,
-    selectedHousehold: HouseHold,
-    onHouseholdSelected: (HouseHold) -> Unit
-) {
-  NavigationDrawerItem(
-      label = {
-        Text(
-            text = household.name,
-            fontWeight = if (household == selectedHousehold) FontWeight.Bold else FontWeight.Normal,
-            color =
-                if (household == selectedHousehold) MaterialTheme.colorScheme.primary
-                else Color.Unspecified)
-      },
-      selected = household == selectedHousehold,
-      onClick = { onHouseholdSelected(household) },
-      modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding))
+fun FilterBar(filters: List<String>) {
+  // State to track the selection of each filter chip
+  val selectedFilters = remember { mutableStateListOf<String>() }
+  val scrollState = rememberScrollState()
+
+  Row(
+      modifier =
+          Modifier.horizontalScroll(scrollState) // Enables horizontal scrolling
+              .padding(horizontal = 8.dp, vertical = 4.dp)) {
+        filters.forEach { filter ->
+          val isSelected = selectedFilters.contains(filter)
+          FilterChipItem(
+              text = filter,
+              isSelected = isSelected,
+              onClick = {
+                if (isSelected) {
+                  selectedFilters.remove(filter)
+                } else {
+                  selectedFilters.add(filter)
+                }
+              })
+        }
+      }
 }
