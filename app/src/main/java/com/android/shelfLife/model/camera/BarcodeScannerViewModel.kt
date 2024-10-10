@@ -43,6 +43,7 @@ class BarcodeScannerViewModel(application: Application) : AndroidViewModel(appli
      * Requests the camera permission.
      *
      * @param isGranted boolean indicating if the permission is granted
+     *
      */
     fun onPermissionResult(isGranted: Boolean) {
     permissionGranted = isGranted
