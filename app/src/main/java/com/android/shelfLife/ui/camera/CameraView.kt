@@ -8,6 +8,7 @@ import android.media.ToneGenerator
 import android.net.Uri
 import android.provider.Settings
 import android.util.Log
+import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -46,6 +47,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
+import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -56,10 +58,11 @@ import com.android.shelfLife.utilities.BarcodeAnalyzer
 @Composable
 fun BarcodeScannerScreen(
     navigationActions: NavigationActions,
-    viewModel: BarcodeScannerViewModel = viewModel()
-) {
+    cameraViewModel: BarcodeScannerViewModel = viewModel(),
+    foodFactsViewModel: FoodFactsViewModel
+    ) {
   val context = LocalContext.current
-  val permissionGranted = viewModel.permissionGranted
+  val permissionGranted = cameraViewModel.permissionGranted
 
   // Observe lifecycle to detect when the app resumes
   val lifecycleOwner = LocalLifecycleOwner.current
@@ -68,7 +71,7 @@ fun BarcodeScannerScreen(
     val observer = LifecycleEventObserver { _, event ->
       if (event == Lifecycle.Event.ON_RESUME) {
         // Re-check the permission status when the app resumes
-        viewModel.checkCameraPermission()
+        cameraViewModel.checkCameraPermission()
       }
     }
 
@@ -105,7 +108,9 @@ fun BarcodeScannerScreen(
                   Log.d("BarcodeScanner", "Scanned barcode: $scannedBarcode")
                   beep()
                   // Update ViewModel or navigate as needed
-                  viewModel.onBarcodeScanned(scannedBarcode)
+                  foodFactsViewModel.searchByBarcode(scannedBarcode.toLong())
+                    Toast.makeText(context, "Scanned barcode: $scannedBarcode", Toast.LENGTH_SHORT).show()
+                  //cameraViewModel.onBarcodeScanned(scannedBarcode)
                 },
                 onPreviewViewCreated = { previewView ->
                   // Do nothing for now
@@ -133,7 +138,7 @@ fun ScannerOverlay(onRoiCalculated: (RectF) -> Unit) {
 
     // Semi-transparent background
     drawRect(
-        color = Color(0x80000000), // 50% opacity black
+        color = Color(0x40FFFFFF), // 50% opacity black
         size = size)
 
     // Transparent rectangle in the middle
