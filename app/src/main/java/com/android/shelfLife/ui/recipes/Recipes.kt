@@ -277,7 +277,7 @@ fun RecipeItem(
 
                           // Display the total cooking time
                           Text(
-                              "Time : ${getTotalMinutes(recipe.time)} min",
+                              "Time : ${recipe.time.inWholeMinutes} min",
                               overflow =
                                   TextOverflow.Ellipsis // Show ellipsis if the text overflows
                               )

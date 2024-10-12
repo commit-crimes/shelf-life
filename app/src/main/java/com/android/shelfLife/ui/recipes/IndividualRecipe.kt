@@ -151,7 +151,7 @@ fun IndividualRecipeScreen(
                               Spacer(modifier = Modifier.width(16.dp)) // Add space between text
                               Text(
                                   text =
-                                      "Time: ${getTotalMinutes(selectedRecipe.time)} min") // Display
+                                      "Time: ${selectedRecipe.time.inWholeMinutes} min") // Display
                               // total time
                             }
 
@@ -160,7 +160,7 @@ fun IndividualRecipeScreen(
 
                             // Display recipe instructions, scrollable if long
                             Text(
-                                text = selectedRecipe.instructions,
+                                text = selectedRecipe.instructions.toString(),
                                 modifier =
                                     Modifier.padding(
                                         vertical = 8.dp) // Add padding around instructions
