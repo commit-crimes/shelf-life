@@ -7,6 +7,10 @@ gms = "4.4.2"
 ktfmt = "0.17.0"
 
 # Barcode Scanner
+ktorClientApache5 = "2.3.7"
+ktorClientAuth = "2.3.7"
+ktorClientCore = "2.3.7"
+ktorClientLogging = "2.3.2"
 mlkit-barcode-scanning = "17.0.2"
 camerax = "1.0.2"
 guava = "31.1-jre"
@@ -110,6 +114,9 @@ kaspresso-allure-support = { module = "com.kaspersky.android-components:kaspress
 kaspresso-compose-support = { module = "com.kaspersky.android-components:kaspresso-compose-support", version.ref = "kaspressoComposeSupport" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+ktor-client-apache5 = { module = "io.ktor:ktor-client-apache5", version.ref = "ktorClientApache5" }
+ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktorClientAuth" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "mapsComposeUtils" }
 material = { module = "com.google.android.material:material", version.ref = "materialVersion" }
@@ -122,6 +129,7 @@ mockk-agent = { module = "io.mockk:mockk-agent", version.ref = "mockkAgent" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockkAndroid" }
 mockwebserver = { module = "com.squareup.okhttp3:mockwebserver", version.ref = "mockwebserver" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+openai-client = { module = "com.aallam.openai:openai-client" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
