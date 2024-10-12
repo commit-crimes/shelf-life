@@ -215,7 +215,7 @@ fun IndividualRecipeScreen(
                           Text(text = "Servings: ${selectedRecipe.servings}") // Display servings
                           Spacer(modifier = Modifier.width(16.dp)) // Add space between text
                           Text(
-                              text = "Time: ${getTotalMinutes(selectedRecipe.time)} min") // Display
+                              text = "Time: ${selectedRecipe.time.inWholeMinutes} min") // Display
                           // total time
                         }
 
