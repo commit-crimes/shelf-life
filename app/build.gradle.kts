@@ -164,7 +164,9 @@ dependencies {
 
     //Openai
     implementation(libs.aallam.openai.client)
-
+    implementation(libs.ktor.client.core) // Ktor core
+    implementation(libs.ktor.client.apache5) // Apache 5 client engine
+    implementation(libs.ktor.client.auth) // For authentication handling if needed
 
     //Barcode Scanner
     implementation(libs.mlkit.barcode.scanning)
