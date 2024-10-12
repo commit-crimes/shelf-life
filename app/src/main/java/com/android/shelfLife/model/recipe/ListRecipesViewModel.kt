@@ -5,8 +5,10 @@ import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-
-open class ListRecipesViewModel : ViewModel() {
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.minutes
+open class ListRecipesViewModel() : ViewModel() {
 
   companion object {
     private const val instructionsTortillaDePatata = // this is an example to shown the
@@ -45,35 +47,50 @@ open class ListRecipesViewModel : ViewModel() {
             "It can be served warm or at room temperature, and is typically enjoyed with crusty bread or a simple salad."
   }
 
-  // list of the recipes, for the moment I have filled up manually
-  private val recipes_ =
-      MutableStateFlow<List<Recipe>>(
-          listOf(
-              Recipe(
-                  name = "Paella", instructions = "cook", servings = 4, time = Timestamp(5400, 0)),
-              Recipe(
-                  name = "Fideua", instructions = "cry", servings = 3, time = Timestamp(3600, 0)),
-              Recipe(
-                  name = "Tortilla de patata",
-                  instructions = instructionsTortillaDePatata,
-                  servings = 4,
-                  time = Timestamp(5400, 0)),
-              Recipe(
-                  name = "Costillas a la brasa",
-                  instructions = "cry",
-                  servings = 3,
-                  time = Timestamp(3600, 0)),
-              Recipe(
-                  name = "Curry rojo",
-                  instructions = "cook",
-                  servings = 4,
-                  time = Timestamp(5400, 0)),
-              Recipe(
-                  name = "Butifarra con boniato al horno",
-                  instructions = "cry",
-                  servings = 3,
-                  time =
-                      Timestamp(3600, 0)))) // it has an extra long name to show the ... in the card
+
+    // list of the recipes, for the moment I have filled up manually
+    private val recipes_ = MutableStateFlow<List<Recipe>>(
+        listOf(
+            Recipe(
+                name = "Paella",
+                instructions = "cook",
+                servings = 4,
+                time = 5400.seconds // 5400 seconds = 90 minutes
+            ),
+            Recipe(
+                name = "Fideua",
+                instructions = "cry",
+                servings = 3,
+                time = 60.minutes // 3600 seconds = 60 minutes
+            ),
+            Recipe(
+                name = "Tortilla de patata",
+                instructions = instructionsTortillaDePatata,
+                servings = 4,
+                time = 90.minutes // 5400 seconds = 90 minutes
+            ),
+            Recipe(
+                name = "Costillas a la brasa",
+                instructions = "cry",
+                servings = 3,
+                time = 60.minutes // 3600 seconds = 60 minutes
+            ),
+            Recipe(
+                name = "Curry rojo",
+                instructions = "cook",
+                servings = 4,
+                time = 5400.seconds // 5400 seconds = 90 minutes
+            ),
+            Recipe(
+                name = "Butifarra con boniato al horno",
+                instructions = "cry",
+                servings = 3,
+                time = 3600.seconds// 3600 seconds = 60 minutes
+                // it has an extra long name to show the ... in the card
+            )
+        )
+    )
+
   val recipes: StateFlow<List<Recipe>> = recipes_.asStateFlow()
 
   // Selected recipe, i.e the recipe for the detail view
@@ -88,4 +105,9 @@ open class ListRecipesViewModel : ViewModel() {
   fun selectRecipe(recipe: Recipe) {
     selectedRecipe_.value = recipe
   }
+
+    fun createRecipe(name: String, instructions: String, servings: Int, time: Duration) {
+        val newRecipe = Recipe(name, instructions, servings, time)
+        recipes_.value += newRecipe
+    }
 }
