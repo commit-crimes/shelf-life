@@ -55,13 +55,19 @@ fun TopNavigationBar(
   var showFilterBar by remember { mutableStateOf(false) }
   Column {
     TopAppBar(
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                navigationIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                actionIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer),
         navigationIcon = {
           IconButton(
               modifier = Modifier.testTag("hamburgerIcon"), onClick = { onHamburgerClick() }) {
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = "Menu Icon",
-                    tint = Color.White)
+                )
               }
         },
         title = {
@@ -70,7 +76,7 @@ fun TopNavigationBar(
                 text = houseHold.name,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                color = Color.White)
+            )
           }
         },
         actions = {
@@ -81,14 +87,11 @@ fun TopNavigationBar(
                   Icon(
                       imageVector = Icons.Default.FilterList,
                       contentDescription = "Filter Icon",
-                      tint = Color.White)
+                  )
                 }
           }
         },
-        colors =
-            TopAppBarDefaults.mediumTopAppBarColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                titleContentColor = Color.White))
+    )
 
     if (filters.isNotEmpty()) {
       AnimatedVisibility(
@@ -176,6 +179,11 @@ fun HouseHoldElement(
     onHouseholdSelected: (HouseHold) -> Unit
 ) {
   NavigationDrawerItem(
+      colors =
+          NavigationDrawerItemDefaults.colors(
+              selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+              selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+          ),
       label = {
         Text(
             text = household.name,

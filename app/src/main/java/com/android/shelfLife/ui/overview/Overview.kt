@@ -31,6 +31,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDrawerState
@@ -104,7 +105,9 @@ fun OverviewScreen(
       modifier = Modifier.testTag("householdSelectionDrawer"),
       drawerState = drawerState,
       drawerContent = {
-        ModalDrawerSheet {
+        ModalDrawerSheet(
+            drawerContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ) {
           Text(
               "Household selection",
               modifier =
@@ -180,7 +183,9 @@ fun OverviewScreen(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer)
           },
           content = { paddingValues ->
-            Column(modifier = Modifier.padding(paddingValues)) {
+            Column(
+                modifier = Modifier.padding(paddingValues),
+            ) {
               FoodSearchBar(
                   query = searchQuery,
                   onQueryChange = { searchQuery = it } // Update the query state when the user types
@@ -268,6 +273,11 @@ fun FoodSearchBar(query: String, onQueryChange: (String) -> Unit) {
       contentAlignment = Alignment.Center // Center the SearchBar within the Box
       ) {
         SearchBar(
+            colors =
+                SearchBarDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                ),
+            shadowElevation = 3.dp,
             query = query,
             onQueryChange = onQueryChange,
             placeholder = { Text("Search food item") },
