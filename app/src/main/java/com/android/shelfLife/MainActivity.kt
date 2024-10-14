@@ -11,7 +11,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
-import com.android.shelfLife.model.foodFacts.FoodFactsRepository
 import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.android.shelfLife.model.foodFacts.OpenFoodFactsRepository
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
@@ -29,7 +28,7 @@ import com.android.shelfLife.ui.overview.AddFoodItemScreen
 import com.android.shelfLife.ui.overview.OverviewScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
-import com.android.shelfLife.ui.theme.ShelfLifeTheme
+import com.example.compose.ShelfLifeTheme
 import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.OkHttpClient
 

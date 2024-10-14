@@ -26,7 +26,7 @@ fun BottomNavigationMenu(
 ) {
   NavigationBar(
       modifier = Modifier.testTag("bottomNavigationMenu"),
-      containerColor = MaterialTheme.colorScheme.surface,
+      containerColor = MaterialTheme.colorScheme.surfaceContainer,
   ) {
     tabList.forEach { tab ->
       NavigationBarItem(
@@ -41,7 +41,7 @@ fun BottomNavigationMenu(
                       MaterialTheme.colorScheme
                           .secondary, // Using the secondary color for the selected tab indicator
                   selectedIconColor =
-                      MaterialTheme.colorScheme.onSecondary, // Color for icons when selected
+                      MaterialTheme.colorScheme.secondaryContainer, // Color for icons when selected
                   selectedTextColor =
                       MaterialTheme.colorScheme.onSurfaceVariant, // Color for text when selected
                   unselectedIconColor =
