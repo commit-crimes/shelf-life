@@ -21,6 +21,7 @@ import com.android.shelfLife.model.foodItem.FoodStorageLocation
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.utils.DropdownFields
 import com.android.shelfLife.ui.utils.ErrorPopUp
 import com.android.shelfLife.ui.utils.formatDateToTimestamp
 import com.android.shelfLife.ui.utils.formatTimestampToDate
@@ -91,100 +92,41 @@ fun AddFoodItemScreen(
                     modifier = Modifier.weight(1f).padding(end = 8.dp)
                 )
 
-                ExposedDropdownMenuBox(
+                DropdownFields(
+                    label = "Unit",
+                    options = FoodUnit.values(),
+                    selectedOption = unit,
+                    onOptionSelected = { unit = it },
                     expanded = unitExpanded,
-                    onExpandedChange = { unitExpanded = !unitExpanded },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    OutlinedTextField(
-                        value = fromCapitalStringtoLowercaseString(unit.name),
-                        onValueChange = {},
-                        label = { Text("Unit") },
-                        readOnly = true,
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = unitExpanded)
-                        },
-                        modifier = Modifier.menuAnchor()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = unitExpanded, onDismissRequest = { unitExpanded = false }
-                    ) {
-                        FoodUnit.values().forEach { selectionOption ->
-                            DropdownMenuItem(
-                                text = { Text(fromCapitalStringtoLowercaseString(selectionOption.name)) },
-                                onClick = {
-                                    unit = selectionOption
-                                    unitExpanded = false // Close dropdown
-                                }
-                            )
-                        }
-                    }
-                }
+                    onExpandedChange = { unitExpanded = it },
+                    optionLabel = { fromCapitalStringtoLowercaseString(it.name) }
+                )
+
             }
 
             // Category dropdown
-            ExposedDropdownMenuBox(
+            DropdownFields(
+                label = "Category",
+                options = FoodCategory.values(),
+                selectedOption = category,
+                onOptionSelected = { category = it },
                 expanded = categoryExpanded,
-                onExpandedChange = { categoryExpanded = !categoryExpanded }
-            ) {
-                OutlinedTextField(
-                    value = fromCapitalStringtoLowercaseString(category.name),
-                    onValueChange = {},
-                    label = { Text("Category") },
-                    readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = categoryExpanded)
-                    },
-                    modifier = Modifier.fillMaxWidth().menuAnchor()
-                )
-                ExposedDropdownMenu(
-                    expanded = categoryExpanded, onDismissRequest = { categoryExpanded = false }
-                ) {
-                    FoodCategory.values().forEach { selectionOption ->
-                        DropdownMenuItem(
-                            text = { Text(fromCapitalStringtoLowercaseString(selectionOption.name)) },
-                            onClick = {
-                                category = selectionOption
-                                categoryExpanded = false
-                            }
-                        )
-                    }
-                }
-            }
+                onExpandedChange = { categoryExpanded = it },
+                optionLabel = { fromCapitalStringtoLowercaseString(it.name) }
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            ExposedDropdownMenuBox(
+            DropdownFields(
+                label = "Location",
+                options = FoodStorageLocation.values(),
+                selectedOption = location,
+                onOptionSelected = { location = it },
                 expanded = locationExpanded,
-                onExpandedChange = { locationExpanded = !locationExpanded }
-            ) {
-                OutlinedTextField(
-                    value = fromCapitalStringtoLowercaseString(location.name),
-                    onValueChange = {},
-                    label = { Text("Location") },
-                    readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = locationExpanded)
-                    },
-                    modifier = Modifier.fillMaxWidth().menuAnchor()
-                )
-                ExposedDropdownMenu(
-                    expanded = locationExpanded, onDismissRequest = { locationExpanded = false }
-                ) {
-                    FoodStorageLocation.values().forEach { selectionOption ->
-                        DropdownMenuItem(
-                            text = { Text(fromCapitalStringtoLowercaseString(selectionOption.name)) },
-                            onClick = {
-                                location = selectionOption
-                                locationExpanded = false
-                            }
-                        )
-                    }
-                }
-            }
+                onExpandedChange = { locationExpanded = it },
+                optionLabel = { fromCapitalStringtoLowercaseString(it.name) }
+            )
 
-            // For dates a future improvement could be having a calendar interfare rather than manual
-            // input
             OutlinedTextField(
                 value = expireDate,
                 onValueChange = { expireDate = it },
