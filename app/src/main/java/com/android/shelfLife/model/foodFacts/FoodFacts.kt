@@ -19,13 +19,17 @@ data class FoodFacts(
     val barcode: String = "", // Barcode number
     val quantity: Quantity, // Quantity of the food item
     val category: FoodCategory = FoodCategory.OTHER, // Default category is OTHER
-    val nutritionFacts: NutritionFacts = NutritionFacts() // Default empty NutritionFacts object
+    val nutritionFacts: NutritionFacts = NutritionFacts(), // Default empty NutritionFacts object
 )
 
 data class Quantity(
     val amount: Double, // Amount of the quantity
     val unit: FoodUnit = FoodUnit.GRAM // Unit of the quantity
-)
+){
+    override fun toString(): String {
+        return "$amount ${unit.name.lowercase()}"
+    }
+}
 
 enum class FoodUnit {
   GRAM, // Gram unit
