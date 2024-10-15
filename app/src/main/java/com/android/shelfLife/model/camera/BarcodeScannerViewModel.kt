@@ -37,8 +37,8 @@ class BarcodeScannerViewModel(application: Application) : AndroidViewModel(appli
   fun onBarcodeScanned(barcode: String) {
     scannedBarcode = barcode
     // TODO add additional logic here, such as fetching product info
-    //get food facts
-    //navigate to product info screen and let the user add the product to their list
+    // get food facts
+    // navigate to product info screen and let the user add the product to their list
 
   }
 
