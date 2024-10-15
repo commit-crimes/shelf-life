@@ -27,7 +27,27 @@ data class FoodItem(
     val openDate: Timestamp? = null, // Expiry date can be null if not provided
     val buyDate: Timestamp = Timestamp.now(), // Default buy date is the current time
     val status: FoodStatus = FoodStatus.CLOSED // Default status is CLOSED
-)
+) {
+    override fun toString(): String {
+        return "Name: ${foodFacts.name}\n" +
+                "Quantity: ${foodFacts.quantity}\n" +
+                "Location: $location\n" +
+                "Days before expiry: ${getRemainingDays()}\n"
+    }
+
+    /**
+     * returns the remaining days until the food item expires.
+     */
+    fun getRemainingDays(): Long {
+        val expiry = expiryDate?.toDate()?.time ?: return -1
+        val today = Timestamp.now().toDate().time
+        return (expiry - today) / (1000 * 60 * 60 * 24)
+    }
+
+    fun isExpired(): Boolean {
+        return getRemainingDays() < 0
+    }
+}
 
 /** This enum class represents the status of a food item. */
 enum class FoodStatus {
