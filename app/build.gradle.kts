@@ -85,6 +85,7 @@ android {
             excludes += "META-INF/LICENSE.txt"
             excludes += "META-INF/NOTICE"
             excludes += "META-INF/NOTICE.txt"
+            pickFirsts += "META-INF/DEPENDENCIES"
         }
     }
 
@@ -146,9 +147,14 @@ dependencies {
 
     //Openai
     implementation(libs.aallam.openai.client)
+    implementation(libs.ktor.client.apache5)
+/*
+    implementation(libs.ktor.client.core)
+*/
+    /*
     implementation(libs.ktor.client.core) // Ktor core
     implementation(libs.ktor.client.apache5) // Apache 5 client engine
-    implementation(libs.ktor.client.auth) // For authentication handling if needed
+    implementation(libs.ktor.client.auth) // For authentication handling if needed*/
 
     //Barcode Scanner
     implementation(libs.mlkit.barcode.scanning)
