@@ -36,7 +36,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn clean verify sonar:sonar \
-            -Dsonar.projectKey=<your_project_key> \
-            -Dsonar.organization=<your_organization_key> \
+            -Dsonar.projectKey=commit-crimes \
+            -Dsonar.organization=commit-crimes \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
