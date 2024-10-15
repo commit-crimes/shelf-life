@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
 fun ShelfLifeApp() {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
-  val listRecipesViewModel = ListRecipesViewModel()
+  val listRecipesViewModel: ListRecipesViewModel = viewModel()
   val firebaseFirestore = FirebaseFirestore.getInstance()
   val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
   val listFoodItemViewModel = ListFoodItemsViewModel(foodItemRepository)
