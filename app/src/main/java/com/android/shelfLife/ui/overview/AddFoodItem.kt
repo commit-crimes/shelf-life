@@ -22,6 +22,9 @@ import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.utils.ErrorPopUp
+import com.android.shelfLife.ui.utils.formatDateToTimestamp
+import com.android.shelfLife.ui.utils.formatTimestampToDate
+import com.android.shelfLife.ui.utils.fromCapitalStringtoLowercaseString
 import com.example.compose.primaryContainerLight
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
@@ -274,19 +277,4 @@ fun AddFoodItemScreen(
             )
         }
     }
-}
-
-fun formatTimestampToDate(timestamp: Timestamp): String {
-    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    return sdf.format(timestamp.toDate())
-}
-
-fun formatDateToTimestamp(dateString: String): Timestamp {
-    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-    val date = sdf.parse(dateString)
-    return Timestamp(date)
-}
-
-fun fromCapitalStringtoLowercaseString(enum: String): String {
-    return enum.lowercase().replaceFirstChar { it.uppercase() }
 }
