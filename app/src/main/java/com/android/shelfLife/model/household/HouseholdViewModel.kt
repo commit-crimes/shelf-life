@@ -108,7 +108,6 @@ class HouseholdViewModel(
    * Factory for creating a [HouseholdViewModel] with a constructor that takes a
    * [HouseHoldRepository] and a [ListFoodItemsViewModel].
    */
-
   fun addFoodItem(foodItem: FoodItem) {
     val selectedHousehold = selectedHousehold.value
     if (selectedHousehold != null) {

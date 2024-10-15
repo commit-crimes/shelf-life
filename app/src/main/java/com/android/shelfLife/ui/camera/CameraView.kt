@@ -66,7 +66,7 @@ fun BarcodeScannerScreen(
     navigationActions: NavigationActions,
     cameraViewModel: BarcodeScannerViewModel = viewModel(),
     foodFactsViewModel: FoodFactsViewModel
-    ) {
+) {
   val context = LocalContext.current
   val permissionGranted = cameraViewModel.permissionGranted
 
@@ -115,8 +115,9 @@ fun BarcodeScannerScreen(
                   beep()
                   // Update ViewModel or navigate as needed
                   foodFactsViewModel.searchByBarcode(scannedBarcode.toLong())
-                    Toast.makeText(context, "Scanned barcode: $scannedBarcode", Toast.LENGTH_SHORT).show()
-                  //cameraViewModel.onBarcodeScanned(scannedBarcode)
+                  Toast.makeText(context, "Scanned barcode: $scannedBarcode", Toast.LENGTH_SHORT)
+                      .show()
+                  // cameraViewModel.onBarcodeScanned(scannedBarcode)
                 },
                 onPreviewViewCreated = { previewView ->
                   // Do nothing for now
