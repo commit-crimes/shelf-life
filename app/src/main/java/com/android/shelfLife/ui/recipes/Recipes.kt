@@ -21,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material3.Card
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -192,25 +191,21 @@ fun RecipesScreen(
                 query = newQuery // Update the query when user types
               } // Pass query and update function to the search bar
 
-
-                if(filteredRecipes.isEmpty()){
-                    Box(modifier = Modifier.fillMaxSize(),
-                        content = {
-                            Text(text = "No recipes available", modifier = Modifier)
-                        },
-                        contentAlignment = Alignment.Center)
-
-                }else{
-                    // LazyColumn for displaying the list of filtered recipes
-                    LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
-                        items(filteredRecipes) { recipe ->
-                            RecipeItem(recipe, navigationActions, listRecipesViewModel)
-                        }
+              if (filteredRecipes.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    content = { Text(text = "No recipes available", modifier = Modifier) },
+                    contentAlignment = Alignment.Center)
+              } else {
+                // LazyColumn for displaying the list of filtered recipes
+                LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
+                  items(filteredRecipes) { recipe ->
+                    RecipeItem(recipe, navigationActions, listRecipesViewModel)
+                  }
                 }
               }
             }
-          }
-      )
+          })
     }
   }
 }
@@ -237,10 +232,11 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
   var isActive by remember {
     mutableStateOf(false)
   } // State to manage whether the search bar is active
-
   Box(
       modifier =
-          Modifier.fillMaxWidth().height(100.dp) // Set a fixed height for the search bar container
+          Modifier.fillMaxWidth()
+              .height(100.dp)
+              .testTag("recipeSearchBar") // Set a fixed height for the search bar container
       ) {
         SearchBar(
             query = query, // The current query string displayed in the search bar
@@ -256,7 +252,9 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
             active = isActive, // Determines whether the search bar is in an active state
             onActiveChange = { active -> isActive = active }, // Callback to update the active state
             modifier =
-                Modifier.fillMaxWidth().padding(horizontal = 8.dp).testTag("recipeSearchBar"), // Padding around the search bar
+                Modifier.fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+                    .testTag("searchBar"), // Padding around the search bar
             trailingIcon = {
               IconButton(onClick = { isActive = false }) { // Button to deactivate the search bar
                 Icon(
@@ -286,15 +284,13 @@ fun RecipeItem(
     listRecipesViewModel: ListRecipesViewModel
 ) {
   var clickOnRecipe by remember { mutableStateOf(false) } // State to track if the recipe is clicked
-
   // The card that visually represents the recipe item
-  Card(
+  Column(
       modifier =
           Modifier.fillMaxWidth() // Make the card fill the available width
               .padding(8.dp) // Add padding around the card
               .clickable(onClick = { clickOnRecipe = true }) // Handle clicks on the card
-              .testTag("recipesCards")
-      ) {
+              .testTag("recipesCards")) {
         // Layout for the content inside the card
         Row(
             modifier =
