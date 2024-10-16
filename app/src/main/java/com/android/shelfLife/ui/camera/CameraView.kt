@@ -48,6 +48,8 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
+import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -65,7 +67,8 @@ import com.android.shelfLife.utilities.BarcodeAnalyzer
 fun BarcodeScannerScreen(
     navigationActions: NavigationActions,
     cameraViewModel: BarcodeScannerViewModel = viewModel(),
-    foodFactsViewModel: FoodFactsViewModel
+    foodFactsViewModel: FoodFactsViewModel,
+    householdViewModel: HouseholdViewModel
     ) {
   val context = LocalContext.current
   val permissionGranted = cameraViewModel.permissionGranted
@@ -115,7 +118,11 @@ fun BarcodeScannerScreen(
                   beep()
                   // Update ViewModel or navigate as needed
                   foodFactsViewModel.searchByBarcode(scannedBarcode.toLong())
-                    Toast.makeText(context, "Scanned barcode: $scannedBarcode", Toast.LENGTH_SHORT).show()
+                  val foodFacts = foodFactsViewModel.foodFactsSuggestions.value?.get(0)
+                  //TODO create food item and add it to the household
+                  //val foodItem = FoodItem()
+                  //householdViewModel.addFoodItem()
+                  Toast.makeText(context, "Scanned barcode: $scannedBarcode", Toast.LENGTH_SHORT).show()
                   //cameraViewModel.onBarcodeScanned(scannedBarcode)
                 },
                 onPreviewViewCreated = { previewView ->
