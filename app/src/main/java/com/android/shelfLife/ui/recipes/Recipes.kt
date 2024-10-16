@@ -171,7 +171,7 @@ fun RecipesScreen(
       FirstTimeWelcomeScreen(householdViewModel)
     } else {
       Scaffold(
-          modifier = Modifier,
+          modifier = Modifier.testTag("recipesScreen"),
           topBar = {
             selectedHousehold?.let {
               TopNavigationBar(
@@ -192,14 +192,25 @@ fun RecipesScreen(
                 query = newQuery // Update the query when user types
               } // Pass query and update function to the search bar
 
-              // LazyColumn for displaying the list of filtered recipes
-              LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(filteredRecipes) { recipe ->
-                  RecipeItem(recipe, navigationActions, listRecipesViewModel)
+
+                if(filteredRecipes.isEmpty()){
+                    Box(modifier = Modifier.fillMaxSize(),
+                        content = {
+                            Text(text = "No recipes available", modifier = Modifier)
+                        },
+                        contentAlignment = Alignment.Center)
+
+                }else{
+                    // LazyColumn for displaying the list of filtered recipes
+                    LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
+                        items(filteredRecipes) { recipe ->
+                            RecipeItem(recipe, navigationActions, listRecipesViewModel)
+                        }
                 }
               }
             }
-          })
+          }
+      )
     }
   }
 }
@@ -245,7 +256,7 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
             active = isActive, // Determines whether the search bar is in an active state
             onActiveChange = { active -> isActive = active }, // Callback to update the active state
             modifier =
-                Modifier.fillMaxWidth().padding(horizontal = 8.dp), // Padding around the search bar
+                Modifier.fillMaxWidth().padding(horizontal = 8.dp).testTag("recipeSearchBar"), // Padding around the search bar
             trailingIcon = {
               IconButton(onClick = { isActive = false }) { // Button to deactivate the search bar
                 Icon(
@@ -282,6 +293,7 @@ fun RecipeItem(
           Modifier.fillMaxWidth() // Make the card fill the available width
               .padding(8.dp) // Add padding around the card
               .clickable(onClick = { clickOnRecipe = true }) // Handle clicks on the card
+              .testTag("recipesCards")
       ) {
         // Layout for the content inside the card
         Row(
