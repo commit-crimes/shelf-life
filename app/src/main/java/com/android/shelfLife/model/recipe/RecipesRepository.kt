@@ -7,6 +7,7 @@ interface RecipesRepository {
 
     enum class SearchRecipeType {
         USE_SOON_TO_EXPIRE,
+        USE_ONLY_HOUSEHOLD_ITEMS,
         HIGH_PROTEIN,
         LOW_CALORIE,
     }
