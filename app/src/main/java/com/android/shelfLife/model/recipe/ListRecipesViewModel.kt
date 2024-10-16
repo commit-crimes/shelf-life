@@ -50,37 +50,37 @@ open class ListRecipesViewModel() : ViewModel() {
         listOf(
             Recipe(
                 name = "Paella",
-                instructions = "cook",
+                instructions = listOf("cook"),
                 servings = 4,
                 time = 5400.seconds // 5400 seconds = 90 minutes
             ),
             Recipe(
                 name = "Fideua",
-                instructions = "cry",
+                instructions = listOf("cry"),
                 servings = 3,
                 time = 60.minutes // 3600 seconds = 60 minutes
             ),
             Recipe(
                 name = "Tortilla de patata",
-                instructions = instructionsTortillaDePatata,
+                instructions = listOf(instructionsTortillaDePatata), //TODO: refactor this constant into a list of strings
                 servings = 4,
                 time = 90.minutes // 5400 seconds = 90 minutes
             ),
             Recipe(
                 name = "Costillas a la brasa",
-                instructions = "cry",
+                instructions = listOf("cry"),
                 servings = 3,
                 time = 60.minutes // 3600 seconds = 60 minutes
             ),
             Recipe(
                 name = "Curry rojo",
-                instructions = "cook",
+                instructions = listOf("cook"),
                 servings = 4,
                 time = 5400.seconds // 5400 seconds = 90 minutes
             ),
             Recipe(
                 name = "Butifarra con boniato al horno",
-                instructions = "cry",
+                instructions = listOf("cry"),
                 servings = 3,
                 time = 3600.seconds// 3600 seconds = 60 minutes
                 // it has an extra long name to show the ... in the card
@@ -103,7 +103,7 @@ open class ListRecipesViewModel() : ViewModel() {
     selectedRecipe_.value = recipe
   }
 
-    fun createRecipe(name: String, instructions: String, servings: Int, time: Duration) {
+    fun createRecipe(name: String, instructions: List<String>, servings: Int, time: Duration) {
         val newRecipe = Recipe(name, instructions, servings, time)
         recipes_.value += newRecipe
     }
