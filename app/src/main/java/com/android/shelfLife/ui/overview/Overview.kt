@@ -205,7 +205,7 @@ fun OverviewScreen(
 @Composable
 fun ListFoodItems(foodItems: List<FoodItem>) {
   if (foodItems.isEmpty()) {
-    // Display a prompt when there are no todos
+    // Display a prompt when there are no food items
     Box(
         modifier = Modifier.fillMaxSize().testTag("NoFoodItems"),
         contentAlignment = Alignment.Center) {
@@ -213,9 +213,9 @@ fun ListFoodItems(foodItems: List<FoodItem>) {
         }
   } else {
     // Display the full list
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(modifier = Modifier.fillMaxSize().testTag("foodItemList")) {
       items(foodItems) { item ->
-        // Call a composable that renders each individual to-do item
+        // Call a composable that renders each individual food item
         FoodItemCard(foodItem = item)
       }
     }
@@ -239,24 +239,26 @@ fun FoodItemCard(foodItem: FoodItem) {
           Modifier.fillMaxWidth()
               .padding(vertical = 8.dp, horizontal = 16.dp)
               .background(Color.White) // Add background color if needed
-              .padding(16.dp)) {
-        // First Row for Date and Status
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween) {
-              Text(text = foodItem.foodFacts.name, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+              .padding(16.dp)
+              .testTag("foodItemCard"),
+  ) {
+    // First Row for Date and Status
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween) {
+          Text(text = foodItem.foodFacts.name, fontSize = 14.sp, fontWeight = FontWeight.Bold)
 
-              Text(text = foodItem.foodFacts.quantity.toString() + "in stock")
-              // Display the due date on the left
-              Text(text = formattedExpiryDate, fontSize = 12.sp, color = Color.Black)
-            }
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-            horizontalArrangement = Arrangement.Center) {
-              // Display the remaining days until expiry in the middle
-              Text(text = "Expires on $formattedExpiryDate", fontSize = 12.sp, color = Color.Black)
-            }
-      }
+          Text(text = foodItem.foodFacts.quantity.toString() + " in stock")
+          // Display the due date on the left
+          Text(text = formattedExpiryDate, fontSize = 12.sp, color = Color.Black)
+        }
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+        horizontalArrangement = Arrangement.Center) {
+          // Display the remaining days until expiry in the middle
+          Text(text = "Expires on $formattedExpiryDate", fontSize = 12.sp, color = Color.Black)
+        }
+  }
 }
 
 /**
@@ -268,10 +270,11 @@ fun FoodItemCard(foodItem: FoodItem) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FoodSearchBar(query: String, onQueryChange: (String) -> Unit) {
+  var active by remember { mutableStateOf(false) }
+
   Box(
-      modifier = Modifier.fillMaxWidth().padding(16.dp), // Outer padding for spacing
-      contentAlignment = Alignment.Center // Center the SearchBar within the Box
-      ) {
+      modifier = Modifier.fillMaxWidth().padding(16.dp).testTag("foodSearchBar"),
+      contentAlignment = Alignment.Center) {
         SearchBar(
             colors =
                 SearchBarDefaults.colors(
@@ -282,20 +285,15 @@ fun FoodSearchBar(query: String, onQueryChange: (String) -> Unit) {
             onQueryChange = onQueryChange,
             placeholder = { Text("Search food item") },
             onSearch = { /* Optional: Handle search action if needed */},
-            active = false,
-            onActiveChange = {},
+            active = active,
+            onActiveChange = { active = it },
             leadingIcon = {},
             trailingIcon = {
               IconButton(onClick = {}) {
                 Icon(Icons.Default.Search, contentDescription = "Search Icon")
               }
             },
-            modifier =
-                Modifier.widthIn(
-                        max = 600.dp) // Restrict max width to prevent over-stretching on large
-                    // screens
-                    .fillMaxWidth(0.9f) // Make it responsive and occupy 90% of available width
-                    .testTag("searchBar")) {}
+            modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth(0.9f).testTag("searchBar")) {}
       }
 }
 
