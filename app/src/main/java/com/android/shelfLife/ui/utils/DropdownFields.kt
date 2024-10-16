@@ -34,33 +34,26 @@ fun <T> DropdownFields(
     optionLabel: (T) -> String,
     modifier_input: Modifier = Modifier
 ) {
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { onExpandedChange(!expanded) },
-        modifier = modifier_input
-    ) {
+  ExposedDropdownMenuBox(
+      expanded = expanded,
+      onExpandedChange = { onExpandedChange(!expanded) },
+      modifier = modifier_input) {
         OutlinedTextField(
             value = optionLabel(selectedOption),
             onValueChange = {},
             label = { Text(label) },
             readOnly = true,
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-            },
-            modifier = Modifier.fillMaxWidth().menuAnchor()
-        )
-        ExposedDropdownMenu(
-            expanded = expanded, onDismissRequest = { onExpandedChange(false) }
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(optionLabel(option)) },
-                    onClick = {
-                        onOptionSelected(option)
-                        onExpandedChange(false)
-                    }
-                )
-            }
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier.fillMaxWidth().menuAnchor())
+        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { onExpandedChange(false) }) {
+          options.forEach { option ->
+            DropdownMenuItem(
+                text = { Text(optionLabel(option)) },
+                onClick = {
+                  onOptionSelected(option)
+                  onExpandedChange(false)
+                })
+          }
         }
-    }
+      }
 }
