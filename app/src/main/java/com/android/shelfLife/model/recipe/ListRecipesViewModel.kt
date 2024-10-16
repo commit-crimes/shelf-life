@@ -10,7 +10,7 @@ open class ListRecipesViewModel : ViewModel() {
 
   companion object {
     private const val instructionsTortillaDePatata = // this is an example to shown the
-                                                     // scroll-ability of
+        // scroll-ability of
         // the IndividualRecipeScreen
         "Peel and slice the potatoes:\n" +
             "\n" +
