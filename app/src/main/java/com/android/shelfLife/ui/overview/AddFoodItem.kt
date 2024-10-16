@@ -106,7 +106,7 @@ fun AddFoodItemScreen(
                     expanded = unitExpanded,
                     onExpandedChange = { unitExpanded = it },
                     optionLabel = { fromCapitalStringtoLowercaseString(it.name) },
-                    modifier_input = Modifier.weight(1f))
+                    modifier = Modifier.weight(1f))
               }
 
           // Category dropdown
