@@ -7,10 +7,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.toLowerCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
@@ -66,7 +68,7 @@ fun AddFoodItemScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = { TopAppBar(title = { Text("Add Food Item") }) },
+        topBar = { TopAppBar(title = { Text(stringResource(id = R.string.add_food_item_title)) }) },
     ) { padding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
@@ -76,7 +78,7 @@ fun AddFoodItemScreen(
             OutlinedTextField(
                 value = foodName,
                 onValueChange = { foodName = it },
-                label = { Text("Name of food") },
+                label = { Text(stringResource(id = R.string.food_name_hint)) },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
             )
 
@@ -87,26 +89,27 @@ fun AddFoodItemScreen(
                 OutlinedTextField(
                     value = amount,
                     onValueChange = { amount = it },
-                    label = { Text("Amount") },
+                    label = { Text(stringResource(id = R.string.amount_hint)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.weight(1f).padding(end = 8.dp)
                 )
 
                 DropdownFields(
-                    label = "Unit",
+                    label  = stringResource(id = R.string.unit_label),
                     options = FoodUnit.values(),
                     selectedOption = unit,
-                    onOptionSelected = { unit = it },
+                    onOptionSelected = {unit = it},
                     expanded = unitExpanded,
-                    onExpandedChange = { unitExpanded = it },
-                    optionLabel = { fromCapitalStringtoLowercaseString(it.name) }
+                    onExpandedChange = {unitExpanded = it},
+                    optionLabel = { fromCapitalStringtoLowercaseString(it.name)},
+                    modifier_input = Modifier.weight(1f)
                 )
 
             }
 
             // Category dropdown
             DropdownFields(
-                label = "Category",
+                label = stringResource(id = R.string.category_label),
                 options = FoodCategory.values(),
                 selectedOption = category,
                 onOptionSelected = { category = it },
@@ -118,7 +121,7 @@ fun AddFoodItemScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             DropdownFields(
-                label = "Location",
+                label = stringResource(id = R.string.location_label),
                 options = FoodStorageLocation.values(),
                 selectedOption = location,
                 onOptionSelected = { location = it },
@@ -130,7 +133,7 @@ fun AddFoodItemScreen(
             OutlinedTextField(
                 value = expireDate,
                 onValueChange = { expireDate = it },
-                label = { Text("Expire Date") },
+                label = { Text(stringResource(id = R.string.expire_date_hint)) },
                 placeholder = { Text("dd/mm/yyyy") },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
             )
@@ -138,7 +141,7 @@ fun AddFoodItemScreen(
             OutlinedTextField(
                 value = openDate,
                 onValueChange = { openDate = it },
-                label = { Text("Open Date") },
+                label = { Text(stringResource(id = R.string.open_date_hint)) },
                 placeholder = { Text("dd/mm/yyyy") },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
             )
@@ -146,7 +149,7 @@ fun AddFoodItemScreen(
             OutlinedTextField(
                 value = buyDate,
                 onValueChange = { buyDate = it },
-                label = { Text("Buy Date") },
+                label = { Text(stringResource(id = R.string.buy_date_hint)) },
                 placeholder = { Text("dd/mm/yyyy") },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
             )
