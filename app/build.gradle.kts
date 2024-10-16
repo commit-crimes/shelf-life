@@ -109,8 +109,8 @@ tasks.withType<Test> {
 
 sonarqube {
     properties {
-        property("sonar.projectKey", "commit-crimes")
-        property("sonar.organization", "commit-crimes")
+        property("sonar.projectKey",  System.getenv("SONAR_PROJECT_KEY") ?: "commit-crimes")
+        property("sonar.organization",  System.getenv("SONAR_ORGANIZATION") ?: "commit-crimes")
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.login", System.getenv("SONAR_TOKEN") ?: "default_token")
 
