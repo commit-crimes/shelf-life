@@ -4,5 +4,5 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid) apply false
     alias(libs.plugins.ktfmt) apply false
     alias(libs.plugins.gms) apply false
-
+    id("org.sonarqube") version "4.3.0.3225" apply false // Add the SonarQube plugin
 }
