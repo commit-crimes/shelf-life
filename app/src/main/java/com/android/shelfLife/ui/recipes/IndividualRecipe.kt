@@ -223,7 +223,7 @@ fun IndividualRecipeScreen(
 
                         // Display recipe instructions, scrollable if long
                         Text(
-                            text = selectedRecipe.instructions,
+                            text = selectedRecipe.instructions.toString(),
                             modifier =
                                 Modifier.padding(vertical = 8.dp) // Add padding around instructions
                             )
