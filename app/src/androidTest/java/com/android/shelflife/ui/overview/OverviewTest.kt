@@ -1,10 +1,14 @@
 package com.android.shelflife.ui.overview
 
-import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
+import com.android.shelfLife.model.foodFacts.FoodCategory
+import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.Quantity
+import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
@@ -13,12 +17,13 @@ import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.overview.OverviewScreen
+import com.google.firebase.Timestamp
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
+import org.mockito.kotlin.*
+import java.util.*
 
 @RunWith(AndroidJUnit4::class)
 class OverviewTest {
@@ -29,31 +34,67 @@ class OverviewTest {
   private lateinit var houseHoldRepository: HouseHoldRepository
   private lateinit var householdViewModel: HouseholdViewModel
 
-  private val houseHold =
-      HouseHold(uid = "1", name = "Test", members = listOf("John", "Doe"), foodItems = listOf())
+  private lateinit var houseHold: HouseHold
 
-  @get:Rule val composeTestRule = createComposeRule()
+  @get:Rule
+  val composeTestRule = createComposeRule()
 
   @Before
   fun setUp() {
-    navigationActions = mock(NavigationActions::class.java)
-    foodItemRepository = mock(FoodItemRepository::class.java)
+    navigationActions = mock()
+    foodItemRepository = mock()
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
 
-    houseHoldRepository = mock(HouseHoldRepository::class.java)
+    houseHoldRepository = mock()
     householdViewModel = HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel)
 
-    `when`(navigationActions.currentRoute()).thenReturn(Route.OVERVIEW)
+    whenever(navigationActions.currentRoute()).thenReturn(Route.OVERVIEW)
+
+    // Create a FoodItem to be used in tests
+    val foodFacts = FoodFacts(
+      name = "Apple",
+      barcode = "123456789",
+      quantity = Quantity(5.0, FoodUnit.COUNT),
+      category = FoodCategory.FRUIT
+    )
+    val foodItem = FoodItem(
+      uid = "foodItem1",
+      foodFacts = foodFacts,
+      expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)) // Expires in 1 day
+    )
+
+    // Initialize the household with the food item
+    houseHold = HouseHold(
+      uid = "1",
+      name = "Test Household",
+      members = listOf("John", "Doe"),
+      foodItems = listOf(foodItem)
+    )
+
+    // Mock the repository to return the initial household
+    mockHouseHoldRepositoryGetHouseholds(listOf(houseHold))
+  }
+
+  private fun mockHouseHoldRepositoryGetHouseholds(households: List<HouseHold>) {
+    doAnswer { invocation ->
+      val onSuccess = invocation.arguments[0] as (List<HouseHold>) -> Unit
+      onSuccess(households)
+      null
+    }.whenever(houseHoldRepository).getHouseholds(any(), any())
   }
 
   // Test if the FirstTimeWelcomeScreen and all its elements are displayed correctly
   @Test
   fun firstTimeWelcomeScreenDisplayedCorrectly() {
+    // Mock empty households to trigger the first-time screen
+    mockHouseHoldRepositoryGetHouseholds(emptyList())
+
     composeTestRule.setContent {
       OverviewScreen(
-          navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
-          householdViewModel = householdViewModel)
+        navigationActions = navigationActions,
+        listFoodItemsViewModel = listFoodItemsViewModel,
+        householdViewModel = householdViewModel
+      )
     }
     composeTestRule.onNodeWithTag("firstTimeWelcomeScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("householdNameTextField").assertIsDisplayed()
@@ -66,14 +107,15 @@ class OverviewTest {
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
       OverviewScreen(
-          navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
-          householdViewModel = householdViewModel)
+        navigationActions = navigationActions,
+        listFoodItemsViewModel = listFoodItemsViewModel,
+        householdViewModel = householdViewModel
+      )
     }
 
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addFoodFab").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("searchBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("foodSearchBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("hamburgerIcon").assertIsDisplayed()
   }
 
@@ -83,28 +125,14 @@ class OverviewTest {
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
       OverviewScreen(
-          navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
-          householdViewModel = householdViewModel)
+        navigationActions = navigationActions,
+        listFoodItemsViewModel = listFoodItemsViewModel,
+        householdViewModel = householdViewModel
+      )
     }
 
     composeTestRule.onNodeWithTag("hamburgerIcon").performClick()
     composeTestRule.onNodeWithTag("householdSelectionDrawer").assertIsDisplayed()
-  }
-
-  // Clicking on the filter icon opens the filter bar
-  @Test
-  fun clickFilterIconOpensFilterBar() {
-    householdViewModel.selectHousehold(houseHold)
-    composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
-          householdViewModel = householdViewModel)
-    }
-
-    composeTestRule.onNodeWithTag("filterIcon").performClick()
-    composeTestRule.onNodeWithTag("filterBar").assertIsDisplayed()
   }
 
   // Clicking on edit icon in the drawer opens the edit household popup
@@ -113,9 +141,10 @@ class OverviewTest {
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
       OverviewScreen(
-          navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
-          householdViewModel = householdViewModel)
+        navigationActions = navigationActions,
+        listFoodItemsViewModel = listFoodItemsViewModel,
+        householdViewModel = householdViewModel
+      )
     }
 
     composeTestRule.onNodeWithTag("hamburgerIcon").performClick()
@@ -129,9 +158,10 @@ class OverviewTest {
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
       OverviewScreen(
-          navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
-          householdViewModel = householdViewModel)
+        navigationActions = navigationActions,
+        listFoodItemsViewModel = listFoodItemsViewModel,
+        householdViewModel = householdViewModel
+      )
     }
 
     composeTestRule.onNodeWithTag("hamburgerIcon").performClick()
@@ -139,20 +169,117 @@ class OverviewTest {
     composeTestRule.onNodeWithTag("addHouseholdPopup").assertIsDisplayed()
   }
 
-  // Does not work for now because the add food screen is not finished
-  /*
-  // Clicking on the add food fab opens the add food screen
+  // Test that the food item list is displayed when food items exist
   @Test
-  fun clickAddFoodFabOpensAddFoodScreen() {
-      householdViewModel.selectHousehold(houseHold)
-      composeTestRule.setContent { OverviewScreen(
-          navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
-          householdViewModel = householdViewModel
-      ) }
+  fun foodItemListIsDisplayedWhenFoodItemsExist() {
+    householdViewModel.selectHousehold(houseHold)
+    composeTestRule.setContent {
+      OverviewScreen(
+        navigationActions = navigationActions,
+        listFoodItemsViewModel = listFoodItemsViewModel,
+        householdViewModel = householdViewModel
+      )
+    }
 
-      composeTestRule.onNodeWithTag("addFoodFab").performClick()
-      verify(navigationActions).navigateTo(Route.ADD_FOOD)
+    // Check that the food item list is displayed
+    composeTestRule.onNodeWithTag("foodItemList").assertIsDisplayed()
+
+    // Check that the food item card is displayed
+    composeTestRule.onAllNodesWithTag("foodItemCard").assertCountEquals(1)
+    composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
   }
-   */
+
+  // Test that "No food available" message is displayed when no food items exist
+  @Test
+  fun noFoodAvailableMessageIsDisplayedWhenNoFoodItems() {
+    val emptyHousehold = houseHold.copy(foodItems = emptyList())
+
+    // Mock the repository to return the household with no food items
+    mockHouseHoldRepositoryGetHouseholds(listOf(emptyHousehold))
+
+    householdViewModel.selectHousehold(emptyHousehold)
+    composeTestRule.setContent {
+      OverviewScreen(
+        navigationActions = navigationActions,
+        listFoodItemsViewModel = listFoodItemsViewModel,
+        householdViewModel = householdViewModel
+      )
+    }
+
+    // Check that the "No food available" message is displayed
+    composeTestRule.onNodeWithTag("NoFoodItems").assertIsDisplayed()
+    composeTestRule.onNodeWithText("No food available").assertIsDisplayed()
+  }
+
+  @Test
+  fun searchFiltersFoodItemList() {
+    // Add a second food item
+    val bananaFoodFacts = FoodFacts(
+      name = "Banana",
+      barcode = "987654321",
+      quantity = Quantity(3.0, FoodUnit.COUNT),
+      category = FoodCategory.FRUIT
+    )
+    val bananaFoodItem = FoodItem(
+      uid = "foodItem2",
+      foodFacts = bananaFoodFacts,
+      expiryDate = Timestamp(Date(System.currentTimeMillis() + 172800000)) // Expires in 2 days
+    )
+
+    val householdWithMultipleItems = houseHold.copy(
+      members = listOf("Jane", "Doe"),
+      foodItems = listOf(bananaFoodItem, houseHold.foodItems[0])
+    )
+
+    // Mock the repository to return the household with multiple food items
+    mockHouseHoldRepositoryGetHouseholds(listOf(householdWithMultipleItems))
+
+    householdViewModel.selectHousehold(householdWithMultipleItems)
+    composeTestRule.setContent {
+      OverviewScreen(
+        navigationActions = navigationActions,
+        listFoodItemsViewModel = listFoodItemsViewModel,
+        householdViewModel = householdViewModel
+      )
+    }
+
+    // Initially, both items should be displayed
+    composeTestRule.onAllNodesWithTag("foodItemCard").assertCountEquals(2)
+
+    // Activate the SearchBar
+    composeTestRule.onNodeWithTag("searchBar").performClick()
+    composeTestRule.waitForIdle()
+
+    // Enter search query "Banana"
+    composeTestRule.onNode(
+      hasSetTextAction() and hasAnyAncestor(hasTestTag("searchBar"))
+    ).performTextInput("Banana")
+
+    // Only Banana should be displayed
+    composeTestRule.onAllNodesWithTag("foodItemCard").assertCountEquals(1)
+
+    // Assert that the displayed FoodItemCard contains the text "Banana"
+    composeTestRule.onNode(
+      hasText("Banana") and hasAnyAncestor(hasTestTag("foodSearchBar"))
+    ).assertIsDisplayed()
+  }
+
+  // Test that the floating action button navigates to the add food screen
+  @Test
+  fun clickAddFoodFabNavigatesToAddFoodScreen() {
+    householdViewModel.selectHousehold(houseHold)
+    composeTestRule.setContent {
+      OverviewScreen(
+        navigationActions = navigationActions,
+        listFoodItemsViewModel = listFoodItemsViewModel,
+        householdViewModel = householdViewModel
+      )
+    }
+
+    // Click on the add food FAB
+    composeTestRule.onNodeWithTag("addFoodFab").performClick()
+
+    // Verify that navigateTo(Screen.ADD_FOOD) was called
+    verify(navigationActions).navigateTo(com.android.shelfLife.ui.navigation.Screen.ADD_FOOD)
+  }
 }

@@ -77,124 +77,133 @@ fun OverviewScreen(
     listFoodItemsViewModel: ListFoodItemsViewModel,
     householdViewModel: HouseholdViewModel
 ) {
-  val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
-  var searchQuery by remember { mutableStateOf("") }
-  val foodItems = selectedHousehold?.foodItems ?: emptyList()
-  val userHouseholds = householdViewModel.households.collectAsState().value
+    val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }
+    val foodItems = selectedHousehold?.foodItems ?: emptyList()
+    val userHouseholds = householdViewModel.households.collectAsState().value
 
-  var showDialog by remember { mutableStateOf(false) }
-  var showEdit by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+    var showEdit by remember { mutableStateOf(false) }
 
-  val drawerState = rememberDrawerState(DrawerValue.Closed)
-  val scope = rememberCoroutineScope()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
-  val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
+    val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
 
-  AddHouseHoldPopUp(
-      showDialog = showDialog,
-      onDismiss = { showDialog = false },
-      householdViewModel = householdViewModel,
-  )
+    AddHouseHoldPopUp(
+        showDialog = showDialog,
+        onDismiss = { showDialog = false },
+        householdViewModel = householdViewModel,
+    )
 
-  EditHouseHoldPopUp(
-      showDialog = showEdit,
-      onDismiss = { showEdit = false },
-      householdViewModel = householdViewModel)
+    EditHouseHoldPopUp(
+        showDialog = showEdit,
+        onDismiss = { showEdit = false },
+        householdViewModel = householdViewModel
+    )
 
-  ModalNavigationDrawer(
-      modifier = Modifier.testTag("householdSelectionDrawer"),
-      drawerState = drawerState,
-      drawerContent = {
-        ModalDrawerSheet(
-            drawerContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        ) {
-          Text(
-              "Household selection",
-              modifier =
-                  Modifier.padding(vertical = 18.dp, horizontal = 16.dp)
-                      .padding(horizontal = 12.dp),
-              style = MaterialTheme.typography.labelMedium)
-          userHouseholds.forEach { household ->
-            selectedHousehold?.let {
-              HouseHoldElement(
-                  household = household,
-                  selectedHousehold = it,
-                  onHouseholdSelected = { household ->
-                    if (household != selectedHousehold) {
-                      householdViewModel.selectHousehold(household)
-                    }
-                    scope.launch { drawerState.close() }
-                  })
-            }
-          }
-          HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-          Row(
-              modifier = Modifier.fillMaxWidth().padding(16.dp),
-              verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.Center) {
-                IconButton(
-                    modifier = Modifier.testTag("addHouseholdIcon"),
-                    onClick = { showDialog = true }) {
-                      Icon(
-                          imageVector = Icons.Default.Add,
-                          contentDescription = "Add Household Icon",
-                      )
-                    }
-
-                IconButton(
-                    modifier = Modifier.testTag("editHouseholdIcon"),
-                    onClick = { showEdit = true }) {
-                      Icon(
-                          imageVector = Icons.Outlined.Edit,
-                          contentDescription = "Edit Household Icon",
-                      )
-                    }
-              }
-        }
-      },
-  ) {
-    val filteredFoodItems =
-        foodItems.filter { it.foodFacts.name.contains(searchQuery, ignoreCase = true) }
-
-    if (selectedHousehold == null) {
-      FirstTimeWelcomeScreen(householdViewModel)
-    } else {
-      Scaffold(
-          modifier = Modifier.testTag("overviewScreen"),
-          topBar = {
-            selectedHousehold?.let {
-              TopNavigationBar(
-                  houseHold = it,
-                  onHamburgerClick = { scope.launch { drawerState.open() } },
-                  filters = filters)
-            }
-          },
-          bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.OVERVIEW)
-          },
-          floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
-                content = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                modifier = Modifier.testTag("addFoodFab"),
-                containerColor = MaterialTheme.colorScheme.secondaryContainer)
-          },
-          content = { paddingValues ->
-            Column(
-                modifier = Modifier.padding(paddingValues),
+    ModalNavigationDrawer(
+        modifier = Modifier.testTag("householdSelectionDrawer"),
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                drawerContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
             ) {
-              FoodSearchBar(
-                  query = searchQuery,
-                  onQueryChange = { searchQuery = it } // Update the query state when the user types
-                  )
-              ListFoodItems(filteredFoodItems)
+                Text(
+                    "Household selection",
+                    modifier =
+                    Modifier.padding(vertical = 18.dp, horizontal = 16.dp)
+                        .padding(horizontal = 12.dp),
+                    style = MaterialTheme.typography.labelMedium
+                )
+                userHouseholds.forEach { household ->
+                    selectedHousehold?.let {
+                        HouseHoldElement(
+                            household = household,
+                            selectedHousehold = it,
+                            onHouseholdSelected = { household ->
+                                if (household != selectedHousehold) {
+                                    householdViewModel.selectHousehold(household)
+                                }
+                                scope.launch { drawerState.close() }
+                            }
+                        )
+                    }
+                }
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    IconButton(
+                        modifier = Modifier.testTag("addHouseholdIcon"),
+                        onClick = { showDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Add Household Icon",
+                        )
+                    }
+
+                    IconButton(
+                        modifier = Modifier.testTag("editHouseholdIcon"),
+                        onClick = { showEdit = true }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Edit,
+                            contentDescription = "Edit Household Icon",
+                        )
+                    }
+                }
             }
-          })
+        },
+    ) {
+        val filteredFoodItems =
+            foodItems.filter { it.foodFacts.name.contains(searchQuery, ignoreCase = true) }
+
+        if (selectedHousehold == null) {
+            FirstTimeWelcomeScreen(householdViewModel)
+        } else {
+            Scaffold(
+                modifier = Modifier.testTag("overviewScreen"),
+                topBar = {
+                    selectedHousehold?.let {
+                        TopNavigationBar(
+                            houseHold = it,
+                            onHamburgerClick = { scope.launch { drawerState.open() } },
+                            filters = filters
+                        )
+                    }
+                },
+                bottomBar = {
+                    BottomNavigationMenu(
+                        onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                        tabList = LIST_TOP_LEVEL_DESTINATION,
+                        selectedItem = Route.OVERVIEW
+                    )
+                },
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
+                        content = { Icon(Icons.Default.Add, contentDescription = "Add") },
+                        modifier = Modifier.testTag("addFoodFab"),
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    )
+                },
+                content = { paddingValues ->
+                    Column(
+                        modifier = Modifier.padding(paddingValues),
+                    ) {
+                        FoodSearchBar(
+                            query = searchQuery,
+                            onQueryChange = { searchQuery = it } // Update the query state when the user types
+                        )
+                        ListFoodItems(filteredFoodItems)
+                    }
+                })
+        }
     }
-  }
 }
 
 /**
@@ -204,22 +213,28 @@ fun OverviewScreen(
  */
 @Composable
 fun ListFoodItems(foodItems: List<FoodItem>) {
-  if (foodItems.isEmpty()) {
-    // Display a prompt when there are no todos
-    Box(
-        modifier = Modifier.fillMaxSize().testTag("NoFoodItems"),
-        contentAlignment = Alignment.Center) {
-          Text(text = "No food available")
+    if (foodItems.isEmpty()) {
+        // Display a prompt when there are no food items
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .testTag("NoFoodItems"),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = "No food available")
         }
-  } else {
-    // Display the full list
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-      items(foodItems) { item ->
-        // Call a composable that renders each individual to-do item
-        FoodItemCard(foodItem = item)
-      }
+    } else {
+        // Display the full list
+        LazyColumn(modifier = Modifier
+            .fillMaxSize()
+            .testTag("foodItemList")
+        ) {
+            items(foodItems) { item ->
+                // Call a composable that renders each individual food item
+                FoodItemCard(foodItem = item)
+            }
+        }
     }
-  }
 }
 
 /**
@@ -229,34 +244,42 @@ fun ListFoodItems(foodItems: List<FoodItem>) {
  */
 @Composable
 fun FoodItemCard(foodItem: FoodItem) {
-  val expiryDate = foodItem.expiryDate
-  Log.d("FoodItemCard", "Expiry Date: $expiryDate")
-  val formattedExpiryDate =
-      expiryDate?.toDate()?.let { SimpleDateFormat("MM dd, yyyy", Locale.getDefault()).format(it) }
-          ?: "No Expiry Date"
-  Column(
-      modifier =
-          Modifier.fillMaxWidth()
-              .padding(vertical = 8.dp, horizontal = 16.dp)
-              .background(Color.White) // Add background color if needed
-              .padding(16.dp)) {
+    val expiryDate = foodItem.expiryDate
+    Log.d("FoodItemCard", "Expiry Date: $expiryDate")
+    val formattedExpiryDate =
+        expiryDate?.toDate()?.let { SimpleDateFormat("MM dd, yyyy", Locale.getDefault()).format(it) }
+            ?: "No Expiry Date"
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp, horizontal = 16.dp)
+            .background(Color.White) // Add background color if needed
+            .padding(16.dp)
+            .testTag("foodItemCard"),
+    ) {
         // First Row for Date and Status
         Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween) {
-              Text(text = foodItem.foodFacts.name, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(text = foodItem.foodFacts.name, fontSize = 14.sp, fontWeight = FontWeight.Bold)
 
-              Text(text = foodItem.foodFacts.quantity.toString() + "in stock")
-              // Display the due date on the left
-              Text(text = formattedExpiryDate, fontSize = 12.sp, color = Color.Black)
-            }
+            Text(text = foodItem.foodFacts.quantity.toString() + " in stock")
+            // Display the due date on the left
+            Text(text = formattedExpiryDate, fontSize = 12.sp, color = Color.Black)
+        }
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-            horizontalArrangement = Arrangement.Center) {
-              // Display the remaining days until expiry in the middle
-              Text(text = "Expires on $formattedExpiryDate", fontSize = 12.sp, color = Color.Black)
-            }
-      }
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            // Display the remaining days until expiry in the middle
+            Text(text = "Expires on $formattedExpiryDate", fontSize = 12.sp, color = Color.Black)
+        }
+    }
 }
 
 /**
@@ -268,35 +291,38 @@ fun FoodItemCard(foodItem: FoodItem) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FoodSearchBar(query: String, onQueryChange: (String) -> Unit) {
-  Box(
-      modifier = Modifier.fillMaxWidth().padding(16.dp), // Outer padding for spacing
-      contentAlignment = Alignment.Center // Center the SearchBar within the Box
-      ) {
+    var active by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .testTag("foodSearchBar"),
+        contentAlignment = Alignment.Center
+    ) {
         SearchBar(
-            colors =
-                SearchBarDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                ),
+            colors = SearchBarDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+            ),
             shadowElevation = 3.dp,
             query = query,
             onQueryChange = onQueryChange,
             placeholder = { Text("Search food item") },
-            onSearch = { /* Optional: Handle search action if needed */},
-            active = false,
-            onActiveChange = {},
+            onSearch = { /* Optional: Handle search action if needed */ },
+            active = active,
+            onActiveChange = { active = it },
             leadingIcon = {},
             trailingIcon = {
-              IconButton(onClick = {}) {
-                Icon(Icons.Default.Search, contentDescription = "Search Icon")
-              }
+                IconButton(onClick = {}) {
+                    Icon(Icons.Default.Search, contentDescription = "Search Icon")
+                }
             },
-            modifier =
-                Modifier.widthIn(
-                        max = 600.dp) // Restrict max width to prevent over-stretching on large
-                    // screens
-                    .fillMaxWidth(0.9f) // Make it responsive and occupy 90% of available width
-                    .testTag("searchBar")) {}
-      }
+            modifier = Modifier
+                .widthIn(max = 600.dp)
+                .fillMaxWidth(0.9f)
+                .testTag("searchBar")
+        ) {}
+    }
 }
 
 /**
@@ -307,10 +333,14 @@ fun FoodSearchBar(query: String, onQueryChange: (String) -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FirstTimeWelcomeScreen(householdViewModel: HouseholdViewModel) {
-  Column(
-      modifier = Modifier.fillMaxSize().padding(16.dp).testTag("firstTimeWelcomeScreen"),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .testTag("firstTimeWelcomeScreen"),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         // Welcome Text
         Text(
             text = "Welcome to ShelfLife!",
@@ -326,7 +356,8 @@ fun FirstTimeWelcomeScreen(householdViewModel: HouseholdViewModel) {
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(horizontal = 16.dp),
-            textAlign = TextAlign.Center)
+            textAlign = TextAlign.Center
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -339,15 +370,17 @@ fun FirstTimeWelcomeScreen(householdViewModel: HouseholdViewModel) {
             onValueChange = { newValue -> householdName = newValue },
             label = { Text("Enter Household name") },
             modifier =
-                Modifier.fillMaxWidth()
-                    .padding(horizontal = 32.dp)
-                    .testTag("householdNameTextField"),
+            Modifier.fillMaxWidth()
+                .padding(horizontal = 32.dp)
+                .testTag("householdNameTextField"),
             singleLine = true,
             shape = MaterialTheme.shapes.medium,
             colors =
-                TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant))
+            TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -355,9 +388,13 @@ fun FirstTimeWelcomeScreen(householdViewModel: HouseholdViewModel) {
         Button(
             onClick = { householdViewModel.addNewHousehold(householdName) },
             enabled = householdName.isNotBlank(),
-            modifier = Modifier.fillMaxWidth(0.6f).height(48.dp).testTag("householdNameSaveButton"),
-            shape = MaterialTheme.shapes.medium) {
-              Text(text = "Create Household", style = MaterialTheme.typography.labelLarge)
-            }
-      }
+            modifier = Modifier
+                .fillMaxWidth(0.6f)
+                .height(48.dp)
+                .testTag("householdNameSaveButton"),
+            shape = MaterialTheme.shapes.medium
+        ) {
+            Text(text = "Create Household", style = MaterialTheme.typography.labelLarge)
+        }
+    }
 }
