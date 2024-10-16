@@ -32,12 +32,12 @@ fun <T> DropdownFields(
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     optionLabel: (T) -> String,
-    modifier_input: Modifier = Modifier
+    modifier: Modifier = Modifier
 ) {
   ExposedDropdownMenuBox(
       expanded = expanded,
       onExpandedChange = { onExpandedChange(!expanded) },
-      modifier = modifier_input) {
+      modifier = modifier) {
         OutlinedTextField(
             value = optionLabel(selectedOption),
             onValueChange = {},
