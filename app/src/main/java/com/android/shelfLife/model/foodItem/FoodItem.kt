@@ -29,10 +29,17 @@ data class FoodItem(
     val status: FoodStatus = FoodStatus.CLOSED // Default status is CLOSED
 ) {
     override fun toString(): String {
-        return "Name: ${foodFacts.name}\n" +
-                "Quantity: ${foodFacts.quantity}\n" +
-                "Location: $location\n" +
-                "Days before expiry: ${getRemainingDays()}\n"
+        return "FoodItem:(" +
+                "Location: ${location.name}\n" +
+                "FoodFacts: ${foodFacts}\n" +
+                "Status: ${status.name}\n" +
+                "Expires in: ${getRemainingDays()} days\n)"
+    }
+
+    fun getImportantDetails(): String {
+        return "${foodFacts.name}[${foodFacts.nutritionFacts.energyKcal}Kcal," +
+                " ${foodFacts.nutritionFacts.proteins}g protein]: " +
+                "(Expires in ${getRemainingDays()} days, ${foodFacts.quantity})"
     }
 
     /**
