@@ -450,7 +450,7 @@ fun ScannedItemFoodScreen(
                         openDate = formatDateToTimestamp(openDate),
                         buyDate = formatDateToTimestamp(buyDate),
                         // Logic to determine status depending on the dates given
-                        status = FoodStatus.CLOSED)
+                       )
                 houseHoldViewModel.addFoodItem(newFoodItem)
                 onFinish() // Call the callback to remove the screen and resume scanning
               },
