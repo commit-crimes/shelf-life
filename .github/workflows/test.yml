@@ -52,7 +52,7 @@ jobs:
             api-level: 30           # API level of the emulator (can be customized)
             target: google_apis      # Target platform for the emulator
             arch: x86_64             # Emulator architecture
-            profile: Pixel_4         # Emulator profile to use (can be customized)
+            profile: Nexus 6         # Emulator profile to use (can be customized)
             script: ./gradlew connectedDebugAndroidTest --parallel --build-cache
 
 
