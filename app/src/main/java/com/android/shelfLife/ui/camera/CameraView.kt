@@ -53,6 +53,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -368,12 +370,18 @@ fun PermissionDeniedScreen(navigationActions: NavigationActions) {
             onTabSelect = { selected -> navigationActions.navigateTo(selected) },
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = Route.SCANNER)
-      }) { paddingVals ->
+      },
+      modifier = Modifier.semantics { testTag = "permissionDeniedScreen" }) { paddingVals ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(paddingVals),
+            modifier =
+                Modifier.fillMaxSize().padding(paddingVals).semantics {
+                  testTag = "permissionDeniedColumn"
+                },
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
-              Text(text = "Camera permission is required to scan barcodes.")
+              Text(
+                  text = "Camera permission is required to scan barcodes.",
+                  modifier = Modifier.semantics { testTag = "permissionDeniedMessage" })
               Spacer(modifier = Modifier.height(16.dp))
               Button(
                   onClick = {
@@ -383,7 +391,8 @@ fun PermissionDeniedScreen(navigationActions: NavigationActions) {
                           data = Uri.fromParts("package", context.packageName, null)
                         }
                     context.startActivity(intent)
-                  }) {
+                  },
+                  modifier = Modifier.semantics { testTag = "openSettingsButton" }) {
                     Text(text = "Open Settings")
                   }
             }
