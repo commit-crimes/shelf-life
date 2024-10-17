@@ -78,7 +78,7 @@ fun EditHouseHoldPopUp(
           Button(
               onClick = {
                 houseHoldsToDeleteId.forEach { householdViewModel.deleteHouseholdById(it) }
-                houseHolds.forEach() { householdViewModel.updateHousehold(it) }
+                houseHolds.forEach { householdViewModel.updateHousehold(it) }
                 onDismiss()
               }) {
                 Text("Apply")
