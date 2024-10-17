@@ -1,9 +1,11 @@
 name: CI - Test Runner
 
+# Run the workflow when commits are pushed on main or when a PR is modified
 on:
   push:
     branches:
       - main
+
   pull_request:
     types:
       - opened
@@ -11,72 +13,24 @@ on:
       - reopened
 
 jobs:
-  prepare-avd:
-    name: Prepare AVD
-    runs-on: ubuntu-latest
-    outputs:
-      avd-cache-hit: ${{ steps.avd-cache.outputs.cache-hit }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install Android SDK Components
-        run: |
-          yes | sdkmanager --licenses > /dev/null
-          yes | sdkmanager --update > /dev/null
-          sdkmanager --install "platform-tools" "emulator" "platforms;android-34" "build-tools;35.0.0" > /dev/null
-        shell: bash
-
-      - name: Set up Android SDK environment
-        run: |
-          echo "ANDROID_HOME=$HOME/Android/Sdk" >> $GITHUB_ENV
-          echo "PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH" >> $GITHUB_ENV
-        shell: bash
-
-      - name: AVD cache
-        id: avd-cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.android/avd
-            ~/.android/adbkey*
-          key: avd-34
-
-      - name: Create AVD if cache miss
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          force-avd-creation: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          script: echo "AVD created and ready for caching."
-
-      - name: Save AVD to Cache
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.android/avd
-            ~/.android/adbkey*
-          key: avd-34
-
   ci:
     name: CI
-    needs: prepare-avd
+    # Execute the CI on the course's runners
     runs-on: ubuntu-latest
+
     steps:
+      # First step : Checkout the repository on the runner
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          fetch-depth: 0
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of Sonar analysis (if we use Sonar Later)
 
+      # This step removes the current gradle cache to avoid any caching issues
       - name: Remove current gradle cache
         run: rm -rf ~/.gradle
 
+      # Kernel-based Virtual Machine (KVM) is an open source virtualization technology built into Linux. Enabling it allows the Android emulator to run faster.
       - name: Enable KVM group perms
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -89,31 +43,26 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
+
+      # Caching is a very useful part of a CI, as a workflow is executed in a clean environement every time,
+      # this means that one would need to re-download and re-process gradle files for every run. Which is very time consuming.
+      #
+      # To avoid that, we cache the the gradle folder to reuse it later.
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Restore AVD cache
+      # Cache the Emulator, if the cache does not hit, create the emulator
+      - name: AVD cache
         uses: actions/cache@v4
+        id: avd-cache
         with:
           path: |
-            ~/.android/avd
-            ~/.android/adbkey*
+            ~/.android/avd/*
+            ~/.android/adb*
           key: avd-34
 
-      - name: Install Android SDK Components
-        run: |
-          yes | sdkmanager --licenses > /dev/null
-          yes | sdkmanager --update > /dev/null
-          sdkmanager --install "platform-tools" "emulator" "platforms;android-34" "build-tools;35.0.0" > /dev/null
-        shell: bash
-
-      - name: Set up Android SDK environment
-        run: |
-          echo "ANDROID_HOME=$HOME/Android/Sdk" >> $GITHUB_ENV
-          echo "PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH" >> $GITHUB_ENV
-        shell: bash
-
-      - name: Setup Emulator
+      - name: create AVD and generate snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -121,8 +70,11 @@ jobs:
           arch: x86_64
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
 
+
+      # Load google-services.json and local.properties from the secrets
       - name: Decode secrets
         env:
           GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
@@ -132,24 +84,45 @@ jobs:
           echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
 
       - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
+        run: |
+          chmod +x ./gradlew
 
+      # Check formatting
       - name: ktfmt Check
-        run: ./gradlew ktfmtCheck
+        run: |
+          ./gradlew ktfmtCheck
 
+      # This step runs gradle commands to build the application
       - name: Assemble and Link
-        run: ./gradlew assemble lint --parallel --build-cache
+        run: |
+          # To run the CI with debug information, add --info
+          ./gradlew assemble lint --parallel --build-cache
 
-      - name: Run Unit Tests
-        run: ./gradlew check --parallel --build-cache
+      # Run Unit tests
+      - name: Run tests
+        run: |
+          # To run the CI with debug information, add --info
+          ./gradlew check --parallel --build-cache
 
-      - name: Run Android Tests
-        run: ./gradlew connectedCheck --parallel --build-cache
+      # Run connected tests on the emulator
+      - name: Run android tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: ./gradlew connectedCheck --parallel --build-cache
 
+      # This step generates the coverage report which will be uploaded to sonar
       - name: Generate Coverage Report
-        run: ./gradlew jacocoTestReport
+        run: |
+          ./gradlew jacocoTestReport
 
-      - name: Upload Report to SonarCloud
+      # Upload the various reports to sonar
+      - name: Upload report to SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
@@ -159,7 +132,7 @@ jobs:
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
-      - name: Upload Test Results
+      - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v3
         with:
@@ -170,13 +143,12 @@ jobs:
     name: SonarCloud
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -190,3 +162,6 @@ jobs:
             -Dsonar.organization=commit-crimes
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+
+
