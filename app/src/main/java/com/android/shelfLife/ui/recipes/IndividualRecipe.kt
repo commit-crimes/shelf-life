@@ -180,7 +180,7 @@ fun IndividualRecipeScreen(
                         // Back button to return to the previous screen
                         IconButton(onClick = { navigationActions.goBack() }) {
                           Icon(
-                              imageVector = Icons.Default.ArrowBack,
+                              imageVector = Icons.Filled.ArrowBack,
                               contentDescription = "Go back Icon")
                         }
                       },

@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -54,13 +55,20 @@ fun TopNavigationBar(
   var showFilterBar by remember { mutableStateOf(false) }
   Column {
     TopAppBar(
+        colors =
+            TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                navigationIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                actionIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer),
         navigationIcon = {
-          IconButton(onClick = { onHamburgerClick() }) {
-            Icon(
-                imageVector = Icons.Default.Menu,
-                contentDescription = "Menu Icon",
-                tint = Color.White)
-          }
+          IconButton(
+              modifier = Modifier.testTag("hamburgerIcon"), onClick = { onHamburgerClick() }) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Menu Icon",
+                )
+              }
         },
         title = {
           Row(modifier = Modifier.padding(end = 8.dp)) {
@@ -68,24 +76,22 @@ fun TopNavigationBar(
                 text = houseHold.name,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                color = Color.White)
+            )
           }
         },
         actions = {
           if (filters.isNotEmpty()) {
             IconButton(
+                modifier = Modifier.testTag("filterIcon"),
                 onClick = { showFilterBar = !showFilterBar }) { // Toggle filter bar visibility
                   Icon(
                       imageVector = Icons.Default.FilterList,
                       contentDescription = "Filter Icon",
-                      tint = Color.White)
+                  )
                 }
           }
         },
-        colors =
-            TopAppBarDefaults.mediumTopAppBarColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                titleContentColor = Color.White))
+    )
 
     if (filters.isNotEmpty()) {
       AnimatedVisibility(
@@ -111,7 +117,8 @@ fun FilterBar(filters: List<String>) {
   Row(
       modifier =
           Modifier.horizontalScroll(scrollState) // Enables horizontal scrolling
-              .padding(horizontal = 8.dp, vertical = 4.dp)) {
+              .padding(horizontal = 8.dp, vertical = 4.dp)
+              .testTag("filterBar")) {
         filters.forEach { filter ->
           val isSelected = selectedFilters.contains(filter)
           FilterChipItem(
@@ -172,6 +179,11 @@ fun HouseHoldElement(
     onHouseholdSelected: (HouseHold) -> Unit
 ) {
   NavigationDrawerItem(
+      colors =
+          NavigationDrawerItemDefaults.colors(
+              selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+              selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+          ),
       label = {
         Text(
             text = household.name,

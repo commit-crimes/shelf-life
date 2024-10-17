@@ -9,6 +9,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import com.android.shelfLife.model.household.HouseholdViewModel
 
 /**
@@ -29,6 +31,7 @@ fun AddHouseHoldPopUp(
 
   if (showDialog) {
     androidx.compose.material3.AlertDialog(
+        modifier = Modifier.testTag("addHouseholdPopup"),
         onDismissRequest = { onDismiss() },
         title = { Text("Add New Household") },
         text = {

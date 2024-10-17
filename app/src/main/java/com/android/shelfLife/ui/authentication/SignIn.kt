@@ -67,7 +67,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
 
   Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
     Column(
-        modifier = Modifier.fillMaxSize().padding(padding),
+        modifier = Modifier.fillMaxSize().padding(padding).padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
           Image(
@@ -79,7 +79,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
 
           Text(
               modifier = Modifier.testTag("loginTitle"),
-              text = "Shelf Life",
+              text = stringResource(R.string.app_name),
               style =
                   MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
               fontWeight = FontWeight.Bold,
