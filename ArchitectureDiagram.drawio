@@ -11,13 +11,13 @@
           <mxGeometry x="12" y="145" width="160" height="40" as="geometry" />
         </mxCell>
         <mxCell id="kBmUnrdPFpruGlUo7dz6-4" value="" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
-          <mxGeometry x="132" y="304" width="1025" height="260" as="geometry" />
+          <mxGeometry x="119.5" y="304" width="1025" height="260" as="geometry" />
         </mxCell>
         <mxCell id="kBmUnrdPFpruGlUo7dz6-5" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Domain Layer&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="17" y="396" width="160" height="76" as="geometry" />
         </mxCell>
         <mxCell id="kBmUnrdPFpruGlUo7dz6-6" value="" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
-          <mxGeometry x="132" y="616" width="1020" height="164" as="geometry" />
+          <mxGeometry x="122" y="616" width="1020" height="164" as="geometry" />
         </mxCell>
         <mxCell id="kBmUnrdPFpruGlUo7dz6-7" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Data Layer&amp;nbsp;&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
           <mxGeometry x="27" y="658.5" width="120" height="85" as="geometry" />
@@ -143,7 +143,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="EQAx6T4KS5A-mvEifLoN" name="Overview">
-    <mxGraphModel dx="1793" dy="1134" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="819" dy="518" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -181,50 +181,128 @@
           <mxGeometry x="147" y="392" width="163" height="80" as="geometry" />
         </mxCell>
         <mxCell id="lAnkNxIDWEyGrCfgzlGp-15" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Food items Data&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
-          <mxGeometry x="427.5" y="658" width="95" height="80" as="geometry" />
+          <mxGeometry x="383.5" y="658" width="95" height="80" as="geometry" />
         </mxCell>
         <mxCell id="lAnkNxIDWEyGrCfgzlGp-34" value="&lt;span style=&quot;font-size: 25px;&quot;&gt;OVERVIEW&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=25;fontStyle=5" vertex="1" parent="1">
           <mxGeometry x="495" y="15" width="160" height="40" as="geometry" />
         </mxCell>
-        <mxCell id="YfQNQKK6J76rFnjM2ni2-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;fillColor=#d5e8d4;strokeColor=#82b366;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" target="YfQNQKK6J76rFnjM2ni2-3">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="270" y="140" as="sourcePoint" />
-            <Array as="points">
-              <mxPoint x="290" y="140" />
-              <mxPoint x="290" y="165" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="YfQNQKK6J76rFnjM2ni2-2" value="&lt;b&gt;Select&amp;nbsp;&lt;/b&gt;&lt;div&gt;&lt;b&gt;household&lt;/b&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="YfQNQKK6J76rFnjM2ni2-1">
-          <mxGeometry x="-0.2889" relative="1" as="geometry">
-            <mxPoint x="37" y="1" as="offset" />
-          </mxGeometry>
-        </mxCell>
         <mxCell id="YfQNQKK6J76rFnjM2ni2-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" source="YfQNQKK6J76rFnjM2ni2-3" target="lAnkNxIDWEyGrCfgzlGp-15">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="YfQNQKK6J76rFnjM2ni2-3" value="&lt;h3 style=&quot;text-align: center; font-size: 15px;&quot;&gt;List food items&lt;/h3&gt;&lt;div&gt;&lt;ul style=&quot;padding-left: 20px;&quot;&gt;&lt;li&gt;&lt;b&gt;Filters&lt;/b&gt;: (decreasing expriy date food category etc.)&lt;/li&gt;&lt;li&gt;&lt;b&gt;Search bar&lt;/b&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;align=left;" vertex="1" parent="1">
-          <mxGeometry x="370" y="110" width="210" height="95" as="geometry" />
+        <mxCell id="YfQNQKK6J76rFnjM2ni2-3" value="&lt;h3 style=&quot;text-align: center; font-size: 15px;&quot;&gt;List food items&lt;/h3&gt;&lt;div&gt;&lt;ul style=&quot;padding-left: 20px;&quot;&gt;&lt;li&gt;&lt;b&gt;Filters&lt;/b&gt;: (decreasing expriy date food category etc.)&lt;/li&gt;&lt;li&gt;&lt;b&gt;Search bar&lt;/b&gt;&lt;/li&gt;&lt;li&gt;&lt;b&gt;Add new food item&lt;/b&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;align=left;" vertex="1" parent="1">
+          <mxGeometry x="326" y="110" width="210" height="100" as="geometry" />
         </mxCell>
         <mxCell id="YfQNQKK6J76rFnjM2ni2-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;sketch=1;curveFitting=1;jiggle=2;" edge="1" source="YfQNQKK6J76rFnjM2ni2-6" target="YfQNQKK6J76rFnjM2ni2-7" parent="1">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="651.5" y="402.0000000000002" as="targetPoint" />
+            <mxPoint x="837.5" y="402.0000000000002" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="YfQNQKK6J76rFnjM2ni2-6" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Profile&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
-          <mxGeometry x="604" y="110" width="95" height="80" as="geometry" />
+          <mxGeometry x="790" y="120" width="95" height="80" as="geometry" />
         </mxCell>
         <mxCell id="YfQNQKK6J76rFnjM2ni2-7" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Profile&amp;nbsp;&lt;span style=&quot;background-color: initial;&quot;&gt;Data&lt;/span&gt;&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;align=center;" vertex="1" parent="1">
-          <mxGeometry x="604" y="658" width="95" height="80" as="geometry" />
+          <mxGeometry x="790" y="658" width="95" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4rJUNRvopHZCuv8tL1Gv-1" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Food items Data&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="617.5" y="658" width="95" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4rJUNRvopHZCuv8tL1Gv-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;sketch=1;curveFitting=1;jiggle=2;" edge="1" source="4rJUNRvopHZCuv8tL1Gv-3" target="4rJUNRvopHZCuv8tL1Gv-1" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="4rJUNRvopHZCuv8tL1Gv-3" value="&lt;h3 style=&quot;text-align: center; font-size: 15px;&quot;&gt;List recipes&lt;/h3&gt;&lt;div&gt;&lt;ul style=&quot;padding-left: 20px;&quot;&gt;&lt;li&gt;&lt;b&gt;Filters&lt;/b&gt;: (missing ingredients, vegan etc.)&lt;/li&gt;&lt;li&gt;&lt;b&gt;Search bar&lt;/b&gt;&lt;/li&gt;&lt;li&gt;&lt;b&gt;Add new recipe&lt;/b&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;align=left;" vertex="1" parent="1">
+          <mxGeometry x="560" y="110" width="210" height="100" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram id="2wOUk39KzuTYBzeXpWRB" name="Add Food">
-    <mxGraphModel dx="1434" dy="907" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="989" dy="626" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="eGGhI4YwiIRE583V5EnX-1" value="" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="122" y="80" width="1020" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="eGGhI4YwiIRE583V5EnX-2" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;font&gt;UI Layer&lt;/font&gt;&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;sketch=1;curveFitting=1;jiggle=2;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="12" y="145" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="eGGhI4YwiIRE583V5EnX-3" value="" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="119.5" y="304" width="1025" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="eGGhI4YwiIRE583V5EnX-4" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Domain Layer&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="17" y="396" width="160" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="eGGhI4YwiIRE583V5EnX-5" value="" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="122" y="616" width="1020" height="164" as="geometry" />
+        </mxCell>
+        <mxCell id="eGGhI4YwiIRE583V5EnX-6" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Data Layer&amp;nbsp;&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="27" y="658.5" width="120" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="eGGhI4YwiIRE583V5EnX-9" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Manually add food item&lt;/h3&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;ul&gt;&lt;li&gt;Input fields for food item&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="147" y="117.5" width="163" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="eGGhI4YwiIRE583V5EnX-10" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Food items Data&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="177" y="658" width="95" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="eGGhI4YwiIRE583V5EnX-11" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;spacingTop=0;fontSize=1;horizontal=1;strokeWidth=2;endSize=6;startSize=5;jumpSize=6;sketch=1;curveFitting=1;jiggle=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;sourcePerimeterSpacing=0;" edge="1" parent="1" source="eGGhI4YwiIRE583V5EnX-9" target="eGGhI4YwiIRE583V5EnX-10">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="492" y="380" as="sourcePoint" />
+            <mxPoint x="192" y="290" as="targetPoint" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="eGGhI4YwiIRE583V5EnX-24" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;3rd Party APIs&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="27" y="830" width="120" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="eGGhI4YwiIRE583V5EnX-34" value="&lt;span style=&quot;font-size: 25px;&quot;&gt;Add Food Item&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=25;fontStyle=5" vertex="1" parent="1">
+          <mxGeometry x="480" y="15" width="190" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="IHIle1BvaInROvlBWk0Z-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" source="g11BYo_Bknl9xhzB3TaB-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="912" y="309" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="laX2A3z0bzZdJ9w2xSLV-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="g11BYo_Bknl9xhzB3TaB-2" target="laX2A3z0bzZdJ9w2xSLV-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="laX2A3z0bzZdJ9w2xSLV-7" value="&lt;font color=&quot;#ff0000&quot;&gt;FOUND&lt;/font&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="laX2A3z0bzZdJ9w2xSLV-6">
+          <mxGeometry x="0.0333" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="g11BYo_Bknl9xhzB3TaB-2" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Scan Barcode&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="600" y="150" width="95" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="g11BYo_Bknl9xhzB3TaB-3" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Food facts Data&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="460" y="658.5" width="95" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="IHIle1BvaInROvlBWk0Z-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fillColor=#d5e8d4;strokeColor=#82b366;strokeWidth=2;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" source="g11BYo_Bknl9xhzB3TaB-2" target="eGGhI4YwiIRE583V5EnX-9">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="340" y="120" />
+              <mxPoint x="340" y="165" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IHIle1BvaInROvlBWk0Z-4" value="&lt;b&gt;&lt;font color=&quot;#ff0000&quot;&gt;Barcode&lt;/font&gt;&lt;/b&gt;&lt;div&gt;&lt;b&gt;&lt;font color=&quot;#ff0000&quot;&gt;&amp;nbsp;NOT FOUND&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="IHIle1BvaInROvlBWk0Z-3">
+          <mxGeometry x="-0.0212" y="-3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IHIle1BvaInROvlBWk0Z-1" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Get matching Food Fact Data&lt;/h3&gt;&lt;div&gt;&lt;ul style=&quot;padding-left: 20px;&quot;&gt;&lt;li&gt;Create a Food Item object with the Facts data&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="770" y="299" width="250" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="laX2A3z0bzZdJ9w2xSLV-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;strokeWidth=2;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" source="laX2A3z0bzZdJ9w2xSLV-3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="230" y="290" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="440" y="290" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="laX2A3z0bzZdJ9w2xSLV-3" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Scanned Food Item&lt;/h3&gt;&lt;div&gt;&lt;ul style=&quot;padding-left: 20px;&quot;&gt;&lt;li&gt;complete location and other trivial fields&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="360" y="150" width="180" height="80" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
