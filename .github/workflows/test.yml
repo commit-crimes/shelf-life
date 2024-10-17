@@ -121,6 +121,25 @@ jobs:
         run: |
           ./gradlew jacocoTestReport
 
+      - name: List build directory contents
+        run: |
+          echo "Listing contents of Jacoco report directory:"
+          ls -R build/reports/jacoco/test/
+
+          echo "Listing contents of test results directory:"
+          ls -R build/test-results/test/
+
+          echo "Listing contents of test directory:"
+          ls -R build/test/
+
+          echo "Listing contents of build directory:"
+          ls -R build/test-results/
+          
+          "Listing contents of build reports directory:"
+          ls -R build/reports/
+      
+      
+
       # Upload the various reports to sonar
       - name: Upload report to SonarCloud
         env:
