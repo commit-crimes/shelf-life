@@ -30,7 +30,6 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
           restore-keys: ${{ runner.os }}-gradle
-
       - name: Build and analyze
         env:
           GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
