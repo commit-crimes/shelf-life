@@ -15,7 +15,7 @@ import androidx.lifecycle.AndroidViewModel
  *
  * @property application The application context
  */
-open class BarcodeScannerViewModel(application: Application) : AndroidViewModel(application) {
+class BarcodeScannerViewModel(application: Application) : AndroidViewModel(application) {
 
   private val sharedPreferences =
       getApplication<Application>()

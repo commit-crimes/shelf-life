@@ -10,192 +10,212 @@ import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
+import io.mockk.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.*
 
 @RunWith(AndroidJUnit4::class)
 class BarcodeScannerScreenTest {
 
-  @get:Rule val composeTestRule = createComposeRule()
+    @get:Rule
+    val composeTestRule = createComposeRule()
 
-  private lateinit var navigationActions: NavigationActions
-  private lateinit var barcodeScannerViewModel: BarcodeScannerViewModel
-  private lateinit var foodFactsViewModel: FoodFactsViewModel
-  private lateinit var householdViewModel: HouseholdViewModel
-  private lateinit var foodItemViewModel: ListFoodItemsViewModel
+    private lateinit var navigationActions: NavigationActions
+    private lateinit var barcodeScannerViewModel: BarcodeScannerViewModel
+    private lateinit var foodFactsViewModel: FoodFactsViewModel
+    private lateinit var householdViewModel: HouseholdViewModel
+    private lateinit var foodItemViewModel: ListFoodItemsViewModel
 
-  @Before
-  fun setUp() {
-    navigationActions = mock()
-    barcodeScannerViewModel = mock()
-    foodFactsViewModel = mock()
-    householdViewModel = mock()
-    foodItemViewModel = mock()
+    // Use real MutableStateFlow to simulate StateFlow behavior
+    private lateinit var searchStatusFlow: MutableStateFlow<SearchStatus>
+    private lateinit var foodFactsSuggestionsFlow: MutableStateFlow<List<FoodFacts>>
 
-    whenever(navigationActions.currentRoute()).thenReturn(Route.SCANNER)
-    whenever(barcodeScannerViewModel.permissionGranted).thenReturn(true)
-  }
+    @Before
+    fun setUp() {
+        navigationActions = mockk(relaxed = true)
+        barcodeScannerViewModel = mockk(relaxed = true)
+        householdViewModel = mockk(relaxed = true)
+        foodItemViewModel = mockk(relaxed = true)
 
-  // Test if the BarcodeScannerScreen is displayed with all elements
-  @Test
-  fun barcodeScannerScreenIsDisplayedCorrectly() {
-    composeTestRule.setContent {
-      BarcodeScannerScreen(
-          navigationActions = navigationActions,
-          cameraViewModel = barcodeScannerViewModel,
-          foodFactsViewModel = foodFactsViewModel,
-          householdViewModel = householdViewModel,
-          foodItemViewModel = foodItemViewModel)
+        // Initialize MutableStateFlow with default values
+        searchStatusFlow = MutableStateFlow(SearchStatus.Success)
+        foodFactsSuggestionsFlow = MutableStateFlow(emptyList())
+
+        foodFactsViewModel = mockk {
+            every { searchStatus } returns searchStatusFlow
+            every { foodFactsSuggestions } returns foodFactsSuggestionsFlow
+        }
+
+        // Mock other interactions
+        every { navigationActions.currentRoute() } returns Route.SCANNER
+        every { barcodeScannerViewModel.permissionGranted } returns true
     }
 
-    // Check that the main screen is displayed
-    composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("cameraPreviewBox").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("scannerOverlay").assertIsDisplayed()
-  }
+    // Test if the BarcodeScannerScreen is displayed with all elements
+    @Test
+    fun barcodeScannerScreenIsDisplayedCorrectly() {
+        composeTestRule.setContent {
+            BarcodeScannerScreen(
+                navigationActions = navigationActions,
+                cameraViewModel = barcodeScannerViewModel,
+                foodFactsViewModel = foodFactsViewModel,
+                householdViewModel = householdViewModel,
+                foodItemViewModel = foodItemViewModel
+            )
+        }
 
-  // Test that when permission is not granted, navigation to permission handler occurs
-  @Test
-  fun whenPermissionNotGranted_NavigateToPermissionHandler() {
-    // Mock permission not granted
-    whenever(barcodeScannerViewModel.permissionGranted).thenReturn(false)
-
-    composeTestRule.setContent {
-      BarcodeScannerScreen(
-          navigationActions = navigationActions,
-          cameraViewModel = barcodeScannerViewModel,
-          foodFactsViewModel = foodFactsViewModel,
-          householdViewModel = householdViewModel,
-          foodItemViewModel = foodItemViewModel)
+        // Check that the main screen is displayed
+        composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("cameraPreviewBox").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("scannerOverlay").assertIsDisplayed()
     }
 
-    // Verify navigation to permission handler
-    verify(navigationActions).navigateTo(Screen.PERMISSION_HANDLER)
-  }
+    // Test that when permission is not granted, navigation to permission handler occurs
+    @Test
+    fun whenPermissionNotGranted_NavigateToPermissionHandler() {
+        // Mock permission not granted
+        every { barcodeScannerViewModel.permissionGranted } returns false
 
-  // Test that ScannedItemFoodScreen is displayed after scanning
-  @Test
-  fun scannedItemFoodScreenIsDisplayedAfterScanning() {
-    // Mock the scanning process
-    whenever(barcodeScannerViewModel.permissionGranted).thenReturn(true)
+        composeTestRule.setContent {
+            BarcodeScannerScreen(
+                navigationActions = navigationActions,
+                cameraViewModel = barcodeScannerViewModel,
+                foodFactsViewModel = foodFactsViewModel,
+                householdViewModel = householdViewModel,
+                foodItemViewModel = foodItemViewModel
+            )
+        }
 
-    // Prepare a sample FoodFacts object with non-null quantity and category
-    val sampleFoodFacts =
-        FoodFacts(
+        // Verify navigation to permission handler
+        verify { navigationActions.navigateTo(Screen.PERMISSION_HANDLER) }
+    }
+
+    // Test that ScannedItemFoodScreen is displayed after scanning
+    @Test
+    fun scannedItemFoodScreenIsDisplayedAfterScanning() {
+        // Mock the scanning process
+        every { barcodeScannerViewModel.permissionGranted } returns true
+
+        // Prepare a sample FoodFacts object with non-null quantity and category
+        val sampleFoodFacts = FoodFacts(
             name = "Sample Food",
             barcode = "1234567890",
             quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
-            category = FoodCategory.OTHER)
+            category = FoodCategory.OTHER
+        )
 
-    // Mock the foodFactsViewModel to return success and the sample food facts
-    whenever(foodFactsViewModel.searchStatus)
-        .thenReturn(mock { on { value } doReturn SearchStatus.Success })
-    whenever(foodFactsViewModel.foodFactsSuggestions)
-        .thenReturn(mock { on { value } doReturn listOf(sampleFoodFacts) })
+        // Update the MutableStateFlow with the new search status and food facts
+        searchStatusFlow.value = SearchStatus.Success
+        foodFactsSuggestionsFlow.value = listOf(sampleFoodFacts)
 
-    composeTestRule.setContent {
-      // We need to directly call ScannedItemFoodScreen to test it
-      ScannedItemFoodScreen(
-          houseHoldViewModel = householdViewModel,
-          foodFacts = sampleFoodFacts,
-          foodItemViewModel = foodItemViewModel,
-          onFinish = {})
+        composeTestRule.setContent {
+            // We need to directly call ScannedItemFoodScreen to test it
+            ScannedItemFoodScreen(
+                houseHoldViewModel = householdViewModel,
+                foodFacts = sampleFoodFacts,
+                foodItemViewModel = foodItemViewModel,
+                onFinish = {}
+            )
+        }
+
+        // Check that ScannedItemFoodScreen is displayed
+        composeTestRule.onNodeWithTag("scannedItemFoodScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("backButton").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("locationDropdown").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("expireDateTextField").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("openDateTextField").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("buyDateTextField").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("submitButton").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
     }
 
-    // Check that ScannedItemFoodScreen is displayed
-    composeTestRule.onNodeWithTag("scannedItemFoodScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("backButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("locationDropdown").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("expireDateTextField").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("openDateTextField").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("buyDateTextField").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("submitButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
-  }
+    // Test clicking on back button returns to scanning
+    @Test
+    fun clickingBackButtonReturnsToScanning() {
+        var onFinishCalled = false
 
-  // Test clicking on back button returns to scanning
-  @Test
-  fun clickingBackButtonReturnsToScanning() {
-    var onFinishCalled = false
+        composeTestRule.setContent {
+            // We need to directly call ScannedItemFoodScreen to test it
+            ScannedItemFoodScreen(
+                houseHoldViewModel = householdViewModel,
+                foodFacts = FoodFacts(
+                    name = "Sample Food",
+                    barcode = "1234567890",
+                    quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
+                    category = FoodCategory.OTHER
+                ),
+                foodItemViewModel = foodItemViewModel,
+                onFinish = { onFinishCalled = true }
+            )
+        }
 
-    composeTestRule.setContent {
-      // We need to directly call ScannedItemFoodScreen to test it
-      ScannedItemFoodScreen(
-          houseHoldViewModel = householdViewModel,
-          foodFacts =
-              FoodFacts(
-                  name = "Sample Food",
-                  barcode = "1234567890",
-                  quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
-                  category = FoodCategory.OTHER),
-          foodItemViewModel = foodItemViewModel,
-          onFinish = { onFinishCalled = true })
+        // Click the back button
+        composeTestRule.onNodeWithTag("backButton").performClick()
+
+        // Assert that onFinish was called
+        assertTrue(onFinishCalled)
     }
 
-    // Click the back button
-    composeTestRule.onNodeWithTag("backButton").performClick()
+    // Test submitting the form adds a food item
+    @Test
+    fun submittingFormAddsFoodItem() {
+        composeTestRule.setContent {
+            // We need to directly call ScannedItemFoodScreen to test it
+            ScannedItemFoodScreen(
+                houseHoldViewModel = householdViewModel,
+                foodFacts = FoodFacts(
+                    name = "Sample Food",
+                    barcode = "1234567890",
+                    quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
+                    category = FoodCategory.OTHER
+                ),
+                foodItemViewModel = foodItemViewModel,
+                onFinish = {}
+            )
+        }
 
-    // Assert that onFinish was called
-    assert(onFinishCalled)
-  }
+        // Fill in the form
+        composeTestRule.onNodeWithTag("expireDateTextField").performTextInput("31/12/2023")
+        composeTestRule.onNodeWithTag("openDateTextField").performTextInput("01/01/2023")
+        composeTestRule.onNodeWithTag("buyDateTextField").performTextInput("15/01/2023")
 
-  // Test submitting the form adds a food item
-  @Test
-  fun submittingFormAddsFoodItem() {
-    composeTestRule.setContent {
-      // We need to directly call ScannedItemFoodScreen to test it
-      ScannedItemFoodScreen(
-          houseHoldViewModel = householdViewModel,
-          foodFacts =
-              FoodFacts(
-                  name = "Sample Food",
-                  barcode = "1234567890",
-                  quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
-                  category = FoodCategory.OTHER),
-          foodItemViewModel = foodItemViewModel,
-          onFinish = {})
+        // Click submit
+        composeTestRule.onNodeWithTag("submitButton").performClick()
+
+        // Verify that addFoodItem was called
+        verify { householdViewModel.addFoodItem(any()) }
     }
 
-    // Fill in the form
-    composeTestRule.onNodeWithTag("expireDateTextField").performTextInput("31/12/2023")
-    composeTestRule.onNodeWithTag("openDateTextField").performTextInput("01/01/2023")
-    composeTestRule.onNodeWithTag("buyDateTextField").performTextInput("15/01/2023")
+    // Test cancelling the form returns to scanning
+    @Test
+    fun cancellingFormReturnsToScanning() {
+        var onFinishCalled = false
 
-    // Click submit
-    composeTestRule.onNodeWithTag("submitButton").performClick()
+        composeTestRule.setContent {
+            // We need to directly call ScannedItemFoodScreen to test it
+            ScannedItemFoodScreen(
+                houseHoldViewModel = householdViewModel,
+                foodFacts = FoodFacts(
+                    name = "Sample Food",
+                    barcode = "1234567890",
+                    quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
+                    category = FoodCategory.OTHER
+                ),
+                foodItemViewModel = foodItemViewModel,
+                onFinish = { onFinishCalled = true }
+            )
+        }
 
-    // Verify that addFoodItem was called
-    verify(householdViewModel).addFoodItem(any())
-  }
+        // Click the cancel button
+        composeTestRule.onNodeWithTag("cancelButton").performClick()
 
-  // Test cancelling the form returns to scanning
-  @Test
-  fun cancellingFormReturnsToScanning() {
-    var onFinishCalled = false
-
-    composeTestRule.setContent {
-      // We need to directly call ScannedItemFoodScreen to test it
-      ScannedItemFoodScreen(
-          houseHoldViewModel = householdViewModel,
-          foodFacts =
-              FoodFacts(
-                  name = "Sample Food",
-                  barcode = "1234567890",
-                  quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
-                  category = FoodCategory.OTHER),
-          foodItemViewModel = foodItemViewModel,
-          onFinish = { onFinishCalled = true })
+        // Assert that onFinish was called
+        assertTrue(onFinishCalled)
     }
 
-    // Click the cancel button
-    composeTestRule.onNodeWithTag("cancelButton").performClick()
-
-    // Assert that onFinish was called
-    assert(onFinishCalled)
-  }
-
-  // Additional tests can be added as needed
+    // Additional tests can be added as needed
 }
