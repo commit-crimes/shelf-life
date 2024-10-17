@@ -330,7 +330,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="LTJ_Gl-xL_AbH-kLbHSW" name="Total View">
-    <mxGraphModel dx="2868" dy="1814" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+    <mxGraphModel dx="2049" dy="1296" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -422,7 +422,7 @@
           <mxGeometry x="950" y="628" width="95" height="80" as="geometry" />
         </mxCell>
         <mxCell id="KqWvt1sPVI4VYO-I-6gQ-10" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Create a&amp;nbsp; new recipe&lt;/h3&gt;&lt;div style=&quot;font-size: 13px;&quot;&gt;&lt;ul style=&quot;&quot;&gt;&lt;li style=&quot;text-align: left;&quot;&gt;&lt;b&gt;Chose specific food items,&lt;/b&gt;&lt;b style=&quot;background-color: initial;&quot;&gt;&amp;nbsp;options&amp;nbsp;&lt;/b&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;(servings, cooking time),&lt;/span&gt;&lt;b style=&quot;background-color: initial;&quot;&gt; type of recipe&lt;/b&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;(high protein, only household items etc..)&lt;/span&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
-          <mxGeometry x="1207" y="80" width="348" height="110" as="geometry" />
+          <mxGeometry x="1219.5" y="90" width="323" height="90" as="geometry" />
         </mxCell>
         <mxCell id="KqWvt1sPVI4VYO-I-6gQ-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;sketch=1;curveFitting=1;jiggle=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="KqWvt1sPVI4VYO-I-6gQ-10" target="KqWvt1sPVI4VYO-I-6gQ-12">
           <mxGeometry relative="1" as="geometry" />
