@@ -36,7 +36,8 @@ fun formatTimestampToDate(timestamp: Timestamp): String {
  */
 fun formatDateToTimestamp(dateString: String): Timestamp {
   val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-  val date = sdf.parse(dateString) ?: throw IllegalArgumentException("Invalid date format: $dateString")
+  val date =
+      sdf.parse(dateString) ?: throw IllegalArgumentException("Invalid date format: $dateString")
 
   return Timestamp(date)
 }
