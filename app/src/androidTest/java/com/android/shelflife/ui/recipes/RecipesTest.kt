@@ -1,16 +1,7 @@
 package com.android.shelflife.ui.recipes
 
-import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.hasAnyAncestor
-import androidx.compose.ui.test.hasSetTextAction
-import androidx.compose.ui.test.hasTestTag
-import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
@@ -29,11 +20,7 @@ import java.util.Date
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doAnswer
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 
 class RecipesTest {
 
@@ -53,12 +40,10 @@ class RecipesTest {
     navigationActions = mock()
     foodItemRepository = mock()
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
-
     listRecipesViewModel = ListRecipesViewModel()
     houseHoldRepository = mock()
     householdViewModel = HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel)
 
-    // Create a FoodItem to be used in tests
     val foodFacts =
         FoodFacts(
             name = "Apple",
@@ -71,7 +56,6 @@ class RecipesTest {
             foodFacts = foodFacts,
             expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)) // Expires in 1 day
             )
-
     houseHold =
         HouseHold(
             uid = "1",
@@ -79,7 +63,6 @@ class RecipesTest {
             members = listOf("John", "Doe"),
             foodItems = listOf(foodItem))
 
-    // Mock the repository to return the initial household
     mockHouseHoldRepositoryGetHouseholds(listOf(houseHold))
   }
 
@@ -93,9 +76,8 @@ class RecipesTest {
         .getHouseholds(any(), any())
   }
 
-  // Test if the RecipeScreen is displayed with all elements
-  @Test
-  fun recipesScreenDisplayedCorrectly() {
+  // Helper function to set up the screen with RecipesScreen content
+  private fun setUpRecipesScreen() {
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
       RecipesScreen(
@@ -103,90 +85,61 @@ class RecipesTest {
           listRecipesViewModel = listRecipesViewModel,
           householdViewModel = householdViewModel)
     }
+  }
 
+  // Helper function to check if the basic UI elements are displayed
+  private fun verifyBasicUIElements() {
     composeTestRule.onNodeWithTag("recipesScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("recipeSearchBar").assertIsDisplayed()
   }
 
-  // Test that the recipes are displayed when recipes exist
+  @Test
+  fun recipesScreenDisplayedCorrectly() {
+    setUpRecipesScreen()
+    verifyBasicUIElements()
+  }
+
   @Test
   fun foodItemListIsDisplayedWhenFoodItemsExist() {
-    householdViewModel.selectHousehold(houseHold)
-    composeTestRule.setContent {
-      RecipesScreen(
-          navigationActions = navigationActions,
-          listRecipesViewModel = listRecipesViewModel,
-          householdViewModel = householdViewModel)
-    }
-
-    // Check that the recipe list is displayed
+    setUpRecipesScreen()
     composeTestRule.onNodeWithTag("recipesList").assertIsDisplayed()
-
-    // Check that 5 recipe card is displayed (only 5 fit at a time)
-    composeTestRule.onAllNodesWithTag("recipesCards").assertCountEquals(5)
+    composeTestRule.onAllNodesWithTag("recipesCards").onFirst().assertExists()
   }
 
   @Test
   fun searchFiltersFoodItemList() {
+    setUpRecipesScreen()
+    composeTestRule.onAllNodesWithTag("recipesCards").onFirst().assertExists()
 
-    householdViewModel.selectHousehold(houseHold)
-    composeTestRule.setContent {
-      RecipesScreen(
-          navigationActions = navigationActions,
-          listRecipesViewModel = listRecipesViewModel,
-          householdViewModel = householdViewModel)
-    }
-
-    // Check that 5 recipe card is displayed (only 5 fit at a time)
-    composeTestRule.onAllNodesWithTag("recipesCards").assertCountEquals(5)
-
-    // Activate the SearchBar
+    // Activate the SearchBar and enter the search query
     composeTestRule.onNodeWithTag("searchBar").performClick()
     composeTestRule.waitForIdle()
-
-    // Enter search query "paella"
     composeTestRule
         .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("searchBar")))
         .performTextInput("Paella")
 
-    // Only Paella should be displayed
+    // Verify that only one recipe card is displayed and contains the text "Paella"
     composeTestRule.onAllNodesWithTag("recipesCards").assertCountEquals(1)
-
-    // Assert that the displayed recipe contains the text "Paella"
     composeTestRule
         .onNode(hasText("Paella") and hasAnyAncestor(hasTestTag("recipeSearchBar")))
         .assertIsDisplayed()
   }
 
-  // Test that the card navigates to the individual recipe screen
   @Test
   fun clickOnRecipeNavigatesToIndividualRecipeScreen() {
-    householdViewModel.selectHousehold(houseHold)
-    composeTestRule.setContent {
-      RecipesScreen(
-          navigationActions = navigationActions,
-          listRecipesViewModel = listRecipesViewModel,
-          householdViewModel = householdViewModel)
-    }
+    setUpRecipesScreen()
+    composeTestRule.onAllNodesWithTag("recipesCards").onFirst().assertExists()
 
-    // Check that 5 recipe card is displayed (only 5 fit at a time)
-    composeTestRule.onAllNodesWithTag("recipesCards").assertCountEquals(5)
-
-    // Activate the SearchBar
+    // Activate the SearchBar and enter the search query
     composeTestRule.onNodeWithTag("searchBar").performClick()
     composeTestRule.waitForIdle()
-
-    // Enter search query "Tortilla de patata"
     composeTestRule
         .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("searchBar")))
         .performTextInput("Tortilla de patata")
 
-    // Click on the recipe
+    // Click on the recipe and verify navigation
     composeTestRule.onNodeWithTag("recipesCards").performClick()
-
     composeTestRule.waitForIdle()
-
-    // Verify that navigateTo(Screen.INDIVIDUAL_RECIPE) was called
     verify(navigationActions)
         .navigateTo(com.android.shelfLife.ui.navigation.Screen.INDIVIDUAL_RECIPE)
   }

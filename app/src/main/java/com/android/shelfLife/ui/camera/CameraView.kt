@@ -20,16 +20,30 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -40,6 +54,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -47,13 +62,22 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
+import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
+import com.android.shelfLife.model.foodFacts.SearchStatus
+import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.foodItem.FoodStorageLocation
+import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
+import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.utils.formatDateToTimestamp
+import com.android.shelfLife.ui.utils.formatTimestampToDate
 import com.android.shelfLife.utilities.BarcodeAnalyzer
+import com.google.firebase.Timestamp
 
 /**
  * Composable function for the barcode scanner screen.
@@ -65,7 +89,9 @@ import com.android.shelfLife.utilities.BarcodeAnalyzer
 fun BarcodeScannerScreen(
     navigationActions: NavigationActions,
     cameraViewModel: BarcodeScannerViewModel = viewModel(),
-    foodFactsViewModel: FoodFactsViewModel
+    foodFactsViewModel: FoodFactsViewModel,
+    householdViewModel: HouseholdViewModel,
+    foodItemViewModel: ListFoodItemsViewModel
 ) {
   val context = LocalContext.current
   val permissionGranted = cameraViewModel.permissionGranted
@@ -73,11 +99,16 @@ fun BarcodeScannerScreen(
   // Observe lifecycle to detect when the app resumes
   val lifecycleOwner = LocalLifecycleOwner.current
 
+  // Use a MutableState to control scanning
+  val isScanningState = remember { mutableStateOf(true) }
+
   DisposableEffect(lifecycleOwner) {
     val observer = LifecycleEventObserver { _, event ->
       if (event == Lifecycle.Event.ON_RESUME) {
-        // Re-check the permission status when the app resumes
         cameraViewModel.checkCameraPermission()
+        isScanningState.value = true
+      } else if (event == Lifecycle.Event.ON_PAUSE) {
+        isScanningState.value = false
       }
     }
 
@@ -86,7 +117,6 @@ fun BarcodeScannerScreen(
     onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
   }
 
-  // If permission is not granted, navigate back to the PermissionHandler
   LaunchedEffect(permissionGranted) {
     if (!permissionGranted) {
       navigationActions.navigateTo(Screen.PERMISSION_HANDLER)
@@ -101,39 +131,111 @@ fun BarcodeScannerScreen(
             selectedItem = Route.SCANNER)
       }) { paddingValues ->
         if (permissionGranted) {
-          // Display the camera preview
           Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-            // Remember the ROI rectangle
+            // State variables
+            val barcodeScanned = remember { mutableStateOf<String?>(null) }
+            val foodScanned = remember { mutableStateOf(false) }
+            val foodFacts = remember { mutableStateOf<FoodFacts?>(null) }
+            val isScanning by isScanningState
+            val searchInProgress = remember { mutableStateOf(false) }
+
+            // ROI calculation (same as before)
             val roiRectF = remember { mutableStateOf<RectF?>(null) }
+            val screenWidth = LocalContext.current.resources.displayMetrics.widthPixels
+            val screenHeight = LocalContext.current.resources.displayMetrics.heightPixels
+
+            val calculatedRoiRectF =
+                calculateRoiRectF(screenWidth.toFloat(), screenHeight.toFloat())
+            roiRectF.value = calculatedRoiRectF
 
             // Camera Preview
             CameraPreviewView(
                 modifier = Modifier.fillMaxSize(),
                 onBarcodeScanned = { scannedBarcode ->
-                  // Handle the scanned barcode
                   Log.d("BarcodeScanner", "Scanned barcode: $scannedBarcode")
                   beep()
-                  // Update ViewModel or navigate as needed
-                  foodFactsViewModel.searchByBarcode(scannedBarcode.toLong())
                   Toast.makeText(context, "Scanned barcode: $scannedBarcode", Toast.LENGTH_SHORT)
                       .show()
-                  // cameraViewModel.onBarcodeScanned(scannedBarcode)
+                  barcodeScanned.value = scannedBarcode
+                  isScanningState.value = false
+                  searchInProgress.value = true
                 },
-                onPreviewViewCreated = { previewView ->
-                  // Do nothing for now
-                },
-                roiRect = roiRectF.value ?: RectF(0f, 0f, 1f, 1f) // Default ROI
-                )
+                onPreviewViewCreated = {},
+                roiRect = roiRectF.value ?: RectF(0f, 0f, 1f, 1f),
+                shouldScan = { isScanning })
 
-            // Overlay
-            ScannerOverlay { calculatedRoiRectF -> roiRectF.value = calculatedRoiRectF }
+            // Scanner Overlay on top
+            ScannerOverlay()
+
+            // Start the search when searchInProgress is true
+            val currentBarcode = barcodeScanned.value
+            if (searchInProgress.value && currentBarcode != null) {
+              LaunchedEffect(currentBarcode) {
+                foodFactsViewModel.searchByBarcode(currentBarcode.toLong())
+              }
+            }
+
+            // Observe searchStatus
+            val searchStatus by foodFactsViewModel.searchStatus.collectAsState()
+            LaunchedEffect(searchStatus) {
+              when (searchStatus) {
+                is SearchStatus.Success -> {
+                  val suggestions = foodFactsViewModel.foodFactsSuggestions.value
+                  if (suggestions.isNotEmpty()) {
+                    foodFacts.value = suggestions[0]
+                    foodScanned.value = true
+                  } else {
+                    Toast.makeText(context, "Food Not Found", Toast.LENGTH_SHORT).show()
+                    navigationActions.navigateTo(Screen.ADD_FOOD)
+                  }
+                  // Reset states
+                  barcodeScanned.value = null
+                  searchInProgress.value = false
+                  foodFactsViewModel.resetSearchStatus()
+                }
+                is SearchStatus.Failure -> {
+                  Toast.makeText(context, "Search failed", Toast.LENGTH_SHORT).show()
+                  barcodeScanned.value = null
+                  searchInProgress.value = false
+                  foodFactsViewModel.resetSearchStatus()
+                }
+                else -> {
+                  // Do nothing for Idle or Loading
+                }
+              }
+            }
+
+            if (foodScanned.value) {
+              ScannedItemFoodScreen(
+                  householdViewModel,
+                  foodFacts.value!!,
+                  foodItemViewModel,
+                  onFinish = {
+                    foodScanned.value = false
+                    isScanningState.value = true
+                  })
+            }
           }
         }
       }
 }
 
+// Function to calculate ROI rectangle based on screen dimensions
+fun calculateRoiRectF(screenWidth: Float, screenHeight: Float): RectF {
+  val rectWidth = screenWidth * 0.8f
+  val rectHeight = screenHeight * 0.2f
+  val left = (screenWidth - rectWidth) / 2f
+  val top = (screenHeight - rectHeight) / 2f
+
+  return RectF(
+      left / screenWidth,
+      top / screenHeight,
+      (left + rectWidth) / screenWidth,
+      (top + rectHeight) / screenHeight)
+}
+
 @Composable
-fun ScannerOverlay(onRoiCalculated: (RectF) -> Unit) {
+fun ScannerOverlay() {
   Canvas(modifier = Modifier.fillMaxSize()) {
     val canvasWidth = size.width
     val canvasHeight = size.height
@@ -145,10 +247,10 @@ fun ScannerOverlay(onRoiCalculated: (RectF) -> Unit) {
 
     // Semi-transparent background
     drawRect(
-        color = Color(0x40FFFFFF), // 50% opacity black
+        color = Color(0x40ffffff), // low opacity white
         size = size)
 
-    // Transparent rectangle in the middle
+    // Transparent rectangle in the middle (ROI)
     drawRect(
         color = Color.Transparent,
         topLeft = Offset(left, top),
@@ -161,17 +263,6 @@ fun ScannerOverlay(onRoiCalculated: (RectF) -> Unit) {
         topLeft = Offset(left, top),
         size = Size(rectWidth, rectHeight),
         style = Stroke(width = 4.dp.toPx()))
-
-    // Calculate ROI rectangle as percentages
-    val roiRectF =
-        RectF(
-            left / size.width,
-            top / size.height,
-            (left + rectWidth) / size.width,
-            (top + rectHeight) / size.height)
-
-    // Pass the calculated ROI back to the parent composable
-    onRoiCalculated(roiRectF)
   }
 }
 
@@ -180,13 +271,14 @@ fun CameraPreviewView(
     modifier: Modifier = Modifier,
     onBarcodeScanned: (String) -> Unit,
     onPreviewViewCreated: (PreviewView) -> Unit,
-    roiRect: RectF
+    roiRect: RectF,
+    shouldScan: () -> Boolean
 ) {
   AndroidView(
       factory = { context ->
         val previewView = PreviewView(context)
         onPreviewViewCreated(previewView)
-        startCamera(context, previewView, onBarcodeScanned, roiRect)
+        startCamera(context, previewView, onBarcodeScanned, roiRect, shouldScan)
         previewView
       },
       modifier = modifier.fillMaxSize())
@@ -196,7 +288,8 @@ fun startCamera(
     context: Context,
     previewView: PreviewView,
     onBarcodeScanned: (String) -> Unit,
-    roiRect: RectF
+    roiRect: RectF,
+    shouldScan: () -> Boolean
 ) {
   val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
 
@@ -212,7 +305,7 @@ fun startCamera(
             ImageAnalysis.Builder().build().also {
               it.setAnalyzer(
                   ContextCompat.getMainExecutor(context),
-                  BarcodeAnalyzer(onBarcodeScanned, roiRect))
+                  BarcodeAnalyzer(onBarcodeScanned, roiRect, shouldScan))
             }
 
         val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -257,6 +350,124 @@ fun PermissionDeniedScreen(navigationActions: NavigationActions) {
                   }
             }
       }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ScannedItemFoodScreen(
+    houseHoldViewModel: HouseholdViewModel,
+    foodFacts: FoodFacts,
+    foodItemViewModel: ListFoodItemsViewModel,
+    onFinish: () -> Unit // Callback to reset scanning state
+) {
+
+  var location by remember { mutableStateOf(FoodStorageLocation.PANTRY) }
+  var expireDate by remember { mutableStateOf("") }
+  var openDate by remember { mutableStateOf("") }
+  var buyDate by remember { mutableStateOf(formatTimestampToDate(Timestamp.now())) }
+
+  var locationExpanded by remember { mutableStateOf(false) }
+
+  Scaffold(
+      modifier = Modifier.fillMaxSize(),
+      topBar = {
+        TopAppBar(
+            title = { Text("Add Food Item") },
+            navigationIcon = {
+              // Back button to return to the previous screen
+              IconButton(onClick = { onFinish() }) {
+                Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Go back Icon")
+              }
+            })
+      },
+  ) { padding ->
+    Column(
+        modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top) {
+          Spacer(modifier = Modifier.height(16.dp))
+
+          ExposedDropdownMenuBox(
+              expanded = locationExpanded,
+              onExpandedChange = { locationExpanded = !locationExpanded }) {
+                OutlinedTextField(
+                    value = location.name.lowercase(),
+                    onValueChange = {},
+                    label = { Text("Location") },
+                    readOnly = true,
+                    trailingIcon = {
+                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = locationExpanded)
+                    },
+                    modifier = Modifier.fillMaxWidth().menuAnchor())
+                ExposedDropdownMenu(
+                    expanded = locationExpanded, onDismissRequest = { locationExpanded = false }) {
+                      FoodStorageLocation.entries.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            text = { Text(selectionOption.name) },
+                            onClick = {
+                              location = selectionOption
+                              locationExpanded = false
+                            })
+                      }
+                    }
+              }
+
+          // For dates a future improvement could be having a calendar interface rather than manual
+          // input
+          val dateFormat = "dd/mm/yyyy"
+          OutlinedTextField(
+              value = expireDate,
+              onValueChange = { expireDate = it },
+              label = { Text("Expire Date") },
+              placeholder = { Text(dateFormat) },
+              modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+          )
+
+          OutlinedTextField(
+              value = openDate,
+              onValueChange = { openDate = it },
+              label = { Text("Open Date") },
+              placeholder = { Text(dateFormat) },
+              modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+          )
+
+          OutlinedTextField(
+              value = buyDate,
+              onValueChange = { buyDate = it },
+              label = { Text("Buy Date") },
+              placeholder = { Text(dateFormat) },
+              modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
+          )
+
+          Button(
+              onClick = {
+                val newFoodItem =
+                    FoodItem(
+                        uid = foodItemViewModel.getUID(),
+                        foodFacts = foodFacts,
+                        location = location,
+                        expiryDate = formatDateToTimestamp(expireDate),
+                        openDate = formatDateToTimestamp(openDate),
+                        buyDate = formatDateToTimestamp(buyDate),
+                        // Logic to determine status depending on the dates given
+                    )
+                houseHoldViewModel.addFoodItem(newFoodItem)
+                onFinish() // Call the callback to remove the screen and resume scanning
+              },
+              modifier = Modifier.fillMaxWidth().height(50.dp)) {
+                Text(text = "Submit", fontSize = 18.sp)
+              }
+          Spacer(modifier = Modifier.height(16.dp))
+          Button(
+              onClick = {
+                // Reset the scanned food item
+                onFinish() // Call the callback to remove the screen and resume scanning
+              },
+              modifier = Modifier.fillMaxWidth().height(50.dp)) {
+                Text(text = "Cancel", fontSize = 18.sp)
+              }
+        }
+  }
 }
 
 // Function to play a beep sound

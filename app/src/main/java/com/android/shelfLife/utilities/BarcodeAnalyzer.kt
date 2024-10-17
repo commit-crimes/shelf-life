@@ -10,14 +10,15 @@ import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 
-class BarcodeAnalyzer(private val onBarcodeScanned: (String) -> Unit, private val roiRectF: RectF) :
-    ImageAnalysis.Analyzer {
-
-  private var isScanning = true
+class BarcodeAnalyzer(
+    private val onBarcodeScanned: (String) -> Unit,
+    private val roiRectF: RectF,
+    private val shouldScan: () -> Boolean // Accepts a lambda to control scanning
+) : ImageAnalysis.Analyzer {
 
   @OptIn(ExperimentalGetImage::class)
   override fun analyze(imageProxy: ImageProxy) {
-    if (!isScanning) {
+    if (!shouldScan()) {
       imageProxy.close()
       return
     }
@@ -49,10 +50,7 @@ class BarcodeAnalyzer(private val onBarcodeScanned: (String) -> Unit, private va
                   boundingBox != null && Rect.intersects(boundingBox, roiRect)
                 }
 
-            targetBarcode?.rawValue?.let { barcodeValue ->
-              isScanning = false
-              onBarcodeScanned(barcodeValue)
-            }
+            targetBarcode?.rawValue?.let { barcodeValue -> onBarcodeScanned(barcodeValue) }
           }
           .addOnFailureListener { e -> Log.e("BarcodeAnalyzer", "Barcode scanning failed", e) }
           .addOnCompleteListener { imageProxy.close() }

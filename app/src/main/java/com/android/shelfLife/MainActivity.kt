@@ -75,7 +75,12 @@ fun ShelfLifeApp() {
         CameraPermissionHandler(navigationActions, barcodeScannerViewModel)
       }
       composable(Screen.BARCODE_SCANNER) {
-        BarcodeScannerScreen(navigationActions, barcodeScannerViewModel, foodFactsViewModel)
+        BarcodeScannerScreen(
+            navigationActions,
+            barcodeScannerViewModel,
+            foodFactsViewModel,
+            householdViewModel,
+            listFoodItemViewModel)
       }
     }
 
