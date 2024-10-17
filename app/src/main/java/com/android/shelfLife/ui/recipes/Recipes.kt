@@ -219,7 +219,6 @@ fun RecipeItem(
     listRecipesViewModel: ListRecipesViewModel
 ) {
   var clickOnRecipe by remember { mutableStateOf(false) } // State to track if the recipe is clicked
-
   // The card that visually represents the recipe item
   Column(
       modifier =

@@ -1,6 +1,7 @@
 package com.android.shelfLife.ui.recipes
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,9 +28,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -68,7 +71,14 @@ fun IndividualRecipeScreen(
   // If no recipe is selected, display an error message.
   val selectedRecipe =
       listRecipesViewModel.selectedRecipe.collectAsState().value
-          ?: return Text(text = "No recipe selected. Should not happen", color = Color.Red)
+          ?: return Box(
+              contentAlignment = Alignment.Center,
+              content = {
+                Text(
+                    text = "No recipe selected. Should not happen",
+                    modifier = Modifier.testTag("noRecipeSelectedMessage"),
+                    color = Color.Red)
+              })
 
   val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
   val userHouseholds = householdViewModel.households.collectAsState().value
@@ -83,6 +93,7 @@ fun IndividualRecipeScreen(
         } else {
           // Scaffold that provides the structure for the screen, including top and bottom bars.
           Scaffold(
+              modifier = Modifier.testTag("individualRecipesScreen"),
               topBar = {
                 selectedHousehold?.let {
                   TopNavigationBar(
@@ -105,16 +116,19 @@ fun IndividualRecipeScreen(
                     modifier =
                         Modifier.padding(paddingValues) // Apply padding provided by Scaffold
                             .fillMaxSize() // Fill the available space
-                    ) {
+                            .testTag("recipe")) {
                       // Additional top app bar for navigation back
                       TopAppBar(
+                          modifier = Modifier.testTag("topBar"),
                           navigationIcon = {
                             // Back button to return to the previous screen
-                            IconButton(onClick = { navigationActions.goBack() }) {
-                              Icon(
-                                  imageVector = Icons.Default.ArrowBack,
-                                  contentDescription = "Go back Icon")
-                            }
+                            IconButton(
+                                onClick = { navigationActions.goBack() },
+                                modifier = Modifier.testTag("goBackArrow")) {
+                                  Icon(
+                                      imageVector = Icons.Default.ArrowBack,
+                                      contentDescription = "Go back Icon")
+                                }
                           },
                           // Title of the screen: Recipe name
                           title = {
@@ -139,7 +153,8 @@ fun IndividualRecipeScreen(
                                 contentDescription = "Recipe Image",
                                 modifier =
                                     Modifier.width(537.dp) // Set the image width
-                                        .height(100.dp), // Set the image height
+                                        .height(100.dp) // Set the image height
+                                        .testTag("recipeImage"),
                                 contentScale =
                                     ContentScale.FillWidth // Make the image fill the width
                                 )
@@ -147,24 +162,22 @@ fun IndividualRecipeScreen(
                             // Row displaying servings and time information
                             Row(modifier = Modifier.fillMaxWidth()) {
                               Text(
-                                  text = "Servings: ${selectedRecipe.servings}") // Display servings
+                                  text = "Servings: ${selectedRecipe.servings}",
+                                  modifier = Modifier.testTag("recipeServings")) // Display servings
                               Spacer(modifier = Modifier.width(16.dp)) // Add space between text
                               Text(
-                                  text =
-                                      "Time: ${getTotalMinutes(selectedRecipe.time)} min") // Display
+                                  text = "Time: ${getTotalMinutes(selectedRecipe.time)} min",
+                                  modifier = Modifier.testTag("recipeTime")) // Display
                               // total time
                             }
 
-                            Spacer(
-                                modifier = Modifier.height(16.dp)) // Add space before instructions
+                            Spacer(modifier = Modifier.height(16.dp))
 
                             // Display recipe instructions, scrollable if long
                             Text(
                                 text = selectedRecipe.instructions,
                                 modifier =
-                                    Modifier.padding(
-                                        vertical = 8.dp) // Add padding around instructions
-                                )
+                                    Modifier.padding(vertical = 8.dp).testTag("recipeInstructions"))
                           }
                     }
               })
