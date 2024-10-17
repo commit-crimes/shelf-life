@@ -1,6 +1,52 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36" version="24.7.17">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36" version="24.7.17" pages="3">
   <diagram name="Page-1" id="5f0bae14-7c28-e335-631c-24af17079c00">
-    <mxGraphModel dx="1195" dy="756" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="none" math="0" shadow="0">
+    <mxGraphModel dx="1195" dy="756" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2UMnR_WibWzh6iIHSxyf-1" value="" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="130" y="30" width="1020" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="kBmUnrdPFpruGlUo7dz6-3" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;&lt;font&gt;UI Layer&lt;/font&gt;&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;sketch=1;curveFitting=1;jiggle=2;fontFamily=Helvetica;" vertex="1" parent="1">
+          <mxGeometry x="10" y="95" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="kBmUnrdPFpruGlUo7dz6-4" value="" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="130" y="250" width="1025" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="kBmUnrdPFpruGlUo7dz6-5" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Domain Layer&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="15" y="346" width="160" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="kBmUnrdPFpruGlUo7dz6-6" value="" style="rounded=1;whiteSpace=wrap;html=1;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="130" y="566" width="1020" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="kBmUnrdPFpruGlUo7dz6-7" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Data Layer&amp;nbsp;&lt;/h1&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="25" y="608.5" width="120" height="85" as="geometry" />
+        </mxCell>
+        <mxCell id="kBmUnrdPFpruGlUo7dz6-8" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;My recipes&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="145" y="95" width="95" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="kBmUnrdPFpruGlUo7dz6-9" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Recipe data&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+          <mxGeometry x="145" y="608.5" width="95" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="kBmUnrdPFpruGlUo7dz6-10" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;spacingTop=0;fontSize=1;horizontal=1;strokeWidth=2;targetPerimeterSpacing=0;endSize=12;startSize=5;jumpSize=6;sketch=1;curveFitting=1;jiggle=2;" edge="1" parent="1" source="kBmUnrdPFpruGlUo7dz6-8" target="kBmUnrdPFpruGlUo7dz6-9">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="440" y="380" as="sourcePoint" />
+            <mxPoint x="490" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="EQAx6T4KS5A-mvEifLoN" name="Page-2">
+    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="2wOUk39KzuTYBzeXpWRB" name="Page-3">
+    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
