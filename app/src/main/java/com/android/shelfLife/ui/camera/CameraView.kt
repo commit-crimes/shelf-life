@@ -161,7 +161,7 @@ fun BarcodeScannerScreen(
                   isScanningState.value = false
                   searchInProgress.value = true
                 },
-                onPreviewViewCreated = { previewView -> },
+                onPreviewViewCreated = { _ },
                 roiRect = roiRectF.value ?: RectF(0f, 0f, 1f, 1f),
                 shouldScan = { isScanning })
 
@@ -402,7 +402,7 @@ fun ScannedItemFoodScreen(
                     modifier = Modifier.fillMaxWidth().menuAnchor())
                 ExposedDropdownMenu(
                     expanded = locationExpanded, onDismissRequest = { locationExpanded = false }) {
-                      FoodStorageLocation.values().forEach { selectionOption ->
+                      FoodStorageLocation.entries.forEach { selectionOption ->
                         DropdownMenuItem(
                             text = { Text(selectionOption.name) },
                             onClick = {
@@ -451,7 +451,7 @@ fun ScannedItemFoodScreen(
                         openDate = formatDateToTimestamp(openDate),
                         buyDate = formatDateToTimestamp(buyDate),
                         // Logic to determine status depending on the dates given
-                        status = FoodStatus.CLOSED)
+                       )
                 houseHoldViewModel.addFoodItem(newFoodItem)
                 onFinish() // Call the callback to remove the screen and resume scanning
               },
