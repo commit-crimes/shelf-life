@@ -9,6 +9,8 @@ import com.android.shelfLife.ui.navigation.Screen
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.delay
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -35,6 +37,9 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(navigationActions, householdViewModel, foodItemViewModel)
     }
 
+    // Add a manual delay to wait for UI rendering
+    runBlocking { delay(2000) }
+
     composeTestRule.waitForIdle()  // Wait for the UI to be fully rendered
 
     composeTestRule.onNodeWithTag("addScreen").assertIsDisplayed()
@@ -60,6 +65,8 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(navigationActions, householdViewModel, foodItemViewModel)
     }
 
+    runBlocking { delay(2000) }  // Add a manual delay to wait for UI rendering
+
     composeTestRule.waitForIdle()  // Wait for the UI to be fully rendered
 
     composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextClearance()
@@ -77,6 +84,8 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(navigationActions, householdViewModel, foodItemViewModel)
     }
 
+    runBlocking { delay(2000) }  // Add a manual delay to wait for UI rendering
+
     composeTestRule.waitForIdle()  // Wait for the UI to be fully rendered
 
     composeTestRule.onNodeWithTag("inputFoodName").performTextClearance()
@@ -92,6 +101,8 @@ class AddFoodItemScreenTest {
     composeTestRule.setContent {
       AddFoodItemScreen(navigationActions, householdViewModel, foodItemViewModel)
     }
+
+    runBlocking { delay(2000) }  // Add a manual delay to wait for UI rendering
 
     composeTestRule.waitForIdle()  // Wait for the UI to be fully rendered
 
@@ -109,6 +120,8 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(navigationActions, householdViewModel, foodItemViewModel)
     }
 
+    runBlocking { delay(2000) }  // Add a manual delay to wait for UI rendering
+
     composeTestRule.waitForIdle()  // Wait for the UI to be fully rendered
 
     // Input valid food name, amount, and valid dates
@@ -120,6 +133,9 @@ class AddFoodItemScreenTest {
     composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextInput("31/12/2023")
     composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextClearance()
     composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextInput("30/12/2023")
+
+    // Verify that the submit button is clickable
+    composeTestRule.onNodeWithTag("foodSave").assertHasClickAction()
 
     // Click the save button
     composeTestRule.onNodeWithTag("foodSave").performClick()
@@ -135,6 +151,8 @@ class AddFoodItemScreenTest {
     composeTestRule.setContent {
       AddFoodItemScreen(navigationActions, householdViewModel, foodItemViewModel)
     }
+
+    runBlocking { delay(2000) }  // Add a manual delay to wait for UI rendering
 
     composeTestRule.waitForIdle()  // Wait for the UI to be fully rendered
 
@@ -161,6 +179,8 @@ class AddFoodItemScreenTest {
     composeTestRule.setContent {
       AddFoodItemScreen(navigationActions, householdViewModel, foodItemViewModel)
     }
+
+    runBlocking { delay(2000) }  // Add a manual delay to wait for UI rendering
 
     composeTestRule.waitForIdle()  // Wait for the UI to be fully rendered
 
