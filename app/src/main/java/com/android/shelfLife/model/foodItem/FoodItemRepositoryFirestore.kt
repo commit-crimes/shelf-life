@@ -147,11 +147,11 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
       val name = doc.getString("name") ?: return null
       val barcode = doc.getString("barcode") ?: return null
 
-        val quantityMap = doc["quantity"] as? Map<*, *> ?: return null
-        val quantity =
-            Quantity(
-                amount = quantityMap["amount"] as? Double ?: 0.0,
-                unit = FoodUnit.valueOf(quantityMap["unit"] as? String ?: "GRAM"))
+      val quantityMap = doc["quantity"] as? Map<*, *> ?: return null
+      val quantity =
+          Quantity(
+              amount = quantityMap["amount"] as? Double ?: 0.0,
+              unit = FoodUnit.valueOf(quantityMap["unit"] as? String ?: "GRAM"))
 
       val nutritionMap = doc["nutritionFacts"] as? Map<*, *>
       val nutritionFacts =

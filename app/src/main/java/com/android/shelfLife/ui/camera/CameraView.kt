@@ -326,44 +326,40 @@ fun startCamera(
 
 @Composable
 fun PermissionDeniedScreen(navigationActions: NavigationActions) {
-    val context = LocalContext.current
-    Scaffold(
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { selected -> navigationActions.navigateTo(selected) },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.SCANNER
-            )
-        },
-        modifier = Modifier.semantics { testTag = "permissionDeniedScreen" }
-    ) { paddingVals ->
+  val context = LocalContext.current
+  Scaffold(
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { selected -> navigationActions.navigateTo(selected) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = Route.SCANNER)
+      },
+      modifier = Modifier.semantics { testTag = "permissionDeniedScreen" }) { paddingVals ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingVals)
-                .semantics { testTag = "permissionDeniedColumn" },
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Camera permission is required to scan barcodes.",
-                modifier = Modifier.semantics { testTag = "permissionDeniedMessage" }
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = {
-                    // Open app settings
-                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                        data = Uri.fromParts("package", context.packageName, null)
-                    }
-                    context.startActivity(intent)
+            modifier =
+                Modifier.fillMaxSize().padding(paddingVals).semantics {
+                  testTag = "permissionDeniedColumn"
                 },
-                modifier = Modifier.semantics { testTag = "openSettingsButton" }
-            ) {
-                Text(text = "Open Settings")
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally) {
+              Text(
+                  text = "Camera permission is required to scan barcodes.",
+                  modifier = Modifier.semantics { testTag = "permissionDeniedMessage" })
+              Spacer(modifier = Modifier.height(16.dp))
+              Button(
+                  onClick = {
+                    // Open app settings
+                    val intent =
+                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                          data = Uri.fromParts("package", context.packageName, null)
+                        }
+                    context.startActivity(intent)
+                  },
+                  modifier = Modifier.semantics { testTag = "openSettingsButton" }) {
+                    Text(text = "Open Settings")
+                  }
             }
-        }
-    }
+      }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
