@@ -42,6 +42,7 @@ replay_pid*
 
 # Config and build files / folders
 .idea/
+.gradle/
 .vscode/
 **/build
 keystore.properties
@@ -68,4 +69,3 @@ app/build/
 
 # Ignore CI workflows (if you don't want to track them)
 .github/
-.gradle
