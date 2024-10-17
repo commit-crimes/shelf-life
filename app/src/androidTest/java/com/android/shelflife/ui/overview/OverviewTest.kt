@@ -91,10 +91,7 @@ class OverviewTest {
     mockHouseHoldRepositoryGetHouseholds(emptyList())
 
     composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
-          householdViewModel = householdViewModel)
+      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
     }
     composeTestRule.onNodeWithTag("firstTimeWelcomeScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("householdNameTextField").assertIsDisplayed()
@@ -106,10 +103,7 @@ class OverviewTest {
   fun overviewScreenDisplayedCorrectly() {
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
-          householdViewModel = householdViewModel)
+      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
     }
 
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
@@ -123,10 +117,7 @@ class OverviewTest {
   fun clickHamburgerIconOpensHouseholdSelectionDrawer() {
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
-          householdViewModel = householdViewModel)
+      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
     }
 
     composeTestRule.onNodeWithTag("hamburgerIcon").performClick()
@@ -138,10 +129,7 @@ class OverviewTest {
   fun clickEditInDrawerOpensEditHouseholdPopup() {
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
-          householdViewModel = householdViewModel)
+      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
     }
 
     composeTestRule.onNodeWithTag("hamburgerIcon").performClick()
@@ -154,10 +142,7 @@ class OverviewTest {
   fun clickAddInDrawerOpensAddHouseholdPopup() {
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
-          householdViewModel = householdViewModel)
+      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
     }
 
     composeTestRule.onNodeWithTag("hamburgerIcon").performClick()
@@ -170,10 +155,7 @@ class OverviewTest {
   fun foodItemListIsDisplayedWhenFoodItemsExist() {
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
-          householdViewModel = householdViewModel)
+      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
     }
 
     // Check that the food item list is displayed
@@ -194,10 +176,7 @@ class OverviewTest {
 
     householdViewModel.selectHousehold(emptyHousehold)
     composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
-          householdViewModel = householdViewModel)
+      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
     }
 
     // Check that the "No food available" message is displayed
@@ -232,22 +211,19 @@ class OverviewTest {
 
     householdViewModel.selectHousehold(householdWithMultipleItems)
     composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
-          householdViewModel = householdViewModel)
+      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
     }
 
     // Initially, both items should be displayed
     composeTestRule.onAllNodesWithTag("foodItemCard").assertCountEquals(2)
 
     // Activate the SearchBar
-    composeTestRule.onNodeWithTag("searchBar").performClick()
+    composeTestRule.onNodeWithTag("foodSearchBar").performClick()
     composeTestRule.waitForIdle()
 
     // Enter search query "Banana"
     composeTestRule
-        .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("searchBar")))
+        .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("foodSearchBar")))
         .performTextInput("Banana")
 
     // Only Banana should be displayed
@@ -264,10 +240,7 @@ class OverviewTest {
   fun clickAddFoodFabNavigatesToAddFoodScreen() {
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
-          householdViewModel = householdViewModel)
+      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
     }
 
     // Click on the add food FAB
