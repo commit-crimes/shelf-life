@@ -1,5 +1,10 @@
-package com.android.shelfLife.model.foodFacts
+package com.android.shelflife.model.foodFacts
 
+import com.android.shelfLife.model.foodFacts.FoodCategory
+import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.FoodSearchInput
+import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodFacts.OpenFoodFactsRepository
 import java.io.IOException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit

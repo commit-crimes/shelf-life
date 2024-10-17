@@ -6,7 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 
-class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHoldRepository {
+class HouseHoldRepositoryFirestore(private val db: FirebaseFirestore) : HouseHoldRepository {
 
   private val collectionPath = "households"
   private val auth = FirebaseAuth.getInstance()

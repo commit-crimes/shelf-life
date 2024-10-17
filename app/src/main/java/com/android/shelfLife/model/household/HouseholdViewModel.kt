@@ -124,7 +124,7 @@ class HouseholdViewModel(
             val firebaseFirestore = FirebaseFirestore.getInstance()
             val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
             val listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
-            val repository = HouseholdRepositoryFirestore(firebaseFirestore)
+            val repository = HouseHoldRepositoryFirestore(firebaseFirestore)
             return HouseholdViewModel(repository, listFoodItemsViewModel) as T
           }
         }

@@ -15,7 +15,7 @@ import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.android.shelfLife.model.foodFacts.OpenFoodFactsRepository
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
+import com.android.shelfLife.model.household.HouseHoldRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.ui.authentication.SignInScreen
@@ -49,7 +49,7 @@ fun ShelfLifeApp() {
   val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
   val listFoodItemViewModel = ListFoodItemsViewModel(foodItemRepository)
   val householdViewModel =
-      HouseholdViewModel(HouseholdRepositoryFirestore(firebaseFirestore), listFoodItemViewModel)
+      HouseholdViewModel(HouseHoldRepositoryFirestore(firebaseFirestore), listFoodItemViewModel)
   val foodFactsRepository = OpenFoodFactsRepository(OkHttpClient())
   val foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)
 

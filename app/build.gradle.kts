@@ -108,7 +108,6 @@ tasks.withType<Test> {
 
 dependencies {
 
-
     // Core
     implementation(libs.core.ktx)
     implementation(libs.androidx.core.ktx)
@@ -169,6 +168,9 @@ dependencies {
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
     testImplementation(libs.json)
+    testImplementation(libs.mockk)
+    testImplementation(libs.mockk.agent)
+    testImplementation(libs.kotlinx.coroutines.test)
     // Testing mock web server for OkHttp
     testImplementation(libs.mockwebserver)
 
