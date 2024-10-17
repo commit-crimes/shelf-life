@@ -26,6 +26,9 @@ ShelfLife is a mobile app designed to help users reduce food waste, save money, 
 ### 5. Offline Mode
 - Manage your inventory and get recipe suggestions even when you're not connected to the internet.
 
+## Architecture Diagram
+![in docs/ArchitectureDiagram/ArchitectureDiagramPicture.png](https://github.com/commit-crimes/shelf-life/blob/feat/60-create-architecture-diagram-for-app/docs/ArchitectureDiagram/ArchitectureDiagramPicture.png)
+
 ## Firebase Integration
 
 ShelfLife uses several Google Firebase services to provide cloud functionalities:
