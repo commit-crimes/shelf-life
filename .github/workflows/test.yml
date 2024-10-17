@@ -1,36 +1,124 @@
-# This is a basic workflow to help you get started with Actions
+name: ShelfLife CI - Test Runner
 
-name: CI
-
-# Controls when the workflow will run
+# Run the workflow when commits are pushed on main or when a PR is modified
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+
   pull_request:
-    branches: [ "main" ]
+    types:
+      - opened
+      - synchronize
+      - reopened
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+  shelflife-ci:
+    name: CI-ShelfLife
+    # Execute the CI on the course's runners
+    runs-on:
+      group: runners_v1
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    env:
+      app_name: ShelfLifeDebug
+
+    defaults:
+      run:
+        working-directory: ./${{ env.base_folder }}
+
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      # First step : Checkout the repository on the runner
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          fetch-depth: 0
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      # This step removes the current gradle cache to avoid any caching issues
+      - name: Remove current gradle cache
+        run: rm -rf ~/.gradle
 
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      # Setup JDK 17
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      # Retrieve gradle cache for faster builds
+      - name: Retrieve gradle cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
+      # Load google-services.json and local.properties from the secrets
+      - name: Decode secrets
+        env:
+          GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
+          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          echo "$GOOGLE_SERVICES" | base64 --decode > ./app/google-services.json
+          echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      # Build the application and run lint checks
+      - name: Assemble and Lint
+        run: |
+          ./gradlew assembleDebug lint --parallel --build-cache
+
+      # Run unit tests
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest --parallel --build-cache
+
+      # Run instrumentation tests on an Android emulator
+      - name: Run Instrumentation Tests
+        uses: RandyLutcavich/android-emulator-runner-without-sdk-setup@v1.0.3
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          avd-name: github
+          force-avd-creation: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -skin 1080x1920
+          disable-animations: true
+          script: ./gradlew connectedDebugAndroidTest --parallel --build-cache
+
+      # Generate test coverage report
+      - name: Generate Coverage Report
+        run: ./gradlew jacocoTestReport
+
+      # Upload coverage report
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: Coverage report
+          path: app/build/reports/jacoco/jacocoTestReport
+
+  exercises:
+    name: Exercises
+    # Execute the CI on the course's runners
+    runs-on:
+      group: runners_v1
+
+    defaults:
+      run:
+        working-directory: ./${{ env.base_folder }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Check that userStories.txt exists
+        run: stat userStories.txt
+
+      # Ensure userStories.txt has at least two non-empty lines
+      - name: Check userStories.txt has at least two lines
+        run: '[ $(grep -cve "^\s*$" userStories.txt) -ge "2" ]'

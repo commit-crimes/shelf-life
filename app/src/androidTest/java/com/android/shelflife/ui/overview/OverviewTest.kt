@@ -93,7 +93,6 @@ class OverviewTest {
     composeTestRule.setContent {
       OverviewScreen(
           navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
           householdViewModel = householdViewModel)
     }
     composeTestRule.onNodeWithTag("firstTimeWelcomeScreen").assertIsDisplayed()
@@ -108,7 +107,6 @@ class OverviewTest {
     composeTestRule.setContent {
       OverviewScreen(
           navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
           householdViewModel = householdViewModel)
     }
 
@@ -125,7 +123,6 @@ class OverviewTest {
     composeTestRule.setContent {
       OverviewScreen(
           navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
           householdViewModel = householdViewModel)
     }
 
@@ -140,7 +137,6 @@ class OverviewTest {
     composeTestRule.setContent {
       OverviewScreen(
           navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
           householdViewModel = householdViewModel)
     }
 
@@ -156,7 +152,6 @@ class OverviewTest {
     composeTestRule.setContent {
       OverviewScreen(
           navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
           householdViewModel = householdViewModel)
     }
 
@@ -172,7 +167,6 @@ class OverviewTest {
     composeTestRule.setContent {
       OverviewScreen(
           navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
           householdViewModel = householdViewModel)
     }
 
@@ -196,7 +190,6 @@ class OverviewTest {
     composeTestRule.setContent {
       OverviewScreen(
           navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
           householdViewModel = householdViewModel)
     }
 
@@ -234,7 +227,6 @@ class OverviewTest {
     composeTestRule.setContent {
       OverviewScreen(
           navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
           householdViewModel = householdViewModel)
     }
 
@@ -266,7 +258,6 @@ class OverviewTest {
     composeTestRule.setContent {
       OverviewScreen(
           navigationActions = navigationActions,
-          listFoodItemsViewModel = listFoodItemsViewModel,
           householdViewModel = householdViewModel)
     }
 
