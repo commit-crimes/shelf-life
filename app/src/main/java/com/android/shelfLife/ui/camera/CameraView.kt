@@ -81,10 +81,13 @@ import com.android.shelfLife.utilities.BarcodeAnalyzer
 import com.google.firebase.Timestamp
 
 /**
- * Composable function for the barcode scanner screen.
+ * Composable function for the Barcode Scanner Screen.
  *
- * @param navigationActions The navigation actions to be used in the screen
- * @param viewModel The ViewModel for the barcode scanner
+ * @param navigationActions Actions for navigation.
+ * @param cameraViewModel ViewModel for the camera.
+ * @param foodFactsViewModel ViewModel for food facts.
+ * @param householdViewModel ViewModel for household.
+ * @param foodItemViewModel ViewModel for food items.
  */
 @Composable
 fun BarcodeScannerScreen(
@@ -225,7 +228,13 @@ fun BarcodeScannerScreen(
       }
 }
 
-// Function to calculate ROI rectangle based on screen dimensions
+/**
+ * Function to calculate the Region of Interest (ROI) rectangle based on screen dimensions.
+ *
+ * @param screenWidth Width of the screen.
+ * @param screenHeight Height of the screen.
+ * @return RectF representing the ROI.
+ */
 fun calculateRoiRectF(screenWidth: Float, screenHeight: Float): RectF {
   val rectWidth = screenWidth * 0.8f
   val rectHeight = screenHeight * 0.2f
@@ -239,6 +248,7 @@ fun calculateRoiRectF(screenWidth: Float, screenHeight: Float): RectF {
       (top + rectHeight) / screenHeight)
 }
 
+/** Composable function to display the scanner overlay. */
 @Composable
 fun ScannerOverlay() {
   Canvas(modifier = Modifier.fillMaxSize().testTag("scannerOverlay")) {
@@ -271,6 +281,15 @@ fun ScannerOverlay() {
   }
 }
 
+/**
+ * Composable function to display the camera preview.
+ *
+ * @param modifier Modifier for the composable.
+ * @param onBarcodeScanned Callback when a barcode is scanned.
+ * @param onPreviewViewCreated Callback when the preview view is created.
+ * @param roiRect Region of Interest rectangle.
+ * @param shouldScan Lambda to determine if scanning should occur.
+ */
 @Composable
 fun CameraPreviewView(
     modifier: Modifier = Modifier,
@@ -289,6 +308,15 @@ fun CameraPreviewView(
       modifier = modifier.fillMaxSize().testTag("cameraPreviewView"))
 }
 
+/**
+ * Function to start the camera and set up the barcode analyzer.
+ *
+ * @param context Context of the application.
+ * @param previewView Preview view for the camera.
+ * @param onBarcodeScanned Callback when a barcode is scanned.
+ * @param roiRect Region of Interest rectangle.
+ * @param shouldScan Lambda to determine if scanning should occur.
+ */
 fun startCamera(
     context: Context,
     previewView: PreviewView,
@@ -326,6 +354,11 @@ fun startCamera(
       ContextCompat.getMainExecutor(context))
 }
 
+/**
+ * Composable function to display the permission denied screen.
+ *
+ * @param navigationActions Actions for navigation.
+ */
 @Composable
 fun PermissionDeniedScreen(navigationActions: NavigationActions) {
   val context = LocalContext.current
@@ -357,6 +390,14 @@ fun PermissionDeniedScreen(navigationActions: NavigationActions) {
       }
 }
 
+/**
+ * Composable function to display the scanned item food screen.
+ *
+ * @param houseHoldViewModel ViewModel for household.
+ * @param foodFacts Food facts data.
+ * @param foodItemViewModel ViewModel for food items.
+ * @param onFinish Callback to reset scanning state.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScannedItemFoodScreen(
@@ -481,7 +522,7 @@ fun ScannedItemFoodScreen(
   }
 }
 
-// Function to play a beep sound
+/** Function to play a beep sound. */
 fun beep() {
   val toneGen = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
   toneGen.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
