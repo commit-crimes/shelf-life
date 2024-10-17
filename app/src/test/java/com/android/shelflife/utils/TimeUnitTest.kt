@@ -11,13 +11,13 @@ import java.util.Locale
 class TimeUnitTest {
 
     @Test
-    fun `test getTotalMinutes with valid timestamp`() {
+    fun testGetTotalMinutesWithValidTimestamp() {
         val timestamp = Timestamp(Date(3600000)) // 1 hour = 3600 seconds
         assertEquals(60, getTotalMinutes(timestamp)) // 3600 seconds = 60 minutes
     }
 
     @Test
-    fun `test formatTimestampToDate with valid timestamp`() {
+    fun testFormatTimestampToDateWithValidTimestamp() {
         val calendar = Calendar.getInstance()
         calendar.set(2024, Calendar.OCTOBER, 17) // Set date to 17th October 2024
         val timestamp = Timestamp(calendar.time)
@@ -27,7 +27,7 @@ class TimeUnitTest {
     }
 
     @Test
-    fun `test formatDateToTimestamp with valid date string`() {
+    fun testFormatDateToTimestampWithValidDateString() {
         val dateString = "17/10/2024"
         val timestamp = formatDateToTimestamp(dateString)
 
@@ -38,28 +38,28 @@ class TimeUnitTest {
     }
 
     @Test
-    fun `test fromCapitalStringToLowercaseString with capitalized string`() {
+    fun testFromCapitalStringToLowercaseStringWithCapitalizedString() {
         val inputString = "hELLO wORLD"
         val expectedOutput = "Hello world"
         assertEquals(expectedOutput, fromCapitalStringToLowercaseString(inputString))
     }
 
     @Test
-    fun `test fromCapitalStringToLowercaseString with already correct format`() {
+    fun testFromCapitalStringToLowercaseStringWithAlreadyCorrectFormat() {
         val inputString = "Hello World"
         val expectedOutput = "Hello world"
         assertEquals(expectedOutput, fromCapitalStringToLowercaseString(inputString))
     }
 
     @Test
-    fun `test fromCapitalStringToLowercaseString with empty string`() {
+    fun testFromCapitalStringToLowercaseStringWithEmptyString() {
         val inputString = ""
         val expectedOutput = ""
         assertEquals(expectedOutput, fromCapitalStringToLowercaseString(inputString))
     }
 
     @Test
-    fun `test fromCapitalStringToLowercaseString with single letter`() {
+    fun testFromCapitalStringToLowercaseStringWithSingleLetter() {
         val inputString = "A"
         val expectedOutput = "A"
         assertEquals(expectedOutput, fromCapitalStringToLowercaseString(inputString))

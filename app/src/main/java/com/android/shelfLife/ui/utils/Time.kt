@@ -10,7 +10,10 @@ import java.util.Locale
  * @param timestamp: the timestamp we want to convert
  */
 fun getTotalMinutes(timestamp: Timestamp): Int {
-  return (timestamp.seconds / 60).toInt() // Convert seconds to minutes
+  // Convert nanoseconds to seconds and add to the total seconds
+  val totalSeconds = timestamp.seconds + timestamp.nanoseconds / 1_000_000_000.0
+  // Convert total seconds to minutes
+  return (totalSeconds / 60).toInt()
 }
 
 /**
