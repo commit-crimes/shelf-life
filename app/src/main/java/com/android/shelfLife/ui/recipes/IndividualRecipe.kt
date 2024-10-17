@@ -1,7 +1,6 @@
 package com.android.shelfLife.ui.recipes
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,12 +16,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -97,6 +93,7 @@ fun IndividualRecipeScreen(
         } else {
           // Scaffold that provides the structure for the screen, including top and bottom bars.
           Scaffold(
+              modifier = Modifier.testTag("individualRecipesScreen"),
               topBar = {
                 selectedHousehold?.let {
                   TopNavigationBar(
@@ -119,16 +116,19 @@ fun IndividualRecipeScreen(
                     modifier =
                         Modifier.padding(paddingValues) // Apply padding provided by Scaffold
                             .fillMaxSize() // Fill the available space
-                    ) {
+                            .testTag("recipe")) {
                       // Additional top app bar for navigation back
                       TopAppBar(
+                          modifier = Modifier.testTag("topBar"),
                           navigationIcon = {
                             // Back button to return to the previous screen
-                            IconButton(onClick = { navigationActions.goBack() }) {
-                              Icon(
-                                  imageVector = Icons.Default.ArrowBack,
-                                  contentDescription = "Go back Icon")
-                            }
+                            IconButton(
+                                onClick = { navigationActions.goBack() },
+                                modifier = Modifier.testTag("goBackArrow")) {
+                                  Icon(
+                                      imageVector = Icons.Default.ArrowBack,
+                                      contentDescription = "Go back Icon")
+                                }
                           },
                           // Title of the screen: Recipe name
                           title = {
@@ -161,25 +161,26 @@ fun IndividualRecipeScreen(
 
                             // Row displaying servings and time information
                             Row(modifier = Modifier.fillMaxWidth()) {
-                              Text(text = "Servings: ${selectedRecipe.servings}",
+                              Text(
+                                  text = "Servings: ${selectedRecipe.servings}",
                                   modifier = Modifier.testTag("recipeServings")) // Display servings
                               Spacer(modifier = Modifier.width(16.dp)) // Add space between text
                               Text(
                                   text = "Time: ${getTotalMinutes(selectedRecipe.time)} min",
-                                        modifier = Modifier.testTag("recipeTime")) // Display
+                                  modifier = Modifier.testTag("recipeTime")) // Display
                               // total time
                             }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                        // Display recipe instructions, scrollable if long
-                        Text(
-                            text = selectedRecipe.instructions,
-                            modifier =
-                                Modifier.padding(vertical = 8.dp).testTag("recipeInstructions"))
-                      }
-                }
-          })
-    }
-  }
+                            // Display recipe instructions, scrollable if long
+                            Text(
+                                text = selectedRecipe.instructions,
+                                modifier =
+                                    Modifier.padding(vertical = 8.dp).testTag("recipeInstructions"))
+                          }
+                    }
+              })
+        }
+      }
 }
