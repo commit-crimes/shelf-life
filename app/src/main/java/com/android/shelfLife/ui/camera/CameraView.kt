@@ -402,7 +402,7 @@ fun ScannedItemFoodScreen(
                     modifier = Modifier.fillMaxWidth().menuAnchor())
                 ExposedDropdownMenu(
                     expanded = locationExpanded, onDismissRequest = { locationExpanded = false }) {
-                      FoodStorageLocation.values().forEach { selectionOption ->
+                      FoodStorageLocation.entries.forEach { selectionOption ->
                         DropdownMenuItem(
                             text = { Text(selectionOption.name) },
                             onClick = {
