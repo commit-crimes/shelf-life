@@ -1,4 +1,4 @@
-package com.github.se.bootcamp.ui.overview
+package com.android.shelflife.ui.overview
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
