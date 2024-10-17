@@ -90,8 +90,7 @@ fun TopNavigationBar(
                   )
                 }
           }
-        },
-    )
+        })
 
     if (filters.isNotEmpty()) {
       AnimatedVisibility(
