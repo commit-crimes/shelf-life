@@ -33,11 +33,13 @@ android {
             useSupportLibrary = true
         }
     }
+
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
         }
     }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -53,19 +55,24 @@ android {
             enableAndroidTestCoverage = true
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
     }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -80,14 +87,9 @@ android {
         }
     }
 
-
-    // Robolectric needs to be run only in debug. But its tests are placed in the shared source set (test)
-    // The next lines transfers the src/test/* from shared to the testDebug one
-    //
-    // This prevent errors from occurring during unit tests
+    // Robolectric tests setup
     sourceSets.getByName("testDebug") {
         val test = sourceSets.getByName("test")
-
         java.setSrcDirs(test.java.srcDirs)
         res.setSrcDirs(test.res.srcDirs)
         resources.setSrcDirs(test.resources.srcDirs)
@@ -100,22 +102,21 @@ android {
     }
 }
 
+// Jacoco test configuration
 tasks.withType<Test> {
-    // Configure Jacoco for each tests
     configure<JacocoTaskExtension> {
         isIncludeNoLocationClasses = true
         excludes = listOf("jdk.internal.*")
     }
 }
 
+// SonarQube configuration
 sonarqube {
     properties {
-        property("sonar.projectKey",  System.getenv("SONAR_PROJECT_KEY") ?: "commit-crimes")
-        property("sonar.organization",  System.getenv("SONAR_ORGANIZATION") ?: "commit-crimes")
+        property("sonar.projectKey", System.getenv("SONAR_PROJECT_KEY") ?: "commit-crimes")
+        property("sonar.organization", System.getenv("SONAR_ORGANIZATION") ?: "commit-crimes")
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.login", System.getenv("SONAR_TOKEN") ?: "default_token")
-
-        // Specify the source and test directories
         property("sonar.sources", "src/main/java")
         property("sonar.tests", "src/test/java")
         property("sonar.java.binaries", "build")
@@ -124,10 +125,52 @@ sonarqube {
     }
 }
 
+// Jacoco test report task
+tasks.register("jacocoTestReport", JacocoReport::class) {
+    mustRunAfter("testDebugUnitTest", "connectedDebugAndroidTest")
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+    }
+
+    val fileFilter = listOf(
+        "**/R.class",
+        "**/R$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "android/**/*.*"
+    )
+    val debugTree = fileTree("${project.buildDir}/tmp/kotlin-classes/debug") {
+        exclude(fileFilter)
+    }
+    val mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories.setFrom(files(mainSrc))
+    classDirectories.setFrom(files(debugTree))
+    executionData.setFrom(fileTree(project.buildDir) {
+        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+        include("outputs/code_coverage/debugAndroidTest/connected/*/coverage.ec")
+    })
+}
+
+// Ensure ktfmtCheck tasks depend on their corresponding ktfmtFormat tasks
+tasks.named("ktfmtCheckAndroidTest") {
+    dependsOn(tasks.named("ktfmtFormatAndroidTest"))
+}
+
+tasks.named("ktfmtCheckMain") {
+    dependsOn(tasks.named("ktfmtFormatMain"))
+}
+
+tasks.named("ktfmtCheckTest") {
+    dependsOn(tasks.named("ktfmtFormatTest"))
+}
+
+// Dependencies
 dependencies {
-
-
-    // Core
+    // Core dependencies
     implementation(libs.core.ktx)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -152,14 +195,12 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.material.icons.extended)
 
-
-    //Barcode Scanner
+    // Barcode Scanner
     implementation(libs.mlkit.barcode.scanning)
     implementation(libs.camerax.camera2)
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.view)
     implementation(libs.guava)
-
 
     // Navigation
     implementation(libs.androidx.navigation.compose)
@@ -177,7 +218,6 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(platform(libs.firebase.bom))
 
-
     // Networking with OkHttp
     implementation(libs.okhttp)
 
@@ -187,9 +227,7 @@ dependencies {
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
     testImplementation(libs.json)
-    // Testing mock web server for OkHttp
     testImplementation(libs.mockwebserver)
-
 
     // Test UI
     androidTestImplementation(libs.androidx.junit)
@@ -207,35 +245,6 @@ dependencies {
     androidTestImplementation(libs.kaspresso.allure.support)
     androidTestImplementation(libs.kaspresso.compose.support)
 
+    // Coroutine Testing
     testImplementation(libs.kotlinx.coroutines.test)
-
-}
-
-tasks.register("jacocoTestReport", JacocoReport::class) {
-    mustRunAfter("testDebugUnitTest", "connectedDebugAndroidTest")
-
-    reports {
-        xml.required = true
-        html.required = true
-    }
-
-    val fileFilter = listOf(
-        "**/R.class",
-        "**/R$*.class",
-        "**/BuildConfig.*",
-        "**/Manifest*.*",
-        "**/*Test*.*",
-        "android/**/*.*",
-    )
-    val debugTree = fileTree("${project.buildDir}/tmp/kotlin-classes/debug") {
-        exclude(fileFilter)
-    }
-    val mainSrc = "${project.projectDir}/src/main/java"
-
-    sourceDirectories.setFrom(files(mainSrc))
-    classDirectories.setFrom(files(debugTree))
-    executionData.setFrom(fileTree(project.buildDir) {
-        include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
-        include("outputs/code_coverage/debugAndroidTest/connected/*/coverage.ec")
-    })
 }
