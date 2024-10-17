@@ -43,7 +43,7 @@ jobs:
 
       # Run instrumentation tests on an emulator
       - name: Start emulator
-        uses: reactive circus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 33
           target: default
