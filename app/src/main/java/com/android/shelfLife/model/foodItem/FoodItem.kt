@@ -12,32 +12,32 @@ import com.google.firebase.Timestamp
  * @property uid Unique identifier for the food item instance.
  * @property foodFacts General product information (e.g., name, barcode, nutritional facts) shared
  *   across all instances of this food item.
- * @property status Current status of the food item (e.g., OPEN, CLOSED, EXPIRED).
+ * @property status Current status of the food item (e.g., OPEN, CLOSED, EXPIRED). Default: CLOSED.
  * @property location Physical location of the food item within the household (e.g., pantry,
- *   fridge).
+ *   fridge). Default: PANTRY.
  * @property expiryDate Expiry date of the food item, if available.
  * @property openDate The date the food item was opened, if applicable.
- * @property buyDate The date the food item was purchased or added to inventory.
+ * @property buyDate The date the food item was purchased or added to inventory. Default: current time.
  */
 data class FoodItem(
-    val uid: String, // Unique ID of the food item
-    val foodFacts: FoodFacts, // Food facts of the food item
-    val location: FoodStorageLocation = FoodStorageLocation.PANTRY, // Default location is PANTRY
-    val expiryDate: Timestamp? = null, // Expiry date can be null if not provided
-    val openDate: Timestamp? = null, // Expiry date can be null if not provided
-    val buyDate: Timestamp = Timestamp.now(), // Default buy date is the current time
-    val status: FoodStatus = FoodStatus.CLOSED // Default status is CLOSED
+    val uid: String,
+    val foodFacts: FoodFacts,
+    val location: FoodStorageLocation = FoodStorageLocation.PANTRY,
+    val expiryDate: Timestamp? = null,
+    val openDate: Timestamp? = null,
+    val buyDate: Timestamp = Timestamp.now(),
+    val status: FoodStatus = FoodStatus.CLOSED
 )
 
 /** This enum class represents the status of a food item. */
 enum class FoodStatus {
-  OPEN, // Food item is opened
-  CLOSED, // Food item is closed or sealed
-  EXPIRED // Food item has expired
+  OPEN,
+  CLOSED,
+  EXPIRED
 }
 
 enum class FoodStorageLocation {
-  PANTRY, // Pantry location
-  FRIDGE, // Fridge location
-  FREEZER, // Freezer location
+  PANTRY,
+  FRIDGE,
+  FREEZER,
 }
