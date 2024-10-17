@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.Card
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -55,14 +56,12 @@ import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
-import com.android.shelfLife.ui.navigation.HouseHoldElement
+import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
-import com.android.shelfLife.ui.overview.AddHouseHoldPopUp
-import com.android.shelfLife.ui.overview.EditHouseHoldPopUp
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
 import com.android.shelfLife.ui.utils.getTotalMinutes
 import kotlinx.coroutines.launch
@@ -82,9 +81,6 @@ fun RecipesScreen(
   val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
   val userHouseholds = householdViewModel.households.collectAsState().value
 
-  var showDialog by remember { mutableStateOf(false) }
-  var showEdit by remember { mutableStateOf(false) }
-
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
 
@@ -100,72 +96,42 @@ fun RecipesScreen(
           "Snack",
           "Breakfast")
 
-  AddHouseHoldPopUp(
-      showDialog = showDialog,
-      onDismiss = { showDialog = false },
-      householdViewModel = householdViewModel,
-  )
-
-  EditHouseHoldPopUp(
-      showDialog = showEdit,
-      onDismiss = { showEdit = false },
-      householdViewModel = householdViewModel)
-
-  ModalNavigationDrawer(
-      drawerState = drawerState,
-      drawerContent = {
-        ModalDrawerSheet {
-          Text(
-              "Household selection",
-              modifier =
-                  Modifier.padding(vertical = 18.dp, horizontal = 16.dp)
-                      .padding(horizontal = 12.dp),
-              style = MaterialTheme.typography.labelMedium)
-          userHouseholds.forEach { household ->
-            selectedHousehold?.let {
-              HouseHoldElement(
-                  household = household,
-                  selectedHousehold = it,
-                  onHouseholdSelected = { household ->
-                    if (household != selectedHousehold) {
-                      householdViewModel.selectHousehold(household)
-                    }
-                    scope.launch { drawerState.close() }
-                  })
-            }
-          }
-          HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-          Row(
-              modifier = Modifier.fillMaxWidth().padding(16.dp),
-              verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.Center) {
-                IconButton(onClick = { showDialog = true }) {
-                  Icon(
-                      imageVector = Icons.Default.Add,
-                      contentDescription = "Add Household Icon",
-                      modifier = Modifier.testTag("addHouseholdIcon"))
-                }
-
-                IconButton(onClick = { showEdit = true }) {
-                  Icon(
-                      imageVector = Icons.Outlined.Edit,
-                      contentDescription = "Edit Household Icon",
-                      modifier = Modifier.testTag("editHouseholdIcon"))
-                }
+  HouseHoldSelectionDrawer(
+      scope = scope, drawerState = drawerState, householdViewModel = householdViewModel) {
+        // Filter the recipes based on the search query
+        val filteredRecipes =
+            if (query.isEmpty()) {
+              recipeList // Use the collected recipe list
+            } else {
+              recipeList.filter { recipe ->
+                recipe.name.contains(query, ignoreCase = true) // Filter by recipe name
               }
-        }
-      },
-  ) {
-    // Filter the recipes based on the search query
-    val filteredRecipes =
-        if (query.isEmpty()) {
-          recipeList // Use the collected recipe list
-        } else {
-          recipeList.filter { recipe ->
-            recipe.name.contains(query, ignoreCase = true) // Filter by recipe name
-          }
-        }
+            }
 
+        if (selectedHousehold == null) {
+          FirstTimeWelcomeScreen(householdViewModel)
+        } else {
+          Scaffold(
+              modifier = Modifier.testTag("recipesScreen"),
+              topBar = {
+                selectedHousehold?.let {
+                  TopNavigationBar(
+                      houseHold = it,
+                      onHamburgerClick = { scope.launch { drawerState.open() } },
+                      filters = filters)
+                }
+              },
+              bottomBar = {
+                BottomNavigationMenu(
+                    onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                    tabList = LIST_TOP_LEVEL_DESTINATION,
+                    selectedItem = Route.RECIPES)
+              },
+              content = { paddingValues ->
+                Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+                  RecipesSearchBar(query) { newQuery ->
+                    query = newQuery // Update the query when user types
+                  } // Pass query and update function to the search bar
     if (selectedHousehold == null) {
       FirstTimeWelcomeScreen(householdViewModel)
     } else {
@@ -232,6 +198,7 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
   var isActive by remember {
     mutableStateOf(false)
   } // State to manage whether the search bar is active
+
   Box(
       modifier =
           Modifier.fillMaxWidth()

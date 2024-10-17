@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.recipes
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,9 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -33,8 +30,6 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,18 +45,15 @@ import com.android.shelfLife.R
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
-import com.android.shelfLife.ui.navigation.HouseHoldElement
+import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.TopNavigationBar
-import com.android.shelfLife.ui.overview.AddHouseHoldPopUp
-import com.android.shelfLife.ui.overview.EditHouseHoldPopUp
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
 import com.android.shelfLife.ui.utils.getTotalMinutes
 import kotlinx.coroutines.launch
 
-@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 /**
@@ -95,140 +87,88 @@ fun IndividualRecipeScreen(
   val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
   val userHouseholds = householdViewModel.households.collectAsState().value
 
-  var showDialog by remember { mutableStateOf(false) }
-  var showEdit by remember { mutableStateOf(false) }
-
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
 
-  AddHouseHoldPopUp(
-      showDialog = showDialog,
-      onDismiss = { showDialog = false },
-      householdViewModel = householdViewModel,
-  )
-
-  EditHouseHoldPopUp(
-      showDialog = showEdit,
-      onDismiss = { showEdit = false },
-      householdViewModel = householdViewModel)
-
-  ModalNavigationDrawer(
-      drawerState = drawerState,
-      drawerContent = {
-        ModalDrawerSheet {
-          Text(
-              "Household selection",
-              modifier =
-                  Modifier.padding(vertical = 18.dp, horizontal = 16.dp)
-                      .padding(horizontal = 12.dp),
-              style = MaterialTheme.typography.labelMedium)
-          userHouseholds.forEach { household ->
-            selectedHousehold?.let {
-              HouseHoldElement(
-                  household = household,
-                  selectedHousehold = it,
-                  onHouseholdSelected = { household ->
-                    if (household != selectedHousehold) {
-                      householdViewModel.selectHousehold(household)
-                    }
-                    scope.launch { drawerState.close() }
-                  })
-            }
-          }
-          HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-          Row(
-              modifier = Modifier.fillMaxWidth().padding(16.dp),
-              verticalAlignment = Alignment.CenterVertically,
-              horizontalArrangement = Arrangement.Center) {
-                IconButton(onClick = { showDialog = true }) {
-                  Icon(
-                      imageVector = Icons.Default.Add,
-                      contentDescription = "Add Household Icon",
-                      modifier = Modifier.testTag("addHouseholdIcon"))
+  HouseHoldSelectionDrawer(
+      scope = scope, drawerState = drawerState, householdViewModel = householdViewModel) {
+        if (selectedHousehold == null) {
+          FirstTimeWelcomeScreen(householdViewModel)
+        } else {
+          // Scaffold that provides the structure for the screen, including top and bottom bars.
+          Scaffold(
+              topBar = {
+                selectedHousehold?.let {
+                  TopNavigationBar(
+                      houseHold = it,
+                      onHamburgerClick = { scope.launch { drawerState.open() } },
+                      filters = emptyList())
                 }
-
-                IconButton(onClick = { showEdit = true }) {
-                  Icon(
-                      imageVector = Icons.Outlined.Edit,
-                      contentDescription = "Edit Household Icon",
-                      modifier = Modifier.testTag("editHouseholdIcon"))
-                }
-              }
-        }
-      },
-  ) {
-    if (selectedHousehold == null) {
-      FirstTimeWelcomeScreen(householdViewModel)
-    } else {
-      // Scaffold that provides the structure for the screen, including top and bottom bars.
-      Scaffold(
-          modifier = Modifier.testTag("individualRecipesScreen"),
-          topBar = {
-            selectedHousehold?.let {
-              TopNavigationBar(
-                  houseHold = it,
-                  onHamburgerClick = { scope.launch { drawerState.open() } },
-                  filters = emptyList())
-            }
-          },
-          bottomBar = {
-            // Bottom navigation bar for switching between main app destinations.
-            BottomNavigationMenu(
-                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.RECIPES)
-          },
-          content = { paddingValues ->
-            Column(
-                modifier =
-                    Modifier.padding(paddingValues) // Apply padding provided by Scaffold
-                        .fillMaxSize() // Fill the available space
-                        .testTag("recipe")) {
-                  // Additional top app bar for navigation back
-                  TopAppBar(
-                      modifier = Modifier.testTag("topBar"),
-                      navigationIcon = {
-                        // Back button to return to the previous screen
-                        IconButton(
-                            onClick = { navigationActions.goBack() },
-                            modifier = Modifier.testTag("goBackArrow")) {
+              },
+              bottomBar = {
+                // Bottom navigation bar for switching between main app destinations.
+                BottomNavigationMenu(
+                    onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                    tabList = LIST_TOP_LEVEL_DESTINATION, // List of top-level destinations
+                    selectedItem =
+                        Route.RECIPES // The currently selected item in the bottom navigation
+                    )
+              },
+              content = { paddingValues ->
+                Column(
+                    modifier =
+                        Modifier.padding(paddingValues) // Apply padding provided by Scaffold
+                            .fillMaxSize() // Fill the available space
+                    ) {
+                      // Additional top app bar for navigation back
+                      TopAppBar(
+                          navigationIcon = {
+                            // Back button to return to the previous screen
+                            IconButton(onClick = { navigationActions.goBack() }) {
                               Icon(
-                                  imageVector = Icons.Filled.ArrowBack,
+                                  imageVector = Icons.Default.ArrowBack,
                                   contentDescription = "Go back Icon")
                             }
-                      },
-                      // Title of the screen: Recipe name
-                      title = {
-                        Text(
-                            text = selectedRecipe.name,
-                            style =
-                                MaterialTheme.typography.bodyLarge.copy(
-                                    fontSize = 24.sp, fontWeight = FontWeight.Bold))
-                      })
+                          },
+                          // Title of the screen: Recipe name
+                          title = {
+                            Text(
+                                text = selectedRecipe.name,
+                                style =
+                                    MaterialTheme.typography.bodyLarge.copy(
+                                        fontSize = 24.sp, fontWeight = FontWeight.Bold))
+                          })
 
-                  // Recipe content: image, servings, time, and instructions
-                  Column(
-                      modifier =
-                          Modifier.padding(8.dp)
-                              .fillMaxSize()
-                              .verticalScroll(rememberScrollState())) {
-                        // Display the recipe image (placeholder for now)
-                        Image(
-                            painter = painterResource(R.drawable.google_logo),
-                            contentDescription = "Recipe Image",
-                            modifier = Modifier.width(537.dp).height(100.dp).testTag("recipeImage"),
-                            contentScale = ContentScale.FillWidth)
+                      // Recipe content: image, servings, time, and instructions
+                      Column(
+                          modifier =
+                              Modifier.padding(8.dp) // Padding around the content
+                                  .fillMaxSize() // Fill the remaining screen space
+                                  .verticalScroll(
+                                      rememberScrollState()) // Enable vertical scrolling
+                          ) {
+                            // Display the recipe image (placeholder for now)
+                            Image(
+                                painter = painterResource(R.drawable.google_logo),
+                                contentDescription = "Recipe Image",
+                                modifier =
+                                    Modifier.width(537.dp) // Set the image width
+                                        .height(100.dp) // Set the image height
+                                        .testTag("recipeImage"),
+                                contentScale =
+                                    ContentScale.FillWidth // Make the image fill the width
+                                )
 
-                        // Row displaying servings and time information
-                        Row(modifier = Modifier.fillMaxWidth()) {
-                          Text(
-                              text = "Servings: ${selectedRecipe.servings}",
-                              modifier = Modifier.testTag("recipeServings"))
-                          Spacer(modifier = Modifier.width(16.dp))
-                          Text(
-                              text = "Time: ${getTotalMinutes(selectedRecipe.time)} min",
-                              modifier = Modifier.testTag("recipeTime"))
-                        }
+                            // Row displaying servings and time information
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                              Text(text = "Servings: ${selectedRecipe.servings}",
+                                  modifier = Modifier.testTag("recipeServings")) // Display servings
+                              Spacer(modifier = Modifier.width(16.dp)) // Add space between text
+                              Text(
+                                  text = "Time: ${getTotalMinutes(selectedRecipe.time)} min",
+                                        modifier = Modifier.testTag("recipeTime")) // Display
+                              // total time
+                            }
 
                         Spacer(modifier = Modifier.height(16.dp))
 
