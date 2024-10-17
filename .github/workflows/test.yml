@@ -1,4 +1,4 @@
-name: Bootcamp CI - Test Runner
+name: ShelfLife CI - Test Runner
 
 on:
   push:
@@ -12,26 +12,23 @@ on:
       - reopened
 
 jobs:
-  bootcamp-ci:
-    name: CI-Bootcamp
+  shelfLife-ci:
+    name: CI-ShelfLife
     runs-on: ubuntu-latest
-
-    env:
-      app_name: BootcampDebug
 
     steps:
       # Checkout the repository on the runner
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      # Setup JDK 17 (update this step to make sure Java 17 is installed)
+      - name: Setup JDK 17
+        uses: actions/setup-java@v3
         with:
-          submodules: recursive
-          fetch-depth: 0
+          distribution: 'temurin' # Or 'zulu' if you prefer
+          java-version: '17'
 
-      # Check if gradlew exists at the root of the repo
-      - name: Verify gradlew exists
-        run: ls -la
-
-      # Ensure that gradlew has execute permissions
+      # Grant execute permission for gradlew
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
