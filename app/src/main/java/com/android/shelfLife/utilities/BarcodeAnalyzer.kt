@@ -10,12 +10,24 @@ import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 
+/**
+ * Analyzes images to detect barcodes within a specified region of interest (ROI).
+ *
+ * @property onBarcodeScanned Callback function invoked when a barcode is successfully scanned.
+ * @property roiRectF The region of interest within the image where barcodes are searched for.
+ * @property shouldScan Lambda function to control whether scanning should proceed.
+ */
 class BarcodeAnalyzer(
     private val onBarcodeScanned: (String) -> Unit,
     private val roiRectF: RectF,
     private val shouldScan: () -> Boolean // Accepts a lambda to control scanning
 ) : ImageAnalysis.Analyzer {
 
+  /**
+   * Analyzes the given image to detect barcodes.
+   *
+   * @param imageProxy The image to analyze.
+   */
   @OptIn(ExperimentalGetImage::class)
   override fun analyze(imageProxy: ImageProxy) {
     if (!shouldScan()) {
