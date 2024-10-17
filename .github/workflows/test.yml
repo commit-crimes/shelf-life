@@ -61,6 +61,19 @@ jobs:
             ~/.android/adb*
           key: avd-34
 
+      - name: Install Android SDK Platform Tools
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager --install "platform-tools" > /dev/null
+          sdkmanager --install "build-tools;35.0.0" "platforms;android-34" > /dev/null
+        shell: bash
+
+      - name: Set up Android SDK environment
+        run: |
+          echo "export ANDROID_HOME=$HOME/Android/Sdk" >> $GITHUB_ENV
+          echo "export PATH=$ANDROID_HOME/platform-tools:$PATH" >> $GITHUB_ENV
+        shell: bash
+
       - name: Setup Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
