@@ -66,7 +66,6 @@ import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.android.shelfLife.model.foodFacts.SearchStatus
 import com.android.shelfLife.model.foodItem.FoodItem
-import com.android.shelfLife.model.foodItem.FoodStatus
 import com.android.shelfLife.model.foodItem.FoodStorageLocation
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
@@ -161,7 +160,7 @@ fun BarcodeScannerScreen(
                   isScanningState.value = false
                   searchInProgress.value = true
                 },
-                onPreviewViewCreated = { _ },
+                onPreviewViewCreated = {},
                 roiRect = roiRectF.value ?: RectF(0f, 0f, 1f, 1f),
                 shouldScan = { isScanning })
 
@@ -415,7 +414,7 @@ fun ScannedItemFoodScreen(
 
           // For dates a future improvement could be having a calendar interface rather than manual
           // input
-        val dateFormat = "dd/mm/yyyy"
+          val dateFormat = "dd/mm/yyyy"
           OutlinedTextField(
               value = expireDate,
               onValueChange = { expireDate = it },
@@ -451,7 +450,7 @@ fun ScannedItemFoodScreen(
                         openDate = formatDateToTimestamp(openDate),
                         buyDate = formatDateToTimestamp(buyDate),
                         // Logic to determine status depending on the dates given
-                       )
+                    )
                 houseHoldViewModel.addFoodItem(newFoodItem)
                 onFinish() // Call the callback to remove the screen and resume scanning
               },
