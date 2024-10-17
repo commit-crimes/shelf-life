@@ -60,7 +60,7 @@ fun OverviewScreen(
             foodItems.filter { it.foodFacts.name.contains(searchQuery, ignoreCase = true) }
 
         // Display a welcome screen when the user has no households
-        if (selectedHousehold == null) {
+        if (selectedHousehold == null && userHouseholds.isEmpty()) {
           FirstTimeWelcomeScreen(householdViewModel)
         } else {
           Scaffold(
@@ -99,7 +99,5 @@ fun OverviewScreen(
             }
           }
         }
-          })
-    }
   }
 }
