@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -22,21 +23,27 @@ import androidx.compose.ui.window.Dialog
  * @param errorMessages A list of error messages to be displayed in the dialog.
  */
 @Composable
-fun ErrorPopUp(showDialog: Boolean, onDismiss: () -> Unit, errorMessages: List<String>) {
+fun ErrorPopUp(
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    errorMessages: List<String>,
+    modifier: Modifier = Modifier
+) {
   if (showDialog) {
     Dialog(onDismissRequest = onDismiss) {
       Surface(
           shape = RoundedCornerShape(12.dp),
-          modifier = Modifier.padding(16.dp).widthIn(min = 280.dp, max = 400.dp)) {
+          modifier =
+              modifier.testTag("errorDialog").padding(16.dp).widthIn(min = 280.dp, max = 400.dp)) {
             Column(
-                modifier = Modifier.padding(16.dp),
+                modifier = modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally) {
                   Text(
-                      text = "Error", modifier = Modifier.padding(bottom = 16.dp), fontSize = 24.sp)
+                      text = "Error", modifier = modifier.padding(bottom = 16.dp), fontSize = 24.sp)
 
-                  Column(modifier = Modifier.padding(bottom = 16.dp)) {
+                  Column(modifier = modifier.padding(bottom = 16.dp)) {
                     errorMessages.forEach { message ->
-                      Text(text = message, modifier = Modifier.padding(bottom = 8.dp))
+                      Text(text = message, modifier = modifier.padding(bottom = 8.dp))
                     }
                   }
 
