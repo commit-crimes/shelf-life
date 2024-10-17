@@ -13,7 +13,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemRepository {
 
-  private val collectionPath = "foodItems"
+  companion object {
+    private const val COLLECTION_PATH = "foodItems"
+  }
+
   private val auth = FirebaseAuth.getInstance()
 
   /**
@@ -22,7 +25,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
    * @return A new unique ID.
    */
   override fun getNewUid(): String {
-    return db.collection(collectionPath).document().id
+    return db.collection(COLLECTION_PATH).document().id
   }
 
   /**
@@ -34,7 +37,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
     auth.addAuthStateListener { authVal ->
       val currentUser = authVal.currentUser
       if (currentUser != null) {
-        db.collection(collectionPath).get().addOnCompleteListener { task ->
+        db.collection(COLLECTION_PATH).get().addOnCompleteListener { task ->
           if (task.isSuccessful) {
             onSuccess()
           } else {
@@ -55,7 +58,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
    * @param onFailure - Called when there is an error retrieving the food items.
    */
   override fun getFoodItems(onSuccess: (List<FoodItem>) -> Unit, onFailure: (Exception) -> Unit) {
-    db.collection(collectionPath)
+    db.collection(COLLECTION_PATH)
         .get()
         .addOnSuccessListener { result ->
           val foodItemList = mutableListOf<FoodItem>()
@@ -87,7 +90,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    db.collection(collectionPath)
+    db.collection(COLLECTION_PATH)
         .document(foodItem.uid)
         .set(foodItem)
         .addOnSuccessListener { onSuccess() }
@@ -109,7 +112,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    db.collection(collectionPath)
+    db.collection(COLLECTION_PATH)
         .document(foodItem.uid)
         .set(foodItem)
         .addOnSuccessListener { onSuccess() }
@@ -131,7 +134,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-    db.collection(collectionPath)
+    db.collection(COLLECTION_PATH)
         .document(id)
         .delete()
         .addOnSuccessListener { onSuccess() }
