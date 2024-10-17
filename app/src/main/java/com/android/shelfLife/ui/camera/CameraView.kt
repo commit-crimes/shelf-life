@@ -161,7 +161,7 @@ fun BarcodeScannerScreen(
                   isScanningState.value = false
                   searchInProgress.value = true
                 },
-                onPreviewViewCreated = { previewView -> },
+                onPreviewViewCreated = { _ },
                 roiRect = roiRectF.value ?: RectF(0f, 0f, 1f, 1f),
                 shouldScan = { isScanning })
 
