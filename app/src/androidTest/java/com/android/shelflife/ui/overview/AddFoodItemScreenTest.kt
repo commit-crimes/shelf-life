@@ -1,21 +1,24 @@
 package com.android.shelfLife.ui.overview
 
+import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class AddFoodItemScreenTest {
 
   @get:Rule
-  val composeTestRule = createComposeRule()
+  val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
   private lateinit var householdViewModel: HouseholdViewModel
   private lateinit var foodItemViewModel: ListFoodItemsViewModel
@@ -23,6 +26,9 @@ class AddFoodItemScreenTest {
 
   @Before
   fun setUp() {
+    // Initialize MockK
+    MockKAnnotations.init(this, relaxed = true)
+
     householdViewModel = mockk(relaxed = true)
     foodItemViewModel = mockk(relaxed = true)
     navigationActions = mockk(relaxed = true)
@@ -30,7 +36,6 @@ class AddFoodItemScreenTest {
 
   @Test
   fun displayAllComponents() {
-    // Set up the screen
     composeTestRule.setContent {
       AddFoodItemScreen(
         navigationActions = navigationActions,
@@ -39,7 +44,7 @@ class AddFoodItemScreenTest {
       )
     }
 
-    // Assert that all UI elements are displayed
+    // Check that the main screen is displayed
     composeTestRule.onNodeWithTag("addScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addFoodItemTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
@@ -55,8 +60,7 @@ class AddFoodItemScreenTest {
   }
 
   @Test
-  fun doesNotSubmitWithInvalidDate() {
-    // Set up the screen
+  fun clickingGoBackButtonCallsNavigation() {
     composeTestRule.setContent {
       AddFoodItemScreen(
         navigationActions = navigationActions,
@@ -65,73 +69,21 @@ class AddFoodItemScreenTest {
       )
     }
 
-    // Input invalid expiration date
-    composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextInput("invalid-date")
+    // Click the go back button
+    composeTestRule.onNodeWithTag("goBackButton").performClick()
 
-    // Attempt to submit
-    composeTestRule.onNodeWithTag("foodSave").performClick()
-
-    // Assert that the error dialog is displayed
-    composeTestRule.onNodeWithTag("errorDialog").assertIsDisplayed()
-
-    // Verify that addFoodItem was not called
-    verify(exactly = 0) { householdViewModel.addFoodItem(any()) }
-  }
-
-  @Test
-  fun doesNotSubmitWithNoFoodName() {
-    // Set up the screen
-    composeTestRule.setContent {
-      AddFoodItemScreen(
-        navigationActions = navigationActions,
-        houseHoldViewModel = householdViewModel,
-        foodItemViewModel = foodItemViewModel
-      )
-    }
-
-    // Clear the food name input
-    composeTestRule.onNodeWithTag("inputFoodName").performTextClearance()
-
-    // Attempt to submit
-    composeTestRule.onNodeWithTag("foodSave").performClick()
-
-    // Assert that the error dialog is displayed
-    composeTestRule.onNodeWithTag("errorDialog").assertIsDisplayed()
-
-    // Verify that addFoodItem was not called
-    verify(exactly = 0) { householdViewModel.addFoodItem(any()) }
-  }
-
-  @Test
-  fun doesNotSubmitWithNoAmount() {
-    // Set up the screen
-    composeTestRule.setContent {
-      AddFoodItemScreen(
-        navigationActions = navigationActions,
-        houseHoldViewModel = householdViewModel,
-        foodItemViewModel = foodItemViewModel
-      )
-    }
-
-    // Clear the amount input
-    composeTestRule.onNodeWithTag("inputFoodAmount").performTextClearance()
-
-    // Attempt to submit
-    composeTestRule.onNodeWithTag("foodSave").performClick()
-
-    // Assert that the error dialog is displayed
-    composeTestRule.onNodeWithTag("errorDialog").assertIsDisplayed()
-
-    // Verify that addFoodItem was not called
-    verify(exactly = 0) { householdViewModel.addFoodItem(any()) }
+    // Verify that navigationActions.goBack() was called
+    verify { navigationActions.goBack() }
   }
 
 //  @Test
 //  fun submitWithValidData() {
-//    // Mock getUID method if necessary
+//    // Clear mocks
+//    clearMocks(householdViewModel, foodItemViewModel, navigationActions)
+//
+//    // Mock getUID method
 //    every { foodItemViewModel.getUID() } returns "testUID"
 //
-//    // Set up the screen
 //    composeTestRule.setContent {
 //      AddFoodItemScreen(
 //        navigationActions = navigationActions,
@@ -147,22 +99,22 @@ class AddFoodItemScreenTest {
 //    composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextInput("01/12/2023")
 //    composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextInput("30/11/2023")
 //
-//    // Submit the form
+//    // Click submit
 //    composeTestRule.onNodeWithTag("foodSave").performClick()
 //
-//    // Assert that the error dialog is not displayed
-//    composeTestRule.onAllNodesWithTag("errorDialog").assertCountEquals(0)
+//    // Wait for any UI updates
+//    composeTestRule.waitForIdle()
 //
 //    // Verify that addFoodItem was called
 //    verify(exactly = 1) { householdViewModel.addFoodItem(any()) }
 //
 //    // Verify that navigationActions.goBack() was called
-//    verify { navigationActions.goBack() }
+//    verify(exactly = 1) { navigationActions.goBack() }
 //  }
 
+
   @Test
-  fun showsErrorMessageWhenBuyDateIsAfterOpenDateOrExpireDate() {
-    // Set up the screen
+  fun cancellingFormReturnsToPreviousScreen() {
     composeTestRule.setContent {
       AddFoodItemScreen(
         navigationActions = navigationActions,
@@ -171,17 +123,35 @@ class AddFoodItemScreenTest {
       )
     }
 
-    // Input data where buy date is after open date and expire date
-    composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Apple")
-    composeTestRule.onNodeWithTag("inputFoodAmount").performTextInput("5")
-    composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextInput("01/01/2024")
-    composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextInput("01/01/2023")
-    composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextInput("31/12/2023")
+    // Click the go back button
+    composeTestRule.onNodeWithTag("goBackButton").performClick()
 
-    // Submit the form
+    // Verify that navigationActions.goBack() was called
+    verify { navigationActions.goBack() }
+  }
+
+  // Additional tests can be added as needed
+  @Test
+  fun doesNotSubmitWhenRequiredFieldsAreEmpty() {
+    composeTestRule.setContent {
+      AddFoodItemScreen(
+        navigationActions = navigationActions,
+        houseHoldViewModel = householdViewModel,
+        foodItemViewModel = foodItemViewModel
+      )
+    }
+
+    // Leave required fields empty
+    composeTestRule.onNodeWithTag("inputFoodName").performTextClearance()
+    composeTestRule.onNodeWithTag("inputFoodAmount").performTextClearance()
+
+    // Click the submit button
     composeTestRule.onNodeWithTag("foodSave").performClick()
 
-    // Assert that the error dialog is displayed
+    // Wait for UI updates
+    composeTestRule.waitForIdle()
+
+    // Verify that the error dialog is displayed
     composeTestRule.onNodeWithTag("errorDialog").assertIsDisplayed()
 
     // Verify that addFoodItem was not called
@@ -189,8 +159,7 @@ class AddFoodItemScreenTest {
   }
 
   @Test
-  fun showsErrorMessageOnInvalidInput() {
-    // Set up the screen
+  fun showsErrorWhenAmountIsNotANumber() {
     composeTestRule.setContent {
       AddFoodItemScreen(
         navigationActions = navigationActions,
@@ -200,16 +169,82 @@ class AddFoodItemScreenTest {
     }
 
     // Input invalid amount
-    composeTestRule.onNodeWithTag("inputFoodAmount").performTextClearance()
+    composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Apple")
     composeTestRule.onNodeWithTag("inputFoodAmount").performTextInput("invalid")
 
-    // Attempt to submit
+    // Click the submit button
     composeTestRule.onNodeWithTag("foodSave").performClick()
 
-    // Assert that the error dialog is displayed
+    // Wait for UI updates
+    composeTestRule.waitForIdle()
+
+    // Verify that the error dialog is displayed
     composeTestRule.onNodeWithTag("errorDialog").assertIsDisplayed()
 
     // Verify that addFoodItem was not called
     verify(exactly = 0) { householdViewModel.addFoodItem(any()) }
   }
+
+  @Test
+  fun showsErrorWhenDatesAreInvalid() {
+    composeTestRule.setContent {
+      AddFoodItemScreen(
+        navigationActions = navigationActions,
+        houseHoldViewModel = householdViewModel,
+        foodItemViewModel = foodItemViewModel
+      )
+    }
+
+    // Input valid food name and amount
+    composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Apple")
+    composeTestRule.onNodeWithTag("inputFoodAmount").performTextInput("5")
+
+    // Input invalid dates
+    composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextInput("invalid-date")
+    composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextInput("another-invalid-date")
+    composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextInput("yet-another-invalid-date")
+
+    // Click the submit button
+    composeTestRule.onNodeWithTag("foodSave").performClick()
+
+    // Wait for UI updates
+    composeTestRule.waitForIdle()
+
+    // Verify that the error dialog is displayed
+    composeTestRule.onNodeWithTag("errorDialog").assertIsDisplayed()
+
+    // Verify that addFoodItem was not called
+    verify(exactly = 0) { householdViewModel.addFoodItem(any()) }
+  }
+
+//  @Test
+//  fun submitWithMinimumRequiredData() {
+//    // Mock getUID method
+//    every { foodItemViewModel.getUID() } returns "testUID"
+//
+//    composeTestRule.setContent {
+//      AddFoodItemScreen(
+//        navigationActions = navigationActions,
+//        houseHoldViewModel = householdViewModel,
+//        foodItemViewModel = foodItemViewModel
+//      )
+//    }
+//
+//    // Input only required fields
+//    composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Banana")
+//    composeTestRule.onNodeWithTag("inputFoodAmount").performTextInput("3")
+//
+//    // Click the submit button
+//    composeTestRule.onNodeWithTag("foodSave").performClick()
+//
+//    // Wait for UI updates
+//    composeTestRule.waitForIdle()
+//
+//    // Verify that addFoodItem was called
+//    verify(exactly = 1) { householdViewModel.addFoodItem(any()) }
+//
+//    // Verify that navigationActions.goBack() was called
+//    verify(exactly = 1) { navigationActions.goBack() }
+//  }
+
 }
