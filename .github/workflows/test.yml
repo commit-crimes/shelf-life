@@ -12,7 +12,7 @@ on:
       - reopened
 
 jobs:
-  shelfLife-ci:
+  shelflife-ci:
     name: CI-ShelfLife
     runs-on: ubuntu-latest
 
@@ -21,12 +21,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Setup JDK 17 (update this step to make sure Java 17 is installed)
+      # Setup JDK 17
       - name: Setup JDK 17
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin' # Or 'zulu' if you prefer
+          distribution: 'temurin'
           java-version: '17'
+
+      # Decode google-services.json from secret
+      - name: Decode google-services.json
+        run: |
+          echo "${{ secrets.GOOGLE_SERVICES }}" | base64 --decode > ./app/google-services.json
 
       # Grant execute permission for gradlew
       - name: Grant execute permission for gradlew
@@ -34,8 +39,7 @@ jobs:
 
       # Build the application and run lint checks
       - name: Assemble and Lint
-        run: |
-          ./gradlew assembleDebug lint --parallel --build-cache
+        run: ./gradlew assembleDebug lint --parallel --build-cache
 
       # Run unit tests
       - name: Run Unit Tests
