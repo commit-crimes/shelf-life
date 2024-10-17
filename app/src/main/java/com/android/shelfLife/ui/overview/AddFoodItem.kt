@@ -3,7 +3,6 @@ package com.android.shelfLife.ui.overview
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,7 +28,7 @@ import com.android.shelfLife.ui.utils.DropdownFields
 import com.android.shelfLife.ui.utils.ErrorPopUp
 import com.android.shelfLife.ui.utils.formatDateToTimestamp
 import com.android.shelfLife.ui.utils.formatTimestampToDate
-import com.android.shelfLife.ui.utils.fromCapitalStringtoLowercaseString
+import com.android.shelfLife.ui.utils.fromCapitalStringToLowercaseString
 import com.example.compose.primaryContainerLight
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
@@ -112,7 +111,7 @@ fun AddFoodItemScreen(
                     onOptionSelected = { unit = it },
                     expanded = unitExpanded,
                     onExpandedChange = { unitExpanded = it },
-                    optionLabel = { fromCapitalStringtoLowercaseString(it.name) },
+                    optionLabel = { fromCapitalStringToLowercaseString(it.name) },
                     modifier = Modifier.weight(1f).testTag("inputFoodUnit"))
               }
 
@@ -124,7 +123,7 @@ fun AddFoodItemScreen(
               onOptionSelected = { category = it },
               expanded = categoryExpanded,
               onExpandedChange = { categoryExpanded = it },
-              optionLabel = { fromCapitalStringtoLowercaseString(it.name) },
+              optionLabel = { fromCapitalStringToLowercaseString(it.name) },
               modifier = Modifier.testTag("inputFoodCategory"))
 
           Spacer(modifier = Modifier.height(16.dp))
@@ -136,7 +135,7 @@ fun AddFoodItemScreen(
               onOptionSelected = { location = it },
               expanded = locationExpanded,
               onExpandedChange = { locationExpanded = it },
-              optionLabel = { fromCapitalStringtoLowercaseString(it.name) },
+              optionLabel = { fromCapitalStringToLowercaseString(it.name) },
               modifier = Modifier.testTag("inputFoodLocation"))
 
           OutlinedTextField(
