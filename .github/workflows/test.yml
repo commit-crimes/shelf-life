@@ -125,10 +125,12 @@ jobs:
       - name: Upload report to SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonarqube \
-               -Dsonar.projectKey=commit-crimes \
-               -Dsonar.organization=commit-crimes \
-               -Dsonar.host.url=https://sonarcloud.io
+        run: |
+          ./gradlew sonarqube \
+            -Dsonar.projectKey=commit-crimes \
+            -Dsonar.organization=commit-crimes \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
       - name: Upload test results
         if: always()
