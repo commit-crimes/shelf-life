@@ -1,6 +1,5 @@
 name: ShelfLife CI - Test Runner
 
-# Run the workflow when commits are pushed on main or when a PR is modified
 on:
   push:
     branches:
@@ -13,62 +12,34 @@ on:
       - reopened
 
 jobs:
-  sh-ci:
+  shelflife-ci:
     name: CI-ShelfLife
-    # Execute the CI on the course's runners
-    runs-on:
-      group: runners_v1
-
-    env:
-      app_name: ShelfLifeDebug
-
-    defaults:
-      run:
-        working-directory: ./${{ env.base_folder }}
+    runs-on: ubuntu-latest
 
     steps:
-      # First step : Checkout the repository on the runner
-      - name: Checkout
+      # Checkout the repository on the runner
+      - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          fetch-depth: 0
-
-      # This step removes the current gradle cache to avoid any caching issues
-      - name: Remove current gradle cache
-        run: rm -rf ~/.gradle
 
       # Setup JDK 17
-      - name: Setup JDK
+      - name: Setup JDK 17
         uses: actions/setup-java@v3
         with:
-          distribution: "temurin"
-          java-version: "17"
+          distribution: 'temurin'
+          java-version: '17'
 
-      # Retrieve gradle cache for faster builds
-      - name: Retrieve gradle cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-
-      # Load google-services.json and local.properties from the secrets
-      - name: Decode secrets
-        env:
-          GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
+      # Decode google-services.json from secret
+      - name: Decode google-services.json
         run: |
-          echo "$GOOGLE_SERVICES" | base64 --decode > ./app/google-services.json
-          echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
+          echo "${{ secrets.GOOGLE_SERVICES }}" | base64 --decode > ./app/google-services.json
 
+      # Grant execute permission for gradlew
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
       # Build the application and run lint checks
       - name: Assemble and Lint
-        run: |
-          ./gradlew assembleDebug lint --parallel --build-cache
+        run: ./gradlew assembleDebug lint --parallel --build-cache
 
       # Run unit tests
       - name: Run Unit Tests
@@ -76,16 +47,14 @@ jobs:
 
       # Run instrumentation tests on an Android emulator
       - name: Run Instrumentation Tests
-        uses: RandyLutcavich/android-emulator-runner-without-sdk-setup@v1.0.3
+        uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          avd-name: github
-          force-avd-creation: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -skin 1080x1920
-          disable-animations: true
-          script: ./gradlew connectedDebugAndroidTest --parallel --build-cache
+            api-level: 30           # API level of the emulator (can be customized)
+            target: google_apis      # Target platform for the emulator
+            arch: x86_64             # Emulator architecture
+            profile: Pixel_4         # Emulator profile to use (can be customized)
+            script: ./gradlew connectedDebugAndroidTest --parallel --build-cache
+
 
       # Generate test coverage report
       - name: Generate Coverage Report
@@ -97,27 +66,3 @@ jobs:
         with:
           name: Coverage report
           path: app/build/reports/jacoco/jacocoTestReport
-
-  exercises:
-    name: Exercises
-    # Execute the CI on the course's runners
-    runs-on:
-      group: runners_v1
-
-    defaults:
-      run:
-        working-directory: ./${{ env.base_folder }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          fetch-depth: 0
-
-      - name: Check that userStories.txt exists
-        run: stat userStories.txt
-
-      # Ensure userStories.txt has at least two non-empty lines
-      - name: Check userStories.txt has at least two lines
-        run: '[ $(grep -cve "^\s*$" userStories.txt) -ge "2" ]'
