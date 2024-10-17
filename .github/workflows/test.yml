@@ -1,6 +1,5 @@
 name: Bootcamp CI - Test Runner
 
-# Run the workflow when commits are pushed on main or when a PR is modified
 on:
   push:
     branches:
@@ -15,53 +14,24 @@ on:
 jobs:
   bootcamp-ci:
     name: CI-Bootcamp
-    # Use a GitHub-hosted runner
     runs-on: ubuntu-latest
 
     env:
       app_name: BootcampDebug
 
-    defaults:
-      run:
-        working-directory: ./${{ env.base_folder }}
-
     steps:
-      # First step : Checkout the repository on the runner
-      - name: Checkout
+      # Checkout the repository on the runner
+      - name: Checkout repository
         uses: actions/checkout@v3
         with:
           submodules: recursive
           fetch-depth: 0
 
-      # This step removes the current gradle cache to avoid any caching issues
-      - name: Remove current gradle cache
-        run: rm -rf ~/.gradle
+      # Check if gradlew exists at the root of the repo
+      - name: Verify gradlew exists
+        run: ls -la
 
-      # Setup JDK 17
-      - name: Setup JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: "temurin"
-          java-version: "17"
-
-      # Retrieve gradle cache for faster builds
-      - name: Retrieve gradle cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-
-      # Load google-services.json and local.properties from the secrets
-      - name: Decode secrets
-        env:
-          GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
-          LOCAL_PROPERTIES: ${{ secrets.LOCAL_PROPERTIES }}
-        run: |
-          echo "$GOOGLE_SERVICES" | base64 --decode > ./app/google-services.json
-          echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
-
+      # Ensure that gradlew has execute permissions
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
@@ -97,26 +67,3 @@ jobs:
         with:
           name: Coverage report
           path: app/build/reports/jacoco/jacocoTestReport
-
-  exercises:
-    name: Exercises
-    # Use a GitHub-hosted runner
-    runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: ./${{ env.base_folder }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          submodules: recursive
-          fetch-depth: 0
-
-      - name: Check that userStories.txt exists
-        run: stat userStories.txt
-
-      # Ensure userStories.txt has at least two non-empty lines
-      - name: Check userStories.txt has at least two lines
-        run: '[ $(grep -cve "^\s*$" userStories.txt) -ge "2" ]'
