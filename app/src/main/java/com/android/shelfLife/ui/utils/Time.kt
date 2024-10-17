@@ -25,14 +25,16 @@ fun formatTimestampToDate(timestamp: Timestamp): String {
 }
 
 /**
- * Coverts from a string to a type Timestamp for dd/MM/yyyy
+ * Converts from a string to a type Timestamp for dd/MM/yyyy
  *
  * @param dateString: String in dd/MM/yyyy
- * @return
+ * @return Timestamp
+ * @throws IllegalArgumentException if the date string is not valid
  */
 fun formatDateToTimestamp(dateString: String): Timestamp {
   val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-  val date = sdf.parse(dateString)
+  val date = sdf.parse(dateString) ?: throw IllegalArgumentException("Invalid date format: $dateString")
+
   return Timestamp(date)
 }
 
@@ -42,6 +44,6 @@ fun formatDateToTimestamp(dateString: String): Timestamp {
  * @param enum: string
  * @return string with capital letter and lowercase
  */
-fun fromCapitalStringtoLowercaseString(enum: String): String {
+fun fromCapitalStringToLowercaseString(enum: String): String {
   return enum.lowercase().replaceFirstChar { it.uppercase() }
 }
