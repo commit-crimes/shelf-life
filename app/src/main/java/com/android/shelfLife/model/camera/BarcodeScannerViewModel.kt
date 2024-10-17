@@ -32,9 +32,6 @@ class BarcodeScannerViewModel(application: Application) : AndroidViewModel(appli
   private var permissionRequested by
       mutableStateOf(sharedPreferences.getBoolean("permissionRequested", false))
 
-  private var scannedBarcode by mutableStateOf<String?>(null)
-    
-
   /** Checks if the camera permission is granted. */
   fun checkCameraPermission() {
     permissionGranted =

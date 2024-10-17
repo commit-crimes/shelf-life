@@ -8,25 +8,53 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+sealed class SearchStatus {
+  object Idle : SearchStatus()
+
+  object Loading : SearchStatus()
+
+  object Success : SearchStatus()
+
+  object Failure : SearchStatus()
+}
+
 class FoodFactsViewModel(private val repository: FoodFactsRepository) : ViewModel() {
 
-  // StateFlow to store the search query entered by the user
+  private val _searchStatus = MutableStateFlow<SearchStatus>(SearchStatus.Idle)
+  val searchStatus: StateFlow<SearchStatus> = _searchStatus
+
+  // Existing properties
   private val _query = MutableStateFlow("")
   val query: StateFlow<String> = _query
 
-  // StateFlow to store the list of FoodFacts suggestions from the repository
   private val _foodFactsSuggestions = MutableStateFlow<List<FoodFacts>>(emptyList())
   val foodFactsSuggestions: StateFlow<List<FoodFacts>> = _foodFactsSuggestions
+
+  // Modified search function
+  fun searchByBarcode(barcode: Long) {
+    viewModelScope.launch {
+      _searchStatus.value = SearchStatus.Loading
+      repository.searchFoodFacts(
+          searchInput = FoodSearchInput.Barcode(barcode),
+          onSuccess = { foodFactsList ->
+            _foodFactsSuggestions.value = foodFactsList
+            _searchStatus.value = SearchStatus.Success
+          },
+          onFailure = {
+            _foodFactsSuggestions.value = emptyList()
+            _searchStatus.value = SearchStatus.Failure
+          })
+    }
+  }
+
+  fun resetSearchStatus() {
+    _searchStatus.value = SearchStatus.Idle
+  }
 
   // Function to set a new query and trigger a search using a query string
   fun searchByQuery(newQuery: String) {
     _query.update { newQuery }
     searchFoodFacts(FoodSearchInput.Query(newQuery))
-  }
-
-  // Function to search using a barcode input
-  fun searchByBarcode(barcode: Long) {
-    searchFoodFacts(FoodSearchInput.Barcode(barcode))
   }
 
   // Private function to search FoodFacts using the repository with either Query or Barcode input
