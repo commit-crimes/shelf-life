@@ -18,7 +18,6 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
   }
 
   private val auth = FirebaseAuth.getInstance()
-
   /**
    * Generates a new unique ID for a food item.
    *
@@ -48,7 +47,6 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
         Log.e("FoodItemRepoFire", "init failed: user not logged in")
       }
     }
-    Log.d("FoodItemRepoFire", "init done")
   }
 
   /**
@@ -143,8 +141,9 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
           onFailure(exception)
         }
   }
+
   // Helper function to convert Firestore DocumentSnapshot into a FoodItem object
-  private fun convertToFoodItem(doc: DocumentSnapshot): FoodItem? {
+  fun convertToFoodItem(doc: DocumentSnapshot): FoodItem? {
     return try {
       val uid = doc.getString("uid") ?: return null
 
@@ -220,7 +219,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
    * @param doc The Firestore document to convert.
    * @return A FoodItem object.
    */
-  fun convertToFoodItemFromMap(map: Map<String, Any>): FoodItem? {
+  fun convertToFoodItemFromMap(map: Map<String, Any?>): FoodItem? {
     return try {
       val uid = map["uid"] as? String ?: return null
       val name = map["name"] as? String ?: return null

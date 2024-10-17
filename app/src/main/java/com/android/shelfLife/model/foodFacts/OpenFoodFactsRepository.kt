@@ -61,10 +61,7 @@ class OpenFoodFactsRepository(
    * @param searchInput The original search input used to determine the type of parsing.
    * @return A list of FoodFacts objects parsed from the response.
    */
-  private fun parseFoodFactsResponse(
-      responseBody: String,
-      searchInput: FoodSearchInput
-  ): List<FoodFacts> {
+  fun parseFoodFactsResponse(responseBody: String, searchInput: FoodSearchInput): List<FoodFacts> {
     return when (searchInput) {
       is FoodSearchInput.Barcode -> parseBarcodeResponse(responseBody)
       is FoodSearchInput.Query -> parseQueryResponse(responseBody)
@@ -72,7 +69,7 @@ class OpenFoodFactsRepository(
   }
 
   /** Parses the response for a barcode search into a list containing a single FoodFacts object. */
-  private fun parseBarcodeResponse(responseBody: String): List<FoodFacts> {
+  fun parseBarcodeResponse(responseBody: String): List<FoodFacts> {
     val jsonObject = JSONObject(responseBody)
     val productObject = jsonObject.optJSONObject("product")
 
@@ -85,7 +82,7 @@ class OpenFoodFactsRepository(
   }
 
   /** Parses the response for a query search into a list of FoodFacts objects. */
-  private fun parseQueryResponse(responseBody: String): List<FoodFacts> {
+  fun parseQueryResponse(responseBody: String): List<FoodFacts> {
     val jsonObject = JSONObject(responseBody)
     val productsArray = jsonObject.optJSONArray("products") ?: JSONArray()
     val foodFactsList = mutableListOf<FoodFacts>()
@@ -100,7 +97,7 @@ class OpenFoodFactsRepository(
   }
 
   /** Extracts FoodFacts details from a JSON object and maps them to the FoodFacts data class. */
-  private fun extractFoodFactsFromJson(productObject: JSONObject): FoodFacts {
+  fun extractFoodFactsFromJson(productObject: JSONObject): FoodFacts {
     val name = productObject.optString("product_name", "Unknown Product")
     val barcode = productObject.optString("code", "")
     val quantity = Quantity(amount = 1.0) // Assuming default quantity, adjust as needed
