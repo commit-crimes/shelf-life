@@ -54,6 +54,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -324,33 +326,44 @@ fun startCamera(
 
 @Composable
 fun PermissionDeniedScreen(navigationActions: NavigationActions) {
-  val context = LocalContext.current
-  Scaffold(
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { selected -> navigationActions.navigateTo(selected) },
-            tabList = LIST_TOP_LEVEL_DESTINATION,
-            selectedItem = Route.SCANNER)
-      }) { paddingVals ->
+    val context = LocalContext.current
+    Scaffold(
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelect = { selected -> navigationActions.navigateTo(selected) },
+                tabList = LIST_TOP_LEVEL_DESTINATION,
+                selectedItem = Route.SCANNER
+            )
+        },
+        modifier = Modifier.semantics { testTag = "permissionDeniedScreen" }
+    ) { paddingVals ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(paddingVals),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingVals)
+                .semantics { testTag = "permissionDeniedColumn" },
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally) {
-              Text(text = "Camera permission is required to scan barcodes.")
-              Spacer(modifier = Modifier.height(16.dp))
-              Button(
-                  onClick = {
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Camera permission is required to scan barcodes.",
+                modifier = Modifier.semantics { testTag = "permissionDeniedMessage" }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = {
                     // Open app settings
-                    val intent =
-                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                          data = Uri.fromParts("package", context.packageName, null)
-                        }
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                        data = Uri.fromParts("package", context.packageName, null)
+                    }
                     context.startActivity(intent)
-                  }) {
-                    Text(text = "Open Settings")
-                  }
+                },
+                modifier = Modifier.semantics { testTag = "openSettingsButton" }
+            ) {
+                Text(text = "Open Settings")
             }
-      }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
