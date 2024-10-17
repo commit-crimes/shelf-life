@@ -13,11 +13,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemRepository {
 
-    companion object {
-        private const val COLLECTION_PATH = "foodItems"
-    }
+  companion object {
+    private const val COLLECTION_PATH = "foodItems"
+  }
 
-    private val auth = FirebaseAuth.getInstance()
+  private val auth = FirebaseAuth.getInstance()
 
   /**
    * Generates a new unique ID for a food item.

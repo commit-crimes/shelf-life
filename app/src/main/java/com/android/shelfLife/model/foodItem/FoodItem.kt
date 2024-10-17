@@ -17,7 +17,8 @@ import com.google.firebase.Timestamp
  *   fridge). Default: PANTRY.
  * @property expiryDate Expiry date of the food item, if available.
  * @property openDate The date the food item was opened, if applicable.
- * @property buyDate The date the food item was purchased or added to inventory. Default: current time.
+ * @property buyDate The date the food item was purchased or added to inventory. Default: current
+ *   time.
  */
 data class FoodItem(
     val uid: String,
