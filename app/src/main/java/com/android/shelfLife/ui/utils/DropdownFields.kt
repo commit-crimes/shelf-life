@@ -9,6 +9,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 
 /**
  * Creates a working dropDown menu in which you can choose from different items
@@ -37,7 +38,7 @@ fun <T> DropdownFields(
   ExposedDropdownMenuBox(
       expanded = expanded,
       onExpandedChange = { onExpandedChange(!expanded) },
-      modifier = modifier) {
+      modifier = modifier.testTag("dropDownField")) {
         OutlinedTextField(
             value = optionLabel(selectedOption),
             onValueChange = {},
@@ -52,7 +53,8 @@ fun <T> DropdownFields(
                 onClick = {
                   onOptionSelected(option)
                   onExpandedChange(false)
-                })
+                },
+                modifier = Modifier.testTag("dropDownItem_${optionLabel(option)}"))
           }
         }
       }
