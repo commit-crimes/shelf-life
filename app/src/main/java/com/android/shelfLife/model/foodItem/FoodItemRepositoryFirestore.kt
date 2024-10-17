@@ -62,11 +62,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
         .get()
         .addOnSuccessListener { result ->
           val foodItemList = mutableListOf<FoodItem>()
-          Log.e("FoodItemRepository", "list: $foodItemList")
-          Log.e("FoodItemRepository", "res: $result")
-
           for (document in result) {
-            Log.e("FoodItemRepository", "Doc: $document")
             val foodItem = convertToFoodItem(document)
             if (foodItem != null) foodItemList.add(foodItem)
           }
