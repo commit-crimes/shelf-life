@@ -1,4 +1,4 @@
-name: ShelfLife CI - Test Runner
+name: Bootcamp CI - Test Runner
 
 # Run the workflow when commits are pushed on main or when a PR is modified
 on:
@@ -13,14 +13,13 @@ on:
       - reopened
 
 jobs:
-  shelflife-ci:
-    name: CI-ShelfLife
-    # Execute the CI on the course's runners
-    runs-on:
-      group: runners_v1
+  bootcamp-ci:
+    name: CI-Bootcamp
+    # Use a GitHub-hosted runner
+    runs-on: ubuntu-latest
 
     env:
-      app_name: ShelfLifeDebug
+      app_name: BootcampDebug
 
     defaults:
       run:
@@ -101,9 +100,8 @@ jobs:
 
   exercises:
     name: Exercises
-    # Execute the CI on the course's runners
-    runs-on:
-      group: runners_v1
+    # Use a GitHub-hosted runner
+    runs-on: ubuntu-latest
 
     defaults:
       run:
