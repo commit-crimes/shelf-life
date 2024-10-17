@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -101,48 +100,48 @@ fun RecipesScreen(
               }
             }
 
-    if (selectedHousehold == null) {
-      FirstTimeWelcomeScreen(householdViewModel)
-    } else {
-      Scaffold(
-          modifier = Modifier.testTag("recipesScreen"),
-          topBar = {
-            selectedHousehold?.let {
-              TopNavigationBar(
-                  houseHold = it,
-                  onHamburgerClick = { scope.launch { drawerState.open() } },
-                  filters = filters)
-            }
-          },
-          bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.RECIPES)
-          },
-          content = { paddingValues ->
-            Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-              RecipesSearchBar(query) { newQuery ->
-                query = newQuery // Update the query when user types
-              } // Pass query and update function to the search bar
+        if (selectedHousehold == null) {
+          FirstTimeWelcomeScreen(householdViewModel)
+        } else {
+          Scaffold(
+              modifier = Modifier.testTag("recipesScreen"),
+              topBar = {
+                selectedHousehold?.let {
+                  TopNavigationBar(
+                      houseHold = it,
+                      onHamburgerClick = { scope.launch { drawerState.open() } },
+                      filters = filters)
+                }
+              },
+              bottomBar = {
+                BottomNavigationMenu(
+                    onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                    tabList = LIST_TOP_LEVEL_DESTINATION,
+                    selectedItem = Route.RECIPES)
+              },
+              content = { paddingValues ->
+                Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+                  RecipesSearchBar(query) { newQuery ->
+                    query = newQuery // Update the query when user types
+                  } // Pass query and update function to the search bar
 
-              if (filteredRecipes.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    content = { Text(text = "No recipes available", modifier = Modifier) },
-                    contentAlignment = Alignment.Center)
-              } else {
-                // LazyColumn for displaying the list of filtered recipes
-                LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
-                  items(filteredRecipes) { recipe ->
-                    RecipeItem(recipe, navigationActions, listRecipesViewModel)
+                  if (filteredRecipes.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        content = { Text(text = "No recipes available", modifier = Modifier) },
+                        contentAlignment = Alignment.Center)
+                  } else {
+                    // LazyColumn for displaying the list of filtered recipes
+                    LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
+                      items(filteredRecipes) { recipe ->
+                        RecipeItem(recipe, navigationActions, listRecipesViewModel)
+                      }
+                    }
                   }
                 }
-              }
-            }
-          })
-    }
-  }
+              })
+        }
+      }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

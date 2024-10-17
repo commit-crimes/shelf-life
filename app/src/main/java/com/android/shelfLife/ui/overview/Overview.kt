@@ -19,7 +19,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
@@ -37,10 +36,7 @@ import kotlinx.coroutines.launch
  * @param householdViewModel The ViewModel for the households the user has access to
  */
 @Composable
-fun OverviewScreen(
-    navigationActions: NavigationActions,
-    householdViewModel: HouseholdViewModel
-) {
+fun OverviewScreen(navigationActions: NavigationActions, householdViewModel: HouseholdViewModel) {
   val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
   var searchQuery by remember { mutableStateOf("") }
   val foodItems = selectedHousehold?.foodItems ?: emptyList()
@@ -97,5 +93,5 @@ fun OverviewScreen(
             }
           }
         }
-  }
+      }
 }
