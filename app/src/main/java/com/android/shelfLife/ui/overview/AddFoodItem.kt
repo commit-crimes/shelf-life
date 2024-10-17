@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -67,14 +68,20 @@ fun AddFoodItemScreen(
   var locationExpanded by remember { mutableStateOf(false) }
 
   Scaffold(
-      modifier = Modifier.fillMaxSize(),
+      modifier = Modifier.fillMaxSize().testTag("addScreen"),
       topBar = {
         TopAppBar(
-            title = { Text(stringResource(id = R.string.add_food_item_title)) },
+            title = {
+              Text(
+                  modifier = Modifier.testTag("addFoodItemTitle"),
+                  text = stringResource(id = R.string.add_food_item_title))
+            },
             navigationIcon = {
-              IconButton(onClick = { navigationActions.goBack() }) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "Go Back")
-              }
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("goBackButton")) {
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "Go Back")
+                  }
             })
       },
   ) { padding ->
@@ -86,7 +93,7 @@ fun AddFoodItemScreen(
               value = foodName,
               onValueChange = { foodName = it },
               label = { Text(stringResource(id = R.string.food_name_hint)) },
-              modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp))
+              modifier = Modifier.testTag("inputFoodName").fillMaxWidth().padding(bottom = 16.dp))
 
           Row(
               modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
@@ -96,7 +103,7 @@ fun AddFoodItemScreen(
                     onValueChange = { amount = it },
                     label = { Text(stringResource(id = R.string.amount_hint)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f).padding(end = 8.dp))
+                    modifier = Modifier.testTag("inputFoodAmount").weight(1f).padding(end = 8.dp))
 
                 DropdownFields(
                     label = stringResource(id = R.string.unit_label),
@@ -106,7 +113,7 @@ fun AddFoodItemScreen(
                     expanded = unitExpanded,
                     onExpandedChange = { unitExpanded = it },
                     optionLabel = { fromCapitalStringtoLowercaseString(it.name) },
-                    modifier = Modifier.weight(1f))
+                    modifier = Modifier.weight(1f).testTag("inputFoodUnit"))
               }
 
           // Category dropdown
@@ -117,7 +124,8 @@ fun AddFoodItemScreen(
               onOptionSelected = { category = it },
               expanded = categoryExpanded,
               onExpandedChange = { categoryExpanded = it },
-              optionLabel = { fromCapitalStringtoLowercaseString(it.name) })
+              optionLabel = { fromCapitalStringtoLowercaseString(it.name) },
+              modifier = Modifier.testTag("inputFoodCategory"))
 
           Spacer(modifier = Modifier.height(16.dp))
 
@@ -128,14 +136,16 @@ fun AddFoodItemScreen(
               onOptionSelected = { location = it },
               expanded = locationExpanded,
               onExpandedChange = { locationExpanded = it },
-              optionLabel = { fromCapitalStringtoLowercaseString(it.name) })
+              optionLabel = { fromCapitalStringtoLowercaseString(it.name) },
+              modifier = Modifier.testTag("inputFoodLocation"))
 
           OutlinedTextField(
               value = expireDate,
               onValueChange = { expireDate = it },
               label = { Text(stringResource(id = R.string.expire_date_hint)) },
               placeholder = { Text("dd/mm/yyyy") },
-              modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+              modifier =
+                  Modifier.testTag("inputFoodExpireDate").fillMaxWidth().padding(bottom = 16.dp),
           )
 
           OutlinedTextField(
@@ -143,7 +153,8 @@ fun AddFoodItemScreen(
               onValueChange = { openDate = it },
               label = { Text(stringResource(id = R.string.open_date_hint)) },
               placeholder = { Text("dd/mm/yyyy") },
-              modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+              modifier =
+                  Modifier.testTag("inputFoodOpenDate").fillMaxWidth().padding(bottom = 16.dp),
           )
 
           OutlinedTextField(
@@ -151,7 +162,8 @@ fun AddFoodItemScreen(
               onValueChange = { buyDate = it },
               label = { Text(stringResource(id = R.string.buy_date_hint)) },
               placeholder = { Text("dd/mm/yyyy") },
-              modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
+              modifier =
+                  Modifier.testTag("inputFoodBuyDate").fillMaxWidth().padding(bottom = 32.dp),
           )
 
           Button(
@@ -163,10 +175,18 @@ fun AddFoodItemScreen(
                 try {
                   val expireDateParsed = sdf.parse(expireDate)
                   val openDateParsed = sdf.parse(openDate)
+                  val buyDateParsed = sdf.parse(buyDate)
 
                   // Error if the expiration date is before the open date
                   if (expireDateParsed.before(openDateParsed)) {
                     errorMessages["date"] = "Expiration date cannot be before the open date."
+                  }
+
+                  // Error if the buy date is after the open date or expiration date
+                  if (buyDateParsed.after(openDateParsed) ||
+                      buyDateParsed.after(expireDateParsed)) {
+                    errorMessages["buyDate"] =
+                        "Buy date cannot be after the open date or expiration date."
                   }
                 } catch (e: Exception) {
                   errorMessages["dateFormat"] = "Invalid date format. Please use dd/mm/yyyy."
@@ -206,7 +226,7 @@ fun AddFoodItemScreen(
                   navigationActions.goBack()
                 }
               },
-              modifier = Modifier.fillMaxWidth().height(50.dp),
+              modifier = Modifier.testTag("foodSave").fillMaxWidth().height(50.dp),
               colors = ButtonDefaults.buttonColors(containerColor = primaryContainerLight)) {
                 Text(text = "Submit", fontSize = 18.sp)
               }
