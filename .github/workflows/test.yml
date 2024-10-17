@@ -119,26 +119,17 @@ jobs:
       # This step generates the coverage report which will be uploaded to sonar
       - name: Generate Coverage Report
         run: |
-          ./gradlew jacocoTestReport
+          ./gradlew jacocoTestReport --info
 
-      - name: List build directory contents
+      - name: List all generated files
         run: |
-          echo "Listing contents of Jacoco report directory:"
-          ls -R build/reports/jacoco/test/
-
-          echo "Listing contents of test results directory:"
-          ls -R build/test-results/test/
-
-          echo "Listing contents of test directory:"
-          ls -R build/test/
-
-          echo "Listing contents of build directory:"
-          ls -R build/test-results/
-          
-          "Listing contents of build reports directory:"
-          ls -R build/reports/
-      
-      
+          echo "Listing all files in the project directory:"
+          find . -type f  
+  
+    
+    
+    
+    
 
       # Upload the various reports to sonar
       - name: Upload report to SonarCloud
