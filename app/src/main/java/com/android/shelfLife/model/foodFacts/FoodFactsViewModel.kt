@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 sealed class SearchStatus {
-  object Idle : SearchStatus()
+ data object Idle : SearchStatus()
 
-  object Loading : SearchStatus()
+ data object Loading : SearchStatus()
 
-  object Success : SearchStatus()
+ data object Success : SearchStatus()
 
-  object Failure : SearchStatus()
+ data object Failure : SearchStatus()
 }
 
 class FoodFactsViewModel(private val repository: FoodFactsRepository) : ViewModel() {
