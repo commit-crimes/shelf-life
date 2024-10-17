@@ -68,3 +68,4 @@ app/build/
 
 # Ignore CI workflows (if you don't want to track them)
 .github/
+.gradle

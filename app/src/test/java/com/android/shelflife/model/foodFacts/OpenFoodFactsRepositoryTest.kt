@@ -124,48 +124,48 @@ class OpenFoodFactsRepositoryTest {
     assertTrue(exceptionThrown is IOException)
   }
 
-  //@Test
+  // @Test
   /*fun `fetch real FoodFacts from OpenFoodFacts API and verify Nutella details`() {
-    val barcodeInput = FoodSearchInput.Barcode(3017620425035) // Barcode for Nutella
-    val latch = CountDownLatch(1)
-    var result: List<FoodFacts>? = null
+      val barcodeInput = FoodSearchInput.Barcode(3017620425035) // Barcode for Nutella
+      val latch = CountDownLatch(1)
+      var result: List<FoodFacts>? = null
 
-    openFoodFactsRepository.searchFoodFacts(
-        barcodeInput,
-        onSuccess = { foodFactsList ->
-          result = foodFactsList
-          latch.countDown()
-        },
-        onFailure = { exception ->
-          println("Error fetching FoodFacts: ${exception.message}")
-          latch.countDown()
-        })
+      openFoodFactsRepository.searchFoodFacts(
+          barcodeInput,
+          onSuccess = { foodFactsList ->
+            result = foodFactsList
+            latch.countDown()
+          },
+          onFailure = { exception ->
+            println("Error fetching FoodFacts: ${exception.message}")
+            latch.countDown()
+          })
 
-    latch.await(10, TimeUnit.SECONDS) // Wait for a maximum of 10 seconds for the response
+      latch.await(10, TimeUnit.SECONDS) // Wait for a maximum of 10 seconds for the response
 
-    // Then: Verify that the correct FoodFacts for Nutella is returned
-      //assertTrue(result != null && result!!.isNotEmpty())
+      // Then: Verify that the correct FoodFacts for Nutella is returned
+        //assertTrue(result != null && result!!.isNotEmpty())
 
-    val foodFacts = result!!.first()
+      val foodFacts = result!!.first()
 
-    assertEquals("Nutella", foodFacts.name)
-    assertEquals("3017620425035", foodFacts.barcode)
-    assertEquals(1.0, foodFacts.quantity.amount, 0.0001)
-    assertEquals(FoodUnit.GRAM, foodFacts.quantity.unit)
-    assertEquals(FoodCategory.OTHER, foodFacts.category)
+      assertEquals("Nutella", foodFacts.name)
+      assertEquals("3017620425035", foodFacts.barcode)
+      assertEquals(1.0, foodFacts.quantity.amount, 0.0001)
+      assertEquals(FoodUnit.GRAM, foodFacts.quantity.unit)
+      assertEquals(FoodCategory.OTHER, foodFacts.category)
 
-    val nutritionFacts = foodFacts.nutritionFacts
-    assertEquals(539, nutritionFacts.energyKcal)
-    assertEquals(30.9, nutritionFacts.fat, 0.0001)
-    assertEquals(10.6, nutritionFacts.saturatedFat, 0.0001)
-    assertEquals(57.5, nutritionFacts.carbohydrates, 0.0001)
-    assertEquals(56.3, nutritionFacts.sugars, 0.0001)
-    assertEquals(6.3, nutritionFacts.proteins, 0.0001)
-    assertEquals(0.107, nutritionFacts.salt, 0.0001)
+      val nutritionFacts = foodFacts.nutritionFacts
+      assertEquals(539, nutritionFacts.energyKcal)
+      assertEquals(30.9, nutritionFacts.fat, 0.0001)
+      assertEquals(10.6, nutritionFacts.saturatedFat, 0.0001)
+      assertEquals(57.5, nutritionFacts.carbohydrates, 0.0001)
+      assertEquals(56.3, nutritionFacts.sugars, 0.0001)
+      assertEquals(6.3, nutritionFacts.proteins, 0.0001)
+      assertEquals(0.107, nutritionFacts.salt, 0.0001)
 
-    println("Verified FoodFacts for Nutella: $foodFacts")
-  }
-*/
+      println("Verified FoodFacts for Nutella: $foodFacts")
+    }
+  */
   @Test
   fun `fetch real FoodFacts from OpenFoodFacts API`() {
     val stringInput = FoodSearchInput.Query("banana")

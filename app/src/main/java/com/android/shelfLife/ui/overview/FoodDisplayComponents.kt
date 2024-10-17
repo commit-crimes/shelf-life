@@ -72,7 +72,8 @@ fun FoodItemCard(foodItem: FoodItem) {
           ?: "No Expiry Date"
   Column(
       modifier =
-          Modifier.fillMaxWidth().testTag("foodItemCard")
+          Modifier.fillMaxWidth()
+              .testTag("foodItemCard")
               .padding(vertical = 8.dp, horizontal = 16.dp)
               .background(Color.White) // Add background color if needed
               .padding(16.dp)) {
