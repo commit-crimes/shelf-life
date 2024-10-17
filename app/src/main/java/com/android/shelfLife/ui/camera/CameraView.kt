@@ -415,11 +415,12 @@ fun ScannedItemFoodScreen(
 
           // For dates a future improvement could be having a calendar interface rather than manual
           // input
+        val dateFormat = "dd/mm/yyyy"
           OutlinedTextField(
               value = expireDate,
               onValueChange = { expireDate = it },
               label = { Text("Expire Date") },
-              placeholder = { Text("dd/mm/yyyy") },
+              placeholder = { Text(dateFormat) },
               modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
           )
 
@@ -427,7 +428,7 @@ fun ScannedItemFoodScreen(
               value = openDate,
               onValueChange = { openDate = it },
               label = { Text("Open Date") },
-              placeholder = { Text("dd/mm/yyyy") },
+              placeholder = { Text(dateFormat) },
               modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
           )
 
@@ -435,7 +436,7 @@ fun ScannedItemFoodScreen(
               value = buyDate,
               onValueChange = { buyDate = it },
               label = { Text("Buy Date") },
-              placeholder = { Text("dd/mm/yyyy") },
+              placeholder = { Text(dateFormat) },
               modifier = Modifier.fillMaxWidth().padding(bottom = 32.dp),
           )
 
