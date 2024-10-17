@@ -1,4 +1,4 @@
-package com.android.shelflife.model.foodItem
+package com.android.shelfLife.model.foodItem
 
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
@@ -7,10 +7,6 @@ import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.foodItem.FoodItem
-import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
-import com.android.shelfLife.model.foodItem.FoodStatus
-import com.android.shelfLife.model.foodItem.FoodStorageLocation
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp

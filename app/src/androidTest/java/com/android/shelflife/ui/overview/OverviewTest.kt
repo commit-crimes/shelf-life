@@ -1,4 +1,4 @@
-package com.android.shelflife.ui.overview
+package com.android.shelfLife.ui.overview
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -15,7 +15,6 @@ import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.overview.OverviewScreen
 import com.google.firebase.Timestamp
 import java.util.*
 import org.junit.Before
