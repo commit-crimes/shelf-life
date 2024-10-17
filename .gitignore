@@ -64,12 +64,6 @@ app/build/
 *.ap_
 *.dex
 
-# Ignore gradle wrapper files (if you want)
-gradlew
-gradlew.bat
-
-
-
 # Ignore generated files
 *.json
 
