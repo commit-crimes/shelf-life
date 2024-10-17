@@ -27,14 +27,42 @@ class OpenAiRecipesRepository(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : RecipesRepository {
 
+    // Define custom prompts for different recipe types
+    private fun getPromptsForMode(
+        listFoodItems: List<FoodItem>,
+        searchRecipeType: RecipesRepository.SearchRecipeType
+    ): Pair<String, String> {
+        val foodItemsNames = listFoodItems.joinToString(", ") { it.toString() }
+
+        // System and user prompts based on the recipe search type
+        return when (searchRecipeType) {
+            RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE -> {
+                "You are an assistant who generates recipes using ingredients that are about to expire." to
+                        "Create a recipe using the following ingredients that are about to expire: $foodItemsNames."
+            }
+            RecipesRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS -> {
+                "You are an assistant who generates recipes using common household ingredients." to
+                        "Create a recipe using the following common household ingredients: $foodItemsNames."
+            }
+            RecipesRepository.SearchRecipeType.HIGH_PROTEIN -> {
+                "You are an assistant who generates high-protein recipes." to
+                        "Create a high-protein recipe using the following ingredients: $foodItemsNames."
+            }
+            RecipesRepository.SearchRecipeType.LOW_CALORIE -> {
+                "You are an assistant who generates low-calorie recipes." to
+                        "Create a low-calorie recipe using the following ingredients: $foodItemsNames."
+            }
+        }
+    }
+
     override fun generateRecipes(
         listFoodItems: List<FoodItem>,
         searchRecipeType: RecipesRepository.SearchRecipeType,
         onSuccess: (List<Recipe>) -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        val foodItemsNames = "kisses, love, chicken"//listFoodItems.joinToString { it.name }  // Convert the food items into a comma-separated string
-        val prompt = "Create a recipe using the following ingredients: $foodItemsNames."
+        // Get the custom system and user prompts based on the mode
+        val (systemPrompt, userPrompt) = getPromptsForMode(listFoodItems, searchRecipeType)
 
         // Launch a coroutine
         CoroutineScope(dispatcher).launch {
@@ -63,25 +91,28 @@ class OpenAiRecipesRepository(
                             putJsonObject("items") {
                                 put("type", "string")
                             }
-                            put("description", "Step by step instructions for the recipe")
+                            put("description", "Step-by-step instructions for the recipe")
                         }
                     }
                     putJsonArray("required") {
                         add("ingredients")
                         add("servings")
                         add("time")
-                        add("instructions") // Make sure instructions are required
+                        add("instructions")
                     }
                 }
 
-
-                // Create the chat completion request with tool call
+                // Create the chat completion request with the system and user prompts
                 val request = chatCompletionRequest {
                     model = ModelId("gpt-4o-mini")
                     messages = listOf(
                         ChatMessage(
+                            role = ChatRole.System,
+                            content = systemPrompt // System prompt
+                        ),
+                        ChatMessage(
                             role = ChatRole.User,
-                            content = prompt
+                            content = userPrompt // User prompt with food items
                         )
                     )
                     tools {
@@ -106,7 +137,8 @@ class OpenAiRecipesRepository(
                         name = "Generated Recipe",
                         instructions = toolResponse.instructions,
                         servings = toolResponse.servings,
-                        time = toolResponse.time
+                        time = toolResponse.time,
+                        ingredients = toolResponse.ingredients
                     )
 
                     onSuccess(listOf(generatedRecipe))  // Return the generated recipe
@@ -117,14 +149,8 @@ class OpenAiRecipesRepository(
         }
     }
 
-    /**
-     * A map that associates function names with their corresponding functions.
-     */
     private val availableFunctions = mapOf("_createRecipeFunction" to ::_createRecipeFunction)
 
-    /**
-     * Executes a function call and returns its result.
-     */
     private fun ToolCall.Function.execute(): Recipe {
         val functionToCall =
             availableFunctions[function.name] ?: error("Function ${function.name} not found")
@@ -142,7 +168,7 @@ class OpenAiRecipesRepository(
     private fun _createRecipeFunction(ingredients: List<String>, instructions: List<String>, servings: Int, time: Duration): Recipe {
         return Recipe(
             name = "Generated Recipe",
-            instructions = instructions.mapIndexed { i, instruction -> "${i + 1}. $instruction" }.joinToString("\n"),
+            instructions = instructions,
             servings = servings,
             time = time
         )
