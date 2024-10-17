@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.gms)
-    id("org.sonarqube") version "4.3.0.3225"
+    id("org.sonarqube") version "5.1.0.4882"
 }
 
 android {
@@ -124,6 +124,13 @@ sonarqube {
     }
 }
 
+sonar {
+    properties {
+        property("sonar.projectKey", "commit-crimes_shelf-life")
+        property("sonar.organization", "commit-crimes")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
+}
 dependencies {
 
 
