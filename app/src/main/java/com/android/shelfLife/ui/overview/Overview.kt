@@ -34,13 +34,11 @@ import kotlinx.coroutines.launch
  * Composable function to display the overview screen
  *
  * @param navigationActions The actions to handle navigation
- * @param listFoodItemsViewModel The ViewModel for the list of food items
  * @param householdViewModel The ViewModel for the households the user has access to
  */
 @Composable
 fun OverviewScreen(
     navigationActions: NavigationActions,
-    listFoodItemsViewModel: ListFoodItemsViewModel,
     householdViewModel: HouseholdViewModel
 ) {
   val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
