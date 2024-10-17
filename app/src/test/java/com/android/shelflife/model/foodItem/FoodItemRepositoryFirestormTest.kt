@@ -4,22 +4,18 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.*
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
@@ -33,8 +29,6 @@ class FoodItemRepositoryFirestoreTest {
   @Mock private lateinit var auth: FirebaseAuth
 
   @Mock private lateinit var authStateListener: FirebaseAuth.AuthStateListener
-
-  @Mock private lateinit var currentUser: FirebaseUser
 
   @Mock private lateinit var collectionReference: CollectionReference
 
@@ -50,17 +44,9 @@ class FoodItemRepositoryFirestoreTest {
 
   @Mock private lateinit var timestamp: Timestamp
 
-  @Captor
-  private lateinit var authStateListenerCaptor: ArgumentCaptor<FirebaseAuth.AuthStateListener>
-
-  @Captor
-  private lateinit var onCompleteListenerCaptor: ArgumentCaptor<OnCompleteListener<QuerySnapshot>>
-
-  @Captor private lateinit var onSuccessListenerCaptor: ArgumentCaptor<OnSuccessListener<Void>>
-
-  @Captor private lateinit var onFailureListenerCaptor: ArgumentCaptor<OnFailureListener>
-
   private lateinit var repo: FoodItemRepositoryFirestore
+
+  private val foodItem = mock(FoodItem::class.java)
 
   @Before
   fun setUp() {
@@ -103,7 +89,7 @@ class FoodItemRepositoryFirestoreTest {
   }
 
   @Test
-  fun testGetFoodItems_onSuccess_callsOnSuccessWithFoodItems() {
+  fun testGetFI_onSuccess_callsOnSuccessWithFoodItems() {
     // Mock Firestore query results
     val queryDocumentSnapshot = mock(QueryDocumentSnapshot::class.java)
     `when`(collectionReference.get()).thenReturn(taskQuerySnapshot)
@@ -136,7 +122,7 @@ class FoodItemRepositoryFirestoreTest {
   }
 
   @Test
-  fun testGetFoodItems_onFailure_callsOnFailure() {
+  fun testGetFI_onFailure_callsOnFailure() {
     `when`(collectionReference.get()).thenReturn(taskQuerySnapshot)
     `when`(taskQuerySnapshot.addOnSuccessListener(any())).thenReturn(taskQuerySnapshot)
     `when`(taskQuerySnapshot.addOnFailureListener(any())).thenAnswer {
@@ -157,8 +143,7 @@ class FoodItemRepositoryFirestoreTest {
   }
 
   @Test
-  fun testAddFoodItem_onSuccess_callsOnSuccess() {
-    val foodItem = mock(FoodItem::class.java)
+  fun testAddFI_onSuccess_callsOnSuccess() {
     `when`(foodItem.uid).thenReturn("test_uid")
     `when`(documentReference.set(foodItem)).thenReturn(taskVoid)
     `when`(taskVoid.addOnSuccessListener(any())).thenAnswer {
@@ -177,8 +162,7 @@ class FoodItemRepositoryFirestoreTest {
   }
 
   @Test
-  fun testAddFoodItem_onFailure_callsOnFailure() {
-    val foodItem = mock(FoodItem::class.java)
+  fun testAddFI_onFailure_callsOnFailure() {
     `when`(foodItem.uid).thenReturn("test_uid")
     `when`(documentReference.set(foodItem)).thenReturn(taskVoid)
     `when`(taskVoid.addOnSuccessListener(any())).thenReturn(taskVoid)
@@ -201,8 +185,7 @@ class FoodItemRepositoryFirestoreTest {
   }
 
   @Test
-  fun testUpdateFoodItem_onSuccess_callsOnSuccess() {
-    val foodItem = mock(FoodItem::class.java)
+  fun testUpFI_onSuccess_callsOnSuccess() {
     `when`(foodItem.uid).thenReturn("test_uid")
     `when`(documentReference.set(foodItem)).thenReturn(taskVoid)
     `when`(taskVoid.addOnSuccessListener(any())).thenAnswer {
@@ -221,8 +204,7 @@ class FoodItemRepositoryFirestoreTest {
   }
 
   @Test
-  fun testUpdateFoodItem_onFailure_callsOnFailure() {
-    val foodItem = mock(FoodItem::class.java)
+  fun testUpFI_onFailure_callsOnFailure() {
     `when`(foodItem.uid).thenReturn("test_uid")
     `when`(documentReference.set(foodItem)).thenReturn(taskVoid)
     `when`(taskVoid.addOnSuccessListener(any())).thenReturn(taskVoid)
@@ -245,7 +227,7 @@ class FoodItemRepositoryFirestoreTest {
   }
 
   @Test
-  fun testDeleteFoodItemById_onSuccess_callsOnSuccess() {
+  fun testDelFIById_onSuccess_callsOnSuccess() {
     `when`(documentReference.delete()).thenReturn(taskVoid)
     `when`(taskVoid.addOnSuccessListener(any())).thenAnswer {
       val listener = it.getArgument<OnSuccessListener<Void>>(0)
@@ -263,7 +245,7 @@ class FoodItemRepositoryFirestoreTest {
   }
 
   @Test
-  fun testDeleteFoodItemById_onFailure_callsOnFailure() {
+  fun testDelFIById_onFailure_callsOnFailure() {
     `when`(documentReference.delete()).thenReturn(taskVoid)
     `when`(taskVoid.addOnSuccessListener(any())).thenReturn(taskVoid)
     `when`(taskVoid.addOnFailureListener(any())).thenAnswer {
@@ -285,7 +267,7 @@ class FoodItemRepositoryFirestoreTest {
   }
 
   @Test
-  fun testConvertToFoodItem_validDocument_returnsFoodItem() {
+  fun testConvToFI_validDocument_returnsFoodItem() {
     mockDocumentSnapshot(documentSnapshot)
 
     val foodItem = repo.convertToFoodItem(documentSnapshot)
@@ -303,7 +285,7 @@ class FoodItemRepositoryFirestoreTest {
   }
 
   @Test
-  fun testConvertToFoodItem_missingRequiredField_returnsNull() {
+  fun testConvToFI_missingRequiredField_returnsNull() {
     `when`(documentSnapshot.getString("uid")).thenReturn(null)
 
     val foodItem = repo.convertToFoodItem(documentSnapshot)
@@ -345,7 +327,7 @@ class FoodItemRepositoryFirestoreTest {
   }
 
   @Test
-  fun testConvertToFoodItemFromMap_ValidInput() {
+  fun testConvertToFIFromMap_ValidInput() {
     val validMap =
         mapOf(
             "uid" to "testUid",
@@ -368,7 +350,7 @@ class FoodItemRepositoryFirestoreTest {
   }
 
   @Test
-  fun testConvertToFoodItemFromMap_MissingFields() {
+  fun testConvToFIFromMap_MissingFields() {
     val incompleteMap =
         mapOf(
             "uid" to "testUid",
@@ -386,7 +368,7 @@ class FoodItemRepositoryFirestoreTest {
   }
 
   @Test
-  fun testConvertToFoodItemFromMap_NullValues() {
+  fun testConvToFIFromMap_NullValues() {
     val mapWithNulls =
         mapOf(
             "uid" to "testUid",
@@ -401,7 +383,7 @@ class FoodItemRepositoryFirestoreTest {
   }
 
   @Test
-  fun testConvertFoodItemToMap_ValidFoodItem() {
+  fun testConvertFIToMap_ValidFoodItem() {
     val quantity = Quantity(2.0, FoodUnit.GRAM)
     val foodFacts = FoodFacts(name = "Apple", barcode = "123456789012", quantity = quantity)
     val foodItem =
@@ -424,7 +406,7 @@ class FoodItemRepositoryFirestoreTest {
   }
 
   @Test
-  fun testConvertFoodItemToMap_DefaultValues() {
+  fun testConvFIToMap_DefaultValues() {
     val quantity = Quantity(1.0, FoodUnit.GRAM)
     val foodFacts = FoodFacts(name = "Apple", quantity = quantity)
     val foodItem =
