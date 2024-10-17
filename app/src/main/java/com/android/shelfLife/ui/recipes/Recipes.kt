@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,9 +33,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -103,7 +104,7 @@ fun RecipesScreen(
           FirstTimeWelcomeScreen(householdViewModel)
         } else {
           Scaffold(
-              modifier = Modifier,
+              modifier = Modifier.testTag("recipesScreen"),
               topBar = {
                 selectedHousehold?.let {
                   TopNavigationBar(
@@ -124,10 +125,17 @@ fun RecipesScreen(
                     query = newQuery // Update the query when user types
                   } // Pass query and update function to the search bar
 
-                  // LazyColumn for displaying the list of filtered recipes
-                  LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(filteredRecipes) { recipe ->
-                      RecipeItem(recipe, navigationActions, listRecipesViewModel)
+                  if (filteredRecipes.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        content = { Text(text = "No recipes available", modifier = Modifier) },
+                        contentAlignment = Alignment.Center)
+                  } else {
+                    // LazyColumn for displaying the list of filtered recipes
+                    LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
+                      items(filteredRecipes) { recipe ->
+                        RecipeItem(recipe, navigationActions, listRecipesViewModel)
+                      }
                     }
                   }
                 }
@@ -161,7 +169,9 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
 
   Box(
       modifier =
-          Modifier.fillMaxWidth().height(100.dp) // Set a fixed height for the search bar container
+          Modifier.fillMaxWidth()
+              .height(100.dp)
+              .testTag("recipeSearchBar") // Set a fixed height for the search bar container
       ) {
         SearchBar(
             query = query, // The current query string displayed in the search bar
@@ -177,7 +187,9 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
             active = isActive, // Determines whether the search bar is in an active state
             onActiveChange = { active -> isActive = active }, // Callback to update the active state
             modifier =
-                Modifier.fillMaxWidth().padding(horizontal = 8.dp), // Padding around the search bar
+                Modifier.fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+                    .testTag("searchBar"), // Padding around the search bar
             trailingIcon = {
               IconButton(onClick = { isActive = false }) { // Button to deactivate the search bar
                 Icon(
@@ -209,12 +221,12 @@ fun RecipeItem(
   var clickOnRecipe by remember { mutableStateOf(false) } // State to track if the recipe is clicked
 
   // The card that visually represents the recipe item
-  Card(
+  Column(
       modifier =
           Modifier.fillMaxWidth() // Make the card fill the available width
               .padding(8.dp) // Add padding around the card
               .clickable(onClick = { clickOnRecipe = true }) // Handle clicks on the card
-      ) {
+              .testTag("recipesCards")) {
         // Layout for the content inside the card
         Row(
             modifier =
