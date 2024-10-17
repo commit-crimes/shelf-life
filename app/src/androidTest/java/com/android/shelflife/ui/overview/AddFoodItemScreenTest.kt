@@ -1,12 +1,7 @@
 package com.android.shelfLife.ui.overview
 
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextClearance
-import androidx.compose.ui.test.performTextInput
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -40,6 +35,8 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(navigationActions, householdViewModel, foodItemViewModel)
     }
 
+    composeTestRule.waitForIdle()  // Wait for the UI to be fully rendered
+
     composeTestRule.onNodeWithTag("addScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addFoodItemTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addFoodItemTitle").assertTextEquals("Add Food Item")
@@ -63,9 +60,13 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(navigationActions, householdViewModel, foodItemViewModel)
     }
 
+    composeTestRule.waitForIdle()  // Wait for the UI to be fully rendered
+
     composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextClearance()
     composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextInput("notadate")
     composeTestRule.onNodeWithTag("foodSave").performClick()
+
+    composeTestRule.waitForIdle()  // Ensure the UI has settled before verification
 
     verify(exactly = 0) { householdViewModel.addFoodItem(any()) }
   }
@@ -76,8 +77,12 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(navigationActions, householdViewModel, foodItemViewModel)
     }
 
+    composeTestRule.waitForIdle()  // Wait for the UI to be fully rendered
+
     composeTestRule.onNodeWithTag("inputFoodName").performTextClearance()
     composeTestRule.onNodeWithTag("foodSave").performClick()
+
+    composeTestRule.waitForIdle()  // Ensure the UI has settled before verification
 
     verify(exactly = 0) { householdViewModel.addFoodItem(any()) }
   }
@@ -88,8 +93,12 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(navigationActions, householdViewModel, foodItemViewModel)
     }
 
+    composeTestRule.waitForIdle()  // Wait for the UI to be fully rendered
+
     composeTestRule.onNodeWithTag("inputFoodAmount").performTextClearance()
     composeTestRule.onNodeWithTag("foodSave").performClick()
+
+    composeTestRule.waitForIdle()  // Ensure the UI has settled before verification
 
     verify(exactly = 0) { householdViewModel.addFoodItem(any()) }
   }
@@ -99,6 +108,8 @@ class AddFoodItemScreenTest {
     composeTestRule.setContent {
       AddFoodItemScreen(navigationActions, householdViewModel, foodItemViewModel)
     }
+
+    composeTestRule.waitForIdle()  // Wait for the UI to be fully rendered
 
     // Input valid food name, amount, and valid dates
     composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Apple")
@@ -113,6 +124,8 @@ class AddFoodItemScreenTest {
     // Click the save button
     composeTestRule.onNodeWithTag("foodSave").performClick()
 
+    composeTestRule.waitForIdle()  // Ensure the UI has settled before verification
+
     // Verify that the addFoodItem method is called with the correct parameters
     verify(exactly = 1) { householdViewModel.addFoodItem(any()) }
   }
@@ -122,6 +135,8 @@ class AddFoodItemScreenTest {
     composeTestRule.setContent {
       AddFoodItemScreen(navigationActions, householdViewModel, foodItemViewModel)
     }
+
+    composeTestRule.waitForIdle()  // Wait for the UI to be fully rendered
 
     // Input valid food name and amount
     composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Apple")
@@ -135,6 +150,8 @@ class AddFoodItemScreenTest {
     // Click the save button
     composeTestRule.onNodeWithTag("foodSave").performClick()
 
+    composeTestRule.waitForIdle()  // Ensure the UI has settled before assertion
+
     // Verify that the error dialog is displayed
     composeTestRule.onNodeWithTag("errorDialog").assertIsDisplayed()
   }
@@ -145,9 +162,14 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(navigationActions, householdViewModel, foodItemViewModel)
     }
 
+    composeTestRule.waitForIdle()  // Wait for the UI to be fully rendered
+
     composeTestRule.onNodeWithTag("inputFoodName").performTextClearance()
     composeTestRule.onNodeWithTag("foodSave").performClick()
 
+    composeTestRule.waitForIdle()  // Ensure the UI has settled before assertion
+
+    // Verify that the error dialog is displayed
     composeTestRule.onNodeWithTag("errorDialog").assertIsDisplayed()
   }
 }
