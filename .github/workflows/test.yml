@@ -47,15 +47,12 @@ jobs:
 
       # Run instrumentation tests on an Android emulator
       - name: Run Instrumentation Tests
-        uses: RandyLutcavich/android-emulator-runner-without-sdk-setup@v1.0.3
+        uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
+          api-level: 30
           target: google_apis
           arch: x86_64
-          avd-name: github
-          force-avd-creation: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -skin 1080x1920
-          disable-animations: true
+          profile: Pixel_4
           script: ./gradlew connectedDebugAndroidTest --parallel --build-cache
 
       # Generate test coverage report

@@ -49,7 +49,7 @@ fun ListFoodItems(foodItems: List<FoodItem>) {
         }
   } else {
     // Display the full list
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(modifier = Modifier.fillMaxSize().testTag("foodItemList")) {
       items(foodItems) { item ->
         // Call a composable that renders each individual to-do item
         FoodItemCard(foodItem = item)
@@ -72,7 +72,7 @@ fun FoodItemCard(foodItem: FoodItem) {
           ?: "No Expiry Date"
   Column(
       modifier =
-          Modifier.fillMaxWidth()
+          Modifier.fillMaxWidth().testTag("foodItemCard")
               .padding(vertical = 8.dp, horizontal = 16.dp)
               .background(Color.White) // Add background color if needed
               .padding(16.dp)) {
@@ -131,6 +131,6 @@ fun FoodSearchBar(query: String, onQueryChange: (String) -> Unit) {
                         max = 600.dp) // Restrict max width to prevent over-stretching on large
                     // screens
                     .fillMaxWidth(0.9f) // Make it responsive and occupy 90% of available width
-                    .testTag("searchBar")) {}
+                    .testTag("foodSearchBar")) {}
       }
 }

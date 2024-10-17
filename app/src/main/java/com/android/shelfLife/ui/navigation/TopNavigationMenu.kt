@@ -64,11 +64,11 @@ fun TopNavigationBar(
         navigationIcon = {
           IconButton(
               modifier = Modifier.testTag("hamburgerIcon"), onClick = { onHamburgerClick() }) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu Icon",
-                )
-              }
+              Icon(
+                  imageVector = Icons.Default.Menu,
+                  contentDescription = "Menu Icon",
+              )
+          }
         },
         title = {
           Row(modifier = Modifier.padding(end = 8.dp)) {
@@ -90,7 +90,7 @@ fun TopNavigationBar(
                   )
                 }
           }
-        },
+        }
     )
 
     if (filters.isNotEmpty()) {

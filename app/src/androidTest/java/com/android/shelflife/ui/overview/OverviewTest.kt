@@ -234,12 +234,12 @@ class OverviewTest {
     composeTestRule.onAllNodesWithTag("foodItemCard").assertCountEquals(2)
 
     // Activate the SearchBar
-    composeTestRule.onNodeWithTag("searchBar").performClick()
+    composeTestRule.onNodeWithTag("foodSearchBar").performClick()
     composeTestRule.waitForIdle()
 
     // Enter search query "Banana"
     composeTestRule
-        .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("searchBar")))
+        .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("foodSearchBar")))
         .performTextInput("Banana")
 
     // Only Banana should be displayed
