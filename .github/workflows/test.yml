@@ -61,17 +61,32 @@ jobs:
             ~/.android/adb*
           key: avd-34
 
-      - name: create AVD and generate snapshot for caching
-        if: steps.avd-cache.outputs.cache-hit != 'true'
+      - name: Setup Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
+            api-level: 34
+            target: google_apis
+            arch: x86_64
+            force-avd-creation: false
+            emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+            disable-animations: true
+
+      - name: Wait for emulator to boot
+        run: sleep 30
+
+      - name: Check ADB connection
+        run: adb devices
+
+      - name: Run android tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+                api-level: 34
+                target: google_apis
+                arch: x86_64
+                force-avd-creation: false
+                emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+                disable-animations: true
+                script: ./gradlew connectedCheck --parallel --build-cache
 
 
       # Load google-services.json and local.properties from the secrets
