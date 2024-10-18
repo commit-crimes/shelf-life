@@ -1,4 +1,4 @@
-package com.android.shelflife.model.foodItem
+package com.android.shelfLife.model.foodItem
 
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
@@ -7,10 +7,6 @@ import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.foodItem.FoodItem
-import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
-import com.android.shelfLife.model.foodItem.FoodStatus
-import com.android.shelfLife.model.foodItem.FoodStorageLocation
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
@@ -19,7 +15,11 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import java.lang.reflect.Method
+import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.fail
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -150,5 +150,171 @@ class FoodItemRepositoryFirestoreTest {
     shadowOf(Looper.getMainLooper()).idle() // Ensure all asynchronous operations complete
 
     verify(mockDocumentReference).delete()
+  }
+
+  /**
+   * Uses "hacky" reflection to test private method (Prof. Candea's suggestion:
+   * https://edstem.org/eu/courses/1567/discussion/131808)
+   */
+  @Test
+  fun convertToFoodItem_withValidDocumentSnapshot_shouldReturnFoodItem() {
+    // Mocking a valid DocumentSnapshot
+    `when`(mockDocumentSnapshot.getString("uid")).thenReturn("1")
+    `when`(mockDocumentSnapshot.getString("name")).thenReturn("Almond Butter")
+    `when`(mockDocumentSnapshot.getString("barcode")).thenReturn("123456789")
+    `when`(mockDocumentSnapshot.get("quantity"))
+        .thenReturn(mapOf("amount" to 1.0, "unit" to "GRAM"))
+    `when`(mockDocumentSnapshot.get("nutritionFacts"))
+        .thenReturn(mapOf("energyKcal" to 100L, "fat" to 10.0))
+    `when`(mockDocumentSnapshot.getString("category")).thenReturn(FoodCategory.OTHER.name)
+    `when`(mockDocumentSnapshot.getTimestamp("expiryDate")).thenReturn(Timestamp.now())
+    `when`(mockDocumentSnapshot.getTimestamp("buyDate")).thenReturn(Timestamp.now())
+    `when`(mockDocumentSnapshot.getString("status")).thenReturn(FoodStatus.CLOSED.name)
+    `when`(mockDocumentSnapshot.get("location"))
+        .thenReturn(mapOf("location" to FoodStorageLocation.PANTRY.name))
+
+    // Call the method under test
+    val method: Method =
+        FoodItemRepositoryFirestore::class
+            .java
+            .getDeclaredMethod("convertToFoodItem", DocumentSnapshot::class.java)
+    method.isAccessible = true // Make the method accessible
+
+    // Invoke the private method
+    val foodItem = method.invoke(foodItemRepositoryFirestore, mockDocumentSnapshot) as FoodItem?
+
+    // Assertions for the returned FoodItem
+    assert(foodItem != null)
+    assert(foodItem?.uid == "1")
+    assert(foodItem?.foodFacts?.name == "Almond Butter")
+    assert(foodItem?.foodFacts?.barcode == "123456789")
+    assert(foodItem?.foodFacts?.quantity?.amount == 1.0)
+    assert(foodItem?.foodFacts?.quantity?.unit == FoodUnit.GRAM)
+    assert(foodItem?.foodFacts?.nutritionFacts?.energyKcal == 100)
+    assert(foodItem?.foodFacts?.nutritionFacts?.fat == 10.0)
+    assert(foodItem?.foodFacts?.category == FoodCategory.OTHER)
+    assert(foodItem?.status == FoodStatus.CLOSED)
+    assert(foodItem?.location == FoodStorageLocation.PANTRY)
+  }
+
+  @Test
+  fun convertToFoodItem_withMissingNutritionFacts_shouldReturnDefaultValues() {
+    // Mocking a DocumentSnapshot with missing nutrition facts
+    `when`(mockDocumentSnapshot.getString("uid")).thenReturn("1")
+    `when`(mockDocumentSnapshot.getString("name")).thenReturn("Almond Butter")
+    `when`(mockDocumentSnapshot.getString("barcode")).thenReturn("123456789")
+    `when`(mockDocumentSnapshot.get("quantity"))
+        .thenReturn(mapOf("amount" to 1.0, "unit" to "GRAM"))
+    `when`(mockDocumentSnapshot.get("nutritionFacts")).thenReturn(null)
+
+    // Call the method under test
+    val method: Method =
+        FoodItemRepositoryFirestore::class
+            .java
+            .getDeclaredMethod("convertToFoodItem", DocumentSnapshot::class.java)
+    method.isAccessible = true // Make the method accessible
+
+    // Invoke the private method
+    val foodItem = method.invoke(foodItemRepositoryFirestore, mockDocumentSnapshot) as FoodItem?
+
+    // Assertions for the returned FoodItem
+    assert(foodItem != null)
+    assert(foodItem?.foodFacts?.nutritionFacts?.energyKcal == 0)
+    assert(foodItem?.foodFacts?.nutritionFacts?.fat == 0.0)
+    assert(foodItem?.foodFacts?.nutritionFacts?.carbohydrates == 0.0)
+    assert(foodItem?.foodFacts?.nutritionFacts?.sugars == 0.0)
+    assert(foodItem?.foodFacts?.nutritionFacts?.proteins == 0.0)
+    assert(foodItem?.foodFacts?.nutritionFacts?.salt == 0.0)
+  }
+
+  @Test
+  fun convertToFoodItemFromMap_withValidData_shouldReturnFoodItem() {
+    val map =
+        mapOf(
+            "uid" to "1",
+            "name" to "Almond Butter",
+            "barcode" to "123456789",
+            "quantity" to mapOf("amount" to 1.0, "unit" to "GRAM"),
+            "expiryDate" to Timestamp.now(),
+            "buyDate" to Timestamp.now(),
+            "status" to "CLOSED",
+            "location" to mapOf("location" to "PANTRY"),
+            "category" to "OTHER")
+
+    val foodItem = foodItemRepositoryFirestore.convertToFoodItemFromMap(map)
+
+    assertNotNull(foodItem)
+    assertEquals("1", foodItem?.uid)
+    assertEquals("Almond Butter", foodItem?.foodFacts?.name)
+    assertEquals("123456789", foodItem?.foodFacts?.barcode)
+    assertEquals(1.0, foodItem?.foodFacts?.quantity?.amount)
+    assertEquals(FoodUnit.GRAM, foodItem?.foodFacts?.quantity?.unit)
+    assertEquals(FoodCategory.OTHER, foodItem?.foodFacts?.category)
+    assertEquals(FoodStatus.CLOSED, foodItem?.status)
+    assertEquals(FoodStorageLocation.PANTRY, foodItem?.location)
+  }
+
+  @Test
+  fun convertToFoodItemFromMap_withInvalidData_shouldReturnNull() {
+    val map =
+        mapOf(
+            "uid" to "1",
+            "name" to "Almond Butter",
+            "quantity" to mapOf("amount" to 1.0, "unit" to "INVALID_UNIT"), // Invalid unit
+            "expiryDate" to Timestamp.now(),
+            "buyDate" to Timestamp.now(),
+            "status" to "CLOSED",
+            "location" to mapOf("location" to "PANTRY"))
+
+    val foodItem = foodItemRepositoryFirestore.convertToFoodItemFromMap(map)
+
+    assertNull(foodItem)
+  }
+
+  @Test
+  fun convertFoodItemToMap_withValidData_shouldReturnMap() {
+    val foodItem =
+        FoodItem(
+            uid = "1",
+            foodFacts =
+                FoodFacts(
+                    name = "Almond Butter",
+                    barcode = "123456789",
+                    quantity = Quantity(1.0, FoodUnit.GRAM),
+                    category = FoodCategory.OTHER,
+                    nutritionFacts =
+                        NutritionFacts(
+                            energyKcal = 100,
+                            fat = 10.0,
+                            saturatedFat = 2.0,
+                            carbohydrates = 20.0,
+                            sugars = 5.0,
+                            proteins = 8.0,
+                            salt = 0.5)),
+            location = FoodStorageLocation.PANTRY,
+            expiryDate = Timestamp.now(),
+            buyDate = Timestamp.now(),
+            status = FoodStatus.CLOSED)
+
+    val map = foodItemRepositoryFirestore.convertFoodItemToMap(foodItem)
+
+    assertNotNull(map)
+    assertEquals("1", map["uid"])
+    assertEquals("Almond Butter", map["name"])
+    assertEquals("123456789", map["barcode"])
+    assertEquals(mapOf("amount" to 1.0, "unit" to "GRAM"), map["quantity"])
+    assertEquals("OTHER", map["category"])
+    assertEquals("CLOSED", map["status"])
+    assertEquals("PANTRY", map["location"])
+    assertEquals(
+        mapOf(
+            "energyKcal" to 100,
+            "fat" to 10.0,
+            "saturatedFat" to 2.0,
+            "carbohydrates" to 20.0,
+            "sugars" to 5.0,
+            "proteins" to 8.0,
+            "salt" to 0.5),
+        map["nutritionFacts"])
   }
 }

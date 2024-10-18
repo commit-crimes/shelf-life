@@ -66,6 +66,3 @@ app/build/
 
 # Ignore generated files
 *.json
-
-# Ignore CI workflows (if you don't want to track them)
-.github/
