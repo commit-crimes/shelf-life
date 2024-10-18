@@ -82,10 +82,10 @@ jobs:
       - name: Run tests
         run: ./gradlew check --parallel --build-cache
 
-      - name: Rename test report files (fix case and remove 'TEST-' prefix)
+      - name: Rename test report files (fix case)
         run: |
           find app/build/test-results/testDebugUnitTest/ -name "TEST-*.xml" | while read file; do
-            newfile=$(echo "$file" | sed 's|TEST-||; s|shelflife|shelfLife|g')
+            newfile=$(echo "$file" | sed 's|shelflife|shelfLife|g')
             if [ "$file" != "$newfile" ]; then
               mv "$file" "$newfile"
             fi
