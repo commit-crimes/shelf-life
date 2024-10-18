@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.gms)
-    id("org.sonarqube") version "4.3.0.3225"
+    alias(libs.plugins.sonar)
 }
 
 android {
@@ -111,18 +111,27 @@ tasks.withType<Test> {
     }
 }
 
-// SonarQube configuration
-sonarqube {
+sonar {
     properties {
-        property("sonar.projectKey", System.getenv("SONAR_PROJECT_KEY") ?: "commit-crimes")
-        property("sonar.organization", System.getenv("SONAR_ORGANIZATION") ?: "commit-crimes")
+        property("sonar.projectKey", "commit-crimes")
+        property("sonar.projectName", "shelf-life")
+        property("sonar.organization", "commit-crimes")
         property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.login", System.getenv("SONAR_TOKEN") ?: "default_token")
-        property("sonar.sources", "src/main/java")
-        property("sonar.tests", "src/test/java")
-        property("sonar.java.binaries", "build")
-        property("sonar.junit.reportPaths", "build/test-results/test")
-        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
+        // Comma-separated paths to the various directories containing the *.xml JUnit report files. Each path may be absolute or relative to the project base directory.
+        property(
+            "sonar.junit.reportPaths",
+            "${project.layout.buildDirectory.get()}/test-results/testDebugUnitTest/"
+        )
+        // Paths to xml files with Android Lint issues. If the main flavor is changed, this file will have to be changed too.
+        property(
+            "sonar.androidLint.reportPaths",
+            "${project.layout.buildDirectory.get()}/reports/lint-results-debug.xml"
+        )
+        // Paths to JaCoCo XML coverage report files.
+        property(
+            "sonar.coverage.jacoco.xmlReportPaths",
+            "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml"
+        )
     }
 }
 
