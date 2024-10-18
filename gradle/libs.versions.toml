@@ -13,7 +13,7 @@ camerax = "1.0.2"
 guava = "31.1-jre"
 
 # Sonar
-sonar = "4.4.1.3373"
+sonar = "5.1.0.4882"
 
 # UI Compose
 mockitoAndroid = "5.13.0"
