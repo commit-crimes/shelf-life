@@ -122,7 +122,7 @@ sonarqube {
         property("sonar.tests", "src/test/java")
         property("sonar.java.binaries", "build")
         property("sonar.junit.reportPaths", "build/test-results/test")
-        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml")
+        property("sonar.coverage.jacoco.xmlReportPaths", "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
     }
 }
 
