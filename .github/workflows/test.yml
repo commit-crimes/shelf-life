@@ -82,6 +82,11 @@ jobs:
       - name: Run tests
         run: ./gradlew check --parallel --build-cache
 
+      - name: List test result directory
+        run: |
+          echo "Listing files in test-results/testDebugUnitTest directory:"
+          ls -la app/build/test-results/testDebugUnitTest
+
       - name: Run android tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -93,11 +98,9 @@ jobs:
           disable-animations: true
           script: ./gradlew connectedCheck --parallel --build-cache
 
-      # This step generates the coverage report which will be uploaded to sonar
       - name: Generate Coverage Report
         run: |
           ./gradlew jacocoTestReport
-
 
       - name: Upload report to SonarCloud
         env:
