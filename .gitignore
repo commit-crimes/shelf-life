@@ -48,7 +48,6 @@ replay_pid*
 keystore.properties
 /app/google-services.json
 google-services.json
-/app/release
 upload-keystore.jks
 /scraping/firebase_credentials.json
 
