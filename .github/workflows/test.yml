@@ -93,17 +93,13 @@ jobs:
           disable-animations: true
           script: ./gradlew connectedCheck --parallel --build-cache
 
+      # This step generates the coverage report which will be uploaded to sonar
       - name: Generate Coverage Report
-        run: ./gradlew jacocoTestReport
+        run: |
+          ./gradlew jacocoTestReport
+
 
       - name: Upload report to SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonarqube -Dsonar.projectKey=commit-crimes -Dsonar.organization=commit-crimes -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: jacocoTestReport
-          path: build/reports/jacoco/jacocoTestReport
+        run: ./gradlew sonar --parallel --build-cache
