@@ -18,7 +18,6 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
   }
 
   private val auth = FirebaseAuth.getInstance()
-
   /**
    * Generates a new unique ID for a food item.
    *
@@ -48,7 +47,6 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
         Log.e("FoodItemRepoFire", "init failed: user not logged in")
       }
     }
-    Log.d("FoodItemRepoFire", "init done")
   }
 
   /**
@@ -62,11 +60,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
         .get()
         .addOnSuccessListener { result ->
           val foodItemList = mutableListOf<FoodItem>()
-          Log.e("FoodItemRepository", "list: $foodItemList")
-          Log.e("FoodItemRepository", "res: $result")
-
           for (document in result) {
-            Log.e("FoodItemRepository", "Doc: $document")
             val foodItem = convertToFoodItem(document)
             if (foodItem != null) foodItemList.add(foodItem)
           }
@@ -143,8 +137,9 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
           onFailure(exception)
         }
   }
+
   // Helper function to convert Firestore DocumentSnapshot into a FoodItem object
-  private fun convertToFoodItem(doc: DocumentSnapshot): FoodItem? {
+  fun convertToFoodItem(doc: DocumentSnapshot): FoodItem? {
     return try {
       val uid = doc.getString("uid") ?: return null
 
@@ -152,13 +147,13 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
       val name = doc.getString("name") ?: return null
       val barcode = doc.getString("barcode") ?: return null
 
-      val quantityMap = doc.get("quantity") as? Map<*, *> ?: return null
+      val quantityMap = doc["quantity"] as? Map<*, *> ?: return null
       val quantity =
           Quantity(
               amount = quantityMap["amount"] as? Double ?: 0.0,
               unit = FoodUnit.valueOf(quantityMap["unit"] as? String ?: "GRAM"))
 
-      val nutritionMap = doc.get("nutritionFacts") as? Map<*, *>
+      val nutritionMap = doc["nutritionFacts"] as? Map<*, *>
       val nutritionFacts =
           if (nutritionMap != null) {
             NutritionFacts(
@@ -191,7 +186,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
       val status = doc.getString("status") ?: FoodStatus.CLOSED.name
       val foodStatus = FoodStatus.valueOf(status)
 
-      val locationMap = doc.get("location") as? Map<*, *>
+      val locationMap = doc["location"] as? Map<*, *>
       val foodStorageLocation =
           if (locationMap != null) {
             FoodStorageLocation.valueOf(
@@ -220,7 +215,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
    * @param doc The Firestore document to convert.
    * @return A FoodItem object.
    */
-  fun convertToFoodItemFromMap(map: Map<String, Any>): FoodItem? {
+  fun convertToFoodItemFromMap(map: Map<String, Any?>): FoodItem? {
     return try {
       val uid = map["uid"] as? String ?: return null
       val name = map["name"] as? String ?: return null

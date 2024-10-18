@@ -1,6 +1,5 @@
 name: CI - Test Runner
 
-# Run the workflow when commits are pushed on main or when a PR is modified
 on:
   push:
     branches:
@@ -15,22 +14,18 @@ on:
 jobs:
   ci:
     name: CI
-    # Execute the CI on the course's runners
     runs-on: ubuntu-latest
 
     steps:
-      # First step : Checkout the repository on the runner
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: recursive
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of Sonar analysis (if we use Sonar Later)
+          fetch-depth: 0
 
-      # This step removes the current gradle cache to avoid any caching issues
       - name: Remove current gradle cache
         run: rm -rf ~/.gradle
 
-      # Kernel-based Virtual Machine (KVM) is an open source virtualization technology built into Linux. Enabling it allows the Android emulator to run faster.
       - name: Enable KVM group perms
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -43,15 +38,9 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
-
-      # Caching is a very useful part of a CI, as a workflow is executed in a clean environement every time,
-      # this means that one would need to re-download and re-process gradle files for every run. Which is very time consuming.
-      #
-      # To avoid that, we cache the the gradle folder to reuse it later.
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
 
-      # Cache the Emulator, if the cache does not hit, create the emulator
       - name: AVD cache
         uses: actions/cache@v4
         id: avd-cache
@@ -73,8 +62,6 @@ jobs:
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
-
-      # Load google-services.json and local.properties from the secrets
       - name: Decode secrets
         env:
           GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
@@ -84,27 +71,17 @@ jobs:
           echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
 
       - name: Grant execute permission for gradlew
-        run: |
-          chmod +x ./gradlew
+        run: chmod +x ./gradlew
 
-      # Check formatting
       - name: ktfmt Check
-        run: |
-          ./gradlew ktfmtCheck
+        run: ./gradlew ktfmtCheck
 
-      # This step runs gradle commands to build the application
       - name: Assemble and Link
-        run: |
-          # To run the CI with debug information, add --info
-          ./gradlew assemble lint --parallel --build-cache
+        run: ./gradlew assemble lint --parallel --build-cache
 
-      # Run Unit tests
       - name: Run tests
-        run: |
-          # To run the CI with debug information, add --info
-          ./gradlew check --parallel --build-cache
+        run: ./gradlew check --parallel --build-cache
 
-      # Run connected tests on the emulator
       - name: Run android tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -116,21 +93,13 @@ jobs:
           disable-animations: true
           script: ./gradlew connectedCheck --parallel --build-cache
 
-      # This step generates the coverage report which will be uploaded to sonar
       - name: Generate Coverage Report
-        run: |
-          ./gradlew jacocoTestReport
+        run: ./gradlew jacocoTestReport
 
-      # Upload the various reports to sonar
       - name: Upload report to SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          ./gradlew sonarqube \
-            -Dsonar.projectKey=commit-crimes \
-            -Dsonar.organization=commit-crimes \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonarqube -Dsonar.projectKey=commit-crimes -Dsonar.organization=commit-crimes -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
       - name: Upload test results
         if: always()
@@ -162,6 +131,3 @@ jobs:
             -Dsonar.organization=commit-crimes
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-
-
