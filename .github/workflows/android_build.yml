@@ -36,6 +36,7 @@ jobs:
           GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
         run: |
           echo "$GOOGLE_SERVICES" | base64 --decode > ./app/google-services.json
+
       # Give gradle permission
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
@@ -50,3 +51,5 @@ jobs:
         with:
           name: app-debug.apk
           path: ${project.layout.buildDirectory.get()}/releases/app-debug.apk
+
+
