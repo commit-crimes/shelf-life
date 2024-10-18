@@ -118,10 +118,10 @@ sonarqube {
         property("sonar.organization", System.getenv("SONAR_ORGANIZATION") ?: "commit-crimes")
         property("sonar.host.url", "https://sonarcloud.io")
         property("sonar.login", System.getenv("SONAR_TOKEN") ?: "default_token")
-        property("sonar.sources", "src/main/java")
-        property("sonar.tests", "src/test/java")
-        property("sonar.java.binaries", "build")
-        property("sonar.junit.reportPaths", "build/test-results/test")
+        //property("sonar.sources", "src/main/java")
+        //property("sonar.tests", "src/test/java")
+        //property("sonar.java.binaries", "${project.layout.buildDirectory.get()}")
+        property("sonar.junit.reportPaths", "${project.layout.buildDirectory.get()}/test-results/test")
         property("sonar.coverage.jacoco.xmlReportPaths", "${project.layout.buildDirectory.get()}/reports/jacoco/jacocoTestReport/jacocoTestReport.xml")
     }
 }
