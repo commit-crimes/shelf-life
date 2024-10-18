@@ -45,6 +45,37 @@ fun OverviewScreen(navigationActions: NavigationActions, householdViewModel: Hou
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
 
+    // Bogus vars for testing
+    var a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+    a = 1
+
+
   // TODO remove hardcoded filters
   val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
 
