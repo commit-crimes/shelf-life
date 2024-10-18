@@ -82,18 +82,6 @@ jobs:
       - name: Run tests
         run: ./gradlew check --parallel --build-cache
 
-      - name: Rename test report files (fix case)
-        run: |
-          find app/build/test-results/testDebugUnitTest/ -name "TEST-*.xml" | while read file; do
-            newfile=$(echo "$file" | sed 's|shelflife|shelfLife|g')
-            if [ "$file" != "$newfile" ]; then
-              mv "$file" "$newfile"
-            fi
-          done
-
-      - name: List renamed test report files
-        run: ls -la app/build/test-results/testDebugUnitTest/
-
       - name: Run android tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -105,11 +93,14 @@ jobs:
           disable-animations: true
           script: ./gradlew connectedCheck --parallel --build-cache
 
+      # This step generates the coverage report which will be uploaded to sonar
       - name: Generate Coverage Report
         run: |
           ./gradlew jacocoTestReport
 
+
       - name: Upload report to SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew sonar --parallel --build-cache
