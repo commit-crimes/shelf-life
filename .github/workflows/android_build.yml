@@ -50,5 +50,3 @@ jobs:
         with:
           name: app-debug.apk
           path: ${project.layout.buildDirectory.get()}/outputs/apk/debug/app-debug.apk
-
-          path: app/build/outputs/apk/debug/app-debug.apk
