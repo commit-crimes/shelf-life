@@ -164,9 +164,9 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
 
       // Convert the list of food items from firestore into a list of FoodItem objects
       val foodItemList =
-          foodItems?.mapNotNull { foodItemMap ->
+          foodItems.mapNotNull { foodItemMap ->
             foodItemRepository.convertToFoodItemFromMap(foodItemMap)
-          } ?: emptyList()
+          }
 
       HouseHold(uid = uid, name = name, members = members, foodItems = foodItemList)
     } catch (e: Exception) {
