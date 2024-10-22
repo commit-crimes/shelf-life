@@ -141,7 +141,7 @@ class AddFoodItemScreenTest {
 
     // Click the submit button
     composeTestRule.onNodeWithTag("foodSave").performClick()
-      // Check that the error dialog is shown with the correct message
+    // Check that the error dialog is shown with the correct message
     composeTestRule
         .onNodeWithText("Expiration date cannot be before the open date.")
         .assertIsDisplayed()

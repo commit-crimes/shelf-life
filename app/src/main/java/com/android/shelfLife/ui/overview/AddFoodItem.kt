@@ -145,8 +145,7 @@ fun AddFoodItemScreen(
               onValueChange = { expireDate = it },
               label = { Text(stringResource(id = R.string.expire_date_hint)) },
               placeholder = { Text("dd/mm/yyyy") },
-              modifier =
-                  Modifier.testTag("inputFoodExpireDate").fillMaxWidth(),
+              modifier = Modifier.testTag("inputFoodExpireDate").fillMaxWidth(),
           )
 
           OutlinedTextField(
@@ -154,8 +153,7 @@ fun AddFoodItemScreen(
               onValueChange = { openDate = it },
               label = { Text(stringResource(id = R.string.open_date_hint)) },
               placeholder = { Text("dd/mm/yyyy") },
-              modifier =
-                  Modifier.testTag("inputFoodOpenDate").fillMaxWidth(),
+              modifier = Modifier.testTag("inputFoodOpenDate").fillMaxWidth(),
           )
 
           OutlinedTextField(
@@ -163,8 +161,7 @@ fun AddFoodItemScreen(
               onValueChange = { buyDate = it },
               label = { Text(stringResource(id = R.string.buy_date_hint)) },
               placeholder = { Text("dd/mm/yyyy") },
-              modifier =
-                  Modifier.testTag("inputFoodBuyDate").fillMaxWidth(),
+              modifier = Modifier.testTag("inputFoodBuyDate").fillMaxWidth(),
           )
 
           Button(
