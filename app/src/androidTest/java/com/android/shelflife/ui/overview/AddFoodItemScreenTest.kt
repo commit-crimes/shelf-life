@@ -51,7 +51,6 @@ class AddFoodItemScreenTest {
 
     // Click the submit button
     composeTestRule.onNodeWithTag("foodSave").performClick()
-
     // Check that the error dialog is shown with the correct message
     composeTestRule.onNodeWithText("Food name cannot be empty.").assertIsDisplayed()
   }
@@ -74,7 +73,6 @@ class AddFoodItemScreenTest {
 
     // Click the submit button
     composeTestRule.onNodeWithTag("foodSave").performClick()
-
     // Check that the error dialog is shown with the correct message
     composeTestRule.onNodeWithText("Amount cannot be empty.").assertIsDisplayed()
   }
@@ -97,7 +95,6 @@ class AddFoodItemScreenTest {
 
     // Click the submit button
     composeTestRule.onNodeWithTag("foodSave").performClick()
-
     // Check that the error dialog is shown with the correct message
     composeTestRule.onNodeWithText("Amount must be a number.").assertIsDisplayed()
   }
@@ -120,7 +117,6 @@ class AddFoodItemScreenTest {
 
     // Click the submit button
     composeTestRule.onNodeWithTag("foodSave").performClick()
-
     // Check that the error dialog is shown with the correct message
     composeTestRule
         .onNodeWithText("Invalid date format. Please use dd/mm/yyyy.")
@@ -145,8 +141,7 @@ class AddFoodItemScreenTest {
 
     // Click the submit button
     composeTestRule.onNodeWithTag("foodSave").performClick()
-
-    // Check that the error dialog is shown with the correct message
+      // Check that the error dialog is shown with the correct message
     composeTestRule
         .onNodeWithText("Expiration date cannot be before the open date.")
         .assertIsDisplayed()

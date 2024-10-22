@@ -85,24 +85,24 @@ fun AddFoodItemScreen(
       },
   ) { padding ->
     Column(
-        modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top) {
           OutlinedTextField(
               value = foodName,
               onValueChange = { foodName = it },
               label = { Text(stringResource(id = R.string.food_name_hint)) },
-              modifier = Modifier.testTag("inputFoodName").fillMaxWidth().padding(bottom = 16.dp))
+              modifier = Modifier.testTag("inputFoodName").fillMaxWidth())
 
           Row(
-              modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+              modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween) {
                 OutlinedTextField(
                     value = amount,
                     onValueChange = { amount = it },
                     label = { Text(stringResource(id = R.string.amount_hint)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.testTag("inputFoodAmount").weight(1f).padding(end = 8.dp))
+                    modifier = Modifier.testTag("inputFoodAmount").weight(1f))
 
                 DropdownFields(
                     label = stringResource(id = R.string.unit_label),
@@ -144,7 +144,7 @@ fun AddFoodItemScreen(
               label = { Text(stringResource(id = R.string.expire_date_hint)) },
               placeholder = { Text("dd/mm/yyyy") },
               modifier =
-                  Modifier.testTag("inputFoodExpireDate").fillMaxWidth().padding(bottom = 16.dp),
+                  Modifier.testTag("inputFoodExpireDate").fillMaxWidth(),
           )
 
           OutlinedTextField(
@@ -153,7 +153,7 @@ fun AddFoodItemScreen(
               label = { Text(stringResource(id = R.string.open_date_hint)) },
               placeholder = { Text("dd/mm/yyyy") },
               modifier =
-                  Modifier.testTag("inputFoodOpenDate").fillMaxWidth().padding(bottom = 16.dp),
+                  Modifier.testTag("inputFoodOpenDate").fillMaxWidth(),
           )
 
           OutlinedTextField(
@@ -162,7 +162,7 @@ fun AddFoodItemScreen(
               label = { Text(stringResource(id = R.string.buy_date_hint)) },
               placeholder = { Text("dd/mm/yyyy") },
               modifier =
-                  Modifier.testTag("inputFoodBuyDate").fillMaxWidth().padding(bottom = 32.dp),
+                  Modifier.testTag("inputFoodBuyDate").fillMaxWidth(),
           )
 
           Button(
