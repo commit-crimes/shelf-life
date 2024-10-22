@@ -169,7 +169,7 @@ fun AddFoodItemScreen(
               onClick = {
                 errorMessages.clear()
 
-                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
 
                 try {
                   val expireDateParsed = sdf.parse(expireDate)
