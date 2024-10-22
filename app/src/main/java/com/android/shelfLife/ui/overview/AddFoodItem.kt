@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.overview
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -44,6 +45,7 @@ import java.util.*
  * @param foodItemViewModel An instance of [ListFoodItemsViewModel] that provides access to the
  *   user's food item data.
  */
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddFoodItemScreen(
@@ -83,7 +85,7 @@ fun AddFoodItemScreen(
                   }
             })
       },
-  ) { padding ->
+  ) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
