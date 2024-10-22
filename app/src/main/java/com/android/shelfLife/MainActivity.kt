@@ -26,6 +26,7 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.overview.AddFoodItemScreen
 import com.android.shelfLife.ui.overview.OverviewScreen
+import com.android.shelfLife.ui.profile.ProfileScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.example.compose.ShelfLifeTheme
@@ -69,7 +70,6 @@ fun ShelfLifeApp() {
         AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
       }
     }
-
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
       composable(Screen.PERMISSION_HANDLER) {
         CameraPermissionHandler(navigationActions, barcodeScannerViewModel)
@@ -83,7 +83,6 @@ fun ShelfLifeApp() {
             listFoodItemViewModel)
       }
     }
-
     navigation(
         startDestination = Screen.RECIPES,
         route = Route.RECIPES,
@@ -94,6 +93,9 @@ fun ShelfLifeApp() {
       composable(Screen.INDIVIDUAL_RECIPE) {
         IndividualRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)
       }
+    }
+    navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
+      composable(Screen.PROFILE) { ProfileScreen(navigationActions) }
     }
   }
 }

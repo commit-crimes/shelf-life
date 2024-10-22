@@ -231,6 +231,10 @@ dependencies {
     // Networking with OkHttp
     implementation(libs.okhttp)
 
+    // Image from network
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
     // Testing Unit
     testImplementation(libs.junit)
     androidTestImplementation(libs.mockk)
