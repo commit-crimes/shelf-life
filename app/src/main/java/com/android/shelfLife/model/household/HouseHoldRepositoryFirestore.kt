@@ -9,8 +9,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHoldRepository {
 
   private val collectionPath = "households"
-  private val auth = FirebaseAuth.getInstance()
-  private val foodItemRepository = FoodItemRepositoryFirestore(db)
+  var auth = FirebaseAuth.getInstance()
+  var foodItemRepository = FoodItemRepositoryFirestore(db)
 
   /**
    * Generates a new unique ID for a household.
@@ -155,18 +155,18 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
    *
    * @param doc The Firestore document to convert.
    */
-  private fun convertToHousehold(doc: DocumentSnapshot): HouseHold? {
+  fun convertToHousehold(doc: DocumentSnapshot): HouseHold? {
     return try {
       val uid = doc.getString("uid") ?: return null
       val name = doc.getString("name") ?: return null
       val members = doc.get("members") as? List<String> ?: emptyList()
-      val foodItems = doc.get("foodItems") as? List<Map<String, Any>>
+      val foodItems = doc.get("foodItems") as? List<Map<String, Any>> ?: emptyList()
 
       // Convert the list of food items from firestore into a list of FoodItem objects
       val foodItemList =
-          foodItems?.mapNotNull { foodItemMap ->
+          foodItems.mapNotNull { foodItemMap ->
             foodItemRepository.convertToFoodItemFromMap(foodItemMap)
-          } ?: emptyList()
+          }
 
       HouseHold(uid = uid, name = name, members = members, foodItems = foodItemList)
     } catch (e: Exception) {

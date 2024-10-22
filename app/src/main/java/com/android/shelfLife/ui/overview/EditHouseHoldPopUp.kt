@@ -67,7 +67,8 @@ fun EditHouseHoldPopUp(
                             houseHoldsToDeleteId.add(it.uid)
                             textColor = Color.Gray
                           }
-                        }) {
+                        },
+                        modifier = Modifier.testTag("deleteIcon_${it.uid}")) {
                           Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Delete")
                         }
                   }

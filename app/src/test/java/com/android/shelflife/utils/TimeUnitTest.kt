@@ -1,5 +1,9 @@
-package com.android.shelfLife.ui.utils
+package com.android.shelflife.utils
 
+import com.android.shelfLife.ui.utils.formatDateToTimestamp
+import com.android.shelfLife.ui.utils.formatTimestampToDate
+import com.android.shelfLife.ui.utils.fromCapitalStringToLowercaseString
+import com.android.shelfLife.ui.utils.getTotalMinutes
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Calendar

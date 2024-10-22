@@ -26,6 +26,10 @@ class HouseholdViewModel(
     loadHouseholds()
   }
 
+  fun setHouseholds(households: List<HouseHold>) {
+    _households.value = households
+  }
+
   /** Loads the list of households from the repository and updates the [_households] flow. */
   private fun loadHouseholds() {
     repository.getHouseholds(
