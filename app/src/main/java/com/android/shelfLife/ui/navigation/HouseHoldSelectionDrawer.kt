@@ -70,7 +70,7 @@ fun HouseHoldSelectionDrawer(
                   Modifier.padding(vertical = 18.dp, horizontal = 16.dp)
                       .padding(horizontal = 12.dp),
               style = MaterialTheme.typography.labelMedium)
-          userHouseholds.forEach { household ->
+          userHouseholds.forEachIndexed {index, household ->
             selectedHousehold?.let {
               HouseHoldElement(
                   household = household,
@@ -80,7 +80,9 @@ fun HouseHoldSelectionDrawer(
                       householdViewModel.selectHousehold(household)
                     }
                     scope.launch { drawerState.close() }
-                  })
+                  },
+                  modifier = Modifier.testTag("householdElement_$index")
+              )
             }
           }
           HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
