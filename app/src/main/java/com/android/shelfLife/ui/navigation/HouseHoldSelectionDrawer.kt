@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.navigation
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -71,7 +72,8 @@ fun HouseHoldSelectionDrawer(
                       .padding(horizontal = 12.dp),
               style = MaterialTheme.typography.labelMedium)
           userHouseholds.forEachIndexed {index, household ->
-            selectedHousehold?.let {
+              Log.d("HouseHoldSelectionDrawer", "HouseHoldElement index: $index")
+              selectedHousehold?.let {
               HouseHoldElement(
                   household = household,
                   selectedHousehold = it,

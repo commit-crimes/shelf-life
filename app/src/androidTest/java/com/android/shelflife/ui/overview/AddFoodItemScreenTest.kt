@@ -43,7 +43,7 @@ class AddFoodItemScreenTest {
   //    }
   //
   //    // Check that the main screen is displayed
-  //    composeTestRule.onNodeWithTag("addScreen").assertIsDisplayed()
+  //    composeTestRule.onNodeWithTag("addFoodItemScreen").assertIsDisplayed()
   //    composeTestRule.onNodeWithTag("addFoodItemTitle").assertIsDisplayed()
   //    composeTestRule.onNodeWithTag("goBackButton").assertIsDisplayed()
   //    composeTestRule.onNodeWithTag("foodSave").assertIsDisplayed()

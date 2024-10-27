@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.overview
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -75,8 +76,11 @@ fun OverviewScreen(navigationActions: NavigationActions, householdViewModel: Hou
               },
               // Floating Action Button to add a new food item
               floatingActionButton = {
+                  Log.d("OverviewScreen", "Add Food Item called")
                 FloatingActionButton(
-                    onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
+                    onClick = {
+                        Log.d("OverviewScreen", "Add Food Item clicked")
+                        navigationActions.navigateTo(Screen.ADD_FOOD) },
                     content = { Icon(Icons.Default.Add, contentDescription = "Add") },
                     modifier = Modifier.testTag("addFoodFab"),
                     containerColor = MaterialTheme.colorScheme.secondaryContainer)

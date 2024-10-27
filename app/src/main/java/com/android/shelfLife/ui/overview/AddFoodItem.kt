@@ -1,9 +1,10 @@
 package com.android.shelfLife.ui.overview
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -66,11 +67,13 @@ fun AddFoodItemScreen(
   var categoryExpanded by remember { mutableStateOf(false) }
   var locationExpanded by remember { mutableStateOf(false) }
 
+    Log.d("AddFoodItemScreen", "Entered AddFoodItemScreen")
   Scaffold(
-      modifier = Modifier.fillMaxSize().testTag("addScreen"),
+      modifier = Modifier.fillMaxSize(),
       topBar = {
         TopAppBar(
             title = {
+                Log.d("AddFoodItemScreen", "Entered AddFoodItemScreen")
               Text(
                   modifier = Modifier.testTag("addFoodItemTitle"),
                   text = stringResource(id = R.string.add_food_item_title))
@@ -79,13 +82,13 @@ fun AddFoodItemScreen(
               IconButton(
                   onClick = { navigationActions.goBack() },
                   modifier = Modifier.testTag("goBackButton")) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "Go Back")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go Back")
                   }
             })
       },
   ) { padding ->
     Column(
-        modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
+        modifier = Modifier.testTag("addFoodItemScreen").fillMaxSize().padding(padding).padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top) {
           OutlinedTextField(
@@ -176,8 +179,8 @@ fun AddFoodItemScreen(
                   val openDateParsed = sdf.parse(openDate)
                   val buyDateParsed = sdf.parse(buyDate)
 
-                  // Error if the expiration date is before the open date
-                  if (expireDateParsed.before(openDateParsed)) {
+                  // Error if the expiration date is before the open date or the buy date
+                  if (expireDateParsed.before(openDateParsed) || expireDateParsed.before(buyDateParsed)) {
                     errorMessages["date"] = "Expiration date cannot be before the open date."
                   }
 

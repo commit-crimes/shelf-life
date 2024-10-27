@@ -1,6 +1,7 @@
 package com.android.shelfLife
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -67,6 +68,7 @@ fun ShelfLifeApp() {
     navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
       composable(Screen.OVERVIEW) { OverviewScreen(navigationActions, householdViewModel) }
       composable(Screen.ADD_FOOD) {
+        Log.d("Main Activity", "Navigating to add foot item screen")
         AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
       }
     }
