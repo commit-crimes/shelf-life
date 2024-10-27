@@ -47,7 +47,7 @@ fun ErrorPopUp(
                     }
                   }
 
-                  Button(onClick = onDismiss) { Text("OK") }
+                  Button(onClick = onDismiss, modifier = modifier.testTag("errorDialogDismissButton")) { Text("OK") }
                 }
           }
     }

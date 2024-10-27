@@ -67,13 +67,11 @@ fun AddFoodItemScreen(
   var categoryExpanded by remember { mutableStateOf(false) }
   var locationExpanded by remember { mutableStateOf(false) }
 
-    Log.d("AddFoodItemScreen", "Entered AddFoodItemScreen")
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
         TopAppBar(
             title = {
-                Log.d("AddFoodItemScreen", "Entered AddFoodItemScreen")
               Text(
                   modifier = Modifier.testTag("addFoodItemTitle"),
                   text = stringResource(id = R.string.add_food_item_title))
@@ -184,9 +182,8 @@ fun AddFoodItemScreen(
                     errorMessages["date"] = "Expiration date cannot be before the open date."
                   }
 
-                  // Error if the buy date is after the open date or expiration date
-                  if (buyDateParsed.after(openDateParsed) ||
-                      buyDateParsed.after(expireDateParsed)) {
+                  // Error if the buy date is after the open date
+                  if (buyDateParsed.after(openDateParsed)) {
                     errorMessages["buyDate"] =
                         "Buy date cannot be after the open date or expiration date."
                   }
@@ -209,6 +206,7 @@ fun AddFoodItemScreen(
                 if (errorMessages.isNotEmpty()) {
                   showDialog = true
                 } else {
+
                   val foodFacts =
                       FoodFacts(
                           name = foodName,

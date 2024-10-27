@@ -76,7 +76,6 @@ fun OverviewScreen(navigationActions: NavigationActions, householdViewModel: Hou
               },
               // Floating Action Button to add a new food item
               floatingActionButton = {
-                  Log.d("OverviewScreen", "Add Food Item called")
                 FloatingActionButton(
                     onClick = {
                         Log.d("OverviewScreen", "Add Food Item clicked")

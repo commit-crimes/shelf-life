@@ -82,7 +82,6 @@ open class NavigationActions(
    * Clear the back stack when navigating to a new destination.
    */
   open fun navigateTo(destination: TopLevelDestination) {
-      Log.d("NavigationActions", "navigateTo() called with: topdestination = $destination")
     navController.navigate(destination.route) {
       popUpTo(navController.graph.startDestinationId) { saveState = true }
       launchSingleTop = true
@@ -96,7 +95,6 @@ open class NavigationActions(
    * @param screen The screen to navigate to
    */
   open fun navigateTo(screen: String) {
-      Log.d("NavigationActions", "navigateTo() called with: screen = $screen")
     navController.navigate(screen)
   }
 

@@ -2,6 +2,7 @@ package com.android.shelfLife.ui.overview
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.internal.composableLambdaInstance
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.NavHostController
@@ -11,8 +12,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.FoodFactsRepository
+import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
+import com.android.shelfLife.model.foodFacts.FoodSearchInput
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodItem.FoodItem
@@ -21,10 +26,14 @@ import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.recipe.ListRecipesViewModel
+import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.google.firebase.Timestamp
+import io.mockk.every
 import io.mockk.mockk
 import java.util.*
 import org.junit.Before
@@ -46,16 +55,19 @@ class EndToEndM1Test {
   private lateinit var listFoodItemsViewModel: ListFoodItemsViewModel
   private lateinit var houseHoldRepository: HouseHoldRepository
   private lateinit var householdViewModel: HouseholdViewModel
+  private lateinit var foodFactsViewModel: FoodFactsViewModel
+  private lateinit var foodFactsRepository: FoodFactsRepository
+  private lateinit var listRecipesViewModel: ListRecipesViewModel
 
   private lateinit var navController: NavHostController
   private lateinit var houseHold: HouseHold
+  private lateinit var barcodeScannerViewModel: BarcodeScannerViewModel
 
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
   fun setUp() {
     val context = ApplicationProvider.getApplicationContext<Context>()
-
     // Initialize the class-level navController
     navController = TestNavHostController(context)
     navController.navigatorProvider.addNavigator(ComposeNavigator())
@@ -64,11 +76,18 @@ class EndToEndM1Test {
     navigationActions = NavigationActions(navController)
 
     // Initialize repositories and view models
+    barcodeScannerViewModel = mockk(relaxed = true)
     foodItemRepository = mock(FoodItemRepository::class.java)
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
     houseHoldRepository = mock(HouseHoldRepository::class.java)
     householdViewModel = HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel)
+    listRecipesViewModel = ListRecipesViewModel()
 
+    foodFactsRepository = FakeFoodFactsRepository()
+    foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)
+
+    `when`(foodItemRepository.getNewUid()).thenReturn("mockedUid")
+    every { barcodeScannerViewModel.permissionGranted } returns true
     // Set up test data (household and food item)
     val foodFacts = FoodFacts(
       name = "Apple",
@@ -103,31 +122,9 @@ class EndToEndM1Test {
       .getHouseholds(any(), any())
   }
 
-
-//  @Test
-//  fun notGoingCrazy(){
-//    householdViewModel.selectHousehold(houseHold)
-//    composeTestRule.setContent {
-//      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
-//    }
-//
-//    // Click on the add food FAB
-//    composeTestRule.onNodeWithTag("addFoodFab").performClick()
-//
-//    // Verify that navigateTo(Screen.ADD_FOOD) was called
-//    //verify(navigationActions).navigateTo(com.android.shelfLife.ui.navigation.Screen.ADD_FOOD)
-//  }
-
-
   @Test
   fun testEndToEndFlow() {
-    //Second as a new user a new household is created
-
-
     householdViewModel.selectHousehold(houseHold)
-//    composeTestRule.setContent {
-//      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
-//    }
     composeTestRule.setContent {
       NavHost(
         navController = navController,
@@ -135,57 +132,84 @@ class EndToEndM1Test {
       ) {
         composable(Route.OVERVIEW) { OverviewScreen(navigationActions, householdViewModel) }
         composable(Screen.ADD_FOOD) { AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemsViewModel) }
+        composable(Route.SCANNER) { BarcodeScannerScreen(
+          navigationActions = navigationActions,
+          cameraViewModel = barcodeScannerViewModel,
+          foodFactsViewModel = foodFactsViewModel,
+          householdViewModel = householdViewModel,
+          foodItemViewModel = listFoodItemsViewModel)
+        }
+        composable(Route.RECIPES) { RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel) }
+
       }
-    }
+      }
+
     //User is now on the overview Screen
-    //composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
-
-    //User wants to see the amount households they have access to
-//    composeTestRule.onNodeWithTag("hamburgerIcon").performClick()
-//    composeTestRule.onNodeWithTag("householdSelectionDrawer").assertIsDisplayed()
-
     //User wants to add a new food item
-
     composeTestRule.onNodeWithTag("addFoodFab").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addFoodFab").assertHasClickAction()
     composeTestRule.onNodeWithTag("addFoodFab").performClick()
-    //verify(navigationActions).navigateTo(com.android.shelfLife.ui.navigation.Screen.ADD_FOOD)
-
-    var found = false
-    repeat(5) {
-      try {
-        composeTestRule.onNodeWithTag("addFoodItemTitle").assertExists()
-        found = true
-        return
-      } catch (e: AssertionError) {
-        Thread.sleep(500)  // Wait a bit and retry
-        composeTestRule.waitForIdle()
-      }
-    }
-    if (!found) throw AssertionError("addFoodItemTitle not found")
-
+    //Thread.sleep(1000)
     composeTestRule.onNodeWithTag("addFoodItemTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Apple")
     composeTestRule.onNodeWithTag("inputFoodAmount").performTextInput("5")
-    composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextInput("29/12/2023")
+    composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextClearance()
+    composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextInput("29/10/2023")
+    composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextClearance()
     composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextInput("01/12/2023")
+    composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextClearance()
     composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextInput("30/11/2023")
-
+    //Thread.sleep(1000)
     composeTestRule.onNodeWithTag("foodSave").performClick()
 
-    //composeTestRule.onNodeWithTag("errorDialog").assertIsDisplayed()
+    //User inputs incorrect data and inputs the correct data again
+    //Thread.sleep(1000)
+    composeTestRule.onNodeWithTag("errorDialog").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("errorDialogDismissButton").performClick()
+    //Thread.sleep(1000)
+    composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextClearance()
+    composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextInput("29/12/2023")
+    composeTestRule.onNodeWithTag("foodSave").performClick()
+    //Thread.sleep(1000)
+    composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+    //Thread.sleep(1000)
+    //User now wants to use the scanner
+    composeTestRule.onNodeWithTag("Scanner").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("Scanner").performClick()
+    composeTestRule.onNodeWithTag("Scanner").performClick()
+    //Thread.sleep(1000)
+    composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
+    //User now want to check for the Recepie for Paella
+    composeTestRule.onNodeWithTag("Recipes").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("Recipes").performClick()
+    //Thread.sleep(5000)
+    composeTestRule.onNodeWithTag("recipesScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("searchBar").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule
+      .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("searchBar")))
+      .performTextInput("Paella")
+    composeTestRule.onAllNodesWithTag("recipesCards").assertCountEquals(1)
+    composeTestRule
+      .onNode(hasText("Paella") and hasAnyAncestor(hasTestTag("recipeSearchBar")))
+      .assertIsDisplayed()
   }
 
-//  @Test
-//  fun testDirectAddFoodItemScreenRender() {
-//    composeTestRule.setContent {
-//      AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemsViewModel)
-//    }
-//
-//    // Verify if the tag is displayed directly
-//    composeTestRule.onNodeWithTag("addFoodItemTitle").assertIsDisplayed()
-//  }
+  // Include the FakeFoodFactsRepository within the test class or as a nested class
+  inner class FakeFoodFactsRepository : FoodFactsRepository {
+    var shouldReturnError = false
+    var foodFactsList = listOf<FoodFacts>()
 
-
-
+    override fun searchFoodFacts(
+      searchInput: FoodSearchInput,
+      onSuccess: (List<FoodFacts>) -> Unit,
+      onFailure: (Exception) -> Unit
+    ) {
+      if (shouldReturnError) {
+        onFailure(Exception("Test exception"))
+      } else {
+        onSuccess(foodFactsList)
+      }
+    }
+  }
 }
