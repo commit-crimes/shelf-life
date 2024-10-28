@@ -107,6 +107,9 @@ open class ListRecipesViewModel() : ViewModel() {
     selectedRecipe_.value = recipe
   }
 
+    /**
+     * TODO: complete with Alejandro in a future task. Depends on his vision of the UI and how the viewModel should create a recipe from the OpenAiRecipesRepository
+     */
   fun createRecipe(name: String, instructions: List<String>, servings: Int, time: Duration) {
     val newRecipe = Recipe(name, instructions, servings, time)
     recipes_.value += newRecipe

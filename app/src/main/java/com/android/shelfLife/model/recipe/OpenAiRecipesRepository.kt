@@ -192,6 +192,8 @@ class OpenAiRecipesRepository(
       servings: Int,
       time: kotlin.time.Duration
   ): Recipe {
+
+      //TODO: logic to find and create a new list of Ingredients
     return Recipe(
         name = "Generated Recipe", instructions = instructions, servings = servings, time = time)
   }
