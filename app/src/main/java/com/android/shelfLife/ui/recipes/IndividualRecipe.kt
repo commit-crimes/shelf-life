@@ -1,7 +1,6 @@
 package com.android.shelfLife.ui.recipes
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,17 +13,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -33,8 +27,6 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -55,7 +47,6 @@ import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
-import com.android.shelfLife.ui.utils.getTotalMinutes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -155,7 +146,6 @@ fun IndividualRecipeScreen(
                             modifier = Modifier.width(537.dp).height(159.dp).testTag("recipeImage"),
                             contentScale = ContentScale.FillWidth)
 
-
                         // Row displaying servings and time information
                         Row(modifier = Modifier.fillMaxWidth()) {
                           Text(
@@ -168,7 +158,6 @@ fun IndividualRecipeScreen(
                         }
 
                         Spacer(modifier = Modifier.height(16.dp))
-
 
                         // Display recipe instructions, scrollable if long
                         Text(

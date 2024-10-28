@@ -29,32 +29,30 @@ data class FoodItem(
     val buyDate: Timestamp = Timestamp.now(),
     val status: FoodStatus = FoodStatus.CLOSED
 ) {
-    override fun toString(): String {
-        return "FoodItem:(" +
-                "Location: ${location.name}\n" +
-                "FoodFacts: ${foodFacts}\n" +
-                "Status: ${status.name}\n" +
-                "Expires in: ${getRemainingDays()} days\n)"
-    }
+  override fun toString(): String {
+    return "FoodItem:(" +
+        "Location: ${location.name}\n" +
+        "FoodFacts: ${foodFacts}\n" +
+        "Status: ${status.name}\n" +
+        "Expires in: ${getRemainingDays()} days\n)"
+  }
 
-    fun getImportantDetails(): String {
-        return "${foodFacts.name}[${foodFacts.nutritionFacts.energyKcal}Kcal," +
-                " ${foodFacts.nutritionFacts.proteins}g protein]: " +
-                "(Expires in ${getRemainingDays()} days, ${foodFacts.quantity})"
-    }
+  fun getImportantDetails(): String {
+    return "${foodFacts.name}[${foodFacts.nutritionFacts.energyKcal}Kcal," +
+        " ${foodFacts.nutritionFacts.proteins}g protein]: " +
+        "(Expires in ${getRemainingDays()} days, ${foodFacts.quantity})"
+  }
 
-    /**
-     * returns the remaining days until the food item expires.
-     */
-    fun getRemainingDays(): Long {
-        val expiry = expiryDate?.toDate()?.time ?: return -1
-        val today = Timestamp.now().toDate().time
-        return (expiry - today) / (1000 * 60 * 60 * 24)
-    }
+  /** returns the remaining days until the food item expires. */
+  fun getRemainingDays(): Long {
+    val expiry = expiryDate?.toDate()?.time ?: return -1
+    val today = Timestamp.now().toDate().time
+    return (expiry - today) / (1000 * 60 * 60 * 24)
+  }
 
-    fun isExpired(): Boolean {
-        return getRemainingDays() < 0
-    }
+  fun isExpired(): Boolean {
+    return getRemainingDays() < 0
+  }
 }
 
 /** This enum class represents the status of a food item. */
