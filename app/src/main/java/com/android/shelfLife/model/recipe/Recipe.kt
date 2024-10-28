@@ -1,7 +1,6 @@
 package com.android.shelfLife.model.recipe
 
 import com.android.shelfLife.model.foodItem.FoodItem
-import com.google.firebase.Timestamp
 import kotlin.time.Duration
 
 data class Recipe(
@@ -9,10 +8,11 @@ data class Recipe(
     val instructions: List<String>, // instructions of recipes step by step (hence the list)
     val servings: Int, // total number of servings
     val time: Duration, // time it takes to cook
-    val ingredients : List<Ingredient> = listOf(), // ingredients in recipe todo check with Alex about this
+    val ingredients: List<Ingredient> =
+        listOf(), // ingredients in recipe todo check with Alex about this
 )
 
 data class Ingredient(
     val foodItem: FoodItem,
-    val isOwned: Boolean //false when the user does not have the ingredient (i.e. need to buy)
+    val isOwned: Boolean // false when the user does not have the ingredient (i.e. need to buy)
 )
