@@ -1,13 +1,13 @@
 package com.android.shelfLife.model.recipe
 
 import androidx.lifecycle.ViewModel
-import com.google.firebase.Timestamp
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.Duration.Companion.minutes
+
 open class ListRecipesViewModel() : ViewModel() {
 
   companion object {
@@ -47,49 +47,50 @@ open class ListRecipesViewModel() : ViewModel() {
             "It can be served warm or at room temperature, and is typically enjoyed with crusty bread or a simple salad."
   }
 
-
-    // list of the recipes, for the moment I have filled up manually
-    private val recipes_ = MutableStateFlow<List<Recipe>>(
-        listOf(
-            Recipe(
-                name = "Paella",
-                instructions = listOf("cook"),
-                servings = 4,
-                time = 5400.seconds // 5400 seconds = 90 minutes
-            ),
-            Recipe(
-                name = "Fideua",
-                instructions = listOf("cry"),
-                servings = 3,
-                time = 60.minutes // 3600 seconds = 60 minutes
-            ),
-            Recipe(
-                name = "Tortilla de patata",
-                instructions = listOf(instructionsTortillaDePatata), //TODO: refactor this constant into a list of strings
-                servings = 4,
-                time = 90.minutes // 5400 seconds = 90 minutes
-            ),
-            Recipe(
-                name = "Costillas a la brasa",
-                instructions = listOf("cry"),
-                servings = 3,
-                time = 60.minutes // 3600 seconds = 60 minutes
-            ),
-            Recipe(
-                name = "Curry rojo",
-                instructions = listOf("cook"),
-                servings = 4,
-                time = 5400.seconds // 5400 seconds = 90 minutes
-            ),
-            Recipe(
-                name = "Butifarra con boniato al horno",
-                instructions = listOf("cry"),
-                servings = 3,
-                time = 3600.seconds// 3600 seconds = 60 minutes
-                // it has an extra long name to show the ... in the card
-            )
-        )
-    )
+  // list of the recipes, for the moment I have filled up manually
+  private val recipes_ =
+      MutableStateFlow<List<Recipe>>(
+          listOf(
+              Recipe(
+                  name = "Paella",
+                  instructions = listOf("cook"),
+                  servings = 4,
+                  time = 5400.seconds // 5400 seconds = 90 minutes
+                  ),
+              Recipe(
+                  name = "Fideua",
+                  instructions = listOf("cry"),
+                  servings = 3,
+                  time = 60.minutes // 3600 seconds = 60 minutes
+                  ),
+              Recipe(
+                  name = "Tortilla de patata",
+                  instructions =
+                      listOf(
+                          instructionsTortillaDePatata), // TODO: refactor this constant into a list
+                                                         // of strings
+                  servings = 4,
+                  time = 90.minutes // 5400 seconds = 90 minutes
+                  ),
+              Recipe(
+                  name = "Costillas a la brasa",
+                  instructions = listOf("cry"),
+                  servings = 3,
+                  time = 60.minutes // 3600 seconds = 60 minutes
+                  ),
+              Recipe(
+                  name = "Curry rojo",
+                  instructions = listOf("cook"),
+                  servings = 4,
+                  time = 5400.seconds // 5400 seconds = 90 minutes
+                  ),
+              Recipe(
+                  name = "Butifarra con boniato al horno",
+                  instructions = listOf("cry"),
+                  servings = 3,
+                  time = 3600.seconds // 3600 seconds = 60 minutes
+                  // it has an extra long name to show the ... in the card
+                  )))
 
   val recipes: StateFlow<List<Recipe>> = recipes_.asStateFlow()
 
@@ -106,8 +107,8 @@ open class ListRecipesViewModel() : ViewModel() {
     selectedRecipe_.value = recipe
   }
 
-    fun createRecipe(name: String, instructions: List<String>, servings: Int, time: Duration) {
-        val newRecipe = Recipe(name, instructions, servings, time)
-        recipes_.value += newRecipe
-    }
+  fun createRecipe(name: String, instructions: List<String>, servings: Int, time: Duration) {
+    val newRecipe = Recipe(name, instructions, servings, time)
+    recipes_.value += newRecipe
+  }
 }
