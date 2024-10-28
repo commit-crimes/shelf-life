@@ -68,7 +68,6 @@ fun ShelfLifeApp() {
     navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
       composable(Screen.OVERVIEW) { OverviewScreen(navigationActions, householdViewModel) }
       composable(Screen.ADD_FOOD) {
-        Log.d("Main Activity", "Navigating to add foot item screen")
         AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
       }
     }
