@@ -32,27 +32,33 @@ fun ErrorPopUp(
     paddingValues: PaddingValues = PaddingValues(8.dp),
     modifier: Modifier = Modifier
 ) {
-    if (showDialog) {
-        Dialog(onDismissRequest = onDismiss) {
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                modifier =
-                modifier.testTag("errorDialog").padding(paddingValues).widthIn(min = 200.dp, max = 300.dp)) {
-                Column(
-                    modifier = modifier.padding(paddingValues),
-                    horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "Error", modifier = modifier.padding(bottom = 8.dp), fontSize = 20.sp)
+  if (showDialog) {
+    Dialog(onDismissRequest = onDismiss) {
+      Surface(
+          shape = RoundedCornerShape(12.dp),
+          modifier =
+              modifier
+                  .testTag("errorDialog")
+                  .padding(paddingValues)
+                  .widthIn(min = 200.dp, max = 300.dp)) {
+            Column(
+                modifier = modifier.padding(paddingValues),
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                  Text(text = "Error", modifier = modifier.padding(bottom = 8.dp), fontSize = 20.sp)
 
-                    Column(modifier = modifier.padding(bottom = 8.dp)) {
-                        errorMessages.forEach { message ->
-                            Text(text = message, modifier = modifier.padding(bottom = 4.dp))
-                        }
+                  Column(modifier = modifier.padding(bottom = 8.dp)) {
+                    errorMessages.forEach { message ->
+                      Text(text = message, modifier = modifier.padding(bottom = 4.dp))
                     }
+                  }
 
-                    Button(onClick = onDismiss, modifier = modifier.testTag("errorDialogDismissButton")) { Text("OK") }
+                  Button(
+                      onClick = onDismiss,
+                      modifier = modifier.testTag("errorDialogDismissButton")) {
+                        Text("OK")
+                      }
                 }
-            }
-        }
+          }
     }
+  }
 }

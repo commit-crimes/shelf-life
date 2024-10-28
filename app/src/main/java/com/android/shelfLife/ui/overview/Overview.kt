@@ -78,8 +78,9 @@ fun OverviewScreen(navigationActions: NavigationActions, householdViewModel: Hou
               floatingActionButton = {
                 FloatingActionButton(
                     onClick = {
-                        Log.d("OverviewScreen", "Add Food Item clicked")
-                        navigationActions.navigateTo(Screen.ADD_FOOD) },
+                      Log.d("OverviewScreen", "Add Food Item clicked")
+                      navigationActions.navigateTo(Screen.ADD_FOOD)
+                    },
                     content = { Icon(Icons.Default.Add, contentDescription = "Add") },
                     modifier = Modifier.testTag("addFoodFab"),
                     containerColor = MaterialTheme.colorScheme.secondaryContainer)

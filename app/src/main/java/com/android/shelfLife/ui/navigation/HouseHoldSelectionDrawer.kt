@@ -71,9 +71,9 @@ fun HouseHoldSelectionDrawer(
                   Modifier.padding(vertical = 18.dp, horizontal = 16.dp)
                       .padding(horizontal = 12.dp),
               style = MaterialTheme.typography.labelMedium)
-          userHouseholds.forEachIndexed {index, household ->
-              Log.d("HouseHoldSelectionDrawer", "HouseHoldElement index: $index")
-              selectedHousehold?.let {
+          userHouseholds.forEachIndexed { index, household ->
+            Log.d("HouseHoldSelectionDrawer", "HouseHoldElement index: $index")
+            selectedHousehold?.let {
               HouseHoldElement(
                   household = household,
                   selectedHousehold = it,
@@ -83,8 +83,7 @@ fun HouseHoldSelectionDrawer(
                     }
                     scope.launch { drawerState.close() }
                   },
-                  modifier = Modifier.testTag("householdElement_$index")
-              )
+                  modifier = Modifier.testTag("householdElement_$index"))
             }
           }
           HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))

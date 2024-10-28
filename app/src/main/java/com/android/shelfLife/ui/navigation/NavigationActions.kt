@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.navigation
 
-import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Bookmark
 import androidx.compose.material.icons.outlined.Menu
