@@ -1,7 +1,7 @@
 package com.android.shelfLife.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Bookmark
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Videocam
@@ -51,7 +51,7 @@ object TopLevelDestinations {
   val RECIPES =
       TopLevelDestination(
           route = Route.RECIPES,
-          icon = Icons.Outlined.Bookmark, // Icon for the profile
+          icon = Icons.Outlined.BookmarkBorder, // Icon for the profile
           textId = "Recipes" // Text label for the profile
           )
   val PROFILE =
