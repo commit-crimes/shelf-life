@@ -33,7 +33,7 @@ class OpenFoodFactsRepositoryTest {
   }
 
   @Test
-  fun `test searchFoodFacts with Barcode returns success`() {
+  fun testSearchFoodFactsWithBarcodeReturnsSuccess() {
     // Mocking a successful response from the server
     val mockResponse =
         MockResponse()
@@ -75,7 +75,7 @@ class OpenFoodFactsRepositoryTest {
   }
 
   @Test
-  fun `test searchFoodFacts with Query returns success`() {
+  fun testSearchFoodFactsWithQueryReturnsSuccess() {
     // Mocking a successful response for a query search
     val mockResponse =
         MockResponse()
@@ -133,7 +133,7 @@ class OpenFoodFactsRepositoryTest {
   }
 
   @Test
-  fun `test searchFoodFacts returns HTTP error`() {
+  fun testSearchFoodFactsReturnsHTTPError() {
     // Mocking an HTTP error response
     val mockResponse = MockResponse().setResponseCode(500).setBody("Internal Server Error")
     mockWebServer.enqueue(mockResponse)
@@ -154,7 +154,7 @@ class OpenFoodFactsRepositoryTest {
   }
 
   @Test
-  fun `test searchFoodFacts returns network failure`() {
+  fun testSearchFoodFactsReturnsNetworkFailure() {
     // Simulate network failure
     mockWebServer.shutdown() // Simulating no connection
 
@@ -173,7 +173,7 @@ class OpenFoodFactsRepositoryTest {
   }
 
   @Test
-  fun `test extractFoodFactsFromJson parses correct data`() {
+  fun testExtractFoodFactsFromJsonParsesCorrectData() {
     // Mocking a JSONObject to represent a product
     val productJson =
         JSONObject(
@@ -207,7 +207,7 @@ class OpenFoodFactsRepositoryTest {
   }
 
   @Test
-  fun `test parseQueryResponse parses multiple products`() {
+  fun testParseQueryResponseParsesMultipleProducts() {
     // Mocking a JSON response string for a query
     val responseBody =
         """
@@ -251,7 +251,7 @@ class OpenFoodFactsRepositoryTest {
   }
 
   @Test
-  fun `test parseBarcodeResponse parses single product`() {
+  fun testParseBarcodeResponseParsesSingleProduct() {
     // Mocking a JSON response string for a barcode
     val responseBody =
         """
@@ -281,7 +281,7 @@ class OpenFoodFactsRepositoryTest {
   }
 
   @Test
-  fun `test parseBarcodeResponse returns empty list when no product is found`() {
+  fun testParseBarcodeResponseReturnsEmptyListWhenNoProductIsFound() {
     // Mocking an empty JSON response
     val responseBody =
         """
@@ -298,7 +298,7 @@ class OpenFoodFactsRepositoryTest {
   }
 
   @Test
-  fun `test parseFoodFactsResponse for barcode input`() {
+  fun testParseFoodFactsResponseForBarcodeInput() {
     val responseBody =
         """
             {
@@ -326,7 +326,7 @@ class OpenFoodFactsRepositoryTest {
   }
 
   @Test
-  fun `test parseFoodFactsResponse for query input`() {
+  fun testParseFoodFactsResponseForQueryInput() {
     val responseBody =
         """
             {
