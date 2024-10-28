@@ -31,30 +31,49 @@ class OpenAiRecipesRepository(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : RecipesRepository {
 
+  companion object {
+    const val USE_SOON_TO_EXPIRE_SYSTEM_PROMPT =
+        "You are an assistant who generates recipes using ingredients that are about to expire."
+    const val USE_SOON_TO_EXPIRE_USER_PROMPT =
+        "Create a recipe using the following ingredients that are about to expire: "
+
+    const val USE_ONLY_HOUSEHOLD_ITEMS_SYSTEM_PROMPT =
+        "You are an assistant who generates recipes using common household ingredients."
+    const val USE_ONLY_HOUSEHOLD_ITEMS_USER_PROMPT =
+        "Create a recipe using the following common household ingredients: "
+
+    const val HIGH_PROTEIN_SYSTEM_PROMPT =
+        "You are an assistant who generates high-protein recipes."
+    const val HIGH_PROTEIN_USER_PROMPT =
+        "Create a high-protein recipe using the following ingredients: "
+
+    const val LOW_CALORIE_SYSTEM_PROMPT = "You are an assistant who generates low-calorie recipes."
+    const val LOW_CALORIE_USER_PROMPT =
+        "Create a low-calorie recipe using the following ingredients: "
+  }
+
   // Define custom prompts for different recipe types
   private fun getPromptsForMode(
       listFoodItems: List<FoodItem>,
       searchRecipeType: RecipesRepository.SearchRecipeType
   ): Pair<String, String> {
+
     val foodItemsNames = listFoodItems.joinToString(", ") { it.toString() }
 
     // System and user prompts based on the recipe search type
     return when (searchRecipeType) {
       RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE -> {
-        "You are an assistant who generates recipes using ingredients that are about to expire." to
-            "Create a recipe using the following ingredients that are about to expire: $foodItemsNames."
+        USE_SOON_TO_EXPIRE_SYSTEM_PROMPT to "$USE_SOON_TO_EXPIRE_USER_PROMPT$foodItemsNames."
       }
       RecipesRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS -> {
-        "You are an assistant who generates recipes using common household ingredients." to
-            "Create a recipe using the following common household ingredients: $foodItemsNames."
+        USE_ONLY_HOUSEHOLD_ITEMS_SYSTEM_PROMPT to
+            "$USE_ONLY_HOUSEHOLD_ITEMS_USER_PROMPT$foodItemsNames."
       }
       RecipesRepository.SearchRecipeType.HIGH_PROTEIN -> {
-        "You are an assistant who generates high-protein recipes." to
-            "Create a high-protein recipe using the following ingredients: $foodItemsNames."
+        HIGH_PROTEIN_SYSTEM_PROMPT to "$HIGH_PROTEIN_USER_PROMPT$foodItemsNames."
       }
       RecipesRepository.SearchRecipeType.LOW_CALORIE -> {
-        "You are an assistant who generates low-calorie recipes." to
-            "Create a low-calorie recipe using the following ingredients: $foodItemsNames."
+        LOW_CALORIE_SYSTEM_PROMPT to "$LOW_CALORIE_USER_PROMPT$foodItemsNames."
       }
     }
   }
