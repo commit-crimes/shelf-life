@@ -1,151 +1,204 @@
 package com.android.shelfLife.model.recipe
 
-import com.aallam.openai.api.http.Timeout
+import com.aallam.openai.api.chat.ChatChoice
+import com.aallam.openai.api.chat.ChatCompletion
+import com.aallam.openai.api.chat.ChatMessage
+import com.aallam.openai.api.chat.ChatRole
+import com.aallam.openai.api.chat.FunctionCall
+import com.aallam.openai.api.chat.ToolCall
+import com.aallam.openai.api.chat.ToolId
+import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
-import com.android.shelfLife.BuildConfig
-import com.android.shelfLife.model.foodFacts.*
-import com.android.shelfLife.model.foodItem.*
-import com.google.firebase.Timestamp
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
-import org.junit.After
+import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodFacts.Quantity
+import com.android.shelfLife.model.foodItem.FoodItem
+import kotlin.time.Duration.Companion.microseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import kotlin.time.Duration.Companion.seconds
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.whenever
 
-class OpenAiRecipesRepositoryIntegrationTest {
+class OpenAiRecipesRepositoryTest {
 
-    private lateinit var mockWebServer: MockWebServer
-    private lateinit var openAiRecipesRepository: OpenAiRecipesRepository
+  @Mock private lateinit var mockOpenAI: OpenAI
+  private lateinit var openAiRecipesRepository: OpenAiRecipesRepository
 
-    val oneDaySeconds = 24 * 60 * 60 // 1 day in milliseconds
+  @OptIn(ExperimentalCoroutinesApi::class) private val testDispatcher = UnconfinedTestDispatcher()
 
-    val foodItems = listOf(
-        FoodItem(
-            uid = "1",
-            foodFacts = FoodFacts(
-                name = "Apple",
-                barcode = "123456789012",
-                quantity = Quantity(4.0, FoodUnit.COUNT),
-                category = FoodCategory.FRUIT
-            ),
-            location = FoodStorageLocation.PANTRY,
-            expiryDate = Timestamp.now(), // Just purchased, no expiry date provided
-            status = FoodStatus.CLOSED
-        ),
-        FoodItem(
-            uid = "2",
-            foodFacts = FoodFacts(
-                name = "Milk",
-                barcode = "987654321098",
-                quantity = Quantity(1000.0, FoodUnit.ML),
-                category = FoodCategory.DAIRY,
-                nutritionFacts = NutritionFacts(energyKcal = 50, fat = 3.0, proteins = 3.4, sugars = 5.0)
-            ),
-            location = FoodStorageLocation.FRIDGE,
-            expiryDate = Timestamp(Timestamp.now().seconds + 1 * oneDaySeconds, 0), // Expires in 5 days
-            status = FoodStatus.CLOSED
-        ),
-        FoodItem(
-            uid = "3",
-            foodFacts = FoodFacts(
-                name = "Chicken Breast",
-                barcode = "564738291234",
-                quantity = Quantity(500.0, FoodUnit.GRAM),
-                category = FoodCategory.MEAT
-            ),
-            location = FoodStorageLocation.FREEZER,
-            expiryDate = Timestamp(Timestamp.now().seconds + 5 * oneDaySeconds, 0), // Expires in 5 days
-            status = FoodStatus.CLOSED
-        ),
-        FoodItem(
-            uid = "4",
-            foodFacts = FoodFacts(
-                name = "Orange Juice",
-                barcode = "349857621098",
-                quantity = Quantity(1500.0, FoodUnit.ML),
-                category = FoodCategory.BEVERAGE
-            ),
-            location = FoodStorageLocation.FRIDGE,
-            expiryDate = Timestamp(Timestamp.now().seconds + 3 * oneDaySeconds, 0), // Expires in 5 days
-            status = FoodStatus.OPEN
-        ),
-        FoodItem(
-            uid = "5",
-            foodFacts = FoodFacts(
-                name = "Pasta",
-                barcode = "238974561234",
-                quantity = Quantity(500.0, FoodUnit.GRAM),
-                category = FoodCategory.GRAIN
-            ),
-            location = FoodStorageLocation.PANTRY,
-            expiryDate = null, // No expiry date provided
-            status = FoodStatus.CLOSED
-        ),
-        FoodItem(
-            uid = "5",
-            foodFacts = FoodFacts(
-                name = "Pasta",
-                barcode = "238974561234",
-                quantity = Quantity(500.0, FoodUnit.GRAM),
-                category = FoodCategory.GRAIN
-            ),
-            location = FoodStorageLocation.PANTRY,
-            expiryDate = null, // No expiry date provided
-            status = FoodStatus.CLOSED
-        )
-    )
+  private val testFoodItems =
+      listOf(
+          FoodItem(
+              uid = "1",
+              foodFacts =
+                  FoodFacts(name = "Ingredient 1", quantity = Quantity(1.0, FoodUnit.COUNT))),
+          FoodItem(
+              uid = "2",
+              foodFacts =
+                  FoodFacts(name = "Ingredient 2", quantity = Quantity(1.0, FoodUnit.COUNT))))
 
-    @Before
-    fun setUp() {
-        // Initialize the mock web server (if needed, otherwise comment this out for real calls)
-        mockWebServer = MockWebServer()
-        mockWebServer.start()
+  @Before
+  fun setUp() {
+    MockitoAnnotations.openMocks(this)
+    openAiRecipesRepository =
+        OpenAiRecipesRepository(openai = mockOpenAI, dispatcher = testDispatcher)
+  }
 
-        // Initialize OpenAI repository with real API key (or mock URL if using MockWebServer)
-        val openai = OpenAI(
-            token = BuildConfig.OPENAI_API_KEY,
-            timeout = Timeout(socket = 60.seconds)
-        )
-        openAiRecipesRepository = OpenAiRecipesRepository(openai, dispatcher = Dispatchers.IO)
-    }
+  @Test
+  fun `generateRecipes should call OpenAI with appropriate request`() =
+      runTest(testDispatcher) {
+        val mockResponse = mockRecipeResponse()
+        whenever(mockOpenAI.chatCompletion(any(), anyOrNull())).thenReturn(mockResponse)
 
-    @After
-    fun tearDown() {
-        // Shut down the mock web server after each test (if needed)
-        mockWebServer.shutdown()
-    }
-
-    @Test
-    fun `test generateRecipes from OpenAI API and print results`(): Unit = runBlocking {
-        val latch = CountDownLatch(1)
-        // Example food items for the recipe generation
-
-        // Call the repository to generate a recipe using OpenAI
+        var recipesResult: List<Recipe>? = null
         openAiRecipesRepository.generateRecipes(
-            listFoodItems = foodItems,
-            searchRecipeType = RecipesRepository.SearchRecipeType.LOW_CALORIE,
+            testFoodItems,
+            RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE,
             onSuccess = { recipes ->
-                // Print the recipes to the console
-                recipes.forEach { recipe ->
-                    println("Generated Recipe: ${recipe.name}")
-                    println("Ingredients: ${recipe.ingredients}")
-                    println("Instructions: ${recipe.instructions.mapIndexed { index, instruction -> "${index + 1}. $instruction" }.joinToString(", ")}")
-                    println("Servings: ${recipe.servings}")
-                    println("Time: ${recipe.time}")
-                }
-                latch.countDown()
+              println("Success: Recipes generated successfully $recipes")
+              recipesResult = recipes
             },
-            onFailure = { error ->
-                println("Error generating recipes: ${error.message}")
-                latch.countDown()
-            }
-        )
+            onFailure = { e ->
+              println("FAILURE: $e")
+              fail("Expected success callback")
+            })
 
-        latch.await(10, TimeUnit.SECONDS) // Wait for the recipe generation to complete
+        // No need to advance time with UnconfinedTestDispatcher
+
+        assertNotNull(recipesResult)
+        assertEquals(1, recipesResult?.size)
+        assertEquals("Generated Recipe", recipesResult?.first()?.name)
+      }
+
+  @Test
+  fun `generateRecipes should call onFailure on exception`() =
+      runTest(testDispatcher) {
+        whenever(mockOpenAI.chatCompletion(any(), anyOrNull()))
+            .thenThrow(RuntimeException("API error"))
+
+        var errorMessage: String? = null
+        openAiRecipesRepository.generateRecipes(
+            testFoodItems,
+            RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE,
+            onSuccess = { fail("Expected failure callback") },
+            onFailure = { error ->
+              println("FAILURE: $error")
+              errorMessage = error.message
+            })
+
+        assertEquals("API error", errorMessage)
+      }
+
+  /**
+   * Uses "hacky" reflection to test private method (Prof. Candea's suggestion:
+   * https://edstem.org/eu/courses/1567/discussion/131808)
+   */
+  @Test
+  fun `test _createRecipeFunction using reflection`() {
+    val method =
+        OpenAiRecipesRepository::class.java.declaredMethods.firstOrNull {
+          it.name == "_createRecipeFunction"
+        } ?: throw NoSuchMethodException("Method _createRecipeFunction not found")
+
+    method.isAccessible = true
+
+    val ingredients = listOf("Chicken", "Rice", "Broccoli")
+    val instructions = listOf("Cook rice", "Steam broccoli", "Grill chicken")
+    val servings = 5
+    val time = 100.seconds // Original Duration value
+
+    // Convert time to milliseconds (Long) for reflection (it compiled Duration into a Long)
+    val timeInMillis = time.inWholeMilliseconds
+
+    // Invoke the private method
+    val recipe =
+        method.invoke(openAiRecipesRepository, ingredients, instructions, servings, timeInMillis)
+            as Recipe
+
+    // Assertions for the returned Recipe
+    assertNotNull(recipe)
+    assertEquals("Generated Recipe", recipe.name)
+    assertEquals(instructions, recipe.instructions)
+    assertEquals(servings, recipe.servings)
+
+    // Assert that the Recipe's time matches the expected time in milliseconds
+    // REALLY STRANGE expected and real values, due to JVM compiling Duration into a Long and it
+    // messes up everything...
+    assertEquals(
+        timeInMillis.microseconds.toDouble(DurationUnit.MILLISECONDS),
+        recipe.time.toDouble(DurationUnit.MICROSECONDS) * 2,
+        0.1) // Consistent units
+  }
+
+  // Mock method for generating a recipe response
+  private fun mockRecipeResponse(): ChatCompletion {
+    // Mock the tool response as a JSON object to simulate recipe generation
+    val mockToolResponse = buildJsonObject {
+      put(
+          "ingredients",
+          buildJsonArray {
+            add("Chicken")
+            add("Rice")
+            add("Broccoli")
+          })
+      put("servings", 2)
+      put("time", "30 minutes")
+      putJsonArray("instructions") {
+        add("Cook rice")
+        add("Steam broccoli")
+        add("Grill chicken")
+      }
     }
+
+    // Convert the mockToolResponse to a JSON string for argumentsOrNull
+    val mockToolResponseString = Json.encodeToString(mockToolResponse)
+
+    // Define the FunctionCall with the function name and arguments
+    val functionCall =
+        FunctionCall(nameOrNull = "_createRecipeFunction", argumentsOrNull = mockToolResponseString)
+
+    // Assuming `ToolCall` has an associated method or factory for instantiation
+    val mockToolCall =
+        ToolCall.Function(id = ToolId("_createRecipeFunction"), function = functionCall)
+
+    // Creating the mock message with tool calls
+    val mockMessage =
+        ChatMessage(
+            role = ChatRole.Assistant,
+            content = "Generated Recipe",
+            toolCalls =
+                listOf(mockToolCall) // Assuming toolCalls is the list of tool calls required
+            )
+
+    // Creating the choice with the missing index value added
+    val mockChoice =
+        ChatChoice(
+            index = 0, // Add index for ChatChoice
+            message = mockMessage)
+
+    // Returning a mock ChatCompletion response
+    return ChatCompletion(
+        id = "test_id",
+        created = System.currentTimeMillis() / 1000, // Mock Unix timestamp
+        model = ModelId("test-model"),
+        choices = listOf(mockChoice))
+  }
 }
