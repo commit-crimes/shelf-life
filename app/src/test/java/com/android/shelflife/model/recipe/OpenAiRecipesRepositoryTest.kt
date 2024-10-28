@@ -13,6 +13,7 @@ import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodItem.FoodItem
+import java.lang.reflect.Method
 import kotlin.time.Duration.Companion.microseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -60,6 +61,51 @@ class OpenAiRecipesRepositoryTest {
     MockitoAnnotations.openMocks(this)
     openAiRecipesRepository =
         OpenAiRecipesRepository(openai = mockOpenAI, dispatcher = testDispatcher)
+  }
+
+  /**
+   * Test for every recipe type enum value, ensuring that the correct system and user prompts are
+   * generated.
+   */
+  @Test
+  fun `getPromptsForMode should return correct prompts for all recipe types`() {
+    val method: Method =
+        OpenAiRecipesRepository::class
+            .java
+            .getDeclaredMethod(
+                "getPromptsForMode",
+                List::class.java,
+                RecipesRepository.SearchRecipeType::class.java)
+    method.isAccessible = true // Make the method accessible
+
+    // Define expected system and user prompts for each search type
+    val ingredientsString = testFoodItems.joinToString(", ") { it.toString() }
+    val expectedPrompts =
+        mapOf(
+            RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE to
+                (OpenAiRecipesRepository.USE_SOON_TO_EXPIRE_SYSTEM_PROMPT to
+                    "${OpenAiRecipesRepository.USE_SOON_TO_EXPIRE_USER_PROMPT}${ingredientsString}."),
+            RecipesRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS to
+                (OpenAiRecipesRepository.USE_ONLY_HOUSEHOLD_ITEMS_SYSTEM_PROMPT to
+                    "${OpenAiRecipesRepository.USE_ONLY_HOUSEHOLD_ITEMS_USER_PROMPT}${ingredientsString}."),
+            RecipesRepository.SearchRecipeType.HIGH_PROTEIN to
+                (OpenAiRecipesRepository.HIGH_PROTEIN_SYSTEM_PROMPT to
+                    "${OpenAiRecipesRepository.HIGH_PROTEIN_USER_PROMPT}${ingredientsString}."),
+            RecipesRepository.SearchRecipeType.LOW_CALORIE to
+                (OpenAiRecipesRepository.LOW_CALORIE_SYSTEM_PROMPT to
+                    "${OpenAiRecipesRepository.LOW_CALORIE_USER_PROMPT}${ingredientsString}."))
+
+    // Iterate over each search type and test the generated prompts
+    for ((searchType, expectedPromptPair) in expectedPrompts) {
+      val (expectedSystemPrompt, expectedUserPrompt) = expectedPromptPair
+
+      val (systemPrompt, userPrompt) =
+          method.invoke(openAiRecipesRepository, testFoodItems, searchType) as Pair<String, String>
+
+      assertEquals(
+          "System prompt for $searchType did not match.", expectedSystemPrompt, systemPrompt)
+      assertEquals("User prompt for $searchType did not match.", expectedUserPrompt, userPrompt)
+    }
   }
 
   @Test
