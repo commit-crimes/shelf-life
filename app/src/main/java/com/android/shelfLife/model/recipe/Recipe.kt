@@ -1,5 +1,6 @@
 package com.android.shelfLife.model.recipe
 
+import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodItem.FoodItem
 import kotlin.time.Duration
 
@@ -13,6 +14,6 @@ data class Recipe(
 )
 
 data class Ingredient(
-    val foodItem: FoodItem,
+    val foodFacts: FoodFacts,
     val isOwned: Boolean // false when the user does not have the ingredient (i.e. need to buy)
 )
