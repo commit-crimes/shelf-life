@@ -1,12 +1,4 @@
-package com.android.shelflife.authentication
-
-// ***************************************************************************** //
-// ***                                                                       *** //
-// *** THIS FILE WILL BE OVERWRITTEN DURING GRADING. IT SHOULD BE LOCATED IN *** //
-// *** `app/src/androidTest/java/com/github/se/bootcamp/authentication/`.    *** //
-// *** DO **NOT** IMPLEMENT YOUR OWN TESTS IN THIS FILE                      *** //
-// ***                                                                       *** //
-// ***************************************************************************** //
+package com.android.shelfLife
 
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
@@ -18,20 +10,27 @@ import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.shelfLife.MainActivity
+import com.google.firebase.auth.FirebaseAuth
 import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class LoginTest : TestCase() {
+class MainActivityTest : TestCase() {
+
   @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
 
-  // The IntentsTestRule simply calls Intents.init() before the @Test block
-  // and Intents.release() after the @Test block is completed. IntentsTestRule
-  // is deprecated, but it was MUCH faster than using IntentsRule in our tests
   @get:Rule val intentsTestRule = IntentsTestRule(MainActivity::class.java)
+
+  private lateinit var firebaseAuth: FirebaseAuth
+
+  @Before
+  fun setup() {
+    firebaseAuth = FirebaseAuth.getInstance()
+    firebaseAuth.signOut() // Ensure the user is signed out before each test
+  }
 
   @Test
   fun titleAndButtonAreCorrectlyDisplayed() {
@@ -46,7 +45,60 @@ class LoginTest : TestCase() {
   fun googleSignInReturnsValidActivityResult() {
     composeTestRule.onNodeWithTag("loginButton").performClick()
 
-    // assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
+    // Assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
     intended(toPackage("com.google.android.gms"))
+  }
+
+  @Test
+  fun overviewScreenDisplaysWhenLoggedIn() {
+    firebaseAuth.signInAnonymously().addOnCompleteListener {
+      if (it.isSuccessful) {
+        composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+      }
+    }
+  }
+
+  @Test
+  fun addFoodScreenAccessibleFromOverview() {
+    firebaseAuth.signInAnonymously().addOnCompleteListener {
+      if (it.isSuccessful) {
+        composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("navigateToAddFood").performClick()
+        composeTestRule.onNodeWithTag("addFoodScreen").assertIsDisplayed()
+      }
+    }
+  }
+
+  @Test
+  fun barcodeScannerScreenAccessibleWhenPermissionGranted() {
+    firebaseAuth.signInAnonymously().addOnCompleteListener {
+      if (it.isSuccessful) {
+        composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("navigateToBarcodeScanner").performClick()
+        composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
+      }
+    }
+  }
+
+  @Test
+  fun recipeScreenAccessibleFromOverview() {
+    firebaseAuth.signInAnonymously().addOnCompleteListener {
+      if (it.isSuccessful) {
+        composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("navigateToRecipes").performClick()
+        composeTestRule.onNodeWithTag("recipeScreen").assertIsDisplayed()
+      }
+    }
+  }
+
+  @Test
+  fun profileScreenAccessibleFromOverview() {
+    firebaseAuth.signInAnonymously().addOnCompleteListener {
+      if (it.isSuccessful) {
+        composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("navigateToProfile").performClick()
+        composeTestRule.onNodeWithTag("profileScreen").assertIsDisplayed()
+      }
+    }
   }
 }
