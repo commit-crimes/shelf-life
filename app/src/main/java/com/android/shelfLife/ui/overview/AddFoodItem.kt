@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.overview
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -44,6 +45,7 @@ import java.util.*
  * @param foodItemViewModel An instance of [ListFoodItemsViewModel] that provides access to the
  *   user's food item data.
  */
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddFoodItemScreen(
@@ -83,26 +85,26 @@ fun AddFoodItemScreen(
                   }
             })
       },
-  ) { padding ->
+  ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(padding).padding(16.dp),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top) {
           OutlinedTextField(
               value = foodName,
               onValueChange = { foodName = it },
               label = { Text(stringResource(id = R.string.food_name_hint)) },
-              modifier = Modifier.testTag("inputFoodName").fillMaxWidth().padding(bottom = 16.dp))
+              modifier = Modifier.testTag("inputFoodName").fillMaxWidth())
 
           Row(
-              modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+              modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween) {
                 OutlinedTextField(
                     value = amount,
                     onValueChange = { amount = it },
                     label = { Text(stringResource(id = R.string.amount_hint)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.testTag("inputFoodAmount").weight(1f).padding(end = 8.dp))
+                    modifier = Modifier.testTag("inputFoodAmount").weight(1f))
 
                 DropdownFields(
                     label = stringResource(id = R.string.unit_label),
@@ -143,8 +145,7 @@ fun AddFoodItemScreen(
               onValueChange = { expireDate = it },
               label = { Text(stringResource(id = R.string.expire_date_hint)) },
               placeholder = { Text("dd/mm/yyyy") },
-              modifier =
-                  Modifier.testTag("inputFoodExpireDate").fillMaxWidth().padding(bottom = 16.dp),
+              modifier = Modifier.testTag("inputFoodExpireDate").fillMaxWidth(),
           )
 
           OutlinedTextField(
@@ -152,8 +153,7 @@ fun AddFoodItemScreen(
               onValueChange = { openDate = it },
               label = { Text(stringResource(id = R.string.open_date_hint)) },
               placeholder = { Text("dd/mm/yyyy") },
-              modifier =
-                  Modifier.testTag("inputFoodOpenDate").fillMaxWidth().padding(bottom = 16.dp),
+              modifier = Modifier.testTag("inputFoodOpenDate").fillMaxWidth(),
           )
 
           OutlinedTextField(
@@ -161,15 +161,14 @@ fun AddFoodItemScreen(
               onValueChange = { buyDate = it },
               label = { Text(stringResource(id = R.string.buy_date_hint)) },
               placeholder = { Text("dd/mm/yyyy") },
-              modifier =
-                  Modifier.testTag("inputFoodBuyDate").fillMaxWidth().padding(bottom = 32.dp),
+              modifier = Modifier.testTag("inputFoodBuyDate").fillMaxWidth(),
           )
 
           Button(
               onClick = {
                 errorMessages.clear()
 
-                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
 
                 try {
                   val expireDateParsed = sdf.parse(expireDate)
