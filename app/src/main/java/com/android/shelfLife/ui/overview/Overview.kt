@@ -13,6 +13,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -36,11 +37,15 @@ import kotlinx.coroutines.launch
  * @param householdViewModel The ViewModel for the households the user has access to
  */
 @Composable
-fun OverviewScreen(navigationActions: NavigationActions, householdViewModel: HouseholdViewModel) {
+fun OverviewScreen(
+    navigationActions: NavigationActions,
+    householdViewModel: HouseholdViewModel,
+) {
   val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
   var searchQuery by remember { mutableStateOf("") }
   val foodItems = selectedHousehold?.foodItems ?: emptyList()
   val userHouseholds = householdViewModel.households.collectAsState().value
+  var selectedFilters = remember { mutableStateListOf<String>() }
 
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
@@ -50,13 +55,17 @@ fun OverviewScreen(navigationActions: NavigationActions, householdViewModel: Hou
 
   HouseHoldSelectionDrawer(
       scope = scope, drawerState = drawerState, householdViewModel = householdViewModel) {
-      val filteredFoodItems =
-          foodItems.filter { it.foodFacts.name.contains(searchQuery, ignoreCase = true) }
+        val filteredFoodItems =
+            foodItems.filter { item ->
+              item.foodFacts.name.contains(searchQuery, ignoreCase = true) &&
+                  (selectedFilters.isEmpty() ||
+                      selectedFilters.contains(item.foodFacts.category.name))
+            }
 
-      // Display a welcome screen when the user has no households
-      if (selectedHousehold == null && userHouseholds.isEmpty()) {
+        // Display a welcome screen when the user has no households
+        if (selectedHousehold == null && userHouseholds.isEmpty()) {
           FirstTimeWelcomeScreen(householdViewModel)
-      } else {
+        } else {
           Scaffold(
               modifier = Modifier.testTag("overviewScreen"),
               topBar = {
@@ -64,7 +73,15 @@ fun OverviewScreen(navigationActions: NavigationActions, householdViewModel: Hou
                   TopNavigationBar(
                       houseHold = it,
                       onHamburgerClick = { scope.launch { drawerState.open() } },
-                      filters = filters)
+                      filters = filters,
+                      selectedFilters = selectedFilters,
+                      onFilterChange = { filter, isSelected ->
+                        if (isSelected) {
+                          selectedFilters.add(filter)
+                        } else {
+                          selectedFilters.remove(filter)
+                        }
+                      })
                 }
               },
               bottomBar = {

@@ -17,9 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,7 +28,6 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -75,84 +72,63 @@ fun ListFoodItems(foodItems: List<FoodItem>) {
   }
 }
 
-
 @Composable
 fun FoodItemCard(foodItem: FoodItem) {
-    val expiryDate = foodItem.expiryDate
-    val currentDate = Timestamp.now()
+  val expiryDate = foodItem.expiryDate
+  val currentDate = Timestamp.now()
 
-    val timeRemaining = expiryDate?.seconds?.minus(currentDate.seconds) ?: 0L
-    val thresholds = getThresholdsForCategory(foodItem.foodFacts.category)
+  val timeRemaining = expiryDate?.seconds?.minus(currentDate.seconds) ?: 0L
+  val thresholds = getThresholdsForCategory(foodItem.foodFacts.category)
 
-    val (progress, progressBarColor) = getProgressBarState(timeRemaining, thresholds)
+  val (progress, progressBarColor) = getProgressBarState(timeRemaining, thresholds)
 
-    val formattedExpiryDate = expiryDate?.toDate()
-        ?.let { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it) }
-        ?: "No Expiry Date"
+  val formattedExpiryDate =
+      expiryDate?.toDate()?.let { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it) }
+          ?: "No Expiry Date"
 
-    ElevatedCard(
-        elevation = CardDefaults.elevatedCardElevation(),
-        colors = CardDefaults.elevatedCardColors(containerColor = Color.White),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .background(Color.White)
-            .testTag("foodItemCard")
-    ) {
+  ElevatedCard(
+      elevation = CardDefaults.elevatedCardElevation(),
+      colors = CardDefaults.elevatedCardColors(containerColor = Color.White),
+      modifier =
+          Modifier.fillMaxWidth()
+              .padding(horizontal = 16.dp, vertical = 8.dp)
+              .background(Color.White)
+              .testTag("foodItemCard")) {
         Row(modifier = Modifier.padding(16.dp)) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = foodItem.foodFacts.name,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
+          Column(modifier = Modifier.weight(1f)) {
+            Text(text = foodItem.foodFacts.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
-                when (foodItem.foodFacts.quantity.unit) {
-                    FoodUnit.GRAM -> Text(
-                        text = "${foodItem.foodFacts.quantity.amount.toInt()}g",
-                        fontSize = 12.sp
-                    )
-                    FoodUnit.ML -> Text(
-                        text = "${foodItem.foodFacts.quantity.amount.toInt()}ml",
-                        fontSize = 12.sp
-                    )
-                    FoodUnit.COUNT -> Text(
-                        text = "${foodItem.foodFacts.quantity.amount.toInt()} in stock",
-                        fontSize = 12.sp
-                    )
-                }
-
-                Text(
-                    text = "Expires on $formattedExpiryDate",
-                    fontSize = 12.sp,
-                    color = Color.Black
-                )
-
+            when (foodItem.foodFacts.quantity.unit) {
+              FoodUnit.GRAM ->
+                  Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}g", fontSize = 12.sp)
+              FoodUnit.ML ->
+                  Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}ml", fontSize = 12.sp)
+              FoodUnit.COUNT ->
+                  Text(
+                      text = "${foodItem.foodFacts.quantity.amount.toInt()} in stock",
+                      fontSize = 12.sp)
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Text(text = "Expires on $formattedExpiryDate", fontSize = 12.sp, color = Color.Black)
+          }
 
-            AsyncImage(
-                model = foodItem.foodFacts.imageUrl,
-                contentDescription = "Food Image",
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
-            )
+          Spacer(modifier = Modifier.width(8.dp))
+
+          AsyncImage(
+              model = foodItem.foodFacts.imageUrl,
+              contentDescription = "Food Image",
+              modifier = Modifier.size(64.dp).clip(RoundedCornerShape(8.dp)),
+              contentScale = ContentScale.Crop)
         }
         Row {
-            LinearProgressIndicator(
-                progress = progress,
-                color = progressBarColor,
-                trackColor = LightGray,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-            )
+          LinearProgressIndicator(
+              progress = progress,
+              color = progressBarColor,
+              trackColor = LightGray,
+              modifier = Modifier.fillMaxWidth().height(8.dp))
         }
         Spacer(modifier = Modifier.width(8.dp))
-    }
+      }
 }
 
 /**

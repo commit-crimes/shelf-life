@@ -5,7 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -54,7 +53,6 @@ fun ShelfLifeApp() {
       HouseholdViewModel(HouseholdRepositoryFirestore(firebaseFirestore), listFoodItemViewModel)
   val foodFactsRepository = OpenFoodFactsRepository(OkHttpClient())
   val foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)
-
   val barcodeScannerViewModel: BarcodeScannerViewModel = viewModel()
 
   NavHost(navController = navController, startDestination = Route.AUTH) {
