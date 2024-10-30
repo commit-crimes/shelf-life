@@ -82,7 +82,15 @@ open class NavigationActions(
    */
   open fun navigateTo(destination: TopLevelDestination) {
     navController.navigate(destination.route) {
-      popUpTo(navController.graph.startDestinationId) { saveState = true }
+      popUpTo(navController.graph.id) { saveState = true }
+      launchSingleTop = true
+      restoreState = true
+    }
+  }
+
+  open fun navigateToAndClearBackStack(screen: String) {
+    navController.navigate(screen) {
+      popUpTo(navController.graph.id) { saveState = true }
       launchSingleTop = true
       restoreState = true
     }

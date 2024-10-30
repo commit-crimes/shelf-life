@@ -86,7 +86,6 @@ fun ProfileScreen(
                   onClick = {
                     // Sign out the user
                     signOutUser()
-                    navigationActions.navigateTo(Route.AUTH)
                   },
                   modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
                   border = BorderStroke(1.dp, Color.Red) // Outline color matches the current status
