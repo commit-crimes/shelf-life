@@ -22,6 +22,8 @@ android {
         localProperties.load(FileInputStream(localPropertiesFile))
     }
 
+    val openAIApiKey: String = localProperties.getProperty("OPENAI_API_KEY") ?: ""
+
     defaultConfig {
         applicationId = "com.android.shelfLife"
         minSdk = 24
@@ -33,6 +35,13 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // Add the API key to the BuildConfig class
+        buildConfigField(
+            type = "String",
+            name = "OPENAI_API_KEY",
+            value = "\"${openAIApiKey}\""
+        )
     }
 
     testOptions {
@@ -67,6 +76,7 @@ android {
     }
 
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 
@@ -85,6 +95,7 @@ android {
             excludes += "META-INF/LICENSE.txt"
             excludes += "META-INF/NOTICE"
             excludes += "META-INF/NOTICE.txt"
+            pickFirsts += "META-INF/DEPENDENCIES"
         }
     }
 
@@ -205,7 +216,12 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.material.icons.extended)
 
-    // Barcode Scanner
+    //Openai
+    implementation(libs.aallam.openai.client)
+    implementation(libs.ktor.client.apache5)
+
+    //Barcode Scanner
+
     implementation(libs.mlkit.barcode.scanning)
     implementation(libs.camerax.camera2)
     implementation(libs.camerax.lifecycle)

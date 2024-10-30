@@ -19,13 +19,25 @@ data class FoodFacts(
     val barcode: String = "", // Barcode number
     val quantity: Quantity, // Quantity of the food item
     val category: FoodCategory = FoodCategory.OTHER, // Default category is OTHER
-    val nutritionFacts: NutritionFacts = NutritionFacts() // Default empty NutritionFacts object
-)
+    val nutritionFacts: NutritionFacts = NutritionFacts(), // Default empty NutritionFacts object
+) {
+  override fun toString(): String {
+    return "Name: $name\n" +
+        "Barcode: $barcode\n" +
+        "Quantity: $quantity\n" +
+        "Category: ${category.name}\n" +
+        "Nutrition facts: $nutritionFacts"
+  }
+}
 
 data class Quantity(
     val amount: Double, // Amount of the quantity
     val unit: FoodUnit = FoodUnit.GRAM // Unit of the quantity
-)
+) {
+  override fun toString(): String {
+    return "$amount ${unit.name.lowercase()}"
+  }
+}
 
 enum class FoodUnit {
   GRAM, // Gram unit
@@ -56,4 +68,14 @@ data class NutritionFacts(
     val sugars: Double = 0.0, // Default sugars value is 0.0g if not provided
     val proteins: Double = 0.0, // Default proteins value is 0.0g
     val salt: Double = 0.0, // Default salt value is 0.0g
-)
+) {
+  override fun toString(): String {
+    return "Energy: $energyKcal Kcal\n" +
+        "Fat: $fat g\n" +
+        "Saturated fat: $saturatedFat g\n" +
+        "Carbohydrates: $carbohydrates g\n" +
+        "Sugars: $sugars g\n" +
+        "Proteins: $proteins g\n" +
+        "Salt: $salt g"
+  }
+}
