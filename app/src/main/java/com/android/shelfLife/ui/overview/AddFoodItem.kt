@@ -84,38 +84,43 @@ fun AddFoodItemScreen(
                     Icon(Icons.Filled.ArrowBack, contentDescription = "Go Back")
                   }
             })
-      },
-  ) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top) {
+      }
+  ) {padding ->
+      Column(
+          modifier = Modifier.fillMaxSize().padding(padding),
+          horizontalAlignment = Alignment.CenterHorizontally,
+          verticalArrangement = Arrangement.Top
+      ) {
           OutlinedTextField(
               value = foodName,
               onValueChange = { foodName = it },
               label = { Text(stringResource(id = R.string.food_name_hint)) },
-              modifier = Modifier.testTag("inputFoodName").fillMaxWidth())
+              modifier = Modifier.testTag("inputFoodName").fillMaxWidth()
+          )
 
           Row(
               modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.SpaceBetween) {
-                OutlinedTextField(
-                    value = amount,
-                    onValueChange = { amount = it },
-                    label = { Text(stringResource(id = R.string.amount_hint)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.testTag("inputFoodAmount").weight(1f))
+              horizontalArrangement = Arrangement.SpaceBetween
+          ) {
+              OutlinedTextField(
+                  value = amount,
+                  onValueChange = { amount = it },
+                  label = { Text(stringResource(id = R.string.amount_hint)) },
+                  keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                  modifier = Modifier.testTag("inputFoodAmount").weight(1f)
+              )
 
-                DropdownFields(
-                    label = stringResource(id = R.string.unit_label),
-                    options = FoodUnit.values(),
-                    selectedOption = unit,
-                    onOptionSelected = { unit = it },
-                    expanded = unitExpanded,
-                    onExpandedChange = { unitExpanded = it },
-                    optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-                    modifier = Modifier.weight(1f).testTag("inputFoodUnit"))
-              }
+              DropdownFields(
+                  label = stringResource(id = R.string.unit_label),
+                  options = FoodUnit.values(),
+                  selectedOption = unit,
+                  onOptionSelected = { unit = it },
+                  expanded = unitExpanded,
+                  onExpandedChange = { unitExpanded = it },
+                  optionLabel = { fromCapitalStringToLowercaseString(it.name) },
+                  modifier = Modifier.weight(1f).testTag("inputFoodUnit")
+              )
+          }
 
           // Category dropdown
           DropdownFields(
@@ -126,7 +131,8 @@ fun AddFoodItemScreen(
               expanded = categoryExpanded,
               onExpandedChange = { categoryExpanded = it },
               optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-              modifier = Modifier.testTag("inputFoodCategory"))
+              modifier = Modifier.testTag("inputFoodCategory")
+          )
 
           Spacer(modifier = Modifier.height(16.dp))
 
@@ -138,7 +144,8 @@ fun AddFoodItemScreen(
               expanded = locationExpanded,
               onExpandedChange = { locationExpanded = it },
               optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-              modifier = Modifier.testTag("inputFoodLocation"))
+              modifier = Modifier.testTag("inputFoodLocation")
+          )
 
           OutlinedTextField(
               value = expireDate,
@@ -166,73 +173,78 @@ fun AddFoodItemScreen(
 
           Button(
               onClick = {
-                errorMessages.clear()
+                  errorMessages.clear()
 
-                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
+                  val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
 
-                try {
-                  val expireDateParsed = sdf.parse(expireDate)
-                  val openDateParsed = sdf.parse(openDate)
-                  val buyDateParsed = sdf.parse(buyDate)
+                  try {
+                      val expireDateParsed = sdf.parse(expireDate)
+                      val openDateParsed = sdf.parse(openDate)
+                      val buyDateParsed = sdf.parse(buyDate)
 
-                  // Error if the expiration date is before the open date
-                  if (expireDateParsed.before(openDateParsed)) {
-                    errorMessages["date"] = "Expiration date cannot be before the open date."
+                      // Error if the expiration date is before the open date
+                      if (expireDateParsed.before(openDateParsed)) {
+                          errorMessages["date"] = "Expiration date cannot be before the open date."
+                      }
+
+                      // Error if the buy date is after the open date or expiration date
+                      if (buyDateParsed.after(openDateParsed) ||
+                          buyDateParsed.after(expireDateParsed)
+                      ) {
+                          errorMessages["buyDate"] =
+                              "Buy date cannot be after the open date or expiration date."
+                      }
+                  } catch (e: Exception) {
+                      errorMessages["dateFormat"] = "Invalid date format. Please use dd/mm/yyyy."
                   }
 
-                  // Error if the buy date is after the open date or expiration date
-                  if (buyDateParsed.after(openDateParsed) ||
-                      buyDateParsed.after(expireDateParsed)) {
-                    errorMessages["buyDate"] =
-                        "Buy date cannot be after the open date or expiration date."
+                  // Error is the food name field is empty
+                  if (foodName.isBlank()) {
+                      errorMessages["foodName"] = "Food name cannot be empty."
                   }
-                } catch (e: Exception) {
-                  errorMessages["dateFormat"] = "Invalid date format. Please use dd/mm/yyyy."
-                }
 
-                // Error is the food name field is empty
-                if (foodName.isBlank()) {
-                  errorMessages["foodName"] = "Food name cannot be empty."
-                }
+                  // Error is the food amount is blank or not a number
+                  if (amount.isBlank()) {
+                      errorMessages["amount"] = "Amount cannot be empty."
+                  } else if (amount.toDoubleOrNull() == null) {
+                      errorMessages["amountFormat"] = "Amount must be a number."
+                  }
 
-                // Error is the food amount is blank or not a number
-                if (amount.isBlank()) {
-                  errorMessages["amount"] = "Amount cannot be empty."
-                } else if (amount.toDoubleOrNull() == null) {
-                  errorMessages["amountFormat"] = "Amount must be a number."
-                }
-
-                if (errorMessages.isNotEmpty()) {
-                  showDialog = true
-                } else {
-                  val foodFacts =
-                      FoodFacts(
-                          name = foodName,
-                          barcode = "",
-                          quantity = Quantity(amount.toDouble(), unit),
-                          category = category)
-                  val newFoodItem =
-                      FoodItem(
-                          uid = foodItemViewModel.getUID(),
-                          foodFacts = foodFacts,
-                          location = location,
-                          expiryDate = formatDateToTimestamp(expireDate),
-                          openDate = formatDateToTimestamp(openDate),
-                          buyDate = formatDateToTimestamp(buyDate),
-                          status = FoodStatus.CLOSED)
-                  houseHoldViewModel.addFoodItem(newFoodItem)
-                  navigationActions.goBack()
-                }
+                  if (errorMessages.isNotEmpty()) {
+                      showDialog = true
+                  } else {
+                      val foodFacts =
+                          FoodFacts(
+                              name = foodName,
+                              barcode = "",
+                              quantity = Quantity(amount.toDouble(), unit),
+                              category = category
+                          )
+                      val newFoodItem =
+                          FoodItem(
+                              uid = foodItemViewModel.getUID(),
+                              foodFacts = foodFacts,
+                              location = location,
+                              expiryDate = formatDateToTimestamp(expireDate),
+                              openDate = formatDateToTimestamp(openDate),
+                              buyDate = formatDateToTimestamp(buyDate),
+                              status = FoodStatus.CLOSED
+                          )
+                      houseHoldViewModel.addFoodItem(newFoodItem)
+                      navigationActions.goBack()
+                  }
               },
               modifier = Modifier.testTag("foodSave").fillMaxWidth().height(50.dp),
-              colors = ButtonDefaults.buttonColors(containerColor = primaryContainerLight)) {
-                Text(text = "Submit", fontSize = 18.sp)
-              }
+              colors = ButtonDefaults.buttonColors(containerColor = primaryContainerLight)
+          ) {
+              Text(text = "Submit", fontSize = 18.sp)
+          }
 
           ErrorPopUp(
               showDialog = showDialog,
               onDismiss = { showDialog = false },
-              errorMessages = errorMessages.values.toList())
-        }
+              errorMessages = errorMessages.values.toList()
+          )
+      }
   }
 }

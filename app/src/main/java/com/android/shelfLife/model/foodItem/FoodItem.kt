@@ -27,7 +27,7 @@ data class FoodItem(
     val expiryDate: Timestamp? = null,
     val openDate: Timestamp? = null,
     val buyDate: Timestamp = Timestamp.now(),
-    val status: FoodStatus = FoodStatus.CLOSED
+    val status: FoodStatus = FoodStatus.CLOSED,
 )
 
 /** This enum class represents the status of a food item. */

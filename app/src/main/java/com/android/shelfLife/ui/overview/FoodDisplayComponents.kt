@@ -1,35 +1,52 @@
 package com.android.shelfLife.ui.overview
 
-import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.LightGray
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
+import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.ui.utils.getProgressBarState
+import com.android.shelfLife.ui.utils.getThresholdsForCategory
+import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -58,42 +75,84 @@ fun ListFoodItems(foodItems: List<FoodItem>) {
   }
 }
 
-/**
- * Composable function to display a single food item card
- *
- * @param foodItem The food item to display
- */
+
 @Composable
 fun FoodItemCard(foodItem: FoodItem) {
-  val expiryDate = foodItem.expiryDate
-  Log.d("FoodItemCard", "Expiry Date: $expiryDate")
-  val formattedExpiryDate =
-      expiryDate?.toDate()?.let { SimpleDateFormat("MM dd, yyyy", Locale.getDefault()).format(it) }
-          ?: "No Expiry Date"
-  Column(
-      modifier =
-          Modifier.fillMaxWidth()
-              .testTag("foodItemCard")
-              .padding(vertical = 8.dp, horizontal = 16.dp)
-              .background(Color.White) // Add background color if needed
-              .padding(16.dp)) {
-        // First Row for Date and Status
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween) {
-              Text(text = foodItem.foodFacts.name, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+    val expiryDate = foodItem.expiryDate
+    val currentDate = Timestamp.now()
 
-              Text(text = foodItem.foodFacts.quantity.toString() + "in stock")
-              // Display the due date on the left
-              Text(text = formattedExpiryDate, fontSize = 12.sp, color = Color.Black)
+    val timeRemaining = expiryDate?.seconds?.minus(currentDate.seconds) ?: 0L
+    val thresholds = getThresholdsForCategory(foodItem.foodFacts.category)
+
+    val (progress, progressBarColor) = getProgressBarState(timeRemaining, thresholds)
+
+    val formattedExpiryDate = expiryDate?.toDate()
+        ?.let { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it) }
+        ?: "No Expiry Date"
+
+    ElevatedCard(
+        elevation = CardDefaults.elevatedCardElevation(),
+        colors = CardDefaults.elevatedCardColors(containerColor = Color.White),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .background(Color.White)
+            .testTag("foodItemCard")
+    ) {
+        Row(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = foodItem.foodFacts.name,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                when (foodItem.foodFacts.quantity.unit) {
+                    FoodUnit.GRAM -> Text(
+                        text = "${foodItem.foodFacts.quantity.amount.toInt()}g",
+                        fontSize = 12.sp
+                    )
+                    FoodUnit.ML -> Text(
+                        text = "${foodItem.foodFacts.quantity.amount.toInt()}ml",
+                        fontSize = 12.sp
+                    )
+                    FoodUnit.COUNT -> Text(
+                        text = "${foodItem.foodFacts.quantity.amount.toInt()} in stock",
+                        fontSize = 12.sp
+                    )
+                }
+
+                Text(
+                    text = "Expires on $formattedExpiryDate",
+                    fontSize = 12.sp,
+                    color = Color.Black
+                )
+
             }
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-            horizontalArrangement = Arrangement.Center) {
-              // Display the remaining days until expiry in the middle
-              Text(text = "Expires on $formattedExpiryDate", fontSize = 12.sp, color = Color.Black)
-            }
-      }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            AsyncImage(
+                model = foodItem.foodFacts.imageUrl,
+                contentDescription = "Food Image",
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop
+            )
+        }
+        Row {
+            LinearProgressIndicator(
+                progress = progress,
+                color = progressBarColor,
+                trackColor = LightGray,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+    }
 }
 
 /**

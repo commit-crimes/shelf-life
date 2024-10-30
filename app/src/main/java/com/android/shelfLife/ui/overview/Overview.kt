@@ -50,13 +50,13 @@ fun OverviewScreen(navigationActions: NavigationActions, householdViewModel: Hou
 
   HouseHoldSelectionDrawer(
       scope = scope, drawerState = drawerState, householdViewModel = householdViewModel) {
-        val filteredFoodItems =
-            foodItems.filter { it.foodFacts.name.contains(searchQuery, ignoreCase = true) }
+      val filteredFoodItems =
+          foodItems.filter { it.foodFacts.name.contains(searchQuery, ignoreCase = true) }
 
-        // Display a welcome screen when the user has no households
-        if (selectedHousehold == null && userHouseholds.isEmpty()) {
+      // Display a welcome screen when the user has no households
+      if (selectedHousehold == null && userHouseholds.isEmpty()) {
           FirstTimeWelcomeScreen(householdViewModel)
-        } else {
+      } else {
           Scaffold(
               modifier = Modifier.testTag("overviewScreen"),
               topBar = {
