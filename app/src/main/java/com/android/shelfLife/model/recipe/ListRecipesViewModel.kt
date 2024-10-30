@@ -1,6 +1,9 @@
 package com.android.shelfLife.model.recipe
 
 import androidx.lifecycle.ViewModel
+import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodFacts.Quantity
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -70,7 +73,25 @@ open class ListRecipesViewModel() : ViewModel() {
                           instructionsTortillaDePatata), // TODO: refactor this constant into a list
                                                          // of strings
                   servings = 4,
-                  time = 90.minutes // 5400 seconds = 90 minutes
+                  time = 90.minutes, // 5400 seconds = 90 minutes
+                  ingredients = listOf(
+                      Ingredient(FoodFacts(
+                          name = "potato",
+                          quantity = Quantity(amount= 4.0, unit = FoodUnit.COUNT)
+                        ), true),
+                      Ingredient(FoodFacts(
+                          name = "egg",
+                          quantity = Quantity(amount= 8.0, unit = FoodUnit.COUNT)
+                      ), true),
+                      Ingredient(FoodFacts(
+                          name = "salt",
+                          quantity = Quantity(amount= 15.5, unit = FoodUnit.GRAM)
+                      ), true),
+                      Ingredient(FoodFacts(
+                          name = "salt",
+                          quantity = Quantity(amount= 20.75, unit = FoodUnit.ML)
+                      ), true),
+                      )
                   ),
               Recipe(
                   name = "Costillas a la brasa",

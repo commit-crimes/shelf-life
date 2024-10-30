@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -39,7 +41,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
+import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
@@ -47,6 +51,7 @@ import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
+import kotlin.math.floor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -159,14 +164,47 @@ fun IndividualRecipeScreen(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        // Display recipe instructions, scrollable if long
-                        Text(
-                            text = selectedRecipe.instructions.toString(),
-                            modifier =
-                                Modifier.padding(vertical = 8.dp).testTag("recipeInstructions"))
+                        Column (modifier = Modifier.testTag("recipeIngredients")){
+                            selectedRecipe.ingredients.forEach{ingredient->
+                                DisplayIngredient(ingredient)
+                            }
+                        }
+
+                        Column (modifier = Modifier.testTag("recipeInstructions")){
+                            selectedRecipe.instructions.forEach{instruction ->
+                                DisplayInstruction(instruction)
+                            }
+                        }
                       }
                 }
               })
         }
       }
+}
+
+@Composable
+fun DisplayIngredient(ingredient : Ingredient){
+    val unit = when(ingredient.foodFacts.quantity.unit){
+        FoodUnit.GRAM -> "gr"
+        FoodUnit.ML -> "ml"
+        FoodUnit.COUNT -> ""
+    }
+
+    val amount = ingredient.foodFacts.quantity.amount
+    val quantity = if (floor(amount) == amount) amount.toInt().toString() else amount.toString()
+
+
+    Text(
+        text = " - ${quantity}${unit} of ${ingredient.foodFacts.name}",
+        modifier = Modifier.testTag("recipeIngredient")
+    )
+}
+
+@Composable
+fun DisplayInstruction(instruction : String){
+    // Display recipe instructions, scrollable if long
+    Text(
+        text = instruction,
+        modifier =
+        Modifier.padding(vertical = 8.dp).testTag("recipeInstruction"))
 }

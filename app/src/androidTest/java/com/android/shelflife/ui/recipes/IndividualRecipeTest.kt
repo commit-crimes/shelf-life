@@ -98,7 +98,10 @@ class IndividualRecipeTest {
     composeTestRule.onNodeWithTag("recipeImage").assertIsDisplayed()
     composeTestRule.onNodeWithTag("recipeServings").assertIsDisplayed()
     composeTestRule.onNodeWithTag("recipeTime").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("recipeIngredients").assertIsDisplayed()
+    composeTestRule.onAllNodesWithTag("recipeIngredient").onFirst().assertExists()
     composeTestRule.onNodeWithTag("recipeInstructions").assertIsDisplayed()
+    composeTestRule.onAllNodesWithTag("recipeInstruction").onFirst().assertExists()
   }
 
   @Test
