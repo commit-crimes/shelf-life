@@ -50,16 +50,16 @@ jobs:
             ~/.android/adb*
           key: avd-34
 
-      - name: create AVD and generate snapshot for caching
+      - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
+          api-level: 30                   # Use a lower API level for stability
           target: google_apis
           arch: x86_64
           force-avd-creation: false
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
+          disable-animations: true
           script: echo "Generated AVD snapshot for caching."
 
       - name: Decode secrets
@@ -79,30 +79,33 @@ jobs:
       - name: Assemble and Link
         run: ./gradlew assemble lint --parallel --build-cache
 
+      - name: Increase ADB Timeout
+        run: adb start-server && adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+
       - name: Run tests
         run: ./gradlew check --parallel --build-cache
 
       - name: Run android tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
+          api-level: 30                   # Lowered API level for stability
           target: google_apis
           arch: x86_64
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          force-avd-creation: true        # Ensures a fresh AVD creation each run
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
-          script: ./gradlew connectedCheck --parallel --build-cache
+          script: |
+            adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'
+            ./gradlew connectedCheck --parallel --build-cache
 
-      # This step generates the coverage report which will be uploaded to sonar
+      - name: Check Emulator Status
+        run: adb devices
+
       - name: Generate Coverage Report
-        run: |
-          ./gradlew jacocoTestReport
-
+        run: ./gradlew jacocoTestReport
 
       - name: Upload report to SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          ./gradlew sonar --parallel --build-cache
-          ./gradlew testDebugUnitTest --tests *  # Logs each test
+        run: ./gradlew sonar --parallel --build-cache
