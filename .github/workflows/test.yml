@@ -103,4 +103,6 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew sonar --parallel --build-cache
+        run: |
+          ./gradlew sonar --parallel --build-cache
+          ./gradlew testDebugUnitTest --tests *  # Logs each test
