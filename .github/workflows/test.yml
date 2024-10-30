@@ -11,8 +11,6 @@ on:
       - synchronize
       - reopened
 
-  workflow_dispatch:  # Allows manual triggering of the workflow
-
 jobs:
   ci:
     name: CI
@@ -99,6 +97,7 @@ jobs:
       - name: Generate Coverage Report
         run: |
           ./gradlew jacocoTestReport
+
 
       - name: Upload report to SonarCloud
         env:
