@@ -75,12 +75,7 @@ fun RecipesScreen(
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
 
-  val filters =
-      listOf("Soon to expire",
-          "Only household items",
-          "High protein",
-          "Low calories"
-          )
+  val filters = listOf("Soon to expire", "Only household items", "High protein", "Low calories")
 
   HouseHoldSelectionDrawer(
       scope = scope, drawerState = drawerState, householdViewModel = householdViewModel) {
