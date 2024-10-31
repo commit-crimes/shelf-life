@@ -1,9 +1,12 @@
 package com.android.shelfLife.ui.overview
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -17,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.android.shelfLife.model.household.HouseholdViewModel
@@ -41,6 +45,7 @@ fun OverviewScreen(navigationActions: NavigationActions, householdViewModel: Hou
   var searchQuery by remember { mutableStateOf("") }
   val foodItems = selectedHousehold?.foodItems ?: emptyList()
   val userHouseholds = householdViewModel.households.collectAsState().value
+  val householdViewModelIsLoaded = householdViewModel.finishedLoading.collectAsState().value
 
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
@@ -53,8 +58,15 @@ fun OverviewScreen(navigationActions: NavigationActions, householdViewModel: Hou
         val filteredFoodItems =
             foodItems.filter { it.foodFacts.name.contains(searchQuery, ignoreCase = true) }
 
-        // Display a welcome screen when the user has no households
-        if (selectedHousehold == null && userHouseholds.isEmpty()) {
+        if (!householdViewModelIsLoaded) {
+          Column(
+              modifier = Modifier.fillMaxSize(),
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.Center,
+          ) {
+            CircularProgressIndicator()
+          }
+        } else if (selectedHousehold == null && userHouseholds.isEmpty()) {
           FirstTimeWelcomeScreen(householdViewModel)
         } else {
           Scaffold(
