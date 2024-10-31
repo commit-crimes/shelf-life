@@ -37,7 +37,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -52,7 +51,6 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
@@ -60,8 +58,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
@@ -77,6 +73,7 @@ import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.utils.OnLifecycleEvent
 import com.android.shelfLife.ui.utils.formatDateToTimestamp
 import com.android.shelfLife.ui.utils.formatTimestampToDate
 import com.android.shelfLife.utilities.BarcodeAnalyzer
@@ -102,26 +99,18 @@ fun BarcodeScannerScreen(
   val context = LocalContext.current
   val permissionGranted = cameraViewModel.permissionGranted
 
-  // Observe lifecycle to detect when the app resumes
-  val lifecycleOwner = LocalLifecycleOwner.current
-
   // Use a MutableState to control scanning
   val isScanningState = remember { mutableStateOf(true) }
 
-  DisposableEffect(lifecycleOwner) {
-    val observer = LifecycleEventObserver { _, event ->
-      if (event == Lifecycle.Event.ON_RESUME) {
-        cameraViewModel.checkCameraPermission()
-        isScanningState.value = true
-      } else if (event == Lifecycle.Event.ON_PAUSE) {
-        isScanningState.value = false
+  OnLifecycleEvent(
+      onResume = {
+          cameraViewModel.checkCameraPermission()
+          isScanningState.value = true
+      },
+      onPause = {
+          isScanningState.value = false
       }
-    }
-
-    lifecycleOwner.lifecycle.addObserver(observer)
-
-    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-  }
+  )
 
   LaunchedEffect(permissionGranted) {
     if (!permissionGranted) {
