@@ -6,8 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -50,13 +48,6 @@ class MainActivity : ComponentActivity() {
 fun ShelfLifeApp() {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
-  val isUserLoggedIn = remember { mutableStateOf(false) }
-
-  // Listen for authentication changes
-  FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
-    isUserLoggedIn.value = firebaseAuth.currentUser != null
-  }
-
   val listRecipesViewModel: ListRecipesViewModel = viewModel()
   val firebaseFirestore = FirebaseFirestore.getInstance()
   val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
@@ -78,11 +69,7 @@ fun ShelfLifeApp() {
 
   // Initialize HouseholdViewModel only if the user is logged in
   val householdViewModel =
-      if (isUserLoggedIn.value) {
-        HouseholdViewModel(HouseholdRepositoryFirestore(firebaseFirestore), listFoodItemViewModel)
-      } else {
-        null
-      }
+      HouseholdViewModel(HouseholdRepositoryFirestore(firebaseFirestore), listFoodItemViewModel)
 
   NavHost(navController = navController, startDestination = startingRoute) {
     // Authentication route
@@ -93,20 +80,9 @@ fun ShelfLifeApp() {
       composable(Screen.AUTH) { SignInScreen(navigationActions) }
     }
     navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
-      composable(Screen.OVERVIEW) {
-        if (householdViewModel != null) {
-          OverviewScreen(navigationActions, householdViewModel)
-        } else {
-          // Handle case where the user is not logged in
-          SignInScreen(navigationActions)
-        }
-      }
+      composable(Screen.OVERVIEW) { OverviewScreen(navigationActions, householdViewModel) }
       composable(Screen.ADD_FOOD) {
-        if (householdViewModel != null) {
-          AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
-        } else {
-          SignInScreen(navigationActions)
-        }
+        AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
       }
     }
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
@@ -114,16 +90,12 @@ fun ShelfLifeApp() {
         CameraPermissionHandler(navigationActions, barcodeScannerViewModel)
       }
       composable(Screen.BARCODE_SCANNER) {
-        if (householdViewModel != null) {
-          BarcodeScannerScreen(
-              navigationActions,
-              barcodeScannerViewModel,
-              foodFactsViewModel,
-              householdViewModel,
-              listFoodItemViewModel)
-        } else {
-          SignInScreen(navigationActions)
-        }
+        BarcodeScannerScreen(
+            navigationActions,
+            barcodeScannerViewModel,
+            foodFactsViewModel,
+            householdViewModel,
+            listFoodItemViewModel)
       }
     }
     navigation(
@@ -131,18 +103,10 @@ fun ShelfLifeApp() {
         route = Route.RECIPES,
     ) {
       composable(Screen.RECIPES) {
-        if (householdViewModel != null) {
-          RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
-        } else {
-          SignInScreen(navigationActions)
-        }
+        RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
       }
       composable(Screen.INDIVIDUAL_RECIPE) {
-        if (householdViewModel != null) {
-          IndividualRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)
-        } else {
-          SignInScreen(navigationActions)
-        }
+        IndividualRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)
       }
     }
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {

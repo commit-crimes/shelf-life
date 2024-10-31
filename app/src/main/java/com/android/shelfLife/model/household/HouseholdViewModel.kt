@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,9 +22,15 @@ class HouseholdViewModel(
   private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
   val selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
 
+  var finishedLoading = MutableStateFlow(false)
+
   /** Initializes the HouseholdViewModel by loading the list of households from the repository. */
   init {
-    loadHouseholds()
+    FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
+      if (firebaseAuth.currentUser != null) {
+        loadHouseholds()
+      }
+    }
   }
 
   fun setHouseholds(households: List<HouseHold>) {
@@ -36,9 +43,11 @@ class HouseholdViewModel(
         onSuccess = { householdList ->
           _households.value = householdList
           selectHousehold(householdList.firstOrNull()) // Default to the first household
+          finishedLoading.value = true
         },
         onFailure = { exception ->
           Log.e("HouseholdViewModel", "Error loading households: $exception")
+          finishedLoading.value = true
         })
   }
 
