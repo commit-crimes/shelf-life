@@ -213,7 +213,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
   /**
    * Converts a Firestore document to a FoodItem object.
    *
-   * @param doc The Firestore document to convert.
+   * @param map The Firestore document to convert.
    * @return A FoodItem object.
    */
   fun convertToFoodItemFromMap(map: Map<String, Any?>): FoodItem? {

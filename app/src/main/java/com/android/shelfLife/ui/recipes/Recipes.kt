@@ -55,7 +55,6 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
-import com.android.shelfLife.ui.utils.getTotalMinutes
 import kotlinx.coroutines.launch
 
 @Composable
@@ -276,7 +275,7 @@ fun RecipeItem(
 
                           // Display the total cooking time
                           Text(
-                              "Time : ${getTotalMinutes(recipe.time)} min",
+                              "Time : ${recipe.time.inWholeMinutes} min",
                               overflow =
                                   TextOverflow.Ellipsis // Show ellipsis if the text overflows
                               )
