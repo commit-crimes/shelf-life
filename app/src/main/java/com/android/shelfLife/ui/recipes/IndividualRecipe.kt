@@ -47,7 +47,6 @@ import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
-import com.android.shelfLife.ui.utils.getTotalMinutes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -154,7 +153,7 @@ fun IndividualRecipeScreen(
                               modifier = Modifier.testTag("recipeServings"))
                           Spacer(modifier = Modifier.width(16.dp))
                           Text(
-                              text = "Time: ${getTotalMinutes(selectedRecipe.time)} min",
+                              text = "Time: ${selectedRecipe.time.inWholeMinutes} min",
                               modifier = Modifier.testTag("recipeTime"))
                         }
 
@@ -162,7 +161,7 @@ fun IndividualRecipeScreen(
 
                         // Display recipe instructions, scrollable if long
                         Text(
-                            text = selectedRecipe.instructions,
+                            text = selectedRecipe.instructions.toString(),
                             modifier =
                                 Modifier.padding(vertical = 8.dp).testTag("recipeInstructions"))
                       }
