@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,7 +30,9 @@ import com.android.shelfLife.ui.overview.OverviewScreen
 import com.android.shelfLife.ui.profile.ProfileScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
+import com.android.shelfLife.ui.utils.signOutUser
 import com.example.compose.ShelfLifeTheme
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.OkHttpClient
 
@@ -49,14 +52,26 @@ fun ShelfLifeApp() {
   val firebaseFirestore = FirebaseFirestore.getInstance()
   val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
   val listFoodItemViewModel = ListFoodItemsViewModel(foodItemRepository)
-  val householdViewModel =
-      HouseholdViewModel(HouseholdRepositoryFirestore(firebaseFirestore), listFoodItemViewModel)
   val foodFactsRepository = OpenFoodFactsRepository(OkHttpClient())
   val foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)
+  val context = LocalContext.current
 
   val barcodeScannerViewModel: BarcodeScannerViewModel = viewModel()
 
-  NavHost(navController = navController, startDestination = Route.AUTH) {
+  // Checks if user is logged in and selects correct screen
+  val firebaseUser = FirebaseAuth.getInstance().currentUser
+  val startingRoute =
+      if (firebaseUser == null) {
+        Route.AUTH
+      } else {
+        Route.OVERVIEW
+      }
+
+  // Initialize HouseholdViewModel only if the user is logged in
+  val householdViewModel =
+      HouseholdViewModel(HouseholdRepositoryFirestore(firebaseFirestore), listFoodItemViewModel)
+
+  NavHost(navController = navController, startDestination = startingRoute) {
     // Authentication route
     navigation(
         startDestination = Screen.AUTH,
@@ -95,7 +110,16 @@ fun ShelfLifeApp() {
       }
     }
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
-      composable(Screen.PROFILE) { ProfileScreen(navigationActions) }
+      composable(Screen.PROFILE) {
+        ProfileScreen(
+            navigationActions,
+            signOutUser = {
+              signOutUser(context) {
+                // Navigate to the authentication screen
+                navigationActions.navigateToAndClearBackStack(Route.AUTH)
+              }
+            })
+      }
     }
   }
 }
