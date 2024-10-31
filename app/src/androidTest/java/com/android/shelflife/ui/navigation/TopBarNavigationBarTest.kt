@@ -33,14 +33,13 @@ class TopNavigationBarTest {
   fun setUp() {
     // Set up a valid instance of NutritionFacts
 
-
-      testHouseHold = HouseHold(
-          uid = "householdId123",
-          name = "Test Household",
-          members = listOf("member1", "member2"),
-          foodItems = emptyList()
-      )
-      selectedHouseHold = testHouseHold
+    testHouseHold =
+        HouseHold(
+            uid = "householdId123",
+            name = "Test Household",
+            members = listOf("member1", "member2"),
+            foodItems = emptyList())
+    selectedHouseHold = testHouseHold
     testNutritionFacts =
         NutritionFacts(
             energyKcal = 52,
@@ -196,71 +195,66 @@ class TopNavigationBarTest {
     composeTestRule.onNodeWithContentDescription("Selected").assertExists().assertIsDisplayed()
   }
 
-    @Test
-    fun houseHoldElement_displaysCorrectly() {
-        composeTestRule.setContent {
-            HouseHoldElement(
-                household = testHouseHold,
-                selectedHousehold = selectedHouseHold,
-                onHouseholdSelected = {}
-            )
-        }
-
-        composeTestRule.onNodeWithText("Test Household").assertExists().assertIsDisplayed()
+  @Test
+  fun houseHoldElement_displaysCorrectly() {
+    composeTestRule.setContent {
+      HouseHoldElement(
+          household = testHouseHold,
+          selectedHousehold = selectedHouseHold,
+          onHouseholdSelected = {})
     }
 
-    @Test
-    fun houseHoldElement_isSelected() {
-        composeTestRule.setContent {
-            HouseHoldElement(
-                household = testHouseHold,
-                selectedHousehold = selectedHouseHold,
-                onHouseholdSelected = {}
-            )
-        }
+    composeTestRule.onNodeWithText("Test Household").assertExists().assertIsDisplayed()
+  }
 
-        composeTestRule.onNodeWithText("Test Household")
-            .assertExists()
-            .assertIsDisplayed()
-            .assert(hasText("Test Household", ignoreCase = true))
+  @Test
+  fun houseHoldElement_isSelected() {
+    composeTestRule.setContent {
+      HouseHoldElement(
+          household = testHouseHold,
+          selectedHousehold = selectedHouseHold,
+          onHouseholdSelected = {})
     }
 
-    @Test
-    fun houseHoldElement_onClick() {
-        var clickedHouseHold: HouseHold? = null
+    composeTestRule
+        .onNodeWithText("Test Household")
+        .assertExists()
+        .assertIsDisplayed()
+        .assert(hasText("Test Household", ignoreCase = true))
+  }
 
-        composeTestRule.setContent {
-            HouseHoldElement(
-                household = testHouseHold,
-                selectedHousehold = selectedHouseHold,
-                onHouseholdSelected = { clickedHouseHold = it }
-            )
-        }
+  @Test
+  fun houseHoldElement_onClick() {
+    var clickedHouseHold: HouseHold? = null
 
-        composeTestRule.onNodeWithText("Test Household").performClick()
-        assert(clickedHouseHold == testHouseHold)
+    composeTestRule.setContent {
+      HouseHoldElement(
+          household = testHouseHold,
+          selectedHousehold = selectedHouseHold,
+          onHouseholdSelected = { clickedHouseHold = it })
     }
 
-    @Test
-    fun filterChipItem_toggleSelection2() {
-        val testFilters = listOf("Filter1", "Filter2", "Filter3")
+    composeTestRule.onNodeWithText("Test Household").performClick()
+    assert(clickedHouseHold == testHouseHold)
+  }
 
-        composeTestRule.setContent {
-            FilterBar(filters = testFilters)
-        }
+  @Test
+  fun filterChipItem_toggleSelection2() {
+    val testFilters = listOf("Filter1", "Filter2", "Filter3")
 
-        // Verify initial state (no filters selected)
-        testFilters.forEach { filter ->
-            composeTestRule.onNodeWithText(filter).assertExists().assertIsDisplayed()
-        }
+    composeTestRule.setContent { FilterBar(filters = testFilters) }
 
-        // Select the first filter
-        composeTestRule.onNodeWithText("Filter1").performClick()
-        composeTestRule.onNodeWithText("Filter1").assertIsSelected()
-
-        // Deselect the first filter
-        composeTestRule.onNodeWithText("Filter1").performClick()
-        composeTestRule.onNodeWithText("Filter1").assertIsNotSelected()
+    // Verify initial state (no filters selected)
+    testFilters.forEach { filter ->
+      composeTestRule.onNodeWithText(filter).assertExists().assertIsDisplayed()
     }
 
+    // Select the first filter
+    composeTestRule.onNodeWithText("Filter1").performClick()
+    composeTestRule.onNodeWithText("Filter1").assertIsSelected()
+
+    // Deselect the first filter
+    composeTestRule.onNodeWithText("Filter1").performClick()
+    composeTestRule.onNodeWithText("Filter1").assertIsNotSelected()
+  }
 }

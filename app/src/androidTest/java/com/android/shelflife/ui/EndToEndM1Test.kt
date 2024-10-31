@@ -71,7 +71,6 @@ class EndToEndM1Test {
 
     // Initialize NavigationActions with the properly initialized navController
     navigationActions = NavigationActions(navController)
-
     // Initialize repositories and view models
     barcodeScannerViewModel = mockk(relaxed = true)
     foodItemRepository = mock(FoodItemRepository::class.java)
@@ -85,7 +84,8 @@ class EndToEndM1Test {
 
     `when`(foodItemRepository.getNewUid()).thenReturn("mockedUid")
     every { barcodeScannerViewModel.permissionGranted } returns true
-    // Set up test data (household and food item)
+
+    // Create a FoodItem to be used in tests
     val foodFacts =
         FoodFacts(
             name = "Apple",
@@ -99,6 +99,7 @@ class EndToEndM1Test {
             expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)) // Expires in 1 day
             )
 
+    // Initialize the household with the food item
     houseHold =
         HouseHold(
             uid = "1",
@@ -106,7 +107,9 @@ class EndToEndM1Test {
             members = listOf("John", "Doe"),
             foodItems = listOf(foodItem))
 
-    // Mock the household repository to return the initial household
+    householdViewModel.finishedLoading.value = true
+
+    // Mock the repository to return the initial household
     mockHouseHoldRepositoryGetHouseholds(listOf(houseHold))
   }
 
@@ -118,6 +121,19 @@ class EndToEndM1Test {
         }
         .whenever(houseHoldRepository)
         .getHouseholds(any(), any())
+  }
+
+  @Test
+  fun overviewScreenDisplayedCorrectly() {
+    householdViewModel.selectHousehold(houseHold)
+    composeTestRule.setContent {
+      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+    }
+
+    composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addFoodFab").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("foodSearchBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("hamburgerIcon").assertIsDisplayed()
   }
 
   @Test
@@ -143,6 +159,7 @@ class EndToEndM1Test {
       }
     }
 
+    composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
     // User is now on the overview Screen
     // User wants to add a new food item
     composeTestRule.onNodeWithTag("addFoodFab").assertIsDisplayed()
