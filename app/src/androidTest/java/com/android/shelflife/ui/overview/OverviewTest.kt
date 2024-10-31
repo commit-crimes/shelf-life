@@ -69,6 +69,8 @@ class OverviewTest {
             members = listOf("John", "Doe"),
             foodItems = listOf(foodItem))
 
+    householdViewModel.finishedLoading.value = true
+
     // Mock the repository to return the initial household
     mockHouseHoldRepositoryGetHouseholds(listOf(houseHold))
   }
