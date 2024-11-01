@@ -13,17 +13,15 @@ fun OnLifecycleEvent(
     onResume: () -> Unit = {},
     onPause: () -> Unit = {}
 ) {
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_RESUME -> onResume()
-                Lifecycle.Event.ON_PAUSE -> onPause()
-                else -> {}
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+  DisposableEffect(lifecycleOwner) {
+    val observer = LifecycleEventObserver { _, event ->
+      when (event) {
+        Lifecycle.Event.ON_RESUME -> onResume()
+        Lifecycle.Event.ON_PAUSE -> onPause()
+        else -> {}
+      }
     }
+    lifecycleOwner.lifecycle.addObserver(observer)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+  }
 }
