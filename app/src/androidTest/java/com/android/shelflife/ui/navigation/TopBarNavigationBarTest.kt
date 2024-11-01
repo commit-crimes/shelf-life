@@ -272,7 +272,7 @@ class TopNavigationBarTest {
   fun filterChipItem_toggleSelection2() {
     val testFilters = listOf("Filter1", "Filter2", "Filter3")
 
-    composeTestRule.setContent { FilterBar(filters = testFilters) }
+    composeTestRule.setContent { FilterBar(filters = testFilters, selectedFilters = listOf(), onFilterChange = { _, _ -> }) }
 
     // Verify initial state (no filters selected)
     testFilters.forEach { filter ->

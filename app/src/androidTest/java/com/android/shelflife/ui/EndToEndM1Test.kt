@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.overview
+package com.android.shelflife.ui
 
 import android.content.Context
 import androidx.compose.ui.test.*
@@ -29,6 +29,8 @@ import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.overview.AddFoodItemScreen
+import com.android.shelfLife.ui.overview.OverviewScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.google.firebase.Timestamp
 import io.mockk.every
