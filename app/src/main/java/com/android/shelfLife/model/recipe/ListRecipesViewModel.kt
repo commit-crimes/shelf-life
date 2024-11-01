@@ -1,12 +1,17 @@
 package com.android.shelfLife.model.recipe
 
 import androidx.lifecycle.ViewModel
-import com.google.firebase.Timestamp
+import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodFacts.Quantity
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-open class ListRecipesViewModel : ViewModel() {
+open class ListRecipesViewModel() : ViewModel() {
 
   companion object {
     private const val instructionsTortillaDePatata = // this is an example to shown the
@@ -50,30 +55,68 @@ open class ListRecipesViewModel : ViewModel() {
       MutableStateFlow<List<Recipe>>(
           listOf(
               Recipe(
-                  name = "Paella", instructions = "cook", servings = 4, time = Timestamp(5400, 0)),
+                  name = "Paella",
+                  instructions = listOf("cook"),
+                  servings = 4,
+                  time = 5400.seconds // 5400 seconds = 90 minutes
+                  ),
               Recipe(
-                  name = "Fideua", instructions = "cry", servings = 3, time = Timestamp(3600, 0)),
+                  name = "Fideua",
+                  instructions = listOf("cry"),
+                  servings = 3,
+                  time = 60.minutes // 3600 seconds = 60 minutes
+                  ),
               Recipe(
                   name = "Tortilla de patata",
-                  instructions = instructionsTortillaDePatata,
+                  instructions =
+                      listOf(
+                          instructionsTortillaDePatata), // TODO: refactor this constant into a list
+                  // of strings
                   servings = 4,
-                  time = Timestamp(5400, 0)),
+                  time = 90.minutes, // 5400 seconds = 90 minutes
+                  ingredients =
+                      listOf(
+                          Ingredient(
+                              FoodFacts(
+                                  name = "potato",
+                                  quantity = Quantity(amount = 4.0, unit = FoodUnit.COUNT)),
+                              true),
+                          Ingredient(
+                              FoodFacts(
+                                  name = "egg",
+                                  quantity = Quantity(amount = 8.0, unit = FoodUnit.COUNT)),
+                              true),
+                          Ingredient(
+                              FoodFacts(
+                                  name = "salt",
+                                  quantity = Quantity(amount = 15.5, unit = FoodUnit.GRAM)),
+                              true),
+                          Ingredient(
+                              FoodFacts(
+                                  name = "salt",
+                                  quantity = Quantity(amount = 20.75, unit = FoodUnit.ML)),
+                              true),
+                      )),
               Recipe(
                   name = "Costillas a la brasa",
-                  instructions = "cry",
+                  instructions = listOf("cry"),
                   servings = 3,
-                  time = Timestamp(3600, 0)),
+                  time = 60.minutes // 3600 seconds = 60 minutes
+                  ),
               Recipe(
                   name = "Curry rojo",
-                  instructions = "cook",
+                  instructions = listOf("cook"),
                   servings = 4,
-                  time = Timestamp(5400, 0)),
+                  time = 5400.seconds // 5400 seconds = 90 minutes
+                  ),
               Recipe(
                   name = "Butifarra con boniato al horno",
-                  instructions = "cry",
+                  instructions = listOf("cry"),
                   servings = 3,
-                  time =
-                      Timestamp(3600, 0)))) // it has an extra long name to show the ... in the card
+                  time = 3600.seconds // 3600 seconds = 60 minutes
+                  // it has an extra long name to show the ... in the card
+                  )))
+
   val recipes: StateFlow<List<Recipe>> = recipes_.asStateFlow()
 
   // Selected recipe, i.e the recipe for the detail view
@@ -87,5 +130,14 @@ open class ListRecipesViewModel : ViewModel() {
    */
   fun selectRecipe(recipe: Recipe) {
     selectedRecipe_.value = recipe
+  }
+
+  /**
+   * TODO: complete with Alejandro in a future task. Depends on his vision of the UI and how the
+   *   viewModel should create a recipe from the OpenAiRecipesRepository
+   */
+  fun createRecipe(name: String, instructions: List<String>, servings: Int, time: Duration) {
+    val newRecipe = Recipe(name, instructions, servings, time)
+    recipes_.value += newRecipe
   }
 }

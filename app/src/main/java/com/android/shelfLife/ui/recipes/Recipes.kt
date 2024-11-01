@@ -56,7 +56,6 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
-import com.android.shelfLife.ui.utils.getTotalMinutes
 import kotlinx.coroutines.launch
 
 @Composable
@@ -78,17 +77,7 @@ fun RecipesScreen(
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
 
-  val filters =
-      listOf(
-          "No missing ingredients",
-          "Vegan",
-          "Vegetarian",
-          "Easy",
-          "Spicy",
-          "Dessert",
-          "Appetizer",
-          "Snack",
-          "Breakfast")
+  val filters = listOf("Soon to expire", "Only household items", "High protein", "Low calories")
 
   HouseHoldSelectionDrawer(
       scope = scope, drawerState = drawerState, householdViewModel = householdViewModel) {
@@ -286,7 +275,7 @@ fun RecipeItem(
 
                           // Display the total cooking time
                           Text(
-                              "Time : ${getTotalMinutes(recipe.time)} min",
+                              "Time : ${recipe.time.inWholeMinutes} min",
                               overflow =
                                   TextOverflow.Ellipsis // Show ellipsis if the text overflows
                               )

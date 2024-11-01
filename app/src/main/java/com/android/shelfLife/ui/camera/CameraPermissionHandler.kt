@@ -6,22 +6,19 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.utils.OnLifecycleEvent
 
 /**
  * Composable function for handling camera permissions.
@@ -47,19 +44,11 @@ fun CameraPermissionHandler(
       }
 
   // Observe lifecycle to detect when the app resumes
-  val lifecycleOwner = LocalLifecycleOwner.current
-  DisposableEffect(lifecycleOwner) {
-    val observer = LifecycleEventObserver { _, event ->
-      if (event == Lifecycle.Event.ON_RESUME) {
-        // Re-check the permission status when the app resumes
-        viewModel.checkCameraPermission()
-      }
+  OnLifecycleEvent(
+    onResume = {
+      viewModel.checkCameraPermission()
     }
-
-    lifecycleOwner.lifecycle.addObserver(observer)
-
-    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-  }
+  )
 
   // Check if we should show a rationale for the permission
   var shouldShowRationale by remember { mutableStateOf(false) }
