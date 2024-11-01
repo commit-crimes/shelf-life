@@ -44,11 +44,7 @@ fun CameraPermissionHandler(
       }
 
   // Observe lifecycle to detect when the app resumes
-  OnLifecycleEvent(
-    onResume = {
-      viewModel.checkCameraPermission()
-    }
-  )
+  OnLifecycleEvent(onResume = { viewModel.checkCameraPermission() })
 
   // Check if we should show a rationale for the permission
   var shouldShowRationale by remember { mutableStateOf(false) }

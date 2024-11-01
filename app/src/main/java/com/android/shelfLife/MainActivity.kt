@@ -41,9 +41,7 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
-    setContent {
-      ShelfLifeTheme {Surface{ ShelfLifeApp()} }
-    }
+    setContent { ShelfLifeTheme { Surface { ShelfLifeApp() } } }
   }
 }
 

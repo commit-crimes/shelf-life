@@ -104,13 +104,10 @@ fun BarcodeScannerScreen(
 
   OnLifecycleEvent(
       onResume = {
-          cameraViewModel.checkCameraPermission()
-          isScanningState.value = true
+        cameraViewModel.checkCameraPermission()
+        isScanningState.value = true
       },
-      onPause = {
-          isScanningState.value = false
-      }
-  )
+      onPause = { isScanningState.value = false })
 
   LaunchedEffect(permissionGranted) {
     if (!permissionGranted) {
