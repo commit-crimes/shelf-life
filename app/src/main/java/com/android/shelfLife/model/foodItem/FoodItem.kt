@@ -27,7 +27,7 @@ data class FoodItem(
     val expiryDate: Timestamp? = null,
     val openDate: Timestamp? = null,
     val buyDate: Timestamp = Timestamp.now(),
-    val status: FoodStatus = FoodStatus.CLOSED
+    val status: FoodStatus = FoodStatus.CLOSED,
 ) {
   override fun toString(): String {
     return "FoodItem:(" +

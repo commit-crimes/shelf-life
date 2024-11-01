@@ -29,6 +29,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -61,13 +62,14 @@ import kotlinx.coroutines.launch
 fun RecipesScreen(
     navigationActions: NavigationActions,
     listRecipesViewModel: ListRecipesViewModel,
-    householdViewModel: HouseholdViewModel
+    householdViewModel: HouseholdViewModel,
 ) {
   // Collect the recipes StateFlow as a composable state
   val recipeList by listRecipesViewModel.recipes.collectAsState()
 
   // State for the search query
   var query by remember { mutableStateOf("") }
+  var selectedFilters = remember { mutableStateListOf<String>() }
 
   val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
   val userHouseholds = householdViewModel.households.collectAsState().value
@@ -99,7 +101,15 @@ fun RecipesScreen(
                   TopNavigationBar(
                       houseHold = it,
                       onHamburgerClick = { scope.launch { drawerState.open() } },
-                      filters = filters)
+                      filters = filters,
+                      selectedFilters = selectedFilters,
+                      onFilterChange = { filter, isSelected ->
+                        if (isSelected) {
+                          selectedFilters.add(filter)
+                        } else {
+                          selectedFilters.remove(filter)
+                        }
+                      })
                 }
               },
               bottomBar = {
