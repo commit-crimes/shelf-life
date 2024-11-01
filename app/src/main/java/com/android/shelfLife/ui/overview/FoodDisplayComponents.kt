@@ -87,7 +87,7 @@ fun FoodItemCard(foodItem: FoodItem) {
           ?: "No Expiry Date"
 
   ElevatedCard(
-      elevation = CardDefaults.elevatedCardElevation(),
+      elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
       colors = CardDefaults.elevatedCardColors(containerColor = Color.White),
       modifier =
           Modifier.fillMaxWidth()
