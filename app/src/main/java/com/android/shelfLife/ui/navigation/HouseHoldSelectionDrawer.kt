@@ -18,16 +18,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.android.shelfLife.model.household.HouseholdViewModel
-import com.android.shelfLife.ui.overview.AddHouseHoldPopUp
-import com.android.shelfLife.ui.overview.EditHouseHoldPopUp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -35,27 +30,13 @@ import kotlinx.coroutines.launch
 fun HouseHoldSelectionDrawer(
     scope: CoroutineScope,
     drawerState: DrawerState,
+    navigationActions: NavigationActions,
     householdViewModel: HouseholdViewModel,
     content: @Composable () -> Unit
 ) {
 
   val userHouseholds = householdViewModel.households.collectAsState().value
   val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
-
-  var showDialog by remember { mutableStateOf(false) }
-  var showEdit by remember { mutableStateOf(false) }
-
-  // These two popups will be replaced in the future with a dedicated screen
-  AddHouseHoldPopUp(
-      showDialog = showDialog,
-      onDismiss = { showDialog = false },
-      householdViewModel = householdViewModel,
-  )
-
-  EditHouseHoldPopUp(
-      showDialog = showEdit,
-      onDismiss = { showEdit = false },
-      householdViewModel = householdViewModel)
 
   ModalNavigationDrawer(
       modifier = Modifier.testTag("householdSelectionDrawer"),
@@ -90,7 +71,10 @@ fun HouseHoldSelectionDrawer(
               horizontalArrangement = Arrangement.Center) {
                 IconButton(
                     modifier = Modifier.testTag("addHouseholdIcon"),
-                    onClick = { showDialog = true }) {
+                    onClick = {
+                      householdViewModel.selectHouseholdToEdit(null)
+                      navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
+                    }) {
                       Icon(
                           imageVector = Icons.Default.Add,
                           contentDescription = "Add Household Icon",
@@ -99,7 +83,11 @@ fun HouseHoldSelectionDrawer(
 
                 IconButton(
                     modifier = Modifier.testTag("editHouseholdIcon"),
-                    onClick = { showEdit = true }) {
+                    onClick = {
+                      // TODO need a way to select the household to edit
+                      householdViewModel.selectHouseholdToEdit(selectedHousehold)
+                      navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
+                    }) {
                       Icon(
                           imageVector = Icons.Outlined.Edit,
                           contentDescription = "Edit Household Icon",

@@ -59,7 +59,10 @@ fun OverviewScreen(
   val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
 
   HouseHoldSelectionDrawer(
-      scope = scope, drawerState = drawerState, householdViewModel = householdViewModel) {
+      scope = scope,
+      drawerState = drawerState,
+      householdViewModel = householdViewModel,
+      navigationActions = navigationActions) {
         val filteredFoodItems =
             foodItems.filter { item ->
               item.foodFacts.name.contains(searchQuery, ignoreCase = true) &&

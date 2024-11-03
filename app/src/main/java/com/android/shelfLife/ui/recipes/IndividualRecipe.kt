@@ -88,7 +88,10 @@ fun IndividualRecipeScreen(
   val scope = rememberCoroutineScope()
 
   HouseHoldSelectionDrawer(
-      scope = scope, drawerState = drawerState, householdViewModel = householdViewModel) {
+      scope = scope,
+      drawerState = drawerState,
+      householdViewModel = householdViewModel,
+      navigationActions = navigationActions) {
         if (selectedHousehold == null) {
           FirstTimeWelcomeScreen(householdViewModel)
         } else {
