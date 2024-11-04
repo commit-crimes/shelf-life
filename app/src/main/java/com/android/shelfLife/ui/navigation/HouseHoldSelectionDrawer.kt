@@ -16,6 +16,7 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,6 +42,13 @@ fun HouseHoldSelectionDrawer(
   val userHouseholds = householdViewModel.households.collectAsState().value
   val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
   var editMode by remember { mutableStateOf(false) }
+
+  // Disable edit mode when the drawer is closed
+  LaunchedEffect(drawerState.isClosed) {
+    if (drawerState.isClosed) {
+      editMode = false
+    }
+  }
 
   ModalNavigationDrawer(
       modifier = Modifier.testTag("householdSelectionDrawer"),

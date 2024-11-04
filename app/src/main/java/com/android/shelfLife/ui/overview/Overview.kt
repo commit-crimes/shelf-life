@@ -50,7 +50,7 @@ fun OverviewScreen(
   val foodItems = selectedHousehold?.foodItems ?: emptyList()
   val userHouseholds = householdViewModel.households.collectAsState().value
   val householdViewModelIsLoaded = householdViewModel.finishedLoading.collectAsState().value
-  var selectedFilters = remember { mutableStateListOf<String>() }
+  val selectedFilters = remember { mutableStateListOf<String>() }
 
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()

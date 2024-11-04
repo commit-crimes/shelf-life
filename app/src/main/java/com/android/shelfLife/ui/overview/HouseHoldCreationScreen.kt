@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -46,6 +47,8 @@ fun HouseHoldCreationScreen(
   var isError by remember { mutableStateOf(false) }
   var houseHoldName by rememberSaveable { mutableStateOf(householdToEdit?.name ?: "") }
 
+  var showConfirmationDialog by remember { mutableStateOf(false) }
+
   return Scaffold(
       topBar = {
         TopAppBar(
@@ -61,17 +64,12 @@ fun HouseHoldCreationScreen(
             },
             actions = {
               if (householdToEdit != null) {
-                IconButton(
-                    onClick = {
-                      // TODO add are you sure dialog
-                      householdViewModel.deleteHouseholdById(householdToEdit.uid)
-                      navigationActions.goBack()
-                    }) {
-                      Icon(
-                          Icons.Outlined.Delete,
-                          contentDescription = "Delete",
-                          tint = MaterialTheme.colorScheme.error)
-                    }
+                IconButton(onClick = { showConfirmationDialog = true }) {
+                  Icon(
+                      Icons.Outlined.Delete,
+                      contentDescription = "Delete",
+                      tint = MaterialTheme.colorScheme.error)
+                }
               }
             })
       },
@@ -135,5 +133,29 @@ fun HouseHoldCreationScreen(
             Text("Cancel", style = TextStyle(fontSize = 22.sp), modifier = Modifier.padding(10.dp))
           }
         }
+    when {
+      showConfirmationDialog -> {
+        AlertDialog(
+            onDismissRequest = { showConfirmationDialog = false },
+            title = { Text("Delete household") },
+            text = { Text("Are you sure ?") },
+            confirmButton = {
+              Button(
+                  onClick = {
+                    if (householdToEdit != null) {
+                      householdViewModel.deleteHouseholdById(householdToEdit.uid)
+                    }
+                    navigationActions.goBack()
+                    showConfirmationDialog = false
+                  }) {
+                    Text("Confirm")
+                  }
+            },
+            dismissButton = {
+              Button(onClick = { showConfirmationDialog = false }) { Text("Cancel") }
+            },
+        )
+      }
+    }
   }
 }
