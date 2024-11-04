@@ -18,6 +18,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -37,6 +40,7 @@ fun HouseHoldSelectionDrawer(
 
   val userHouseholds = householdViewModel.households.collectAsState().value
   val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
+  var editMode by remember { mutableStateOf(false) }
 
   ModalNavigationDrawer(
       modifier = Modifier.testTag("householdSelectionDrawer"),
@@ -56,11 +60,16 @@ fun HouseHoldSelectionDrawer(
               HouseHoldElement(
                   household = household,
                   selectedHousehold = it,
+                  editMode = editMode,
                   onHouseholdSelected = { household ->
                     if (household != selectedHousehold) {
                       householdViewModel.selectHousehold(household)
                     }
                     scope.launch { drawerState.close() }
+                  },
+                  onHouseholdEditSelected = { household ->
+                    householdViewModel.selectHouseholdToEdit(household)
+                    navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
                   })
             }
           }
@@ -85,8 +94,7 @@ fun HouseHoldSelectionDrawer(
                     modifier = Modifier.testTag("editHouseholdIcon"),
                     onClick = {
                       // TODO need a way to select the household to edit
-                      householdViewModel.selectHouseholdToEdit(selectedHousehold)
-                      navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
+                      editMode = true
                     }) {
                       Icon(
                           imageVector = Icons.Outlined.Edit,

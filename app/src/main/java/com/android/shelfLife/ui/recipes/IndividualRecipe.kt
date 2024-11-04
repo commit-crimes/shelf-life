@@ -93,7 +93,7 @@ fun IndividualRecipeScreen(
       householdViewModel = householdViewModel,
       navigationActions = navigationActions) {
         if (selectedHousehold == null) {
-          FirstTimeWelcomeScreen(householdViewModel)
+          FirstTimeWelcomeScreen(navigationActions, householdViewModel)
         } else {
           // Scaffold that provides the structure for the screen, including top and bottom bars.
           Scaffold(

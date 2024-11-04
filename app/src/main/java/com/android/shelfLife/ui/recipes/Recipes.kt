@@ -95,7 +95,7 @@ fun RecipesScreen(
             }
 
         if (selectedHousehold == null) {
-          FirstTimeWelcomeScreen(householdViewModel)
+          FirstTimeWelcomeScreen(navigationActions, householdViewModel)
         } else {
           Scaffold(
               modifier = Modifier.testTag("recipesScreen"),

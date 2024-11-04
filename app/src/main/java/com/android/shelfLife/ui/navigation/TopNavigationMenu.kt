@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -175,7 +176,9 @@ fun FilterChipItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
 fun HouseHoldElement(
     household: HouseHold,
     selectedHousehold: HouseHold,
-    onHouseholdSelected: (HouseHold) -> Unit
+    editMode: Boolean,
+    onHouseholdSelected: (HouseHold) -> Unit,
+    onHouseholdEditSelected: (HouseHold) -> Unit
 ) {
   NavigationDrawerItem(
       colors =
@@ -191,7 +194,23 @@ fun HouseHoldElement(
                 if (household == selectedHousehold) MaterialTheme.colorScheme.primary
                 else Color.Unspecified)
       },
+      icon = {
+        if (editMode) {
+          IconButton(onClick = { onHouseholdEditSelected(household) }) {
+            Icon(
+                imageVector = Icons.Outlined.Edit,
+                contentDescription = "Edit Icon",
+            )
+          }
+        }
+      },
       selected = household == selectedHousehold,
-      onClick = { onHouseholdSelected(household) },
+      onClick = {
+        if (editMode) {
+          onHouseholdEditSelected(household)
+        } else {
+          onHouseholdSelected(household)
+        }
+      },
       modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding))
 }

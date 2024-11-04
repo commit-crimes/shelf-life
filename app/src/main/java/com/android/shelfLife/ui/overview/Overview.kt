@@ -79,7 +79,7 @@ fun OverviewScreen(
             CircularProgressIndicator()
           }
         } else if (selectedHousehold == null && userHouseholds.isEmpty()) {
-          FirstTimeWelcomeScreen(householdViewModel)
+          FirstTimeWelcomeScreen(navigationActions, householdViewModel)
         } else {
           Scaffold(
               modifier = Modifier.testTag("overviewScreen"),
