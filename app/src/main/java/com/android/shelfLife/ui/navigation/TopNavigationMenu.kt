@@ -14,15 +14,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -34,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.android.shelfLife.model.household.HouseHold
@@ -162,58 +158,4 @@ fun FilterChipItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
               labelColor = Color.Black),
       modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp) // Add padding between chips
       )
-}
-
-/**
- * Composable function for a single household element in the navigation drawer This function
- * displays a single household element in the navigation drawer.
- *
- * @param household The household to display
- * @param selectedHousehold The currently selected household
- * @param onHouseholdSelected The lambda to be called when the household is selected
- */
-@Composable
-fun HouseHoldElement(
-    household: HouseHold,
-    selectedHousehold: HouseHold,
-    editMode: Boolean,
-    onHouseholdSelected: (HouseHold) -> Unit,
-    onHouseholdEditSelected: (HouseHold) -> Unit
-) {
-  NavigationDrawerItem(
-      colors =
-          NavigationDrawerItemDefaults.colors(
-              selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-              selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
-          ),
-      label = {
-        Text(
-            text = household.name,
-            fontWeight = if (household == selectedHousehold) FontWeight.Bold else FontWeight.Normal,
-            color =
-                if (household == selectedHousehold) MaterialTheme.colorScheme.primary
-                else Color.Unspecified)
-      },
-      icon = {
-        if (editMode) {
-          IconButton(
-              modifier = Modifier.testTag("editHouseholdIndicatorIcon"),
-              onClick = { onHouseholdEditSelected(household) }) {
-                Icon(
-                    imageVector = Icons.Outlined.Edit,
-                    contentDescription = "Edit Icon",
-                )
-              }
-        }
-      },
-      selected = household == selectedHousehold,
-      onClick = {
-        if (editMode) {
-          onHouseholdEditSelected(household)
-        } else {
-          onHouseholdSelected(household)
-        }
-      },
-      modifier =
-          Modifier.padding(NavigationDrawerItemDefaults.ItemPadding).testTag("householdElement"))
 }

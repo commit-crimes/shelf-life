@@ -65,7 +65,7 @@ fun HouseHoldSelectionDrawer(
               style = MaterialTheme.typography.labelMedium)
           userHouseholds.forEach { household ->
             selectedHousehold?.let {
-              HouseHoldElement(
+              HouseholdDrawerItem(
                   household = household,
                   selectedHousehold = it,
                   editMode = editMode,
