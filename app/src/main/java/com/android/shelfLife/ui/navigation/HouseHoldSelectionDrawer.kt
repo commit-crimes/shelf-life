@@ -100,10 +100,7 @@ fun HouseHoldSelectionDrawer(
 
                 IconButton(
                     modifier = Modifier.testTag("editHouseholdIcon"),
-                    onClick = {
-                      // TODO need a way to select the household to edit
-                      editMode = true
-                    }) {
+                    onClick = { editMode = true }) {
                       Icon(
                           imageVector = Icons.Outlined.Edit,
                           contentDescription = "Edit Household Icon",

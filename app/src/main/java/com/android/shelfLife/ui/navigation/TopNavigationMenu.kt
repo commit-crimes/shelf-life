@@ -196,12 +196,14 @@ fun HouseHoldElement(
       },
       icon = {
         if (editMode) {
-          IconButton(onClick = { onHouseholdEditSelected(household) }) {
-            Icon(
-                imageVector = Icons.Outlined.Edit,
-                contentDescription = "Edit Icon",
-            )
-          }
+          IconButton(
+              modifier = Modifier.testTag("editHouseholdIndicatorIcon"),
+              onClick = { onHouseholdEditSelected(household) }) {
+                Icon(
+                    imageVector = Icons.Outlined.Edit,
+                    contentDescription = "Edit Icon",
+                )
+              }
         }
       },
       selected = household == selectedHousehold,
@@ -212,5 +214,6 @@ fun HouseHoldElement(
           onHouseholdSelected(household)
         }
       },
-      modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding))
+      modifier =
+          Modifier.padding(NavigationDrawerItemDefaults.ItemPadding).testTag("householdElement"))
 }
