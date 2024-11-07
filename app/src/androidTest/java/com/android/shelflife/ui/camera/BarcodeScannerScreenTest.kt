@@ -1,8 +1,10 @@
 package com.android.shelfLife.ui.camera
 
 import androidx.activity.ComponentActivity
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.text.AnnotatedString
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.*
@@ -21,200 +23,399 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class BarcodeScannerScreenTest {
 
-  @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+    @get:Rule
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-  private lateinit var navigationActions: NavigationActions
-  private lateinit var barcodeScannerViewModel: BarcodeScannerViewModel
-  private lateinit var foodFactsViewModel: FoodFactsViewModel
-  private lateinit var householdViewModel: HouseholdViewModel
-  private lateinit var foodItemViewModel: ListFoodItemsViewModel
+    private lateinit var navigationActions: NavigationActions
+    private lateinit var barcodeScannerViewModel: BarcodeScannerViewModel
+    private lateinit var foodFactsViewModel: FoodFactsViewModel
+    private lateinit var householdViewModel: HouseholdViewModel
+    private lateinit var foodItemViewModel: ListFoodItemsViewModel
 
-  private lateinit var fakeRepository: FakeFoodFactsRepository
+    private lateinit var fakeRepository: FakeFoodFactsRepository
 
-  @Before
-  fun setUp() {
-    // Initialize MockK
-    MockKAnnotations.init(this, relaxed = true)
+    @Before
+    fun setUp() {
+        // Initialize MockK
+        MockKAnnotations.init(this, relaxed = true)
 
-    navigationActions = mockk(relaxed = true)
-    barcodeScannerViewModel = mockk(relaxed = true)
-    householdViewModel = mockk(relaxed = true)
-    foodItemViewModel = mockk(relaxed = true)
+        navigationActions = mockk(relaxed = true)
+        barcodeScannerViewModel = mockk(relaxed = true)
+        householdViewModel = mockk(relaxed = true)
+        foodItemViewModel = mockk(relaxed = true)
 
-    // Mock other interactions
-    every { navigationActions.currentRoute() } returns Route.SCANNER
-    every { barcodeScannerViewModel.permissionGranted } returns true
+        // Mock other interactions
+        every { navigationActions.currentRoute() } returns Route.SCANNER
+        every { barcodeScannerViewModel.permissionGranted } returns true
 
-    // Initialize the fake repository and real ViewModel
-    fakeRepository = FakeFoodFactsRepository()
-    foodFactsViewModel = FoodFactsViewModel(fakeRepository)
-  }
+        // Mock getUID() to return a valid UID
+        every { foodItemViewModel.getUID() } returns "testUID"
 
-  @Test
-  fun barcodeScannerScreenIsDisplayedCorrectly() {
-    composeTestRule.setContent {
-      BarcodeScannerScreen(
-          navigationActions = navigationActions,
-          cameraViewModel = barcodeScannerViewModel,
-          foodFactsViewModel = foodFactsViewModel,
-          householdViewModel = householdViewModel,
-          foodItemViewModel = foodItemViewModel)
+        // Initialize the fake repository and real ViewModel
+        fakeRepository = FakeFoodFactsRepository()
+        foodFactsViewModel = FoodFactsViewModel(fakeRepository)
     }
 
-    // Check that the main screen is displayed
-    composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("cameraPreviewBox").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("scannerOverlay").assertIsDisplayed()
-  }
+    @Test
+    fun barcodeScannerScreenIsDisplayedCorrectly() {
+        composeTestRule.setContent {
+            BarcodeScannerScreen(
+                navigationActions = navigationActions,
+                cameraViewModel = barcodeScannerViewModel,
+                foodFactsViewModel = foodFactsViewModel,
+                householdViewModel = householdViewModel,
+                foodItemViewModel = foodItemViewModel)
+        }
 
-  @Test
-  fun whenPermissionNotGranted_NavigateToPermissionHandler() {
-    // Mock permission not granted
-    every { barcodeScannerViewModel.permissionGranted } returns false
-
-    composeTestRule.setContent {
-      BarcodeScannerScreen(
-          navigationActions = navigationActions,
-          cameraViewModel = barcodeScannerViewModel,
-          foodFactsViewModel = foodFactsViewModel,
-          householdViewModel = householdViewModel,
-          foodItemViewModel = foodItemViewModel)
+        // Check that the main screen is displayed
+        composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("cameraPreviewBox").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("scannerOverlay").assertIsDisplayed()
     }
 
-    // Verify navigation to permission handler
-    verify { navigationActions.navigateTo(Screen.PERMISSION_HANDLER) }
-  }
+    @Test
+    fun whenPermissionNotGranted_NavigateToPermissionHandler() {
+        // Mock permission not granted
+        every { barcodeScannerViewModel.permissionGranted } returns false
 
-  @Test
-  fun scannedItemFoodScreenIsDisplayedAfterScanning() {
-    // Set up the fake repository to return a sample food item
-    val sampleFoodFacts =
-        FoodFacts(
+        composeTestRule.setContent {
+            BarcodeScannerScreen(
+                navigationActions = navigationActions,
+                cameraViewModel = barcodeScannerViewModel,
+                foodFactsViewModel = foodFactsViewModel,
+                householdViewModel = householdViewModel,
+                foodItemViewModel = foodItemViewModel)
+        }
+
+        // Verify navigation to permission handler
+        verify { navigationActions.navigateTo(Screen.PERMISSION_HANDLER) }
+    }
+
+    @Test
+    fun scannedItemFoodScreenIsDisplayedAfterScanning() {
+        // Set up the fake repository to return a sample food item
+        val sampleFoodFacts = FoodFacts(
             name = "Sample Food",
             barcode = "1234567890",
             quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
             category = FoodCategory.OTHER)
-    fakeRepository.foodFactsList = listOf(sampleFoodFacts)
+        fakeRepository.foodFactsList = listOf(sampleFoodFacts)
 
-    // Simulate the scanning process
-    composeTestRule.setContent {
-      BarcodeScannerScreen(
-          navigationActions = navigationActions,
-          cameraViewModel = barcodeScannerViewModel,
-          foodFactsViewModel = foodFactsViewModel,
-          householdViewModel = householdViewModel,
-          foodItemViewModel = foodItemViewModel)
+        // Simulate the scanning process
+        composeTestRule.setContent {
+            BarcodeScannerScreen(
+                navigationActions = navigationActions,
+                cameraViewModel = barcodeScannerViewModel,
+                foodFactsViewModel = foodFactsViewModel,
+                householdViewModel = householdViewModel,
+                foodItemViewModel = foodItemViewModel)
+        }
+
+        // Simulate scanning a barcode
+        composeTestRule.activity.runOnUiThread {
+            foodFactsViewModel.searchByBarcode(1234567890L)
+        }
+
+        // Wait until the small popup is displayed
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Assert that the small popup is displayed
+        composeTestRule.onNodeWithText("Sample Food").assertIsDisplayed()
+
+        // Click on the small popup to expand it
+        composeTestRule.onNodeWithText("Sample Food").performClick()
+
+        // Wait until the input fields are displayed
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Now assert that the input form is displayed
+        composeTestRule.onNodeWithTag("locationDropdown").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("expireDateTextField").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("openDateTextField").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("buyDateTextField").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("submitButton").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
     }
 
-    // Simulate scanning a barcode
-    composeTestRule.activity.runOnUiThread { foodFactsViewModel.searchByBarcode(1234567890L) }
+    @Test
+    fun smallPopupExpandsOnClick() {
+        // Set up the fake repository to return a sample food item
+        val sampleFoodFacts = FoodFacts(
+            name = "Sample Food",
+            barcode = "1234567890",
+            quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
+            category = FoodCategory.OTHER
+        )
+        fakeRepository.foodFactsList = listOf(sampleFoodFacts)
 
-    // Wait for the UI to update
-    composeTestRule.waitForIdle()
+        composeTestRule.setContent {
+            BarcodeScannerScreen(
+                navigationActions = navigationActions,
+                cameraViewModel = barcodeScannerViewModel,
+                foodFactsViewModel = foodFactsViewModel,
+                householdViewModel = householdViewModel,
+                foodItemViewModel = foodItemViewModel
+            )
+        }
 
-    //    // Check that ScannedItemFoodScreen is displayed
-    //    composeTestRule.onNodeWithTag("scannedItemFoodScreen").assertIsDisplayed()
-    //    composeTestRule.onNodeWithTag("locationDropdown").assertIsDisplayed()
-    //    composeTestRule.onNodeWithTag("expireDateTextField").assertIsDisplayed()
-    //    composeTestRule.onNodeWithTag("openDateTextField").assertIsDisplayed()
-    //    composeTestRule.onNodeWithTag("buyDateTextField").assertIsDisplayed()
-    //    composeTestRule.onNodeWithTag("submitButton").assertIsDisplayed()
-    //    composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
-  }
-  //
-  //  @Test
-  //  fun clickingBackButtonReturnsToScanning() {
-  //    var onFinishCalled = false
-  //
-  //    composeTestRule.setContent {
-  //      ScannedItemFoodScreen(
-  //          houseHoldViewModel = householdViewModel,
-  //          foodFacts =
-  //              FoodFacts(
-  //                  name = "Sample Food",
-  //                  barcode = "1234567890",
-  //                  quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
-  //                  category = FoodCategory.OTHER),
-  //          foodItemViewModel = foodItemViewModel,
-  //          onFinish = { onFinishCalled = true })
-  //    }
-  //
-  //    // Click the back button
-  //    composeTestRule.onNodeWithTag("backButton").performClick()
-  //
-  //    // Assert that onFinish was called
-  //    assertTrue(onFinishCalled)
-  //  }
+        // Simulate scanning a barcode
+        composeTestRule.activity.runOnUiThread {
+            foodFactsViewModel.searchByBarcode(1234567890L)
+        }
 
-  //    @Test
-  //    fun submittingFormAddsFoodItem() {
-  //        composeTestRule.setContent {
-  //            ScannedItemFoodScreen(
-  //                houseHoldViewModel = householdViewModel,
-  //                foodFacts = FoodFacts(
-  //                    name = "Sample Food",
-  //                    barcode = "1234567890",
-  //                    quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
-  //                    category = FoodCategory.OTHER
-  //                ),
-  //                foodItemViewModel = foodItemViewModel,
-  //                onFinish = {}
-  //            )
-  //        }
-  //
-  //        // Fill in the form
-  //        composeTestRule.onNodeWithTag("expireDateTextField").performTextInput("31/12/2023")
-  //        composeTestRule.onNodeWithTag("openDateTextField").performTextInput("01/01/2023")
-  //        composeTestRule.onNodeWithTag("buyDateTextField").performTextInput("15/01/2023")
-  //
-  //        // Click submit
-  //        composeTestRule.onNodeWithTag("submitButton").performClick()
-  //
-  //        // Verify that addFoodItem was called
-  //        verify { householdViewModel.addFoodItem(any()) }
-  //    }
-  //
-  //  @Test
-  //  fun cancellingFormReturnsToScanning() {
-  //    var onFinishCalled = false
-  //
-  //    composeTestRule.setContent {
-  //      ScannedItemFoodScreen(
-  //          houseHoldViewModel = householdViewModel,
-  //          foodFacts =
-  //              FoodFacts(
-  //                  name = "Sample Food",
-  //                  barcode = "1234567890",
-  //                  quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
-  //                  category = FoodCategory.OTHER),
-  //          foodItemViewModel = foodItemViewModel,
-  //          onFinish = { onFinishCalled = true })
-  //    }
-  //
-  //    // Click the cancel button
-  //    composeTestRule.onNodeWithTag("cancelButton").performClick()
-  //
-  //    // Assert that onFinish was called
-  //    assertTrue(onFinishCalled)
-  //  }
+        // Wait until the small popup is displayed
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
+        }
 
-  // Additional tests can be added as needed
+        // Assert that the small popup is displayed with minimal content
+        composeTestRule.onNodeWithText("Sample Food").assertIsDisplayed()
+        // Ensure that the input fields are not displayed yet
+        composeTestRule.onNodeWithTag("expireDateTextField").assertDoesNotExist()
 
-  // Include the FakeFoodFactsRepository within the test class or as a nested class
-  inner class FakeFoodFactsRepository : FoodFactsRepository {
-    var shouldReturnError = false
-    var foodFactsList = listOf<FoodFacts>()
+        // Click on the small popup to expand it
+        composeTestRule.onNodeWithText("Sample Food").performClick()
 
-    override fun searchFoodFacts(
-        searchInput: FoodSearchInput,
-        onSuccess: (List<FoodFacts>) -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-      if (shouldReturnError) {
-        onFailure(Exception("Test exception"))
-      } else {
-        onSuccess(foodFactsList)
-      }
+        // Wait until the input fields are displayed
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Assert that the input fields are now displayed
+        composeTestRule.onNodeWithTag("expireDateTextField").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("openDateTextField").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("buyDateTextField").assertIsDisplayed()
     }
-  }
+
+    @Test
+    fun submittingFormClosesModalAndResumesScanning() {
+        // Set up the fake repository to return a sample food item
+        val sampleFoodFacts = FoodFacts(
+            name = "Sample Food",
+            barcode = "1234567890",
+            quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
+            category = FoodCategory.OTHER
+        )
+        fakeRepository.foodFactsList = listOf(sampleFoodFacts)
+
+        composeTestRule.setContent {
+            BarcodeScannerScreen(
+                navigationActions = navigationActions,
+                cameraViewModel = barcodeScannerViewModel,
+                foodFactsViewModel = foodFactsViewModel,
+                householdViewModel = householdViewModel,
+                foodItemViewModel = foodItemViewModel
+            )
+        }
+
+        // Simulate scanning a barcode
+        composeTestRule.activity.runOnUiThread {
+            foodFactsViewModel.searchByBarcode(1234567890L)
+        }
+
+        // Wait until the small popup is displayed
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Click on the small popup to expand it
+        composeTestRule.onNodeWithText("Sample Food").performClick()
+
+        // Wait until the input fields are displayed
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Fill in the form with valid dates
+        composeTestRule.onNodeWithTag("expireDateTextField").performTextInput("31122023")
+        composeTestRule.onNodeWithTag("buyDateTextField").performTextClearance()
+        composeTestRule.onNodeWithTag("buyDateTextField").performTextInput("15012023")
+        composeTestRule.onNodeWithTag("openDateTextField").performTextInput("16012023") // After buyDate
+
+        // Click submit
+        composeTestRule.onNodeWithTag("submitButton").performClick()
+
+        // Wait for any UI updates
+        composeTestRule.waitForIdle()
+
+        // Verify that the ModalBottomSheet is dismissed
+        composeTestRule.onNodeWithTag("expireDateTextField").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("openDateTextField").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("buyDateTextField").assertDoesNotExist()
+
+        // Verify that the scanner is active again (e.g., camera preview is displayed)
+        composeTestRule.onNodeWithTag("cameraPreviewBox").assertIsDisplayed()
+    }
+
+    @Test
+    fun cancellingFormReturnsToScanning() {
+        // Set up the fake repository to return a sample food item
+        val sampleFoodFacts = FoodFacts(
+            name = "Sample Food",
+            barcode = "1234567890",
+            quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
+            category = FoodCategory.OTHER)
+        fakeRepository.foodFactsList = listOf(sampleFoodFacts)
+
+        composeTestRule.setContent {
+            BarcodeScannerScreen(
+                navigationActions = navigationActions,
+                cameraViewModel = barcodeScannerViewModel,
+                foodFactsViewModel = foodFactsViewModel,
+                householdViewModel = householdViewModel,
+                foodItemViewModel = foodItemViewModel)
+        }
+
+        // Simulate scanning a barcode
+        composeTestRule.activity.runOnUiThread {
+            foodFactsViewModel.searchByBarcode(1234567890L)
+        }
+
+        // Wait until the small popup is displayed
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Click on the small popup to expand it
+        composeTestRule.onNodeWithText("Sample Food").performClick()
+
+        // Wait until the input fields are displayed
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Click the cancel button
+        composeTestRule.onNodeWithTag("cancelButton").performClick()
+
+        // Verify that the ModalBottomSheet is dismissed and scanning resumes
+        composeTestRule.onNodeWithTag("expireDateTextField").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("openDateTextField").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("buyDateTextField").assertDoesNotExist()
+    }
+
+    @Test
+    fun submittingFormWithInvalidDateShowsError() {
+        // Set up the fake repository to return a sample food item
+        val sampleFoodFacts = FoodFacts(
+            name = "Sample Food",
+            barcode = "1234567890",
+            quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
+            category = FoodCategory.OTHER)
+        fakeRepository.foodFactsList = listOf(sampleFoodFacts)
+
+        composeTestRule.setContent {
+            BarcodeScannerScreen(
+                navigationActions = navigationActions,
+                cameraViewModel = barcodeScannerViewModel,
+                foodFactsViewModel = foodFactsViewModel,
+                householdViewModel = householdViewModel,
+                foodItemViewModel = foodItemViewModel)
+        }
+
+        // Simulate scanning a barcode
+        composeTestRule.activity.runOnUiThread {
+            foodFactsViewModel.searchByBarcode(1234567890L)
+        }
+
+        // Wait until the small popup is displayed
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Click on the small popup to expand it
+        composeTestRule.onNodeWithText("Sample Food").performClick()
+
+        // Wait until the input fields are displayed
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Fill in the form with an invalid date
+        composeTestRule.onNodeWithTag("expireDateTextField").performTextInput("32122023") // Invalid day
+        composeTestRule.onNodeWithTag("openDateTextField").performTextInput("01012023")
+        composeTestRule.onNodeWithTag("buyDateTextField").performTextClearance()
+        composeTestRule.onNodeWithTag("buyDateTextField").performTextInput("15012023")
+
+        // Click submit
+        composeTestRule.onNodeWithTag("submitButton").performClick()
+
+        // Check that an error message is displayed for expire date
+        composeTestRule.onNodeWithText("Invalid date").assertIsDisplayed()
+    }
+
+    @Test
+    fun dateFieldAddsSlashesAutomatically() {
+        // Set up the fake repository to return a sample food item
+        val sampleFoodFacts = FoodFacts(
+            name = "Sample Food",
+            barcode = "1234567890",
+            quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
+            category = FoodCategory.OTHER
+        )
+        fakeRepository.foodFactsList = listOf(sampleFoodFacts)
+
+        composeTestRule.setContent {
+            BarcodeScannerScreen(
+                navigationActions = navigationActions,
+                cameraViewModel = barcodeScannerViewModel,
+                foodFactsViewModel = foodFactsViewModel,
+                householdViewModel = householdViewModel,
+                foodItemViewModel = foodItemViewModel
+            )
+        }
+
+        // Simulate scanning a barcode
+        composeTestRule.activity.runOnUiThread {
+            foodFactsViewModel.searchByBarcode(1234567890L)
+        }
+
+        // Wait until the small popup is displayed
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Click on the small popup to expand it
+        composeTestRule.onNodeWithText("Sample Food").performClick()
+
+        // Wait until the input fields are displayed
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Input digits into the expire date field
+        composeTestRule.onNodeWithTag("expireDateTextField").performTextInput("31122023")
+
+        // Check that the EditableText is '31/12/2023'
+        composeTestRule.onNodeWithTag("expireDateTextField")
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.EditableText,
+                    AnnotatedString("31/12/2023")
+                )
+            )
+    }
+
+    // Additional tests can be added as needed
+
+    // Include the FakeFoodFactsRepository within the test class or as a nested class
+    inner class FakeFoodFactsRepository : FoodFactsRepository {
+        var shouldReturnError = false
+        var foodFactsList = listOf<FoodFacts>()
+
+        override fun searchFoodFacts(
+            searchInput: FoodSearchInput,
+            onSuccess: (List<FoodFacts>) -> Unit,
+            onFailure: (Exception) -> Unit
+        ) {
+            if (shouldReturnError) {
+                onFailure(Exception("Test exception"))
+            } else {
+                onSuccess(foodFactsList)
+            }
+        }
+    }
 }
