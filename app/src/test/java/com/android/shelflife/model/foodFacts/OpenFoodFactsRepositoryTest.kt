@@ -247,8 +247,10 @@ class OpenFoodFactsRepositoryTest {
     assertEquals(2, foodFactsList.size)
     assertEquals("Banana", foodFactsList[0].name)
     assertEquals("Apple", foodFactsList[1].name)
-    assertEquals("https://images.openfoodfacts.org/images/products/073/762/806/4502/front_en.6.400.jpg", foodFactsList[0].imageUrl)
-    //should expect default image constant
+    assertEquals(
+        "https://images.openfoodfacts.org/images/products/073/762/806/4502/front_en.6.400.jpg",
+        foodFactsList[0].imageUrl)
+    // should expect default image constant
     assertEquals(FoodFacts.DEFAULT_IMAGE_URL, foodFactsList[1].imageUrl)
     assertEquals(89, foodFactsList[0].nutritionFacts.energyKcal)
     assertEquals(52, foodFactsList[1].nutritionFacts.energyKcal)

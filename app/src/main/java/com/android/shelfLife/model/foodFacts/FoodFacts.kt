@@ -1,6 +1,5 @@
 package com.android.shelfLife.model.foodFacts
 
-
 /**
  * Represents intrinsic details of a food item.
  *
@@ -23,16 +22,17 @@ data class FoodFacts(
     val nutritionFacts: NutritionFacts = NutritionFacts(), // Default empty NutritionFacts object
     val imageUrl: String = DEFAULT_IMAGE_URL // New property for image URL
 ) {
-    companion object {
-        const val DEFAULT_IMAGE_URL = "https://media.istockphoto.com/id/1354776457/vector/default-image-icon-vector-missing-picture-page-for-website-design-or-mobile-app-no-photo.jpg?s=612x612&w=0&k=20&c=w3OW0wX3LyiFRuDHo9A32Q0IUMtD4yjXEvQlqyYk9O4="
-    }
+  companion object {
+    const val DEFAULT_IMAGE_URL =
+        "https://media.istockphoto.com/id/1354776457/vector/default-image-icon-vector-missing-picture-page-for-website-design-or-mobile-app-no-photo.jpg?s=612x612&w=0&k=20&c=w3OW0wX3LyiFRuDHo9A32Q0IUMtD4yjXEvQlqyYk9O4="
+  }
 
-    override fun toString(): String {
-        return "Name: $name\n" +
-            "Barcode: $barcode\n" +
-            "Quantity: $quantity\n" +
-            "Category: ${category.name}\n" +
-            "Nutrition facts: $nutritionFacts"
+  override fun toString(): String {
+    return "Name: $name\n" +
+        "Barcode: $barcode\n" +
+        "Quantity: $quantity\n" +
+        "Category: ${category.name}\n" +
+        "Nutrition facts: $nutritionFacts"
   }
 }
 

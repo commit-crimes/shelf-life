@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.overview
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -78,7 +77,11 @@ fun AddFoodItemScreen(
             })
       }) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding).testTag("addFoodItemScreen").verticalScroll(rememberScrollState()),
+            modifier =
+                Modifier.fillMaxSize()
+                    .padding(padding)
+                    .testTag("addFoodItemScreen")
+                    .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top) {
               OutlinedTextField(
@@ -95,7 +98,8 @@ fun AddFoodItemScreen(
                         onValueChange = { amount = it },
                         label = { Text(stringResource(id = R.string.amount_hint)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.testTag("inputFoodAmount").weight(1f).padding(end = 4.dp))
+                        modifier =
+                            Modifier.testTag("inputFoodAmount").weight(1f).padding(end = 4.dp))
 
                     DropdownFields(
                         label = stringResource(id = R.string.unit_label),
@@ -119,7 +123,7 @@ fun AddFoodItemScreen(
                   optionLabel = { fromCapitalStringToLowercaseString(it.name) },
                   modifier = Modifier.testTag("inputFoodCategory"))
 
-          Spacer(modifier = Modifier.height(8.dp))
+              Spacer(modifier = Modifier.height(8.dp))
 
               DropdownFields(
                   label = stringResource(id = R.string.location_label),
@@ -136,8 +140,8 @@ fun AddFoodItemScreen(
                   onValueChange = { expireDate = it },
                   label = { Text(stringResource(id = R.string.expire_date_hint)) },
                   placeholder = { Text("dd/mm/yyyy") },
-                  modifier = Modifier.testTag("inputFoodExpireDate").fillMaxWidth().padding(bottom = 8.dp)
-              )
+                  modifier =
+                      Modifier.testTag("inputFoodExpireDate").fillMaxWidth().padding(bottom = 8.dp))
 
               OutlinedTextField(
                   value = openDate,
