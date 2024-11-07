@@ -16,10 +16,21 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
+import android.util.Log
+import kotlinx.coroutines.test.advanceUntilIdle
+import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Mockito
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.shadows.ShadowLog
 
+// Stub Log.e and other Log methods to do nothing
+
+
+
+@RunWith(RobolectricTestRunner::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class ListFoodItemsViewModelTest {
-
   private lateinit var viewModel: ListFoodItemsViewModel
   private val mockRepository: FoodItemRepository = mock()
 
@@ -60,6 +71,8 @@ class ListFoodItemsViewModelTest {
     whenever(mockRepository.getNewUid()).thenReturn("test-uid")
     // Initialize the ViewModel
     viewModel = ListFoodItemsViewModel(mockRepository)
+    ShadowLog.clear()
+
   }
 
   @Test
@@ -189,5 +202,28 @@ class ListFoodItemsViewModelTest {
     // Assert
     val result = viewModel.selectedFoodItem.first()
     assertEquals(testFoodItem, result)
+  }
+
+  @Test
+  fun `getFoodItems calls _onFail when repository fails`() {
+    // Arrange
+    val exception = Exception("Test Exception")
+
+    // Set up repository to trigger onFailure callback
+    whenever(mockRepository.getFoodItems(any(), any())).thenAnswer {
+      // Call the onFailure lambda directly with an exception
+      it.getArgument<(Exception) -> Unit>(1).invoke(exception)
+    }
+
+    // Act
+    viewModel.getFoodItems()
+
+    // Assert that a log entry with Log.e was created
+    val logEntries = ShadowLog.getLogs()
+    assertTrue(logEntries.any {
+      it.tag == "ListFoodItemsViewModel" &&
+              it.type == Log.ERROR &&
+              it.msg.contains("Error fetching FoodItems: $exception")
+    })
   }
 }

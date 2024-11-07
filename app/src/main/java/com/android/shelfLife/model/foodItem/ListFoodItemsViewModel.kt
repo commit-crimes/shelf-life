@@ -35,6 +35,7 @@ class ListFoodItemsViewModel(private val repository: FoodItemRepository) : ViewM
    * @param exception The exception that occurred.
    */
   private fun _onFail(exception: Exception) {
+    //TODO: proper error Handling (use a global Error PopUp?)
     Log.e("ListFoodItemsViewModel", "Error fetching FoodItems: $exception")
   }
 
