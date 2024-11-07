@@ -26,6 +26,7 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -73,10 +74,11 @@ fun IndividualFoodItemScreen(
                     )
 
                     Image(
-                        painter = painterResource(id = R.drawable.minecraft_steak),
+                        painter = painterResource(id = R.drawable.minecraft_rottenflesh),
                         contentDescription = "Image of ${selectedFoodItem.foodFacts.name}",
                         modifier = Modifier
-                            .size(360.dp, 360.dp)
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
                             .clip(RoundedCornerShape(8.dp)),
                         contentScale = ContentScale.Crop
                     )
