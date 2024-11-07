@@ -86,60 +86,67 @@ class OpenFoodFactsRepositoryTest {
   @Test
   fun testSearchFoodFactsWithQueryReturnsSuccess() {
     // Mocking a successful response for a query search
-    val mockResponse =
-        MockResponse()
-            .setResponseCode(200)
-            .setBody(
-                """
+    val mockResponse = MockResponse()
+      .setResponseCode(200)
+      .setBody(
+        """
+            {
+              "products": [
                 {
-                  "products": [
-                    {
-                      "product_name": "Banana",
-                      "code": "987654321",
-                      "nutriments": {
-                        "energy-kcal_100g": 89,
-                        "fat_100g": 0.3,
-                        "saturated-fat_100g": 0.1,
-                        "carbohydrates_100g": 22.8,
-                        "sugars_100g": 12.2,
-                        "proteins_100g": 1.1,
-                        "salt_100g": 0.0
-                      }
-                    },
-                    {
-                      "product_name": "Orange Juice",
-                      "code": "192837465",
-                      "nutriments": {
-                        "energy-kcal_100g": 45,
-                        "fat_100g": 0.2,
-                        "saturated-fat_100g": 0.0,
-                        "carbohydrates_100g": 11.3,
-                        "sugars_100g": 10.2,
-                        "proteins_100g": 0.7,
-                        "salt_100g": 0.01
-                      }
-                    }
-                  ]
+                  "product_name": "Banana",
+                  "code": "987654321",
+                  "nutriments": {
+                    "energy-kcal_100g": 89,
+                    "fat_100g": 0.3,
+                    "saturated-fat_100g": 0.1,
+                    "carbohydrates_100g": 22.8,
+                    "sugars_100g": 12.2,
+                    "proteins_100g": 1.1,
+                    "salt_100g": 0.0
+                  }
+                },
+                {
+                  "product_name": "Orange Juice",
+                  "code": "192837465",
+                  "nutriments": {
+                    "energy-kcal_100g": 45,
+                    "fat_100g": 0.2,
+                    "saturated-fat_100g": 0.0,
+                    "carbohydrates_100g": 11.3,
+                    "sugars_100g": 10.2,
+                    "proteins_100g": 0.7,
+                    "salt_100g": 0.01
+                  }
                 }
-            """
-                    .trimIndent())
+              ]
+            }
+            """.trimIndent()
+      )
     mockWebServer.enqueue(mockResponse)
 
     val foodSearchInput = FoodSearchInput.Query("fruit")
-    var successCalled = true
+    val latch = CountDownLatch(1) // Latch to wait for callback
+    var successCalled = false
 
     repository.searchFoodFacts(
-        searchInput = foodSearchInput,
-        onSuccess = { foodFactsList ->
-          successCalled = true
-          assertEquals(2, foodFactsList.size)
-          assertEquals("Banana", foodFactsList[0].name)
-          assertEquals("Orange Juice", foodFactsList[1].name)
-        },
-        onFailure = { assertTrue("Failure should not be called in success case", successCalled) })
+      searchInput = foodSearchInput,
+      onSuccess = { foodFactsList ->
+        successCalled = true
+        assertEquals(2, foodFactsList.size)
+        assertEquals("Banana", foodFactsList[0].name)
+        assertEquals("Orange Juice", foodFactsList[1].name)
+        latch.countDown() // Signal that success callback was called
+      },
+      onFailure = {
+        fail("Failure should not be called in success case")
+        latch.countDown() // Signal that failure callback was called
+      }
+    )
 
+    latch.await(3, TimeUnit.SECONDS) // Wait up to 3 seconds for the callback
     assertTrue("Success callback should be called", successCalled)
   }
+
 
   @Test
   fun testSearchFoodFactsReturnsHTTPError() {
@@ -180,18 +187,26 @@ class OpenFoodFactsRepositoryTest {
     mockWebServer.shutdown() // Simulating no connection
 
     val foodSearchInput = FoodSearchInput.Barcode(123456789L)
-    var failureCalled = true
+    val latch = CountDownLatch(1) // Latch to wait for callback
+    var failureCalled = false
 
     repository.searchFoodFacts(
-        searchInput = foodSearchInput,
-        onSuccess = { assertTrue("Success should not be called in network failure case", false) },
-        onFailure = { e ->
-          failureCalled = true
-          assertTrue(e is IOException)
-        })
+      searchInput = foodSearchInput,
+      onSuccess = {
+        fail("Success should not be called in network failure case")
+        latch.countDown()
+      },
+      onFailure = { e ->
+        failureCalled = true
+        assertTrue(e is IOException)
+        latch.countDown() // Signal that failure callback was called
+      }
+    )
 
+    latch.await(3, TimeUnit.SECONDS) // Wait up to 3 seconds for the callback
     assertTrue("Failure callback should be called", failureCalled)
   }
+
 
   @Test
   fun testExtractFoodFactsFromJsonParsesCorrectData() {
