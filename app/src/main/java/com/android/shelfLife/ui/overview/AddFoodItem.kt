@@ -2,9 +2,11 @@ package com.android.shelfLife.ui.overview
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,23 +37,13 @@ import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
 
-/**
- * A composable function that displays the screen for adding a new food item to the user's household
- * inventory.
- *
- * @param navigationActions An instance of [NavigationActions] that handles navigation actions.
- * @param houseHoldViewModel An instance of [HouseholdViewModel] that provides access to the user's
- *   household data.
- * @param foodItemViewModel An instance of [ListFoodItemsViewModel] that provides access to the
- *   user's food item data.
- */
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddFoodItemScreen(
     navigationActions: NavigationActions,
     houseHoldViewModel: HouseholdViewModel,
-    foodItemViewModel: ListFoodItemsViewModel
+    foodItemViewModel: ListFoodItemsViewModel,
+    paddingValues: PaddingValues = PaddingValues(8.dp)
 ) {
   var foodName by remember { mutableStateOf("") }
   var amount by remember { mutableStateOf("") }
@@ -69,7 +61,7 @@ fun AddFoodItemScreen(
   var locationExpanded by remember { mutableStateOf(false) }
 
   Scaffold(
-      modifier = Modifier.fillMaxSize().testTag("addScreen"),
+      modifier = Modifier.fillMaxSize(),
       topBar = {
         TopAppBar(
             title = {
@@ -81,12 +73,12 @@ fun AddFoodItemScreen(
               IconButton(
                   onClick = { navigationActions.goBack() },
                   modifier = Modifier.testTag("goBackButton")) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "Go Back")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go Back")
                   }
             })
       }) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding),
+            modifier = Modifier.fillMaxSize().padding(padding).testTag("addFoodItemScreen").verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top) {
               OutlinedTextField(
@@ -103,7 +95,7 @@ fun AddFoodItemScreen(
                         onValueChange = { amount = it },
                         label = { Text(stringResource(id = R.string.amount_hint)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.testTag("inputFoodAmount").weight(1f))
+                        modifier = Modifier.testTag("inputFoodAmount").weight(1f).padding(end = 4.dp))
 
                     DropdownFields(
                         label = stringResource(id = R.string.unit_label),
@@ -127,7 +119,7 @@ fun AddFoodItemScreen(
                   optionLabel = { fromCapitalStringToLowercaseString(it.name) },
                   modifier = Modifier.testTag("inputFoodCategory"))
 
-              Spacer(modifier = Modifier.height(16.dp))
+          Spacer(modifier = Modifier.height(8.dp))
 
               DropdownFields(
                   label = stringResource(id = R.string.location_label),
@@ -144,7 +136,7 @@ fun AddFoodItemScreen(
                   onValueChange = { expireDate = it },
                   label = { Text(stringResource(id = R.string.expire_date_hint)) },
                   placeholder = { Text("dd/mm/yyyy") },
-                  modifier = Modifier.testTag("inputFoodExpireDate").fillMaxWidth(),
+                  modifier = Modifier.testTag("inputFoodExpireDate").fillMaxWidth().padding(bottom = 8.dp)
               )
 
               OutlinedTextField(

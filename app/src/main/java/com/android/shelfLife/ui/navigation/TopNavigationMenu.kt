@@ -159,3 +159,37 @@ fun FilterChipItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
       modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp) // Add padding between chips
       )
 }
+
+/**
+ * Composable function for a single household element in the navigation drawer This function
+ * displays a single household element in the navigation drawer.
+ *
+ * @param household The household to display
+ * @param selectedHousehold The currently selected household
+ * @param onHouseholdSelected The lambda to be called when the household is selected
+ */
+@Composable
+fun HouseHoldElement(
+    household: HouseHold,
+    selectedHousehold: HouseHold,
+    onHouseholdSelected: (HouseHold) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+  NavigationDrawerItem(
+      colors =
+          NavigationDrawerItemDefaults.colors(
+              selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+              selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+          ),
+      label = {
+        Text(
+            text = household.name,
+            fontWeight = if (household == selectedHousehold) FontWeight.Bold else FontWeight.Normal,
+            color =
+                if (household == selectedHousehold) MaterialTheme.colorScheme.primary
+                else Color.Unspecified)
+      },
+      selected = household == selectedHousehold,
+      onClick = { onHouseholdSelected(household) },
+      modifier = modifier.padding(NavigationDrawerItemDefaults.ItemPadding))
+}
