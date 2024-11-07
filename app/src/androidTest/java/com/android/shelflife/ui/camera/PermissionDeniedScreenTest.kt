@@ -54,29 +54,29 @@ class PermissionDeniedScreenTest {
     // The actual intent verification is tricky in Compose tests and might require additional setup
   }
 
-  //    @Test
-  //    fun bottomNavigationIsDisplayed() {
-  //        setUpPermissionDeniedScreen()
-  //
-  //        // Verify the bottom navigation is displayed and the SCANNER tab is selected
-  //
-  // composeTestRule.onNodeWithContentDescription("SCANNER").assertIsDisplayed().assertIsSelected()
-  //
-  //        // Select another tab to verify navigation
-  //        composeTestRule.onNodeWithContentDescription("OTHER_TAB").performClick()
-  //
-  //        // Verify that navigateTo() was called with the correct tab
-  //        verify(navigationActions).navigateTo("OTHER_TAB")
-  //    }
+      @Test
+      fun bottomNavigationIsDisplayed() {
+          setUpPermissionDeniedScreen()
 
-  //    @Test
-  //    fun clickOnOtherTabNavigatesToCorrectScreen() {
-  //        setUpPermissionDeniedScreen()
-  //
-  //        // Click on another tab in the bottom navigation menu
-  //        composeTestRule.onNodeWithContentDescription("OTHER_TAB").performClick()
-  //
-  //        // Verify that navigateTo() was called with the correct route
-  //        verify(navigationActions).navigateTo("OTHER_TAB")
-  //    }
+          // Verify the bottom navigation is displayed and the SCANNER tab is selected
+
+   composeTestRule.onNodeWithContentDescription("SCANNER").assertIsDisplayed().assertIsSelected()
+
+          // Select another tab to verify navigation
+          composeTestRule.onNodeWithContentDescription("OTHER_TAB").performClick()
+
+          // Verify that navigateTo() was called with the correct tab
+          verify(navigationActions).navigateTo("OTHER_TAB")
+      }
+
+      @Test
+      fun clickOnOtherTabNavigatesToCorrectScreen() {
+          setUpPermissionDeniedScreen()
+
+          // Click on another tab in the bottom navigation menu
+          composeTestRule.onNodeWithContentDescription("OTHER_TAB").performClick()
+
+          // Verify that navigateTo() was called with the correct route
+          verify(navigationActions).navigateTo("OTHER_TAB")
+      }
 }
