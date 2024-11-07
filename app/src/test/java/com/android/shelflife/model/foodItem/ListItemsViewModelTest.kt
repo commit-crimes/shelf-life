@@ -17,6 +17,8 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
 import android.util.Log
+import androidx.lifecycle.ViewModel
+import junit.framework.TestCase
 import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
@@ -226,4 +228,30 @@ class ListFoodItemsViewModelTest {
               it.msg.contains("Error fetching FoodItems: $exception")
     })
   }
+
+
+  @Test
+  fun `Factory creates ListFoodItemsViewModel instance`() {
+    val factory = ListFoodItemsViewModel.Factory(mockRepository)
+    val viewModel = factory.create(ListFoodItemsViewModel::class.java)
+
+    assertTrue(
+      "Factory should create an instance of FoodFactsViewModel", viewModel is ListFoodItemsViewModel)
+  }
+
+  @Test
+  fun `Factory throws exception for unknown ViewModel class`() {
+    val factory = ListFoodItemsViewModel.Factory(mockRepository)
+
+    try {
+      // Attempt to create a ViewModel of a different class to trigger the exception
+      factory.create(DifferentViewModel::class.java)
+      TestCase.fail("Factory should throw IllegalArgumentException for unknown ViewModel class")
+    } catch (e: IllegalArgumentException) {
+      assertTrue(e.message?.contains("Unknown ViewModel class") == true)
+    }
+  }
+
+  // A dummy ViewModel class to test the exception scenario
+  class DifferentViewModel : ViewModel()
 }
