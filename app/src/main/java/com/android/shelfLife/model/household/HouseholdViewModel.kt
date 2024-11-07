@@ -66,19 +66,46 @@ class HouseholdViewModel(
    *
    * @param householdName - The name of the household to be added.
    */
-  fun addNewHousehold(householdName: String) {
-    val household = HouseHold(repository.getNewUid(), householdName, emptyList(), emptyList())
-    repository.addHousehold(
-        household,
-        onSuccess = {
-          // Refresh the household list after successful addition
-          loadHouseholds()
-          Log.d("HouseholdViewModel", "Household added successfully")
-        },
-        onFailure = { exception ->
-          Log.e("HouseholdViewModel", "Error adding household: $exception")
-        })
-    loadHouseholds()
+  fun addNewHousehold(householdName: String, friendEmails : List<String> = emptyList()) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    if (currentUser != null) {
+        val household = HouseHold(repository.getNewUid(), householdName, emptyList(), emptyList())
+        repository.getUserIds(friendEmails) { emailToUserId ->
+            val emailsNotFound = friendEmails.filter { it !in emailToUserId.keys }
+            if (emailsNotFound.isNotEmpty()) {
+                Log.w("HouseholdViewModel", "Emails not found: $emailsNotFound")
+            }
+            val friendUserIds = emailToUserId.values.toList()
+            val allMembers = friendUserIds.plus(currentUser.uid)
+            val householdWithMembers = household.copy(members = allMembers)
+
+            // Add the household to the repository
+            repository.addHousehold(
+                householdWithMembers,
+                onSuccess = {
+                    loadHouseholds()
+                    Log.d("HouseholdViewModel", "Household added successfully")
+                },
+                onFailure = { exception ->
+                    Log.e("HouseholdViewModel", "Error adding household: $exception")
+                }
+            )
+        }
+        repository.addHousehold(
+            household,
+            onSuccess = {
+                // Refresh the household list after successful addition
+                loadHouseholds()
+                Log.d("HouseholdViewModel", "Household added successfully")
+            },
+            onFailure = { exception ->
+                Log.e("HouseholdViewModel", "Error adding household: $exception")
+            })
+        loadHouseholds()
+    } else {
+      Log.e("HouseholdViewModel", "User not logged in")
+      return
+    }
   }
 
   /**

@@ -39,4 +39,12 @@ interface HouseHoldRepository {
    * @param onFailure - Called when there is an error deleting the household.
    */
   fun deleteHouseholdById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+
+  /**
+   * Gets the user IDs for a list of users in the repository we want.
+   *
+   * @param users - The list of users of which we want the IDs.
+   * @param callback - Called when the user IDs are successfully retrieved.
+   */
+  fun getUserIds(users: List<String>, callback: (Map<String, String>) -> Unit)
 }

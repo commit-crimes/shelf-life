@@ -1,5 +1,7 @@
 package com.android.shelfLife.ui.authentication
 
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import android.content.Intent
 import android.util.Log
 import android.widget.Toast
@@ -51,17 +53,37 @@ import kotlinx.coroutines.tasks.await
 fun SignInScreen(navigationActions: NavigationActions) {
   val context = LocalContext.current
 
-  val launcher =
-      rememberFirebaseAuthLauncher(
-          onAuthComplete = { result ->
-            Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
-            Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-            navigationActions.navigateTo(TopLevelDestinations.OVERVIEW)
-          },
-          onAuthError = {
-            Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
-            Toast.makeText(context, "Login Failed!", Toast.LENGTH_LONG).show()
-          })
+    val launcher =
+        rememberFirebaseAuthLauncher(
+            onAuthComplete = { result ->
+                Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
+
+                // Get the current user
+                val currentUser = Firebase.auth.currentUser
+                if (currentUser != null) {
+                    // Get Firestore instance
+                    val db = FirebaseFirestore.getInstance()
+                    // Create a document reference with the user's UID
+                    val userDoc = db.collection("users").document(currentUser.uid)
+                    // Prepare user data to store
+                    val userData = mapOf(
+                        "email" to currentUser.email,
+                        "name" to currentUser.displayName
+                    )
+                    // Store or update the user data in Firestore
+                    userDoc.set(userData, SetOptions.merge())
+                } else {
+                    Log.e("SignInScreen", "Current user is null after sign-in")
+                }
+
+                Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
+                navigationActions.navigateTo(TopLevelDestinations.OVERVIEW)
+            },
+            onAuthError = {
+                Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
+                Toast.makeText(context, "Login Failed!", Toast.LENGTH_LONG).show()
+            }
+        )
 
   val token = stringResource(R.string.default_web_client_id)
 
