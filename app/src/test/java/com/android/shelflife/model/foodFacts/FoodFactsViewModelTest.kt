@@ -1,5 +1,6 @@
 package com.android.shelflife.model.foodFacts
 
+import androidx.lifecycle.ViewModel
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodFactsRepository
@@ -10,10 +11,12 @@ import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodFacts.SearchStatus
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.fail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
 import org.junit.*
+import org.junit.Assert.assertTrue
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
@@ -156,4 +159,29 @@ class FoodFactsViewModelTest {
     assertEquals(emptyList<FoodFacts>(), viewModel.foodFactsSuggestions.value)
     assertEquals(query, viewModel.query.value)
   }
+
+  @Test
+  fun `Factory creates FoodFactsViewModel instance`() {
+    val factory = FoodFactsViewModel.Factory(repository)
+    val viewModel = factory.create(FoodFactsViewModel::class.java)
+
+    assertTrue(
+        "Factory should create an instance of FoodFactsViewModel", viewModel is FoodFactsViewModel)
+  }
+
+  @Test
+  fun `Factory throws exception for unknown ViewModel class`() {
+    val factory = FoodFactsViewModel.Factory(repository)
+
+    try {
+      // Attempt to create a ViewModel of a different class to trigger the exception
+      factory.create(DifferentViewModel::class.java)
+      fail("Factory should throw IllegalArgumentException for unknown ViewModel class")
+    } catch (e: IllegalArgumentException) {
+      assertTrue(e.message?.contains("Unknown ViewModel class") == true)
+    }
+  }
+
+  // A dummy ViewModel class to test the exception scenario
+  class DifferentViewModel : ViewModel()
 }
