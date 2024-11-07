@@ -22,6 +22,9 @@ class HouseholdViewModel(
   private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
   val selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
 
+    private val _searchedFoodItems = MutableStateFlow<List<FoodItem>>(emptyList())
+    val searchedFoodItems: StateFlow<List<FoodItem>> = _searchedFoodItems.asStateFlow()
+
   var finishedLoading = MutableStateFlow(false)
 
   /** Initializes the HouseholdViewModel by loading the list of households from the repository. */
@@ -128,6 +131,10 @@ class HouseholdViewModel(
           selectedHousehold.copy(foodItems = selectedHousehold.foodItems.plus(foodItem)))
     }
   }
+
+    fun searchFoodItem(foodItem: FoodItem) {
+        _searchedFoodItems.value = selectedHousehold.value?.foodItems?.filter { it.foodFacts.name == foodItem.foodFacts.name } ?: emptyList()
+    }
 
   companion object {
     val Factory: ViewModelProvider.Factory =
