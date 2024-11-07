@@ -71,205 +71,222 @@ fun AddRecipeScreen(
     listRecipesViewModel: ListRecipesViewModel,
     householdViewModel: HouseholdViewModel
 ) {
-
     val scrollState = rememberScrollState()
 
-  var title by remember { mutableStateOf("") }
-  var servings by remember { mutableStateOf("0.0") }
-  var time by remember { mutableStateOf("0.0") }
+    var title by remember { mutableStateOf("") }
+    var servings by remember { mutableStateOf("0.0") }
+    var time by remember { mutableStateOf("0.0") }
     val ingredients = remember { mutableStateListOf<Ingredient>() }
-
     val instructions = remember { mutableStateListOf("") }
 
-  Scaffold(
-      modifier = Modifier.testTag("addRecipeScreen"),
-      topBar = {
-          TopAppBar(
-              colors =
-              TopAppBarDefaults.topAppBarColors(
-                  containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                  titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                  navigationIconContentColor =
-                  MaterialTheme.colorScheme.onSecondaryContainer,
-                  actionIconContentColor =
-                  MaterialTheme.colorScheme.onSecondaryContainer
-              ),
-              modifier = Modifier.testTag("topBar"),
-              navigationIcon = {
-                  // Back button to return to the previous screen
-                  IconButton(
-                      onClick = { navigationActions.goBack() },
-                      modifier = Modifier.testTag("goBackArrow")
-                  ) {
-                      Icon(
-                          imageVector = Icons.Default.ArrowBack,
-                          contentDescription = "Go back Icon"
-                      )
-                  }
-              },
-              // Title of the screen: Recipe name
-              title = {
-                  Text(
-                      text = "Add your own recipe",
-                      style =
-                      MaterialTheme.typography.bodyLarge.copy(
-                          fontSize = 24.sp, fontWeight = FontWeight.Bold
-                      )
-                  )
-              })
-      },
-  ) {
-      LazyColumn(
-          modifier = Modifier
-              .padding(horizontal = 20.dp)
-              .fillMaxSize()
-      ) {
-          item {
-              OutlinedTextField(
-                  value = title,
-                  onValueChange = { title = it },
-                  label = { Text("Recipe title") },
-                  modifier = Modifier
-                      .fillMaxWidth()
-                      .padding(vertical = 20.dp)
-                      .testTag("inputRecipeTitle")
-              )
-          }
+    // Dialog visibility state
+    var showIngredientDialog by remember { mutableStateOf(false) }
 
-          item {
-              OutlinedTextField(
-                  value = servings,
-                  onValueChange = { servings = it },
-                  label = { Text("Servings") },
-                  keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                  modifier = Modifier
-                      .fillMaxWidth()
-                      .padding(vertical = 20.dp)
-                      .testTag("inputRecipeServings")
-              )
-          }
+    // Ingredient data state
+    var ingredientName by remember { mutableStateOf("") }
+    var ingredientQuantity by remember { mutableStateOf("") } // Ensure this stays as String for user input
+    var ingredientUnit by remember { mutableStateOf(FoodUnit.COUNT) }
 
-          item {
-              OutlinedTextField(
-                  value = time,
-                  onValueChange = { time = it },
-                  label = { Text("Time in minutes") },
-                  keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                  modifier = Modifier
-                      .fillMaxWidth()
-                      .padding(vertical = 20.dp)
-                      .testTag("inputRecipeTime")
-              )
-          }
+    Scaffold(
+        modifier = Modifier.testTag("addRecipeScreen"),
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    actionIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                ),
+                modifier = Modifier.testTag("topBar"),
+                navigationIcon = {
+                    // Back button to return to the previous screen
+                    IconButton(
+                        onClick = { navigationActions.goBack() },
+                        modifier = Modifier.testTag("goBackArrow")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Go back Icon"
+                        )
+                    }
+                },
+                // Title of the screen: Recipe name
+                title = {
+                    Text(
+                        text = "Add your own recipe",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = 24.sp, fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            )
+        }
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .padding(horizontal = 20.dp)
+                .fillMaxSize()
+        ) {
+            item {
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("Recipe title") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp)
+                        .testTag("inputRecipeTitle")
+                )
+            }
 
-//          item {
-//              OutlinedTextField(
-//                  value = ingredients,
-//                  onValueChange = { ingredients = it },
-//                  label = { Text("Ingredients") },
-//                  modifier = Modifier
-//                      .fillMaxWidth()
-//                      .padding(vertical = 20.dp)
-//                      .testTag("inputRecipeIngredients")
-//              )
-//          }
+            item {
+                OutlinedTextField(
+                    value = servings,
+                    onValueChange = { servings = it },
+                    label = { Text("Servings") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp)
+                        .testTag("inputRecipeServings")
+                )
+            }
 
-          item{
-              Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                  Text(text = "Ingredients")
-              }
-          }
+            item {
+                OutlinedTextField(
+                    value = time,
+                    onValueChange = { time = it },
+                    label = { Text("Time in minutes") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp)
+                        .testTag("inputRecipeTime")
+                )
+            }
 
-          // Button to add new instruction field
-          item {
-              Spacer(modifier = Modifier.height(4.dp))
-              Button(
-                  onClick = {
-                      ingredients.add(Ingredient(FoodFacts("test", quantity = Quantity(0.0, FoodUnit.COUNT)), false))
-                      },
-                  modifier = Modifier.height(40.dp),
-                  content = {
-                      Icon(imageVector = Icons.Default.Add, contentDescription = "Add Instruction")
-                  }
-              )
-          }
+            item {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = "Ingredients")
+                }
+            }
 
-          itemsIndexed(ingredients) {index, ingredient ->
-              IngredientItem(
-                  index = index,
-                  ingredient = ingredient,
-                  onRemoveClick = {
-                      if (ingredients.size > 0) {
-                          ingredients.removeAt(index)
-                      }
-                  }
-              )
-          }
+            item {
+                Spacer(modifier = Modifier.height(4.dp))
+                Button(
+                    onClick = { showIngredientDialog = true }, // State change to show dialog
+                    modifier = Modifier.height(40.dp),
+                    content = {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = "Add Ingredient")
+                    }
+                )
+            }
 
-          // Section for instructions list with Add button
-          item {
-              Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                  Text(text = "Instructions")
-              }
-          }
+            itemsIndexed(ingredients) { index, ingredient ->
+                IngredientItem(
+                    index = index,
+                    ingredient = ingredient,
+                    onRemoveClick = {
+                        if (ingredients.size > 0) {
+                            ingredients.removeAt(index)
+                        }
+                    }
+                )
+            }
 
-          itemsIndexed(instructions) { index, instruction ->
-              InstructionItem(
-                  index = index,
-                  instruction = instruction,
-                  onInstructionChange = { newInstruction ->
-                      instructions[index] = newInstruction
-                  },
-                  onRemoveClick = {
-                      if (instructions.size > 1) {
-                          instructions.removeAt(index)
-                      }
-                  }
-              )
-          }
+            item {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = "Instructions")
+                }
+            }
 
-          // Button to add new instruction field
-          item {
-              Spacer(modifier = Modifier.height(4.dp))
-              Button(
-                  onClick = { instructions.add("") },
-                  modifier = Modifier.height(40.dp),
-                  content = {
-                      Icon(imageVector = Icons.Default.Add, contentDescription = "Add Instruction")
-                  }
-              )
-          }
+            itemsIndexed(instructions) { index, instruction ->
+                InstructionItem(
+                    index = index,
+                    instruction = instruction,
+                    onInstructionChange = { newInstruction ->
+                        instructions[index] = newInstruction
+                    },
+                    onRemoveClick = {
+                        if (instructions.size > 1) {
+                            instructions.removeAt(index)
+                        }
+                    }
+                )
+            }
 
-          // Footer buttons: Cancel and Add
-          item {
-              Row(
-                  modifier = Modifier
-                      .fillMaxWidth()
-                      .padding(vertical = 20.dp),
-                  horizontalArrangement = Arrangement.Center
-              ) {
-                  Button(
-                      onClick = {navigationActions.goBack()},
-                      modifier = Modifier.height(40.dp),
-                      colors = ButtonDefaults.buttonColors(containerColor = errorContainerDark)
-                  ) {
-                      Text(text = "Cancel", fontSize = 18.sp)
-                  }
+            item {
+                Spacer(modifier = Modifier.height(4.dp))
+                Button(
+                    onClick = { instructions.add("") },
+                    modifier = Modifier.height(40.dp),
+                    content = {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = "Add Instruction")
+                    }
+                )
+            }
 
-                  Spacer(Modifier.width(24.dp))
+            // Footer buttons: Cancel and Add
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        onClick = { navigationActions.goBack() },
+                        modifier = Modifier.height(40.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = errorContainerDark)
+                    ) {
+                        Text(text = "Cancel", fontSize = 18.sp)
+                    }
 
-                  Button(
-                      onClick = {},
-                      modifier = Modifier.height(40.dp),
-                      colors = ButtonDefaults.buttonColors(containerColor = primaryContainerLight)
-                  ) {
-                      Text(text = "Add", fontSize = 18.sp, color = onSecondaryDark)
-                  }
-              }
-          }
-      }
-  }
+                    Spacer(Modifier.width(24.dp))
+
+                    Button(
+                        onClick = {},
+                        modifier = Modifier.height(40.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = primaryContainerLight)
+                    ) {
+                        Text(text = "Add", fontSize = 18.sp, color = onSecondaryDark)
+                    }
+                }
+            }
+        }
+
+        // Ingredient Dialog, now inside the composable block
+        if (showIngredientDialog) {
+            IngredientDialog(
+                ingredientName = ingredientName,
+                onNameChange = { ingredientName = it },
+                ingredientQuantity = ingredientQuantity,
+                onQuantityChange = { ingredientQuantity = it },
+                ingredientUnit = ingredientUnit,
+                onUnitChange = { ingredientUnit = it },
+                onDismiss = { showIngredientDialog = false }, // Hide dialog
+                onAddIngredient = {
+                    // Try to safely parse the quantity
+                    val quantity = ingredientQuantity.toDoubleOrNull()
+                    if (quantity != null) {
+                        val newIngredient = Ingredient(
+                            foodFacts = FoodFacts(
+                                name = ingredientName,
+                                quantity = Quantity(quantity, ingredientUnit)
+                            ),
+                            isOwned = false
+                        )
+                        ingredients.add(newIngredient)
+                        showIngredientDialog = false // Dismiss dialog after adding
+                    } else {
+                        // Handle invalid input (e.g., show a message to the user)
+                    }
+                }
+            )
+        }
+    }
 }
+
 
 @Composable
 fun InstructionItem(
@@ -322,4 +339,54 @@ fun IngredientItem(
             contentDescription = "Delete Ingredient"
         )
     }
+}
+
+@Composable
+fun IngredientDialog(
+    ingredientName: String,
+    onNameChange: (String) -> Unit,
+    ingredientQuantity: String,
+    onQuantityChange: (String) -> Unit,
+    ingredientUnit: FoodUnit,
+    onUnitChange: (FoodUnit) -> Unit,
+    onDismiss: () -> Unit,
+    onAddIngredient: () -> Unit
+) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add Ingredient") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = ingredientName,
+                    onValueChange = onNameChange,
+                    label = { Text("Ingredient Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                OutlinedTextField(
+                    value = ingredientQuantity,
+                    onValueChange = onQuantityChange,
+                    label = { Text("Quantity") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                // Quantity Unit Dropdown
+                FoodUnit.values().forEach { unit ->
+                    Button(onClick = { onUnitChange(unit) }) {
+                        Text(text = unit.name)
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(onClick = onAddIngredient) {
+                Text("Add Ingredient")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }
