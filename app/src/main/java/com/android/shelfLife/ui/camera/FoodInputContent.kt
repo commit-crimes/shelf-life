@@ -56,7 +56,8 @@ fun FoodInputContent(
     onSubmit: (FoodItem) -> Unit,
     onCancel: () -> Unit,
     foodItemViewModel: ListFoodItemsViewModel,
-    householdViewModel: HouseholdViewModel
+    householdViewModel: HouseholdViewModel,
+    isExpanded: Boolean
 ) {
   val context = LocalContext.current
   var location by remember { mutableStateOf(FoodStorageLocation.PANTRY) }
@@ -100,37 +101,43 @@ fun FoodInputContent(
               modifier = Modifier.size(30.dp).padding(end = 8.dp))
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+      if (isExpanded) {
+          Spacer(modifier = Modifier.height(16.dp))
 
-        // Location Dropdown
-        ExposedDropdownMenuBox(
-            expanded = locationExpanded,
-            onExpandedChange = { locationExpanded = !locationExpanded },
-            modifier = Modifier.testTag("locationDropdown")) {
+          // Location Dropdown
+          ExposedDropdownMenuBox(
+              expanded = locationExpanded,
+              onExpandedChange = { locationExpanded = !locationExpanded },
+              modifier = Modifier.testTag("locationDropdown")
+          ) {
               OutlinedTextField(
                   value = location.name.lowercase(),
                   onValueChange = {},
                   label = { Text("Location") },
                   readOnly = true,
                   trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = locationExpanded)
+                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = locationExpanded)
                   },
-                  modifier = Modifier.fillMaxWidth().menuAnchor().testTag("locationTextField"))
+                  modifier = Modifier.fillMaxWidth().menuAnchor().testTag("locationTextField")
+              )
               ExposedDropdownMenu(
                   expanded = locationExpanded,
                   onDismissRequest = { locationExpanded = false },
-                  modifier = Modifier.testTag("locationMenu")) {
-                    FoodStorageLocation.entries.forEach { selectionOption ->
+                  modifier = Modifier.testTag("locationMenu")
+              ) {
+                  FoodStorageLocation.entries.forEach { selectionOption ->
                       DropdownMenuItem(
                           text = { Text(selectionOption.name) },
                           onClick = {
-                            location = selectionOption
-                            locationExpanded = false
+                              location = selectionOption
+                              locationExpanded = false
                           },
-                          modifier = Modifier.testTag("locationOption_${selectionOption.name}"))
-                    }
+                          modifier = Modifier.testTag("locationOption_${selectionOption.name}")
+                      )
                   }
-            }
+              }
+          }
+      }
 
         Spacer(modifier = Modifier.height(16.dp))
 
