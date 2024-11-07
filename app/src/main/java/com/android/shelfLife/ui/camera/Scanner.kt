@@ -51,177 +51,161 @@ fun BarcodeScannerScreen(
     householdViewModel: HouseholdViewModel,
     foodItemViewModel: ListFoodItemsViewModel
 ) {
-    val context = LocalContext.current
-    val permissionGranted = cameraViewModel.permissionGranted
+  val context = LocalContext.current
+  val permissionGranted = cameraViewModel.permissionGranted
 
-    // State variables
-    val isScanningState = remember { mutableStateOf(true) }
-    val foodScanned = remember { mutableStateOf(false) }
-    val barcodeScanned = remember { mutableStateOf<String?>(null) }
-    val foodFacts = remember { mutableStateOf<FoodFacts?>(null) }
-    val searchInProgress = remember { mutableStateOf(false) }
+  // State variables
+  val isScanningState = remember { mutableStateOf(true) }
+  val foodScanned = remember { mutableStateOf(false) }
+  val barcodeScanned = remember { mutableStateOf<String?>(null) }
+  val foodFacts = remember { mutableStateOf<FoodFacts?>(null) }
+  val searchInProgress = remember { mutableStateOf(false) }
 
-    val isContentExpanded = remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
+  val isContentExpanded = remember { mutableStateOf(false) }
+  val coroutineScope = rememberCoroutineScope()
 
-    // Bottom sheet state
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
+  // Bottom sheet state
+  val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    OnLifecycleEvent(
-        onResume = {
-            cameraViewModel.checkCameraPermission()
-            isScanningState.value = true
-        },
-        onPause = { isScanningState.value = false }
-    )
+  OnLifecycleEvent(
+      onResume = {
+        cameraViewModel.checkCameraPermission()
+        isScanningState.value = true
+      },
+      onPause = { isScanningState.value = false })
 
-    LaunchedEffect(permissionGranted) {
-        if (!permissionGranted) {
-            navigationActions.navigateTo(Screen.PERMISSION_HANDLER)
-        }
+  LaunchedEffect(permissionGranted) {
+    if (!permissionGranted) {
+      navigationActions.navigateTo(Screen.PERMISSION_HANDLER)
     }
+  }
 
-    Scaffold(
-        modifier = Modifier.testTag("barcodeScannerScreen"),
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { selected -> navigationActions.navigateTo(selected) },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.SCANNER
-            )
-        }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .testTag("cameraPreviewBox")
-        ) {
-            // ROI calculation
-            val roiRectF = remember { mutableStateOf<RectF?>(null) }
-            val screenWidth = LocalContext.current.resources.displayMetrics.widthPixels
-            val screenHeight = LocalContext.current.resources.displayMetrics.heightPixels
+  Scaffold(
+      modifier = Modifier.testTag("barcodeScannerScreen"),
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { selected -> navigationActions.navigateTo(selected) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = Route.SCANNER)
+      }) { innerPadding ->
+        Box(modifier = Modifier.fillMaxSize().padding(innerPadding).testTag("cameraPreviewBox")) {
+          // ROI calculation
+          val roiRectF = remember { mutableStateOf<RectF?>(null) }
+          val screenWidth = LocalContext.current.resources.displayMetrics.widthPixels
+          val screenHeight = LocalContext.current.resources.displayMetrics.heightPixels
 
-            val calculatedRoiRectF = calculateRoiRectF(screenWidth.toFloat(), screenHeight.toFloat())
-            roiRectF.value = calculatedRoiRectF
+          val calculatedRoiRectF = calculateRoiRectF(screenWidth.toFloat(), screenHeight.toFloat())
+          roiRectF.value = calculatedRoiRectF
 
-            // Camera Preview
-            CameraPreviewView(
-                modifier = Modifier.fillMaxSize(),
-                onBarcodeScanned = { scannedBarcode ->
-                    Log.d("BarcodeScanner", "Scanned barcode: $scannedBarcode")
-                    beep()
-                    Toast.makeText(context, "Scanned barcode: $scannedBarcode", Toast.LENGTH_SHORT)
-                        .show()
-                    barcodeScanned.value = scannedBarcode
-                    isScanningState.value = false
-                    searchInProgress.value = true
-                },
-                onPreviewViewCreated = {},
-                roiRect = roiRectF.value ?: RectF(0f, 0f, 1f, 1f),
-                shouldScan = { isScanningState.value && !foodScanned.value }
-            )
+          // Camera Preview
+          CameraPreviewView(
+              modifier = Modifier.fillMaxSize(),
+              onBarcodeScanned = { scannedBarcode ->
+                Log.d("BarcodeScanner", "Scanned barcode: $scannedBarcode")
+                beep()
+                Toast.makeText(context, "Scanned barcode: $scannedBarcode", Toast.LENGTH_SHORT)
+                    .show()
+                barcodeScanned.value = scannedBarcode
+                isScanningState.value = false
+                searchInProgress.value = true
+              },
+              onPreviewViewCreated = {},
+              roiRect = roiRectF.value ?: RectF(0f, 0f, 1f, 1f),
+              shouldScan = { isScanningState.value && !foodScanned.value })
 
-            // Scanner Overlay on top
-            ScannerOverlay()
+          // Scanner Overlay on top
+          ScannerOverlay()
 
-            // Start the search when searchInProgress is true
-            val currentBarcode = barcodeScanned.value
-            if (searchInProgress.value && currentBarcode != null) {
-                LaunchedEffect(currentBarcode) {
-                    foodFactsViewModel.searchByBarcode(currentBarcode.toLong())
-                }
+          // Start the search when searchInProgress is true
+          val currentBarcode = barcodeScanned.value
+          if (searchInProgress.value && currentBarcode != null) {
+            LaunchedEffect(currentBarcode) {
+              foodFactsViewModel.searchByBarcode(currentBarcode.toLong())
             }
+          }
 
-            // Observe searchStatus and update foodScanned.value
-            val searchStatus by foodFactsViewModel.searchStatus.collectAsState()
-            LaunchedEffect(searchStatus) {
-                when (searchStatus) {
-                    is SearchStatus.Success -> {
-                        val suggestions = foodFactsViewModel.foodFactsSuggestions.value
-                        if (suggestions.isNotEmpty()) {
-                            foodFacts.value = suggestions[0]
-                            foodScanned.value = true
-                        } else {
-                            Toast.makeText(context, "Food Not Found", Toast.LENGTH_SHORT).show()
-                            navigationActions.navigateTo(Screen.ADD_FOOD)
-                        }
-                        // Reset states
-                        barcodeScanned.value = null
-                        searchInProgress.value = false
-                        foodFactsViewModel.resetSearchStatus()
-                    }
-                    is SearchStatus.Failure -> {
-                        Toast.makeText(context, "Search failed", Toast.LENGTH_SHORT).show()
-                        barcodeScanned.value = null
-                        searchInProgress.value = false
-                        foodFactsViewModel.resetSearchStatus()
-                    }
-                    else -> {
-                        // Do nothing for Idle or Loading
-                    }
-                }
-            }
-
-            // Show the ModalBottomSheet when foodScanned.value is true
-            val foodFactsValue = foodFacts.value
-
-            LaunchedEffect(foodScanned.value) {
-                if (foodScanned.value) {
-                    sheetState.show()
-                    Log.d("ModalBottomSheet", "ModalBottomSheet shown")
+          // Observe searchStatus and update foodScanned.value
+          val searchStatus by foodFactsViewModel.searchStatus.collectAsState()
+          LaunchedEffect(searchStatus) {
+            when (searchStatus) {
+              is SearchStatus.Success -> {
+                val suggestions = foodFactsViewModel.foodFactsSuggestions.value
+                if (suggestions.isNotEmpty()) {
+                  foodFacts.value = suggestions[0]
+                  foodScanned.value = true
                 } else {
-                    sheetState.hide()
-                    Log.d("ModalBottomSheet", "ModalBottomSheet hidden")
+                  Toast.makeText(context, "Food Not Found", Toast.LENGTH_SHORT).show()
+                  navigationActions.navigateTo(Screen.ADD_FOOD)
                 }
+                // Reset states
+                barcodeScanned.value = null
+                searchInProgress.value = false
+                foodFactsViewModel.resetSearchStatus()
+              }
+              is SearchStatus.Failure -> {
+                Toast.makeText(context, "Search failed", Toast.LENGTH_SHORT).show()
+                barcodeScanned.value = null
+                searchInProgress.value = false
+                foodFactsViewModel.resetSearchStatus()
+              }
+              else -> {
+                // Do nothing for Idle or Loading
+              }
             }
+          }
 
-            if (foodScanned.value && foodFactsValue != null) {
-                ModalBottomSheet(
-                    onDismissRequest = {
+          // Show the ModalBottomSheet when foodScanned.value is true
+          val foodFactsValue = foodFacts.value
+
+          LaunchedEffect(foodScanned.value) {
+            if (foodScanned.value) {
+              sheetState.show()
+              Log.d("ModalBottomSheet", "ModalBottomSheet shown")
+            } else {
+              sheetState.hide()
+              Log.d("ModalBottomSheet", "ModalBottomSheet hidden")
+            }
+          }
+
+          if (foodScanned.value && foodFactsValue != null) {
+            ModalBottomSheet(
+                onDismissRequest = {
+                  // Reset states
+                  foodScanned.value = false
+                  isScanningState.value = true
+                  isContentExpanded.value = false
+                  Log.d("ModalBottomSheet", "Sheet dismissed")
+                },
+                sheetState = sheetState) {
+                  FoodInputContent(
+                      foodFacts = foodFactsValue,
+                      onSubmit = { newFoodItem ->
+                        householdViewModel.addFoodItem(newFoodItem)
                         // Reset states
                         foodScanned.value = false
                         isScanningState.value = true
                         isContentExpanded.value = false
-                        Log.d("ModalBottomSheet", "Sheet dismissed")
-                    },
-                    sheetState = sheetState
-                ) {
-                    FoodInputContent(
-                        foodFacts = foodFactsValue,
-                        onSubmit = { newFoodItem ->
-                            householdViewModel.addFoodItem(newFoodItem)
-                            // Reset states
-                            foodScanned.value = false
-                            isScanningState.value = true
-                            isContentExpanded.value = false
-                            Log.d("ModalBottomSheet", "Submit clicked")
-                        },
-                        onCancel = {
-                            // Reset states
-                            foodScanned.value = false
-                            isScanningState.value = true
-                            isContentExpanded.value = false
-                            Log.d("ModalBottomSheet", "Cancel clicked")
-                        },
-                        foodItemViewModel = foodItemViewModel,
-                        householdViewModel = householdViewModel,
-                        isExpanded =  isContentExpanded.value,
-                        onExpand = {
-                            isContentExpanded.value = true
-                            coroutineScope.launch {
-                                sheetState.expand()
-                            }
-                        }
-                    )
+                        Log.d("ModalBottomSheet", "Submit clicked")
+                      },
+                      onCancel = {
+                        // Reset states
+                        foodScanned.value = false
+                        isScanningState.value = true
+                        isContentExpanded.value = false
+                        Log.d("ModalBottomSheet", "Cancel clicked")
+                      },
+                      foodItemViewModel = foodItemViewModel,
+                      householdViewModel = householdViewModel,
+                      isExpanded = isContentExpanded.value,
+                      onExpand = {
+                        isContentExpanded.value = true
+                        coroutineScope.launch { sheetState.expand() }
+                      })
                 }
-            }
+          }
         }
-    }
+      }
 }
-
 
 /**
  * Composable function to display the permission denied screen.
