@@ -22,6 +22,9 @@ class HouseholdViewModel(
   private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
   val selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
 
+  private val _householdToEdit = MutableStateFlow<HouseHold?>(null)
+  val householdToEdit: StateFlow<HouseHold?> = _householdToEdit.asStateFlow()
+
   var finishedLoading = MutableStateFlow(false)
 
   /** Initializes the HouseholdViewModel by loading the list of households from the repository. */
@@ -61,51 +64,49 @@ class HouseholdViewModel(
     household?.let { listFoodItemsViewModel.setFoodItems(it.foodItems) }
   }
 
+  fun selectHouseholdToEdit(household: HouseHold?) {
+    _householdToEdit.value = household
+  }
+
+  fun checkIfHouseholdNameExists(houseHoldName: String): Boolean {
+    return _households.value.any { it.name == houseHoldName }
+  }
+
   /**
    * Adds a new household to the repository and updates the household list.
    *
    * @param householdName - The name of the household to be added.
    */
-  fun addNewHousehold(householdName: String, friendEmails : List<String> = emptyList()) {
+  fun addNewHousehold(householdName: String, friendEmails: List<String> = emptyList()) {
     val currentUser = FirebaseAuth.getInstance().currentUser
     if (currentUser != null) {
-        val household = HouseHold(repository.getNewUid(), householdName, emptyList(), emptyList())
-        repository.getUserIds(friendEmails) { emailToUserId ->
-            val emailsNotFound = friendEmails.filter { it !in emailToUserId.keys }
-            if (emailsNotFound.isNotEmpty()) {
-                Log.w("HouseholdViewModel", "Emails not found: $emailsNotFound")
-            }
-            val friendUserIds = emailToUserId.values.toList()
-            val allMembers = friendUserIds.plus(currentUser.uid)
-            val householdWithMembers = household.copy(members = allMembers)
+      val householdUid = repository.getNewUid()
+      val household = HouseHold(householdUid, householdName, emptyList(), emptyList())
 
-            // Add the household to the repository
-            repository.addHousehold(
-                householdWithMembers,
-                onSuccess = {
-                    loadHouseholds()
-                    Log.d("HouseholdViewModel", "Household added successfully")
-                },
-                onFailure = { exception ->
-                    Log.e("HouseholdViewModel", "Error adding household: $exception")
-                }
-            )
+      // Get user IDs corresponding to friend emails
+      repository.getUserIds(friendEmails) { emailToUserId ->
+        val emailsNotFound = friendEmails.filter { it !in emailToUserId.keys }
+        if (emailsNotFound.isNotEmpty()) {
+          Log.w("HouseholdViewModel", "Emails not found: $emailsNotFound")
         }
+        val friendUserIds = emailToUserId.values.toList()
+        val allMembers = friendUserIds.plus(currentUser.uid)
+        val householdWithMembers = household.copy(members = allMembers)
+
         repository.addHousehold(
-            household,
+            householdWithMembers,
             onSuccess = {
-                // Refresh the household list after successful addition
-                loadHouseholds()
-                Log.d("HouseholdViewModel", "Household added successfully")
+              loadHouseholds()
+              Log.d("HouseholdViewModel", "Household added successfully")
             },
             onFailure = { exception ->
-                Log.e("HouseholdViewModel", "Error adding household: $exception")
+              Log.e("HouseholdViewModel", "Error adding household: $exception")
             })
-        loadHouseholds()
+      }
     } else {
       Log.e("HouseholdViewModel", "User not logged in")
-      return
     }
+    loadHouseholds()
   }
 
   /**
@@ -116,14 +117,11 @@ class HouseholdViewModel(
   fun updateHousehold(household: HouseHold) {
     repository.updateHousehold(
         household,
-        onSuccess = {
-          // Refresh the household list after successful update
-          loadHouseholds()
-          Log.d("HouseholdViewModel", "Household updated successfully")
-        },
+        onSuccess = { Log.d("HouseholdViewModel", "Household updated successfully") },
         onFailure = { exception ->
           Log.e("HouseholdViewModel", "Error updating household: $exception")
         })
+    loadHouseholds()
   }
 
   /**
@@ -134,14 +132,11 @@ class HouseholdViewModel(
   fun deleteHouseholdById(householdId: String) {
     repository.deleteHouseholdById(
         householdId,
-        onSuccess = {
-          // Refresh the household list after successful deletion
-          loadHouseholds()
-          Log.d("HouseholdViewModel", "Household deleted successfully")
-        },
+        onSuccess = { Log.d("HouseholdViewModel", "Household deleted successfully") },
         onFailure = { exception ->
           Log.e("HouseholdViewModel", "Error deleting household: $exception")
         })
+    loadHouseholds()
   }
 
   /**

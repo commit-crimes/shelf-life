@@ -197,5 +197,6 @@ class AddFoodItemScreenTest {
     composeTestRule
         .onNodeWithText("Invalid date format. Please use dd/mm/yyyy.")
         .assertIsDisplayed()
+    composeTestRule.onNodeWithTag("goBackButton").performClick()
   }
 }

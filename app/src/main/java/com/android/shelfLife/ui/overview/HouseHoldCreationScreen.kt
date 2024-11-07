@@ -3,10 +3,15 @@ package com.android.shelfLife.ui.overview
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.AlertDialog
@@ -33,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,7 +57,11 @@ fun HouseHoldCreationScreen(
 
   var showConfirmationDialog by remember { mutableStateOf(false) }
 
-  return Scaffold(
+  // New state variables for email input
+  var emailInput by rememberSaveable { mutableStateOf("") }
+  var friendEmails by rememberSaveable { mutableStateOf(mutableListOf<String>()) }
+
+  Scaffold(
       topBar = {
         TopAppBar(
             title = { Text("") },
@@ -84,6 +94,7 @@ fun HouseHoldCreationScreen(
             modifier =
                 Modifier.padding(paddingValues).padding(30.dp).padding(top = 50.dp).fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally) {
+              // Existing household name input
               OutlinedTextField(
                   value = houseHoldName,
                   onValueChange = { houseHoldName = it },
@@ -102,83 +113,130 @@ fun HouseHoldCreationScreen(
                   placeholder = { Text("Enter Household Name") },
                   modifier =
                       Modifier.padding(30.dp).fillMaxWidth().testTag("HouseHoldNameTextField"))
+
+              // Section for household members
               Text(
-                  "Household members",
-                  style = TextStyle(fontSize = 30.sp),
+                  "Household Members",
+                  style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
                   textAlign = TextAlign.Start,
                   modifier =
                       Modifier.fillMaxWidth().padding(top = 20.dp).testTag("HouseHoldMembersText"))
-              // TODO add member list here, maybe make it a composable for reuse
-            }
-        Row(
-            modifier =
-                Modifier.fillMaxSize()
-                    .padding(top = 25.dp, bottom = 60.dp, start = 45.dp, end = 45.dp),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.SpaceBetween) {
-              Button(
-                  modifier = Modifier.testTag("ConfirmButton"),
-                  onClick = {
-                    // TODO change logic to include multiple members
 
-                    if (householdViewModel.checkIfHouseholdNameExists(houseHoldName) &&
-                        (householdToEdit == null || houseHoldName != householdToEdit.name)) {
-                      isError = true
-                    } else {
-                      if (householdToEdit != null) {
-                        val updatedHouseHold = householdToEdit.copy(name = houseHoldName)
-                        householdViewModel.updateHousehold(updatedHouseHold)
-                      } else {
-                        householdViewModel.addNewHousehold(houseHoldName)
+              // Email input field and add button
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 8.dp)) {
+                    OutlinedTextField(
+                        value = emailInput,
+                        onValueChange = { emailInput = it },
+                        label = { Text("Friend's Email") },
+                        placeholder = { Text("Enter email") },
+                        modifier = Modifier.weight(1f))
+                    IconButton(
+                        onClick = {
+                          if (emailInput.isNotBlank()) {
+                            friendEmails.add(emailInput.trim())
+                            emailInput = ""
+                          }
+                        },
+                        modifier = Modifier.testTag("AddEmailButton")) {
+                          Icon(imageVector = Icons.Default.Add, contentDescription = "Add Email")
+                        }
+                  }
+
+              // Display list of added emails
+              LazyColumn(modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp)) {
+                items(friendEmails) { email ->
+                  Row(
+                      verticalAlignment = Alignment.CenterVertically,
+                      modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+                        Text(
+                            text = email,
+                            modifier = Modifier.weight(1f),
+                            style = TextStyle(fontSize = 16.sp))
+                        IconButton(
+                            onClick = { friendEmails.remove(email) },
+                            modifier = Modifier.testTag("RemoveEmailButton")) {
+                              Icon(
+                                  imageVector = Icons.Default.Delete,
+                                  contentDescription = "Remove Email")
+                            }
                       }
-                      navigationActions.goBack()
-                    }
-                  },
-              ) {
-                Text(
-                    "Confirm",
-                    style = TextStyle(fontSize = 22.sp),
-                    modifier = Modifier.padding(10.dp))
+                }
               }
-              Button(
-                  modifier = Modifier.testTag("CancelButton"),
-                  onClick = { navigationActions.goBack() },
-              ) {
-                Text(
-                    "Cancel",
-                    style = TextStyle(fontSize = 22.sp),
-                    modifier = Modifier.padding(10.dp))
+
+              // Spacer to push buttons to the bottom
+              Spacer(modifier = Modifier.weight(1f))
+
+              // Existing buttons
+              Row(
+                  modifier =
+                      Modifier.fillMaxWidth().padding(bottom = 60.dp, start = 45.dp, end = 45.dp),
+                  verticalAlignment = Alignment.Bottom,
+                  horizontalArrangement = Arrangement.SpaceBetween) {
+                    Button(
+                        modifier = Modifier.testTag("ConfirmButton"),
+                        onClick = {
+                          // TODO: Update this logic to include multiple members
+                          if (householdViewModel.checkIfHouseholdNameExists(houseHoldName) &&
+                              (householdToEdit == null || houseHoldName != householdToEdit.name)) {
+                            isError = true
+                          } else {
+                            if (householdToEdit != null) {
+                              val updatedHouseHold = householdToEdit.copy(name = houseHoldName)
+                              householdViewModel.updateHousehold(updatedHouseHold)
+                            } else {
+                              householdViewModel.addNewHousehold(houseHoldName, friendEmails)
+                            }
+                            navigationActions.goBack()
+                          }
+                        },
+                    ) {
+                      Text(
+                          "Confirm",
+                          style = TextStyle(fontSize = 22.sp),
+                          modifier = Modifier.padding(10.dp))
+                    }
+                    Button(
+                        modifier = Modifier.testTag("CancelButton"),
+                        onClick = { navigationActions.goBack() },
+                    ) {
+                      Text(
+                          "Cancel",
+                          style = TextStyle(fontSize = 22.sp),
+                          modifier = Modifier.padding(10.dp))
+                    }
+                  }
+
+              // Existing confirmation dialog
+              if (showConfirmationDialog) {
+                AlertDialog(
+                    modifier = Modifier.testTag("DeleteConfirmationDialog"),
+                    onDismissRequest = { showConfirmationDialog = false },
+                    title = { Text("Delete household") },
+                    text = { Text("Are you sure?") },
+                    confirmButton = {
+                      TextButton(
+                          modifier = Modifier.testTag("ConfirmDeleteButton"),
+                          onClick = {
+                            if (householdToEdit != null) {
+                              householdViewModel.deleteHouseholdById(householdToEdit.uid)
+                            }
+                            navigationActions.goBack()
+                            showConfirmationDialog = false
+                          }) {
+                            Text("Confirm")
+                          }
+                    },
+                    dismissButton = {
+                      TextButton(
+                          modifier = Modifier.testTag("CancelDeleteButton"),
+                          onClick = { showConfirmationDialog = false }) {
+                            Text("Cancel")
+                          }
+                    },
+                )
               }
             }
-        when {
-          showConfirmationDialog -> {
-            AlertDialog(
-                modifier = Modifier.testTag("DeleteConfirmationDialog"),
-                onDismissRequest = { showConfirmationDialog = false },
-                title = { Text("Delete household") },
-                text = { Text("Are you sure ?") },
-                confirmButton = {
-                  TextButton(
-                      modifier = Modifier.testTag("ConfirmDeleteButton"),
-                      onClick = {
-                        if (householdToEdit != null) {
-                          householdViewModel.deleteHouseholdById(householdToEdit.uid)
-                        }
-                        navigationActions.goBack()
-                        showConfirmationDialog = false
-                      }) {
-                        Text("Confirm")
-                      }
-                },
-                dismissButton = {
-                  TextButton(
-                      modifier = Modifier.testTag("CancelDeleteButton"),
-                      onClick = { showConfirmationDialog = false }) {
-                        Text("Cancel")
-                      }
-                },
-            )
-          }
-        }
       }
 }
