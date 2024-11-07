@@ -5,6 +5,7 @@ import com.android.shelfLife.model.foodFacts.OpenFoodFactsRepository
 import java.io.IOException
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
+import junit.framework.TestCase.fail
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -13,6 +14,8 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.*
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class OpenFoodFactsRepositoryTest {
 
@@ -34,44 +37,50 @@ class OpenFoodFactsRepositoryTest {
 
   @Test
   fun testSearchFoodFactsWithBarcodeReturnsSuccess() {
-    // Mocking a successful response from the server
-    val mockResponse =
-        MockResponse()
-            .setResponseCode(200)
-            .setBody(
-                """
-                {
-                  "product": {
-                    "product_name": "Apple Juice",
-                    "code": "123456789",
-                    "nutriments": {
-                      "energy-kcal_100g": 46,
-                      "fat_100g": 0.1,
-                      "saturated-fat_100g": 0.02,
-                      "carbohydrates_100g": 11.0,
-                      "sugars_100g": 10.0,
-                      "proteins_100g": 0.5,
-                      "salt_100g": 0.01
-                    }
-                  }
-                }
-            """
-                    .trimIndent())
-    mockWebServer.enqueue(mockResponse)
+      // Mocking a successful response from the server
+      val mockResponse = MockResponse()
+          .setResponseCode(200)
+          .setBody(
+              """
+          {
+            "product": {
+              "product_name": "Apple Juice",
+              "code": "123456789",
+              "nutriments": {
+                "energy-kcal_100g": 46,
+                "fat_100g": 0.1,
+                "saturated-fat_100g": 0.02,
+                "carbohydrates_100g": 11.0,
+                "sugars_100g": 10.0,
+                "proteins_100g": 0.5,
+                "salt_100g": 0.01
+              }
+            }
+          }
+          """.trimIndent()
+          )
+      mockWebServer.enqueue(mockResponse)
 
-    val foodSearchInput = FoodSearchInput.Barcode(123456789L)
-    var successCalled = true
+      val foodSearchInput = FoodSearchInput.Barcode(123456789L)
+      val latch = CountDownLatch(1) // Latch to wait for callback
+      var successCalled = false
 
-    repository.searchFoodFacts(
-        searchInput = foodSearchInput,
-        onSuccess = { foodFactsList ->
-          successCalled = true
-          assertEquals(1, foodFactsList.size)
-          assertEquals("Apple Juice", foodFactsList[0].name)
-        },
-        onFailure = { assertTrue("Failure should not be called in success case", false) })
+      repository.searchFoodFacts(
+          searchInput = foodSearchInput,
+          onSuccess = { foodFactsList ->
+              successCalled = true
+              assertEquals(1, foodFactsList.size)
+              assertEquals("Apple Juice", foodFactsList[0].name)
+              latch.countDown() // Signal that success callback was called
+          },
+          onFailure = {
+              fail("Failure should not be called in success case")
+              latch.countDown() // Signal that failure callback was called
+          }
+      )
 
-    assertTrue("Success callback should be called", successCalled)
+      latch.await(6, TimeUnit.SECONDS) // Wait up to 3 seconds for the callback
+      assertTrue("Success callback should be called", successCalled)
   }
 
   @Test
@@ -135,23 +144,35 @@ class OpenFoodFactsRepositoryTest {
   @Test
   fun testSearchFoodFactsReturnsHTTPError() {
     // Mocking an HTTP error response
-    val mockResponse = MockResponse().setResponseCode(500).setBody("Internal Server Error")
+    val mockResponse = MockResponse()
+      .setResponseCode(500)
+      .setBody("Internal Server Error")
     mockWebServer.enqueue(mockResponse)
 
     val foodSearchInput = FoodSearchInput.Barcode(123456789L)
-    var failureCalled = true
+    val latch = CountDownLatch(1) // Latch to wait for callback
+    var failureCalled = false
 
     repository.searchFoodFacts(
-        searchInput = foodSearchInput,
-        onSuccess = { assertTrue("Success should not be called in error case", true) },
-        onFailure = { e ->
-          failureCalled = true
-          assertTrue(e is IOException)
-          assertEquals("Server error: HTTP 500 - Internal Server Error", e.message)
-        })
+      searchInput = foodSearchInput,
+      onSuccess = {
+        fail("Success should not be called in error case")
+        latch.countDown()
+      },
+      onFailure = { e ->
+        failureCalled = true
+        assertTrue(e is IOException)
+        // Verify that the error message contains the HTTP status code
+        assertTrue("Error message should contain 'HTTP 500'", e.message?.contains("HTTP 500") == true)
+        assertTrue("Error message should contain 'Server Error'", e.message?.contains("Server Error") == true)
+        latch.countDown() // Signal that failure callback was called
+      }
+    )
 
+    latch.await(3, TimeUnit.SECONDS) // Wait up to 3 seconds for the callback
     assertTrue("Failure callback should be called", failureCalled)
   }
+
 
   @Test
   fun testSearchFoodFactsReturnsNetworkFailure() {
