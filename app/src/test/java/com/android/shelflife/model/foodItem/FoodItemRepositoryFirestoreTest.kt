@@ -11,12 +11,14 @@ import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.FoodStatus
 import com.android.shelfLife.model.foodItem.FoodStorageLocation
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -44,50 +46,64 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class FoodItemRepositoryFirestoreTest {
 
-  @Mock private lateinit var mockFirestore: FirebaseFirestore
-  @Mock private lateinit var mockDocumentReference: DocumentReference
-  @Mock private lateinit var mockCollectionReference: CollectionReference
-  @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
-  @Mock private lateinit var db: FirebaseFirestore
-  @Mock private lateinit var auth: FirebaseAuth
-  @Mock private lateinit var authStateListener: FirebaseAuth.AuthStateListener
+  @Mock
+  private lateinit var mockFirestore: FirebaseFirestore
+  @Mock
+  private lateinit var mockDocumentReference: DocumentReference
+  @Mock
+  private lateinit var mockCollectionReference: CollectionReference
+  @Mock
+  private lateinit var mockDocumentSnapshot: DocumentSnapshot
+  @Mock
+  private lateinit var db: FirebaseFirestore
+  @Mock
+  private lateinit var auth: FirebaseAuth
+  @Mock
+  private lateinit var authStateListener: FirebaseAuth.AuthStateListener
 
-  @Mock private lateinit var collectionReference: CollectionReference
+  @Mock
+  private lateinit var collectionReference: CollectionReference
 
-  @Mock private lateinit var documentReference: DocumentReference
+  @Mock
+  private lateinit var documentReference: DocumentReference
 
-  @Mock private lateinit var querySnapshot: QuerySnapshot
+  @Mock
+  private lateinit var querySnapshot: QuerySnapshot
 
-  @Mock private lateinit var documentSnapshot: DocumentSnapshot
+  @Mock
+  private lateinit var documentSnapshot: DocumentSnapshot
 
-  @Mock private lateinit var taskVoid: Task<Void>
+  @Mock
+  private lateinit var taskVoid: Task<Void>
 
-  @Mock private lateinit var taskQuerySnapshot: Task<QuerySnapshot>
+  @Mock
+  private lateinit var taskQuerySnapshot: Task<QuerySnapshot>
 
-  @Mock private lateinit var timestamp: Timestamp
+  @Mock
+  private lateinit var timestamp: Timestamp
 
   private lateinit var repo: FoodItemRepositoryFirestore
 
   private lateinit var foodItemRepositoryFirestore: FoodItemRepositoryFirestore
 
   private val foodFacts =
-      FoodFacts(
-          name = "Almond Butter",
-          barcode = "123456789",
-          quantity = Quantity(1.0, FoodUnit.GRAM),
-          category = FoodCategory.OTHER,
-          nutritionFacts = NutritionFacts(),
-      )
+    FoodFacts(
+      name = "Almond Butter",
+      barcode = "123456789",
+      quantity = Quantity(1.0, FoodUnit.GRAM),
+      category = FoodCategory.OTHER,
+      nutritionFacts = NutritionFacts(),
+    )
 
   private val foodItem =
-      FoodItem(
-          uid = "1",
-          foodFacts = foodFacts,
-          location = FoodStorageLocation.PANTRY,
-          expiryDate = Timestamp.now(),
-          buyDate = Timestamp.now(),
-          status = FoodStatus.CLOSED,
-      )
+    FoodItem(
+      uid = "1",
+      foodFacts = foodFacts,
+      location = FoodStorageLocation.PANTRY,
+      expiryDate = Timestamp.now(),
+      buyDate = Timestamp.now(),
+      status = FoodStatus.CLOSED,
+    )
   private val mockFoodItem = mock(FoodItem::class.java)
 
   @Before
@@ -128,11 +144,11 @@ class FoodItemRepositoryFirestoreTest {
     `when`(taskVoid.addOnSuccessListener(ArgumentMatchers.any())).thenReturn(taskVoid)
     `when`(taskVoid.addOnFailureListener(ArgumentMatchers.any())).thenReturn(taskVoid)
     `when`(taskQuerySnapshot.addOnCompleteListener(ArgumentMatchers.any()))
-        .thenReturn(taskQuerySnapshot)
+      .thenReturn(taskQuerySnapshot)
     `when`(taskQuerySnapshot.addOnSuccessListener(ArgumentMatchers.any()))
-        .thenReturn(taskQuerySnapshot)
+      .thenReturn(taskQuerySnapshot)
     `when`(taskQuerySnapshot.addOnFailureListener(ArgumentMatchers.any()))
-        .thenReturn(taskQuerySnapshot)
+      .thenReturn(taskQuerySnapshot)
 
     // Initialize the repository with the mocked FirebaseFirestore
     repo = FoodItemRepositoryFirestore(db)
@@ -149,21 +165,21 @@ class FoodItemRepositoryFirestoreTest {
     `when`(mockDocumentSnapshot.getString("name")).thenReturn("Almond Butter")
     `when`(mockDocumentSnapshot.getString("barcode")).thenReturn("123456789")
     `when`(mockDocumentSnapshot.get("quantity"))
-        .thenReturn(mapOf("amount" to 1.0, "unit" to "GRAM"))
+      .thenReturn(mapOf("amount" to 1.0, "unit" to "GRAM"))
     `when`(mockDocumentSnapshot.get("nutritionFacts"))
-        .thenReturn(mapOf("energyKcal" to 100L, "fat" to 10.0))
+      .thenReturn(mapOf("energyKcal" to 100L, "fat" to 10.0))
     `when`(mockDocumentSnapshot.getString("category")).thenReturn(FoodCategory.OTHER.name)
     `when`(mockDocumentSnapshot.getTimestamp("expiryDate")).thenReturn(Timestamp.now())
     `when`(mockDocumentSnapshot.getTimestamp("buyDate")).thenReturn(Timestamp.now())
     `when`(mockDocumentSnapshot.getString("status")).thenReturn(FoodStatus.CLOSED.name)
     `when`(mockDocumentSnapshot.get("location"))
-        .thenReturn(mapOf("location" to FoodStorageLocation.PANTRY.name))
+      .thenReturn(mapOf("location" to FoodStorageLocation.PANTRY.name))
 
     // Call the method under test
     val method: Method =
-        FoodItemRepositoryFirestore::class
-            .java
-            .getDeclaredMethod("convertToFoodItem", DocumentSnapshot::class.java)
+      FoodItemRepositoryFirestore::class
+        .java
+        .getDeclaredMethod("convertToFoodItem", DocumentSnapshot::class.java)
     method.isAccessible = true // Make the method accessible
 
     // Invoke the private method
@@ -190,14 +206,14 @@ class FoodItemRepositoryFirestoreTest {
     `when`(mockDocumentSnapshot.getString("name")).thenReturn("Almond Butter")
     `when`(mockDocumentSnapshot.getString("barcode")).thenReturn("123456789")
     `when`(mockDocumentSnapshot.get("quantity"))
-        .thenReturn(mapOf("amount" to 1.0, "unit" to "GRAM"))
+      .thenReturn(mapOf("amount" to 1.0, "unit" to "GRAM"))
     `when`(mockDocumentSnapshot.get("nutritionFacts")).thenReturn(null)
 
     // Call the method under test
     val method: Method =
-        FoodItemRepositoryFirestore::class
-            .java
-            .getDeclaredMethod("convertToFoodItem", DocumentSnapshot::class.java)
+      FoodItemRepositoryFirestore::class
+        .java
+        .getDeclaredMethod("convertToFoodItem", DocumentSnapshot::class.java)
     method.isAccessible = true // Make the method accessible
 
     // Invoke the private method
@@ -216,16 +232,17 @@ class FoodItemRepositoryFirestoreTest {
   @Test
   fun convertToFoodItemFromMap_withValidData_shouldReturnFoodItem() {
     val map =
-        mapOf(
-            "uid" to "1",
-            "name" to "Almond Butter",
-            "barcode" to "123456789",
-            "quantity" to mapOf("amount" to 1.0, "unit" to "GRAM"),
-            "expiryDate" to Timestamp.now(),
-            "buyDate" to Timestamp.now(),
-            "status" to "CLOSED",
-            "location" to mapOf("location" to "PANTRY"),
-            "category" to "OTHER")
+      mapOf(
+        "uid" to "1",
+        "name" to "Almond Butter",
+        "barcode" to "123456789",
+        "quantity" to mapOf("amount" to 1.0, "unit" to "GRAM"),
+        "expiryDate" to Timestamp.now(),
+        "buyDate" to Timestamp.now(),
+        "status" to "CLOSED",
+        "location" to mapOf("location" to "PANTRY"),
+        "category" to "OTHER"
+      )
 
     val foodItem = foodItemRepositoryFirestore.convertToFoodItemFromMap(map)
 
@@ -243,14 +260,15 @@ class FoodItemRepositoryFirestoreTest {
   @Test
   fun convertToFoodItemFromMap_withInvalidData_shouldReturnNull() {
     val map =
-        mapOf(
-            "uid" to "1",
-            "name" to "Almond Butter",
-            "quantity" to mapOf("amount" to 1.0, "unit" to "INVALID_UNIT"), // Invalid unit
-            "expiryDate" to Timestamp.now(),
-            "buyDate" to Timestamp.now(),
-            "status" to "CLOSED",
-            "location" to mapOf("location" to "PANTRY"))
+      mapOf(
+        "uid" to "1",
+        "name" to "Almond Butter",
+        "quantity" to mapOf("amount" to 1.0, "unit" to "INVALID_UNIT"), // Invalid unit
+        "expiryDate" to Timestamp.now(),
+        "buyDate" to Timestamp.now(),
+        "status" to "CLOSED",
+        "location" to mapOf("location" to "PANTRY")
+      )
 
     val foodItem = foodItemRepositoryFirestore.convertToFoodItemFromMap(map)
 
@@ -260,27 +278,30 @@ class FoodItemRepositoryFirestoreTest {
   @Test
   fun convertFoodItemToMap_withValidData_shouldReturnMap() {
     val foodItem =
-        FoodItem(
-            uid = "1",
-            foodFacts =
-                FoodFacts(
-                    name = "Almond Butter",
-                    barcode = "123456789",
-                    quantity = Quantity(1.0, FoodUnit.GRAM),
-                    category = FoodCategory.OTHER,
-                    nutritionFacts =
-                        NutritionFacts(
-                            energyKcal = 100,
-                            fat = 10.0,
-                            saturatedFat = 2.0,
-                            carbohydrates = 20.0,
-                            sugars = 5.0,
-                            proteins = 8.0,
-                            salt = 0.5)),
-            location = FoodStorageLocation.PANTRY,
-            expiryDate = Timestamp.now(),
-            buyDate = Timestamp.now(),
-            status = FoodStatus.CLOSED)
+      FoodItem(
+        uid = "1",
+        foodFacts =
+        FoodFacts(
+          name = "Almond Butter",
+          barcode = "123456789",
+          quantity = Quantity(1.0, FoodUnit.GRAM),
+          category = FoodCategory.OTHER,
+          nutritionFacts =
+          NutritionFacts(
+            energyKcal = 100,
+            fat = 10.0,
+            saturatedFat = 2.0,
+            carbohydrates = 20.0,
+            sugars = 5.0,
+            proteins = 8.0,
+            salt = 0.5
+          )
+        ),
+        location = FoodStorageLocation.PANTRY,
+        expiryDate = Timestamp.now(),
+        buyDate = Timestamp.now(),
+        status = FoodStatus.CLOSED
+      )
 
     val map = foodItemRepositoryFirestore.convertFoodItemToMap(foodItem)
 
@@ -293,15 +314,17 @@ class FoodItemRepositoryFirestoreTest {
     assertEquals("CLOSED", map["status"])
     assertEquals("PANTRY", map["location"])
     assertEquals(
-        mapOf(
-            "energyKcal" to 100,
-            "fat" to 10.0,
-            "saturatedFat" to 2.0,
-            "carbohydrates" to 20.0,
-            "sugars" to 5.0,
-            "proteins" to 8.0,
-            "salt" to 0.5),
-        map["nutritionFacts"])
+      mapOf(
+        "energyKcal" to 100,
+        "fat" to 10.0,
+        "saturatedFat" to 2.0,
+        "carbohydrates" to 20.0,
+        "sugars" to 5.0,
+        "proteins" to 8.0,
+        "salt" to 0.5
+      ),
+      map["nutritionFacts"]
+    )
   }
 
   @Test
@@ -324,22 +347,23 @@ class FoodItemRepositoryFirestoreTest {
 
     // Return an iterator with a QueryDocumentSnapshot
     `when`(querySnapshot.iterator())
-        .thenReturn(
-            listOf(queryDocumentSnapshot).iterator() as MutableIterator<QueryDocumentSnapshot>?)
+      .thenReturn(
+        listOf(queryDocumentSnapshot).iterator() as MutableIterator<QueryDocumentSnapshot>?
+      )
 
     // Mock queryDocumentSnapshot to return valid data
     mockDocumentSnapshot(queryDocumentSnapshot)
 
     var onSuccessCalled = false
     repo.getFoodItems(
-        onSuccess = { foodItems ->
-          onSuccessCalled = true
-          Assert.assertEquals(1, foodItems.size)
-          val foodItem = foodItems[0]
-          Assert.assertEquals("test_uid", foodItem.uid)
-          Assert.assertEquals("Test Food", foodItem.foodFacts.name)
-        },
-        onFailure = { Assert.fail("onFailure should not be called") })
+      onSuccess = { foodItems ->
+        onSuccessCalled = true
+        Assert.assertEquals(1, foodItems.size)
+        val foodItem = foodItems[0]
+        Assert.assertEquals("test_uid", foodItem.uid)
+        Assert.assertEquals("Test Food", foodItem.foodFacts.name)
+      },
+      onFailure = { Assert.fail("onFailure should not be called") })
 
     assertTrue(onSuccessCalled)
   }
@@ -348,7 +372,7 @@ class FoodItemRepositoryFirestoreTest {
   fun testGetFI_onFailure_callsOnFailure() {
     `when`(collectionReference.get()).thenReturn(taskQuerySnapshot)
     `when`(taskQuerySnapshot.addOnSuccessListener(ArgumentMatchers.any()))
-        .thenReturn(taskQuerySnapshot)
+      .thenReturn(taskQuerySnapshot)
     `when`(taskQuerySnapshot.addOnFailureListener(ArgumentMatchers.any())).thenAnswer {
       val listener = it.getArgument<OnFailureListener>(0)
       listener.onFailure(Exception("Test Exception"))
@@ -357,11 +381,11 @@ class FoodItemRepositoryFirestoreTest {
 
     var onFailureCalled = false
     repo.getFoodItems(
-        onSuccess = { Assert.fail("onSuccess should not be called") },
-        onFailure = { exception ->
-          onFailureCalled = true
-          Assert.assertEquals("Test Exception", exception.message)
-        })
+      onSuccess = { Assert.fail("onSuccess should not be called") },
+      onFailure = { exception ->
+        onFailureCalled = true
+        Assert.assertEquals("Test Exception", exception.message)
+      })
 
     assertTrue(onFailureCalled)
   }
@@ -378,9 +402,9 @@ class FoodItemRepositoryFirestoreTest {
 
     var onSuccessCalled = false
     repo.addFoodItem(
-        mockFoodItem,
-        onSuccess = { onSuccessCalled = true },
-        onFailure = { Assert.fail("onFailure should not be called") })
+      mockFoodItem,
+      onSuccess = { onSuccessCalled = true },
+      onFailure = { Assert.fail("onFailure should not be called") })
 
     assertTrue(onSuccessCalled)
   }
@@ -398,12 +422,12 @@ class FoodItemRepositoryFirestoreTest {
 
     var onFailureCalled = false
     repo.addFoodItem(
-        mockFoodItem,
-        onSuccess = { Assert.fail("onSuccess should not be called") },
-        onFailure = { exception ->
-          onFailureCalled = true
-          Assert.assertEquals("Test Exception", exception.message)
-        })
+      mockFoodItem,
+      onSuccess = { Assert.fail("onSuccess should not be called") },
+      onFailure = { exception ->
+        onFailureCalled = true
+        Assert.assertEquals("Test Exception", exception.message)
+      })
 
     assertTrue(onFailureCalled)
   }
@@ -420,9 +444,9 @@ class FoodItemRepositoryFirestoreTest {
 
     var onSuccessCalled = false
     repo.updateFoodItem(
-        mockFoodItem,
-        onSuccess = { onSuccessCalled = true },
-        onFailure = { Assert.fail("onFailure should not be called") })
+      mockFoodItem,
+      onSuccess = { onSuccessCalled = true },
+      onFailure = { Assert.fail("onFailure should not be called") })
 
     assertTrue(onSuccessCalled)
   }
@@ -440,12 +464,12 @@ class FoodItemRepositoryFirestoreTest {
 
     var onFailureCalled = false
     repo.updateFoodItem(
-        mockFoodItem,
-        onSuccess = { Assert.fail("onSuccess should not be called") },
-        onFailure = { exception ->
-          onFailureCalled = true
-          Assert.assertEquals("Test Exception", exception.message)
-        })
+      mockFoodItem,
+      onSuccess = { Assert.fail("onSuccess should not be called") },
+      onFailure = { exception ->
+        onFailureCalled = true
+        Assert.assertEquals("Test Exception", exception.message)
+      })
 
     assertTrue(onFailureCalled)
   }
@@ -461,9 +485,9 @@ class FoodItemRepositoryFirestoreTest {
 
     var onSuccessCalled = false
     repo.deleteFoodItemById(
-        "test_uid",
-        onSuccess = { onSuccessCalled = true },
-        onFailure = { Assert.fail("onFailure should not be called") })
+      "test_uid",
+      onSuccess = { onSuccessCalled = true },
+      onFailure = { Assert.fail("onFailure should not be called") })
 
     assertTrue(onSuccessCalled)
   }
@@ -480,12 +504,12 @@ class FoodItemRepositoryFirestoreTest {
 
     var onFailureCalled = false
     repo.deleteFoodItemById(
-        "test_uid",
-        onSuccess = { Assert.fail("onSuccess should not be called") },
-        onFailure = { exception ->
-          onFailureCalled = true
-          Assert.assertEquals("Test Exception", exception.message)
-        })
+      "test_uid",
+      onSuccess = { Assert.fail("onSuccess should not be called") },
+      onFailure = { exception ->
+        onFailureCalled = true
+        Assert.assertEquals("Test Exception", exception.message)
+      })
 
     assertTrue(onFailureCalled)
   }
@@ -524,14 +548,15 @@ class FoodItemRepositoryFirestoreTest {
     val barcode = "1234567890"
     val quantityMap = mapOf("amount" to 100.0, "unit" to "GRAM")
     val nutritionFactsMap =
-        mapOf(
-            "energyKcal" to 200L,
-            "fat" to 10.0,
-            "saturatedFat" to 5.0,
-            "carbohydrates" to 30.0,
-            "sugars" to 20.0,
-            "proteins" to 15.0,
-            "salt" to 1.0)
+      mapOf(
+        "energyKcal" to 200L,
+        "fat" to 10.0,
+        "saturatedFat" to 5.0,
+        "carbohydrates" to 30.0,
+        "sugars" to 20.0,
+        "proteins" to 15.0,
+        "salt" to 1.0
+      )
     val expiryDate = timestamp
     val buyDate = timestamp
     val status = "OPEN"
@@ -553,17 +578,18 @@ class FoodItemRepositoryFirestoreTest {
   @Test
   fun testConvertToFIFromMap_ValidInput() {
     val validMap =
-        mapOf(
-            "uid" to "testUid",
-            "name" to "Apple",
-            "barcode" to "123456789012",
-            "quantity" to mapOf("amount" to 1.5, "unit" to "GRAM"),
-            "expiryDate" to Timestamp.now(),
-            "status" to "OPEN")
+      mapOf(
+        "uid" to "testUid",
+        "name" to "Apple",
+        "barcode" to "123456789012",
+        "quantity" to mapOf("amount" to 1.5, "unit" to "GRAM"),
+        "expiryDate" to Timestamp.now(),
+        "status" to "OPEN"
+      )
 
     val foodItem =
-        FoodItemRepositoryFirestore(FirebaseFirestore.getInstance())
-            .convertToFoodItemFromMap(validMap)
+      FoodItemRepositoryFirestore(FirebaseFirestore.getInstance())
+        .convertToFoodItemFromMap(validMap)
 
     assertNotNull(foodItem)
     Assert.assertEquals("testUid", foodItem?.uid)
@@ -576,14 +602,15 @@ class FoodItemRepositoryFirestoreTest {
   @Test
   fun testConvToFIFromMap_MissingFields() {
     val incompleteMap =
-        mapOf(
-            "uid" to "testUid",
-            "name" to "Apple",
-            "quantity" to mapOf("amount" to 1.5, "unit" to "GRAM"))
+      mapOf(
+        "uid" to "testUid",
+        "name" to "Apple",
+        "quantity" to mapOf("amount" to 1.5, "unit" to "GRAM")
+      )
 
     val foodItem =
-        FoodItemRepositoryFirestore(FirebaseFirestore.getInstance())
-            .convertToFoodItemFromMap(incompleteMap)
+      FoodItemRepositoryFirestore(FirebaseFirestore.getInstance())
+        .convertToFoodItemFromMap(incompleteMap)
 
     assertNotNull(foodItem)
     Assert.assertEquals("testUid", foodItem?.uid)
@@ -594,14 +621,15 @@ class FoodItemRepositoryFirestoreTest {
   @Test
   fun testConvToFIFromMap_NullValues() {
     val mapWithNulls =
-        mapOf(
-            "uid" to "testUid",
-            "name" to null,
-            "quantity" to mapOf("amount" to 1.5, "unit" to "GRAM"))
+      mapOf(
+        "uid" to "testUid",
+        "name" to null,
+        "quantity" to mapOf("amount" to 1.5, "unit" to "GRAM")
+      )
 
     val foodItem =
-        FoodItemRepositoryFirestore(FirebaseFirestore.getInstance())
-            .convertToFoodItemFromMap(mapWithNulls)
+      FoodItemRepositoryFirestore(FirebaseFirestore.getInstance())
+        .convertToFoodItemFromMap(mapWithNulls)
 
     assertNull(foodItem) // Expect null because "name" is required
   }
@@ -611,16 +639,17 @@ class FoodItemRepositoryFirestoreTest {
     val quantity = Quantity(2.0, FoodUnit.GRAM)
     val foodFacts = FoodFacts(name = "Apple", barcode = "123456789012", quantity = quantity)
     val foodItem =
-        FoodItem(
-            uid = "testUid",
-            foodFacts = foodFacts,
-            expiryDate = Timestamp.now(),
-            buyDate = Timestamp.now(),
-            status = FoodStatus.OPEN,
-            location = FoodStorageLocation.PANTRY)
+      FoodItem(
+        uid = "testUid",
+        foodFacts = foodFacts,
+        expiryDate = Timestamp.now(),
+        buyDate = Timestamp.now(),
+        status = FoodStatus.OPEN,
+        location = FoodStorageLocation.PANTRY
+      )
 
     val map =
-        FoodItemRepositoryFirestore(FirebaseFirestore.getInstance()).convertFoodItemToMap(foodItem)
+      FoodItemRepositoryFirestore(FirebaseFirestore.getInstance()).convertFoodItemToMap(foodItem)
 
     Assert.assertEquals("testUid", map["uid"])
     Assert.assertEquals("Apple", map["name"])
@@ -634,16 +663,17 @@ class FoodItemRepositoryFirestoreTest {
     val quantity = Quantity(1.0, FoodUnit.GRAM)
     val foodFacts = FoodFacts(name = "Apple", quantity = quantity)
     val foodItem =
-        FoodItem(
-            uid = "testUid",
-            foodFacts = foodFacts,
-            expiryDate = Timestamp.now(),
-            buyDate = Timestamp.now(),
-            status = FoodStatus.CLOSED,
-            location = FoodStorageLocation.PANTRY)
+      FoodItem(
+        uid = "testUid",
+        foodFacts = foodFacts,
+        expiryDate = Timestamp.now(),
+        buyDate = Timestamp.now(),
+        status = FoodStatus.CLOSED,
+        location = FoodStorageLocation.PANTRY
+      )
 
     val map =
-        FoodItemRepositoryFirestore(FirebaseFirestore.getInstance()).convertFoodItemToMap(foodItem)
+      FoodItemRepositoryFirestore(FirebaseFirestore.getInstance()).convertFoodItemToMap(foodItem)
 
     Assert.assertEquals("Apple", map["name"])
     Assert.assertEquals("", map["barcode"]) // Default barcode should be empty

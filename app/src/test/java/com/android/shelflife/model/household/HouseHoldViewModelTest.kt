@@ -6,16 +6,19 @@ import com.android.shelfLife.model.household.*
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
 import org.junit.After
+import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.*
 import org.mockito.kotlin.*
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.shadows.ShadowLog
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
@@ -39,6 +42,8 @@ class HouseholdViewModelTest {
 
     // Initialize Firebase
     FirebaseApp.initializeApp(InstrumentationRegistry.getInstrumentation().targetContext)
+
+    ShadowLog.clear()
   }
 
   @After
@@ -225,5 +230,31 @@ class HouseholdViewModelTest {
     // Assert
     verify(repository).updateHousehold(eq(updatedHousehold), any(), any())
     assertEquals(households, householdViewModel.households.value)
+  }
+
+@Test
+fun addNewHousehold_shouldLogErrorWhenAddingFails() = runTest {
+    // Arrange
+    val householdName = "New Household"
+    val exception = Exception("Test exception")
+
+    whenever(repository.getNewUid()).thenReturn("uid")
+    whenever(repository.addHousehold(any(), any(), any())).thenAnswer { invocation ->
+        val onFailure = invocation.getArgument<(Exception) -> Unit>(2)
+        onFailure(exception)
+        null
+    }
+
+    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+
+    // Act
+    householdViewModel.addNewHousehold(householdName)
+
+    // Assert
+    assertTrue(householdViewModel.households.value.isEmpty())
+    // Verify that the error was logged
+    val logEntries = ShadowLog.getLogs()
+    println(logEntries)
+    assertTrue(logEntries.any { it.tag == "HouseholdViewModel" && it.msg == "Error adding household: $exception" })
   }
 }
