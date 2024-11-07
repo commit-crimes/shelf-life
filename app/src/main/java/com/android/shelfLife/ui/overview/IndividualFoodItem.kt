@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,20 +27,21 @@ import com.android.shelfLife.ui.navigation.Route
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.ui.navigation.TopNavigationBar
-import com.google.android.datatransport.runtime.dagger.Component
+import com.android.shelfLife.ui.utils.FoodItemDetails
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.JsonNull.content
-import org.jetbrains.annotations.TestOnly
+import java.text.SimpleDateFormat
 
 @Composable
 fun IndividualFoodItemScreen(
@@ -60,36 +61,31 @@ fun IndividualFoodItemScreen(
             )
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
-            if (foodItem?.value == null) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-            } else {
-                val selectedFoodItem = foodItem.value!!
+        LazyColumn(modifier = Modifier.padding(paddingValues)) {
+            item {
+                val selectedFoodItem = foodItem?.value
+                if (selectedFoodItem != null) {
+                    Text(
+                        text = selectedFoodItem.foodFacts.name,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(16.dp)
+                    )
 
-                Text(
-                    text = selectedFoodItem.foodFacts.name,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(16.dp)
-                )
+                    Image(
+                        painter = painterResource(id = R.drawable.minecraft_steak),
+                        contentDescription = "Image of ${selectedFoodItem.foodFacts.name}",
+                        modifier = Modifier
+                            .size(360.dp, 360.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
+                    )
 
-                AsyncImage(
-                    model = selectedFoodItem.foodFacts.imageUrl,
-                    contentDescription = "Food Image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .height(200.dp)
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                )
-
-                Text(
-                    text = "Expires on: ${selectedFoodItem.expiryDate}",
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(16.dp)
-                )
+                    FoodItemDetails(foodItem = selectedFoodItem)
+                } else {
+                    CircularProgressIndicator()
+                }
             }
         }
     }
 }
-
