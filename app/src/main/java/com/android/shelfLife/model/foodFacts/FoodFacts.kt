@@ -20,9 +20,13 @@ data class FoodFacts(
     val quantity: Quantity, // Quantity of the food item
     val category: FoodCategory = FoodCategory.OTHER, // Default category is OTHER
     val nutritionFacts: NutritionFacts = NutritionFacts(), // Default empty NutritionFacts object
-    val imageUrl: String =
-        "https://media.istockphoto.com/id/1354776457/vector/default-image-icon-vector-missing-picture-page-for-website-design-or-mobile-app-no-photo.jpg?s=612x612&w=0&k=20&c=w3OW0wX3LyiFRuDHo9A32Q0IUMtD4yjXEvQlqyYk9O4=" // New property for image URL
+    val imageUrl: String = DEFAULT_IMAGE_URL // New property for image URL
 ) {
+  companion object {
+    const val DEFAULT_IMAGE_URL =
+        "https://media.istockphoto.com/id/1354776457/vector/default-image-icon-vector-missing-picture-page-for-website-design-or-mobile-app-no-photo.jpg?s=612x612&w=0&k=20&c=w3OW0wX3LyiFRuDHo9A32Q0IUMtD4yjXEvQlqyYk9O4="
+  }
+
   override fun toString(): String {
     return "Name: $name\n" +
         "Barcode: $barcode\n" +
