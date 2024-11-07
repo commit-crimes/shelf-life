@@ -56,7 +56,8 @@ fun FoodInputContent(
     onSubmit: (FoodItem) -> Unit,
     onCancel: () -> Unit,
     foodItemViewModel: ListFoodItemsViewModel,
-    householdViewModel: HouseholdViewModel
+    householdViewModel: HouseholdViewModel,
+    isExpanded: Boolean
 ) {
   val context = LocalContext.current
   var location by remember { mutableStateOf(FoodStorageLocation.PANTRY) }
@@ -74,208 +75,232 @@ fun FoodInputContent(
       modifier = Modifier.fillMaxWidth().padding(16.dp),
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Top) {
-        // Food information
-        Row(verticalAlignment = Alignment.CenterVertically) {
+      // Food information
+      Row(verticalAlignment = Alignment.CenterVertically) {
           Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = foodFacts.name,
-                style =
-                    TextStyle(
-                        fontSize = 20.sp,
-                        color = Color(0xFF000000),
-                    ))
+              Text(
+                  text = foodFacts.name,
+                  style =
+                  TextStyle(
+                      fontSize = 20.sp,
+                      color = Color(0xFF000000),
+                  )
+              )
 
-            Text(
-                text = foodFacts.category.name,
-                style =
-                    TextStyle(
-                        fontSize = 13.sp,
-                        color = Color(0xFF000000),
-                    ))
+              Text(
+                  text = foodFacts.category.name,
+                  style =
+                  TextStyle(
+                      fontSize = 13.sp,
+                      color = Color(0xFF000000),
+                  )
+              )
           }
 
           Image(
               painter = painterResource(id = R.drawable.app_logo),
               contentDescription = "Food Image",
-              modifier = Modifier.size(30.dp).padding(end = 8.dp))
-        }
+              modifier = Modifier.size(30.dp).padding(end = 8.dp)
+          )
+      }
 
-        Spacer(modifier = Modifier.height(16.dp))
+      if (isExpanded) {
+          Spacer(modifier = Modifier.height(16.dp))
 
-        // Location Dropdown
-        ExposedDropdownMenuBox(
-            expanded = locationExpanded,
-            onExpandedChange = { locationExpanded = !locationExpanded },
-            modifier = Modifier.testTag("locationDropdown")) {
+          // Location Dropdown
+          ExposedDropdownMenuBox(
+              expanded = locationExpanded,
+              onExpandedChange = { locationExpanded = !locationExpanded },
+              modifier = Modifier.testTag("locationDropdown")
+          ) {
               OutlinedTextField(
                   value = location.name.lowercase(),
                   onValueChange = {},
                   label = { Text("Location") },
                   readOnly = true,
                   trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = locationExpanded)
+                      ExposedDropdownMenuDefaults.TrailingIcon(expanded = locationExpanded)
                   },
-                  modifier = Modifier.fillMaxWidth().menuAnchor().testTag("locationTextField"))
+                  modifier = Modifier.fillMaxWidth().menuAnchor().testTag("locationTextField")
+              )
               ExposedDropdownMenu(
                   expanded = locationExpanded,
                   onDismissRequest = { locationExpanded = false },
-                  modifier = Modifier.testTag("locationMenu")) {
-                    FoodStorageLocation.entries.forEach { selectionOption ->
+                  modifier = Modifier.testTag("locationMenu")
+              ) {
+                  FoodStorageLocation.entries.forEach { selectionOption ->
                       DropdownMenuItem(
                           text = { Text(selectionOption.name) },
                           onClick = {
-                            location = selectionOption
-                            locationExpanded = false
+                              location = selectionOption
+                              locationExpanded = false
                           },
-                          modifier = Modifier.testTag("locationOption_${selectionOption.name}"))
-                    }
+                          modifier = Modifier.testTag("locationOption_${selectionOption.name}")
+                      )
                   }
-            }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Expire Date Field with Error Handling and Input Masking
-        OutlinedTextField(
-            value = expireDate,
-            onValueChange = { newValue ->
-              expireDate = newValue.filter { it.isDigit() }
-              expireDateError = getDateErrorMessage(expireDate)
-            },
-            label = { Text("Expire Date") },
-            placeholder = { Text("dd/MM/yyyy") },
-            isError = expireDateError != null,
-            visualTransformation = DateVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-            modifier = Modifier.fillMaxWidth().testTag("expireDateTextField"))
-        if (expireDateError != null) {
-          Text(
-              text = expireDateError!!,
-              color = MaterialTheme.colorScheme.error,
-              style = MaterialTheme.typography.bodySmall,
-              modifier = Modifier.align(Alignment.Start))
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Open Date Field with Error Handling and Input Masking
-        OutlinedTextField(
-            value = openDate,
-            onValueChange = { newValue ->
-              openDate = newValue.filter { it.isDigit() }
-              openDateError = getDateErrorMessage(openDate, isRequired = false)
-
-              // Additional validation only if openDate is not empty
-              if (openDateError == null &&
-                  openDate.isNotEmpty() &&
-                  buyDateError == null &&
-                  openDate.length == 8 &&
-                  buyDate.length == 8) {
-                if (!isDateAfterOrEqual(openDate, buyDate)) {
-                  openDateError = "Open Date cannot be before Buy Date"
-                } else {
-                  openDateError = null
-                }
               }
-            },
-            label = { Text("Open Date") },
-            placeholder = { Text("dd/MM/yyyy") },
-            isError = openDateError != null,
-            visualTransformation = DateVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-            modifier = Modifier.fillMaxWidth().testTag("openDateTextField"))
-        if (openDateError != null) {
-          Text(
-              text = openDateError!!,
-              color = MaterialTheme.colorScheme.error,
-              style = MaterialTheme.typography.bodySmall,
-              modifier = Modifier.align(Alignment.Start))
-        }
+          }
 
-        Spacer(modifier = Modifier.height(8.dp))
 
-        // Buy Date Field with Error Handling and Input Masking
-        OutlinedTextField(
-            value = buyDate,
-            onValueChange = { newValue ->
-              buyDate = newValue.filter { it.isDigit() }
-              buyDateError = getDateErrorMessage(buyDate)
+          Spacer(modifier = Modifier.height(16.dp))
 
-              // Re-validate openDate against buyDate
-              if (openDateError == null &&
-                  buyDateError == null &&
-                  openDate.length == 8 &&
-                  buyDate.length == 8) {
-                if (!isDateAfterOrEqual(openDate, buyDate)) {
-                  openDateError = "Open Date cannot be before Buy Date"
-                } else {
-                  openDateError = null
-                }
-              }
-            },
-            label = { Text("Buy Date") },
-            placeholder = { Text("dd/MM/yyyy") },
-            isError = buyDateError != null,
-            visualTransformation = DateVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-            modifier = Modifier.fillMaxWidth().testTag("buyDateTextField"))
-        if (buyDateError != null) {
-          Text(
-              text = buyDateError!!,
-              color = MaterialTheme.colorScheme.error,
-              style = MaterialTheme.typography.bodySmall,
-              modifier = Modifier.align(Alignment.Start))
-        }
+          // Expire Date Field with Error Handling and Input Masking
+          OutlinedTextField(
+              value = expireDate,
+              onValueChange = { newValue ->
+                  expireDate = newValue.filter { it.isDigit() }
+                  expireDateError = getDateErrorMessage(expireDate)
+              },
+              label = { Text("Expire Date") },
+              placeholder = { Text("dd/MM/yyyy") },
+              isError = expireDateError != null,
+              visualTransformation = DateVisualTransformation(),
+              keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+              modifier = Modifier.fillMaxWidth().testTag("expireDateTextField")
+          )
+          if (expireDateError != null) {
+              Text(
+                  text = expireDateError!!,
+                  color = MaterialTheme.colorScheme.error,
+                  style = MaterialTheme.typography.bodySmall,
+                  modifier = Modifier.align(Alignment.Start)
+              )
+          }
 
-        Spacer(modifier = Modifier.height(32.dp))
+          Spacer(modifier = Modifier.height(8.dp))
 
-        Button(
-            onClick = {
-              // Validate all inputs before proceeding
-              val isExpireDateValid = expireDateError == null && expireDate.isNotEmpty()
-              val isOpenDateValid =
-                  openDateError == null // No need to check length since it's optional
-              val isBuyDateValid = buyDateError == null && buyDate.isNotEmpty()
+          // Open Date Field with Error Handling and Input Masking
+          OutlinedTextField(
+              value = openDate,
+              onValueChange = { newValue ->
+                  openDate = newValue.filter { it.isDigit() }
+                  openDateError = getDateErrorMessage(openDate, isRequired = false)
 
-              val expiryTimestamp = formatDateToTimestamp(expireDate)
-              val openTimestamp =
-                  if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
-              val buyTimestamp = formatDateToTimestamp(buyDate)
+                  // Additional validation only if openDate is not empty
+                  if (openDateError == null &&
+                      openDate.isNotEmpty() &&
+                      buyDateError == null &&
+                      openDate.length == 8 &&
+                      buyDate.length == 8
+                  ) {
+                      if (!isDateAfterOrEqual(openDate, buyDate)) {
+                          openDateError = "Open Date cannot be before Buy Date"
+                      } else {
+                          openDateError = null
+                      }
+                  }
+              },
+              label = { Text("Open Date") },
+              placeholder = { Text("dd/MM/yyyy") },
+              isError = openDateError != null,
+              visualTransformation = DateVisualTransformation(),
+              keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+              modifier = Modifier.fillMaxWidth().testTag("openDateTextField")
+          )
+          if (openDateError != null) {
+              Text(
+                  text = openDateError!!,
+                  color = MaterialTheme.colorScheme.error,
+                  style = MaterialTheme.typography.bodySmall,
+                  modifier = Modifier.align(Alignment.Start)
+              )
+          }
 
-              if (isExpireDateValid &&
-                  isOpenDateValid &&
-                  isBuyDateValid &&
-                  expiryTimestamp != null &&
-                  buyTimestamp != null) {
-                val newFoodItem =
-                    FoodItem(
-                        uid = foodItemViewModel.getUID(),
-                        foodFacts = foodFacts,
-                        location = location,
-                        expiryDate = expiryTimestamp,
-                        openDate = openTimestamp,
-                        buyDate = buyTimestamp,
-                        // Additional logic for status if needed
-                    )
-                onSubmit(newFoodItem)
-              } else {
-                // Handle the case where validation fails
-                Toast.makeText(
-                        context, "Please correct the errors before submitting.", Toast.LENGTH_SHORT)
-                    .show()
-              }
-            },
-            modifier = Modifier.fillMaxWidth().height(50.dp).testTag("submitButton")) {
+          Spacer(modifier = Modifier.height(8.dp))
+
+          // Buy Date Field with Error Handling and Input Masking
+          OutlinedTextField(
+              value = buyDate,
+              onValueChange = { newValue ->
+                  buyDate = newValue.filter { it.isDigit() }
+                  buyDateError = getDateErrorMessage(buyDate)
+
+                  // Re-validate openDate against buyDate
+                  if (openDateError == null &&
+                      buyDateError == null &&
+                      openDate.length == 8 &&
+                      buyDate.length == 8
+                  ) {
+                      if (!isDateAfterOrEqual(openDate, buyDate)) {
+                          openDateError = "Open Date cannot be before Buy Date"
+                      } else {
+                          openDateError = null
+                      }
+                  }
+              },
+              label = { Text("Buy Date") },
+              placeholder = { Text("dd/MM/yyyy") },
+              isError = buyDateError != null,
+              visualTransformation = DateVisualTransformation(),
+              keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+              modifier = Modifier.fillMaxWidth().testTag("buyDateTextField")
+          )
+          if (buyDateError != null) {
+              Text(
+                  text = buyDateError!!,
+                  color = MaterialTheme.colorScheme.error,
+                  style = MaterialTheme.typography.bodySmall,
+                  modifier = Modifier.align(Alignment.Start)
+              )
+          }
+
+          Spacer(modifier = Modifier.height(32.dp))
+
+          Button(
+              onClick = {
+                  // Validate all inputs before proceeding
+                  val isExpireDateValid = expireDateError == null && expireDate.isNotEmpty()
+                  val isOpenDateValid =
+                      openDateError == null // No need to check length since it's optional
+                  val isBuyDateValid = buyDateError == null && buyDate.isNotEmpty()
+
+                  val expiryTimestamp = formatDateToTimestamp(expireDate)
+                  val openTimestamp =
+                      if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
+                  val buyTimestamp = formatDateToTimestamp(buyDate)
+
+                  if (isExpireDateValid &&
+                      isOpenDateValid &&
+                      isBuyDateValid &&
+                      expiryTimestamp != null &&
+                      buyTimestamp != null
+                  ) {
+                      val newFoodItem =
+                          FoodItem(
+                              uid = foodItemViewModel.getUID(),
+                              foodFacts = foodFacts,
+                              location = location,
+                              expiryDate = expiryTimestamp,
+                              openDate = openTimestamp,
+                              buyDate = buyTimestamp,
+                              // Additional logic for status if needed
+                          )
+                      onSubmit(newFoodItem)
+                  } else {
+                      // Handle the case where validation fails
+                      Toast.makeText(
+                          context,
+                          "Please correct the errors before submitting.",
+                          Toast.LENGTH_SHORT
+                      )
+                          .show()
+                  }
+              },
+              modifier = Modifier.fillMaxWidth().height(50.dp).testTag("submitButton")
+          ) {
               Text(text = "Submit", fontSize = 18.sp)
-            }
+          }
 
-        Spacer(modifier = Modifier.height(16.dp))
+          Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = { onCancel() },
-            modifier = Modifier.fillMaxWidth().height(50.dp).testTag("cancelButton")) {
+          Button(
+              onClick = { onCancel() },
+              modifier = Modifier.fillMaxWidth().height(50.dp).testTag("cancelButton")
+          ) {
               Text(text = "Cancel", fontSize = 18.sp)
-            }
+          }
       }
+  }
 }
 
 // Custom VisualTransformation with proper OffsetMapping
