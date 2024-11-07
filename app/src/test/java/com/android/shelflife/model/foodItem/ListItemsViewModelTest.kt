@@ -1,5 +1,7 @@
 package com.android.shelflife.model.foodItem
 
+import android.util.Log
+import androidx.lifecycle.ViewModel
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepository
@@ -7,6 +9,7 @@ import com.android.shelfLife.model.foodItem.FoodStatus
 import com.android.shelfLife.model.foodItem.FoodStorageLocation
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.google.firebase.Timestamp
+import junit.framework.TestCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
@@ -15,11 +18,16 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.kotlin.*
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.shadows.ShadowLog
 
+// Stub Log.e and other Log methods to do nothing
+
+@RunWith(RobolectricTestRunner::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class ListFoodItemsViewModelTest {
-
   private lateinit var viewModel: ListFoodItemsViewModel
   private val mockRepository: FoodItemRepository = mock()
 
@@ -60,6 +68,7 @@ class ListFoodItemsViewModelTest {
     whenever(mockRepository.getNewUid()).thenReturn("test-uid")
     // Initialize the ViewModel
     viewModel = ListFoodItemsViewModel(mockRepository)
+    ShadowLog.clear()
   }
 
   @Test
@@ -190,4 +199,54 @@ class ListFoodItemsViewModelTest {
     val result = viewModel.selectedFoodItem.first()
     assertEquals(testFoodItem, result)
   }
+
+  @Test
+  fun `getFoodItems calls _onFail when repository fails`() {
+    // Arrange
+    val exception = Exception("Test Exception")
+
+    // Set up repository to trigger onFailure callback
+    whenever(mockRepository.getFoodItems(any(), any())).thenAnswer {
+      // Call the onFailure lambda directly with an exception
+      it.getArgument<(Exception) -> Unit>(1).invoke(exception)
+    }
+
+    // Act
+    viewModel.getFoodItems()
+
+    // Assert that a log entry with Log.e was created
+    val logEntries = ShadowLog.getLogs()
+    assertTrue(
+        logEntries.any {
+          it.tag == "ListFoodItemsViewModel" &&
+              it.type == Log.ERROR &&
+              it.msg.contains("Error fetching FoodItems: $exception")
+        })
+  }
+
+  @Test
+  fun `Factory creates ListFoodItemsViewModel instance`() {
+    val factory = ListFoodItemsViewModel.Factory(mockRepository)
+    val viewModel = factory.create(ListFoodItemsViewModel::class.java)
+
+    assertTrue(
+        "Factory should create an instance of FoodFactsViewModel",
+        viewModel is ListFoodItemsViewModel)
+  }
+
+  @Test
+  fun `Factory throws exception for unknown ViewModel class`() {
+    val factory = ListFoodItemsViewModel.Factory(mockRepository)
+
+    try {
+      // Attempt to create a ViewModel of a different class to trigger the exception
+      factory.create(DifferentViewModel::class.java)
+      TestCase.fail("Factory should throw IllegalArgumentException for unknown ViewModel class")
+    } catch (e: IllegalArgumentException) {
+      assertTrue(e.message?.contains("Unknown ViewModel class") == true)
+    }
+  }
+
+  // A dummy ViewModel class to test the exception scenario
+  class DifferentViewModel : ViewModel()
 }
