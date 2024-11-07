@@ -1,6 +1,7 @@
 package com.android.shelfLife.ui.utils
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,12 +22,14 @@ import androidx.compose.ui.window.Dialog
  * @param showDialog A boolean value that indicates whether the dialog should be shown.
  * @param onDismiss A lambda function that is called when the dialog is dismissed.
  * @param errorMessages A list of error messages to be displayed in the dialog.
+ * @param paddingValues Padding values for the dialog content.
  */
 @Composable
 fun ErrorPopUp(
     showDialog: Boolean,
     onDismiss: () -> Unit,
     errorMessages: List<String>,
+    paddingValues: PaddingValues = PaddingValues(8.dp),
     modifier: Modifier = Modifier
 ) {
   if (showDialog) {
@@ -34,20 +37,26 @@ fun ErrorPopUp(
       Surface(
           shape = RoundedCornerShape(12.dp),
           modifier =
-              modifier.testTag("errorDialog").padding(16.dp).widthIn(min = 280.dp, max = 400.dp)) {
+              modifier
+                  .testTag("errorDialog")
+                  .padding(paddingValues)
+                  .widthIn(min = 200.dp, max = 300.dp)) {
             Column(
-                modifier = modifier.padding(16.dp),
+                modifier = modifier.padding(paddingValues),
                 horizontalAlignment = Alignment.CenterHorizontally) {
-                  Text(
-                      text = "Error", modifier = modifier.padding(bottom = 16.dp), fontSize = 24.sp)
+                  Text(text = "Error", modifier = modifier.padding(bottom = 8.dp), fontSize = 20.sp)
 
-                  Column(modifier = modifier.padding(bottom = 16.dp)) {
+                  Column(modifier = modifier.padding(bottom = 8.dp)) {
                     errorMessages.forEach { message ->
-                      Text(text = message, modifier = modifier.padding(bottom = 8.dp))
+                      Text(text = message, modifier = modifier.padding(bottom = 4.dp))
                     }
                   }
 
-                  Button(onClick = onDismiss) { Text("OK") }
+                  Button(
+                      onClick = onDismiss,
+                      modifier = modifier.testTag("errorDialogDismissButton")) {
+                        Text("OK")
+                      }
                 }
           }
     }
