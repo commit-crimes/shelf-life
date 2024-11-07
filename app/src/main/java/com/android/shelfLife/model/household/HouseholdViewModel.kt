@@ -136,6 +136,13 @@ class HouseholdViewModel(
         _searchedFoodItems.value = selectedHousehold.value?.foodItems?.filter { it.foodFacts.name == foodItem.foodFacts.name } ?: emptyList()
     }
 
+    fun getFoodItemById(foodItemId: String): StateFlow<FoodItem?> {
+        val foodItemFlow = MutableStateFlow<FoodItem?>(null)
+        selectedHousehold.value?.let { household ->
+            foodItemFlow.value = household.foodItems.find { it.uid == foodItemId }
+        }
+        return foodItemFlow.asStateFlow()
+    }
   companion object {
     val Factory: ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {

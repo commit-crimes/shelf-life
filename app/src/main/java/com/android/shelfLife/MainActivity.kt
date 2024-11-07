@@ -15,6 +15,7 @@ import androidx.navigation.navigation
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.android.shelfLife.model.foodFacts.OpenFoodFactsRepository
+import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
@@ -27,6 +28,7 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.overview.AddFoodItemScreen
+import com.android.shelfLife.ui.overview.IndividualFoodItemScreen
 import com.android.shelfLife.ui.overview.OverviewScreen
 import com.android.shelfLife.ui.profile.ProfileScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
@@ -85,6 +87,14 @@ fun ShelfLifeApp() {
       composable(Screen.ADD_FOOD) {
         AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
       }
+        composable("${Screen.INDIVIDUAL_FOOD_ITEM}/{foodItemId}") {backStackEntry ->
+            val foodItemId = backStackEntry.arguments?.getString("foodItemId")
+                IndividualFoodItemScreen(
+                    foodItemId = foodItemId,
+                    navigationActions = navigationActions,
+                    householdViewModel = householdViewModel
+                )
+        }
     }
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
       composable(Screen.PERMISSION_HANDLER) {

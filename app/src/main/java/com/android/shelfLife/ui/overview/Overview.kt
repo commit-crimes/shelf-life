@@ -118,7 +118,12 @@ fun OverviewScreen(
                   query = searchQuery,
                   onQueryChange = { searchQuery = it } // Update the query state when the user types
                   )
-              ListFoodItems(filteredFoodItems)
+                ListFoodItems(
+                    foodItems = filteredFoodItems,
+                    onFoodItemClick = { selectedFoodItem ->
+                        navigationActions.navigateToIndividualFood(selectedFoodItem.uid)
+                    }
+                )
             }
           }
         }

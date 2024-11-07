@@ -27,6 +27,7 @@ import com.android.shelfLife.ui.navigation.Route
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,15 +44,11 @@ import org.jetbrains.annotations.TestOnly
 
 @Composable
 fun IndividualFoodItemScreen(
-    selectedFoodItem: FoodItem,
+    foodItemId: String?,
     navigationActions: NavigationActions,
-    householdViewModel: HouseholdViewModel,
-    ){
-
-    LaunchedEffect(selectedFoodItem) {
-        householdViewModel.searchFoodItem(selectedFoodItem)
-    }
-    val searchedFoodItems by householdViewModel.searchedFoodItems.collectAsState()
+    householdViewModel: HouseholdViewModel
+) {
+    val foodItem = foodItemId?.let { householdViewModel.getFoodItemById(it).collectAsState(initial = null) }
 
     Scaffold(
         modifier = Modifier.testTag("IndividualFoodItemScreen"),
@@ -61,24 +58,38 @@ fun IndividualFoodItemScreen(
                 tabList = LIST_TOP_LEVEL_DESTINATION,
                 selectedItem = Route.OVERVIEW
             )
-        },
-        content = { paddingValues ->
-            Column(modifier = Modifier.padding(paddingValues)) {
+        }
+    ) { paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues)) {
+            if (foodItem?.value == null) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+            } else {
+                val selectedFoodItem = foodItem.value!!
+
                 Text(
                     text = selectedFoodItem.foodFacts.name,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(16.dp)
                 )
-                Image(
-                    painter = painterResource(id = R.drawable.minecraft_steak), // Replace with your image resource
-                    contentDescription = "Carousel Image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.padding(paddingValues)
-                )
-                ListFoodItems(searchedFoodItems)
-        }
-        }
-    )
 
+                AsyncImage(
+                    model = selectedFoodItem.foodFacts.imageUrl,
+                    contentDescription = "Food Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .height(200.dp)
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                )
+
+                Text(
+                    text = "Expires on: ${selectedFoodItem.expiryDate}",
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        }
+    }
 }
+

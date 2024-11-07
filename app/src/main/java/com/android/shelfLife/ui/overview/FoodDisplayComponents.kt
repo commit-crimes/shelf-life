@@ -1,6 +1,7 @@
 package com.android.shelfLife.ui.overview
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -53,7 +54,7 @@ import java.util.Locale
  * @param foodItems The list of food items to display
  */
 @Composable
-fun ListFoodItems(foodItems: List<FoodItem>) {
+fun ListFoodItems(foodItems: List<FoodItem>, onFoodItemClick: (FoodItem) -> Unit) {
   if (foodItems.isEmpty()) {
     // Display a prompt when there are no todos
     Box(
@@ -66,14 +67,14 @@ fun ListFoodItems(foodItems: List<FoodItem>) {
     LazyColumn(modifier = Modifier.fillMaxSize().testTag("foodItemList")) {
       items(foodItems) { item ->
         // Call a composable that renders each individual to-do item
-        FoodItemCard(foodItem = item)
+        FoodItemCard(foodItem = item, onClick = {onFoodItemClick(item)})
       }
     }
   }
 }
 
 @Composable
-fun FoodItemCard(foodItem: FoodItem) {
+fun FoodItemCard(foodItem: FoodItem, onClick: () -> Unit) {
   val expiryDate = foodItem.expiryDate
   val currentDate = Timestamp.now()
 
@@ -93,6 +94,7 @@ fun FoodItemCard(foodItem: FoodItem) {
           Modifier.fillMaxWidth()
               .padding(horizontal = 16.dp, vertical = 8.dp)
               .background(Color.White)
+              .clickable {onClick()}
               .testTag("foodItemCard")) {
         Row(modifier = Modifier.padding(16.dp)) {
           Column(modifier = Modifier.weight(1f)) {
