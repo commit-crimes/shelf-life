@@ -1,15 +1,22 @@
 package com.android.shelfLife.ui.recipes
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -37,6 +44,11 @@ import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
+import com.example.compose.errorContainerDark
+import com.example.compose.onPrimaryContainerDark
+import com.example.compose.onSecondaryContainerDark
+import com.example.compose.onSecondaryDark
+import com.example.compose.primaryContainerLight
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,6 +62,8 @@ fun AddRecipeScreen(
   var title by remember { mutableStateOf("") }
   var servings by remember { mutableStateOf("0.0") }
   var time by remember { mutableStateOf("0.0") }
+    var ingredients by remember{ mutableStateOf("") }
+    var instructions by remember{mutableStateOf("")}
 
   Scaffold(
       modifier = Modifier.testTag("addRecipeScreen"),
@@ -125,7 +139,49 @@ fun AddRecipeScreen(
                   .testTag("inputRecipeTime")
           )
 
+          OutlinedTextField(
+              value = ingredients,
+              onValueChange = { ingredients = it },
+              label = { Text("Ingredients") },
+              modifier =
+              Modifier.fillMaxWidth()
+                  .padding(horizontal = 20.dp)
+                  .padding(vertical = 20.dp)
+                  .testTag("inputRecipeIngredients")
+          )
 
+          OutlinedTextField(
+              value = instructions,
+              onValueChange = { instructions = it },
+              label = { Text("Instructions") },
+              modifier =
+              Modifier.fillMaxWidth()
+                  .padding(horizontal = 20.dp)
+                  .padding(vertical = 20.dp)
+                  .testTag("inputRecipeInstructions")
+          )
+
+          Row (modifier = Modifier.padding(horizontal = 24.dp).fillMaxWidth(),
+          horizontalArrangement =  Arrangement.Center)
+          {
+              Button(
+                  onClick = {},
+                  modifier = Modifier.height(40.dp),
+                  colors = ButtonDefaults.buttonColors(containerColor = errorContainerDark))
+                    {
+                      Text(text = "Cancel", fontSize = 18.sp)
+                    }
+
+              Spacer(Modifier.padding(horizontal = 24.dp))
+
+              Button(
+                  onClick = {},
+                  modifier = Modifier.height(40.dp),
+                  colors = ButtonDefaults.buttonColors(containerColor = primaryContainerLight))
+              {
+                  Text(text = "Add", fontSize = 18.sp, color = onSecondaryDark)
+              }
+          }
       }
   }
 }
