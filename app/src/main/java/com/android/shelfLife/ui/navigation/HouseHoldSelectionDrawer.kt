@@ -75,11 +75,11 @@ fun HouseHoldSelectionDrawer(
                     }
                     scope.launch { drawerState.close() }
                   },
+                  modifier = Modifier.testTag("householdElement_$index"),
                   onHouseholdEditSelected = { household ->
                     householdViewModel.selectHouseholdToEdit(household)
                     navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
                   },
-                  modifier = Modifier.testTag("householdElement_$index")
               )
             }
           }

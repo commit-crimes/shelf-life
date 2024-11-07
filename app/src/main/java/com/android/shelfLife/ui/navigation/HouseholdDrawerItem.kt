@@ -30,7 +30,8 @@ fun HouseholdDrawerItem(
     selectedHousehold: HouseHold,
     editMode: Boolean,
     onHouseholdSelected: (HouseHold) -> Unit,
-    onHouseholdEditSelected: (HouseHold) -> Unit
+    onHouseholdEditSelected: (HouseHold) -> Unit,
+    modifier: Modifier = Modifier
 ) {
   NavigationDrawerItem(
       colors =
@@ -66,6 +67,5 @@ fun HouseholdDrawerItem(
           onHouseholdSelected(household)
         }
       },
-      modifier =
-          Modifier.padding(NavigationDrawerItemDefaults.ItemPadding).testTag("householdElement"))
+      modifier = modifier.padding(NavigationDrawerItemDefaults.ItemPadding))
 }
