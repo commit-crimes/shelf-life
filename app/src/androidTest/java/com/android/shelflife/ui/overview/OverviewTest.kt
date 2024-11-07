@@ -99,6 +99,18 @@ class OverviewTest {
     composeTestRule.onNodeWithTag("householdNameSaveButton").assertIsDisplayed()
   }
 
+  @Test
+  fun firstTimeWelcomeScreenClickingAddHouseholdNavigatesToHouseholdCreationScreen() {
+    // Mock empty households to trigger the first-time screen
+    mockHouseHoldRepositoryGetHouseholds(emptyList())
+
+    composeTestRule.setContent {
+      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+    }
+    composeTestRule.onNodeWithTag("householdNameSaveButton").performClick()
+    verify(navigationActions).navigateTo(Screen.HOUSEHOLD_CREATION)
+  }
+
   // Test if the OverviewScreen is displayed with all elements
   @Test
   fun overviewScreenDisplayedCorrectly() {
