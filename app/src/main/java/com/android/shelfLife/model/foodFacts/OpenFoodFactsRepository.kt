@@ -1,6 +1,5 @@
 package com.android.shelfLife.model.foodFacts
 
-import android.util.Log
 import java.io.IOException
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -26,9 +25,12 @@ class OpenFoodFactsRepository(
   ) {
     val url =
         when (searchInput) {
-          is FoodSearchInput.Barcode -> buildUrl(baseUrl, "api/v0/product/${searchInput.barcode}.json")
+          is FoodSearchInput.Barcode ->
+              buildUrl(baseUrl, "api/v0/product/${searchInput.barcode}.json")
           is FoodSearchInput.Query ->
-              buildUrl(baseUrl, "cgi/search.pl?search_terms=${searchInput.searchQuery}&page_size=$MAX_RESULTS&json=true")
+              buildUrl(
+                  baseUrl,
+                  "cgi/search.pl?search_terms=${searchInput.searchQuery}&page_size=$MAX_RESULTS&json=true")
         }
 
     val request = Request.Builder().url(url).build()
