@@ -40,7 +40,11 @@ class FoodItemTest {
     val today = Timestamp.now()
 
     val foodItem =
-      FoodItem(uid = "1", foodFacts = mockFoodFacts, expiryDate = getFutureTimestamp(days = 3), openDate = today)
+        FoodItem(
+            uid = "1",
+            foodFacts = mockFoodFacts,
+            expiryDate = getFutureTimestamp(days = 3),
+            openDate = today)
 
     assertEquals(today, foodItem.openDate)
   }
@@ -56,7 +60,7 @@ class FoodItemTest {
   @Test
   fun `test getRemainingDays for past expiry date`() {
     val foodItem =
-      FoodItem(uid = "1", foodFacts = mockFoodFacts, expiryDate = getPastTimestamp(days = 3))
+        FoodItem(uid = "1", foodFacts = mockFoodFacts, expiryDate = getPastTimestamp(days = 3))
 
     assertEquals(-3, foodItem.getRemainingDays())
   }

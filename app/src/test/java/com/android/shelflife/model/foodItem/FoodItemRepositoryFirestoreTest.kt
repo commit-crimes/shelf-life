@@ -11,7 +11,6 @@ import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.FoodStatus
 import com.android.shelfLife.model.foodItem.FoodStorageLocation
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
@@ -649,5 +648,4 @@ class FoodItemRepositoryFirestoreTest {
     Assert.assertEquals("Apple", map["name"])
     Assert.assertEquals("", map["barcode"]) // Default barcode should be empty
   }
-
 }

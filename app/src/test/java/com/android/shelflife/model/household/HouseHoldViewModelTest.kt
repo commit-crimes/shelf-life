@@ -1,4 +1,5 @@
 // Import statements
+
 import androidx.test.platform.app.InstrumentationRegistry
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.*
@@ -253,7 +254,6 @@ class HouseholdViewModelTest {
     assertTrue(householdViewModel.households.value.isEmpty())
     // Verify that the error was logged
     val logEntries = ShadowLog.getLogs()
-    println(logEntries)
     assertTrue(
         logEntries.any {
           it.tag == "HouseholdViewModel" && it.msg == "Error adding household: $exception"
@@ -276,7 +276,6 @@ class HouseholdViewModelTest {
 
     // Verify that the error was logged
     val logEntries = ShadowLog.getLogs()
-    println(logEntries)
     assertTrue(
         logEntries.any {
           it.tag == "HouseholdViewModel" && it.msg == "Error updating household: $exception"
@@ -299,7 +298,6 @@ class HouseholdViewModelTest {
 
     // Verify that the error was logged
     val logEntries = ShadowLog.getLogs()
-    println(logEntries)
     assertTrue(
         logEntries.any {
           it.tag == "HouseholdViewModel" && it.msg == "Error deleting household: $exception"
@@ -333,7 +331,6 @@ class HouseholdViewModelTest {
 
     // Assert
     val logEntries = ShadowLog.getLogs()
-    println(logEntries)
     assertTrue(
         logEntries.any {
           it.tag == "HouseholdViewModel" && it.msg == "Error loading households: $exception"
@@ -375,5 +372,12 @@ class HouseholdViewModelTest {
     val result = householdViewModel.checkIfHouseholdNameExists(householdName)
     // Assert
     assertFalse(result)
+  }
+
+  @Test
+  fun factory_shouldCreateHouseholdViewModel() {
+    val modelClass = HouseholdViewModel::class.java
+    val viewModel = HouseholdViewModel.Factory.create(modelClass)
+    assertTrue(viewModel is HouseholdViewModel)
   }
 }
