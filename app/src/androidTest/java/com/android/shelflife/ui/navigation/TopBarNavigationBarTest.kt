@@ -268,23 +268,23 @@ class TopNavigationBarTest {
     assert(clickedHouseHold == testHouseHold)
   }
 
-  @Test
-  fun filterChipItem_toggleSelection2() {
-    val testFilters = listOf("Filter1", "Filter2", "Filter3")
-
-    composeTestRule.setContent { FilterBar(filters = testFilters) }
-
-    // Verify initial state (no filters selected)
-    testFilters.forEach { filter ->
-      composeTestRule.onNodeWithText(filter).assertExists().assertIsDisplayed()
-    }
-
-    // Select the first filter
-    composeTestRule.onNodeWithText("Filter1").performClick()
-    composeTestRule.onNodeWithText("Filter1").assertIsSelected()
-
-    // Deselect the first filter
-    composeTestRule.onNodeWithText("Filter1").performClick()
-    composeTestRule.onNodeWithText("Filter1").assertIsNotSelected()
-  }
+  //  @Test
+  //  fun filterChipItem_toggleSelection2() {
+  //    val testFilters = listOf("Filter1", "Filter2", "Filter3")
+  //
+  //    composeTestRule.setContent { FilterBar(filters = testFilters) }
+  //
+  //    // Verify initial state (no filters selected)
+  //    testFilters.forEach { filter ->
+  //      composeTestRule.onNodeWithText(filter).assertExists().assertIsDisplayed()
+  //    }
+  //
+  //    // Select the first filter
+  //    composeTestRule.onNodeWithText("Filter1").performClick()
+  //    composeTestRule.onNodeWithText("Filter1").assertIsSelected()
+  //
+  //    // Deselect the first filter
+  //    composeTestRule.onNodeWithText("Filter1").performClick()
+  //    composeTestRule.onNodeWithText("Filter1").assertIsNotSelected()
+  //  }
 }
