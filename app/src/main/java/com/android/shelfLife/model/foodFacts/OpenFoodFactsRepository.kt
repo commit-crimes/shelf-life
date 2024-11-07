@@ -51,8 +51,7 @@ class OpenFoodFactsRepository(
 
                 val body = response.body?.string() ?: ""
                 val foodFactsList = parseFoodFactsResponse(body, searchInput)
-                Log.d("OpenFoodFactsRepository", "Food Facts: $foodFactsList")
-
+                println("Response: $body") // Logging the response
                 onSuccess(foodFactsList)
               }
             })
