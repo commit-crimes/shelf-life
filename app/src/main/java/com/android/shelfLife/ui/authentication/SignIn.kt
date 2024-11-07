@@ -89,7 +89,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
 
   Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
     Column(
-        modifier = Modifier.fillMaxSize().padding(padding).padding(20.dp),
+        modifier = Modifier.fillMaxSize().padding(padding).padding(20.dp).testTag("signInScreen"),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center) {
           Image(
