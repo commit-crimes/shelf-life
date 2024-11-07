@@ -175,7 +175,8 @@ fun FilterChipItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
 fun HouseHoldElement(
     household: HouseHold,
     selectedHousehold: HouseHold,
-    onHouseholdSelected: (HouseHold) -> Unit
+    onHouseholdSelected: (HouseHold) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
   NavigationDrawerItem(
       colors =
@@ -193,5 +194,5 @@ fun HouseHoldElement(
       },
       selected = household == selectedHousehold,
       onClick = { onHouseholdSelected(household) },
-      modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding))
+      modifier = modifier.padding(NavigationDrawerItemDefaults.ItemPadding))
 }

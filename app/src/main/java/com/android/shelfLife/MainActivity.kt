@@ -27,6 +27,7 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.overview.AddFoodItemScreen
+import com.android.shelfLife.ui.overview.HouseHoldCreationScreen
 import com.android.shelfLife.ui.overview.IndividualFoodItemScreen
 import com.android.shelfLife.ui.overview.OverviewScreen
 import com.android.shelfLife.ui.profile.ProfileScreen
@@ -85,6 +86,9 @@ fun ShelfLifeApp() {
       composable(Screen.OVERVIEW) { OverviewScreen(navigationActions, householdViewModel) }
       composable(Screen.ADD_FOOD) {
         AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
+      }
+      composable(Screen.HOUSEHOLD_CREATION) {
+        HouseHoldCreationScreen(navigationActions, householdViewModel = householdViewModel)
       }
       composable("${Screen.INDIVIDUAL_FOOD_ITEM}/{foodItemId}") { backStackEntry ->
         val foodItemId = backStackEntry.arguments?.getString("foodItemId")

@@ -15,6 +15,10 @@ class OpenFoodFactsRepository(
 
   private val MAX_RESULTS = 7 // Adjust the number of results as needed
 
+  private fun buildUrl(vararg paths: String): String {
+    return paths.joinToString("/") { it.trim('/') }
+  }
+
   override fun searchFoodFacts(
       searchInput: FoodSearchInput,
       onSuccess: (List<FoodFacts>) -> Unit,
@@ -22,9 +26,12 @@ class OpenFoodFactsRepository(
   ) {
     val url =
         when (searchInput) {
-          is FoodSearchInput.Barcode -> "$baseUrl/api/v0/product/${searchInput.barcode}.json"
+          is FoodSearchInput.Barcode ->
+              buildUrl(baseUrl, "api/v0/product/${searchInput.barcode}.json")
           is FoodSearchInput.Query ->
-              "$baseUrl/cgi/search.pl?search_terms=${searchInput.searchQuery}&page_size=$MAX_RESULTS&json=true"
+              buildUrl(
+                  baseUrl,
+                  "cgi/search.pl?search_terms=${searchInput.searchQuery}&page_size=$MAX_RESULTS&json=true")
         }
 
     val request = Request.Builder().url(url).build()
@@ -46,8 +53,8 @@ class OpenFoodFactsRepository(
 
                 val body = response.body?.string() ?: ""
                 val foodFactsList = parseFoodFactsResponse(body, searchInput)
+                println("Response: $body") // Logging the response
                 Log.d("OpenFoodFactsRepository", "Food Facts: $foodFactsList")
-
                 onSuccess(foodFactsList)
               }
             })
@@ -100,6 +107,7 @@ class OpenFoodFactsRepository(
   fun extractFoodFactsFromJson(productObject: JSONObject): FoodFacts {
     val name = productObject.optString("product_name", "Unknown Product")
     val barcode = productObject.optString("code", "")
+    val imageUrl = productObject.optString("image_url", FoodFacts.DEFAULT_IMAGE_URL)
     val quantity = Quantity(amount = 1.0) // Assuming default quantity, adjust as needed
 
     // Map nutrition facts
@@ -124,6 +132,7 @@ class OpenFoodFactsRepository(
         barcode = barcode,
         quantity = quantity,
         category = foodCategory,
-        nutritionFacts = nutritionFacts)
+        nutritionFacts = nutritionFacts,
+        imageUrl = imageUrl)
   }
 }
