@@ -22,6 +22,9 @@ class HouseholdViewModel(
   private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
   val selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
 
+  private val _householdToEdit = MutableStateFlow<HouseHold?>(null)
+  val householdToEdit: StateFlow<HouseHold?> = _householdToEdit.asStateFlow()
+
   var finishedLoading = MutableStateFlow(false)
 
   /** Initializes the HouseholdViewModel by loading the list of households from the repository. */
@@ -61,6 +64,14 @@ class HouseholdViewModel(
     household?.let { listFoodItemsViewModel.setFoodItems(it.foodItems) }
   }
 
+  fun selectHouseholdToEdit(household: HouseHold?) {
+    _householdToEdit.value = household
+  }
+
+  fun checkIfHouseholdNameExists(houseHoldName: String): Boolean {
+    return _households.value.any { it.name == houseHoldName }
+  }
+
   /**
    * Adds a new household to the repository and updates the household list.
    *
@@ -70,11 +81,7 @@ class HouseholdViewModel(
     val household = HouseHold(repository.getNewUid(), householdName, emptyList(), emptyList())
     repository.addHousehold(
         household,
-        onSuccess = {
-          // Refresh the household list after successful addition
-          loadHouseholds()
-          Log.d("HouseholdViewModel", "Household added successfully")
-        },
+        onSuccess = { Log.d("HouseholdViewModel", "Household added successfully") },
         onFailure = { exception ->
           Log.e("HouseholdViewModel", "Error adding household: $exception")
         })
@@ -89,14 +96,11 @@ class HouseholdViewModel(
   fun updateHousehold(household: HouseHold) {
     repository.updateHousehold(
         household,
-        onSuccess = {
-          // Refresh the household list after successful update
-          loadHouseholds()
-          Log.d("HouseholdViewModel", "Household updated successfully")
-        },
+        onSuccess = { Log.d("HouseholdViewModel", "Household updated successfully") },
         onFailure = { exception ->
           Log.e("HouseholdViewModel", "Error updating household: $exception")
         })
+    loadHouseholds()
   }
 
   /**
@@ -107,14 +111,11 @@ class HouseholdViewModel(
   fun deleteHouseholdById(householdId: String) {
     repository.deleteHouseholdById(
         householdId,
-        onSuccess = {
-          // Refresh the household list after successful deletion
-          loadHouseholds()
-          Log.d("HouseholdViewModel", "Household deleted successfully")
-        },
+        onSuccess = { Log.d("HouseholdViewModel", "Household deleted successfully") },
         onFailure = { exception ->
           Log.e("HouseholdViewModel", "Error deleting household: $exception")
         })
+    loadHouseholds()
   }
 
   /**
