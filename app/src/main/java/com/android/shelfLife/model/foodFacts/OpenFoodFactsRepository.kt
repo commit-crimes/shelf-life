@@ -47,7 +47,6 @@ class OpenFoodFactsRepository(
                 val body = response.body?.string() ?: ""
                 val foodFactsList = parseFoodFactsResponse(body, searchInput)
                 Log.d("OpenFoodFactsRepository", "Food Facts: $foodFactsList")
-
                 onSuccess(foodFactsList)
               }
             })
@@ -100,6 +99,7 @@ class OpenFoodFactsRepository(
   fun extractFoodFactsFromJson(productObject: JSONObject): FoodFacts {
     val name = productObject.optString("product_name", "Unknown Product")
     val barcode = productObject.optString("code", "")
+    val imageUrl = productObject.optString("image_url", "https://media.istockphoto.com/id/1354776457/vector/default-image-icon-vector-missing-picture-page-for-website-design-or-mobile-app-no-photo.jpg?s=612x612&w=0&k=20&c=w3OW0wX3LyiFRuDHo9A32Q0IUMtD4yjXEvQlqyYk9O4=")
     val quantity = Quantity(amount = 1.0) // Assuming default quantity, adjust as needed
 
     // Map nutrition facts
@@ -124,6 +124,7 @@ class OpenFoodFactsRepository(
         barcode = barcode,
         quantity = quantity,
         category = foodCategory,
-        nutritionFacts = nutritionFacts)
+        nutritionFacts = nutritionFacts,
+        imageUrl = imageUrl)
   }
 }
