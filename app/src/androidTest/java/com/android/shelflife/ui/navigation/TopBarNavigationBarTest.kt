@@ -82,7 +82,12 @@ class TopNavigationBarTest {
   fun topNavigationBar_hamburgerIconDisplayed() {
     // Act
     composeTestRule.setContent {
-      TopNavigationBar(houseHold = testHouseHold, onHamburgerClick = {}, filters = listOf())
+      TopNavigationBar(
+          houseHold = testHouseHold,
+          onHamburgerClick = {},
+          filters = listOf(),
+          selectedFilters = listOf(),
+          onFilterChange = { _, _ -> })
     }
 
     // Assert
@@ -97,7 +102,12 @@ class TopNavigationBarTest {
   fun topNavigationBar_titleDisplayed() {
     // Act
     composeTestRule.setContent {
-      TopNavigationBar(houseHold = testHouseHold, onHamburgerClick = {}, filters = listOf())
+      TopNavigationBar(
+          houseHold = testHouseHold,
+          onHamburgerClick = {},
+          filters = listOf(),
+          selectedFilters = listOf(),
+          onFilterChange = { _, _ -> })
     }
 
     // Assert
@@ -111,7 +121,12 @@ class TopNavigationBarTest {
 
     // Act
     composeTestRule.setContent {
-      TopNavigationBar(houseHold = testHouseHold, onHamburgerClick = {}, filters = filters)
+      TopNavigationBar(
+          houseHold = testHouseHold,
+          onHamburgerClick = {},
+          filters = filters,
+          selectedFilters = listOf(),
+          onFilterChange = { _, _ -> })
     }
 
     // Assert
@@ -122,7 +137,12 @@ class TopNavigationBarTest {
   fun topNavigationBar_filterIconNotDisplayed_whenNoFilters() {
     // Act
     composeTestRule.setContent {
-      TopNavigationBar(houseHold = testHouseHold, onHamburgerClick = {}, filters = listOf())
+      TopNavigationBar(
+          houseHold = testHouseHold,
+          onHamburgerClick = {},
+          filters = listOf(),
+          selectedFilters = listOf(),
+          onFilterChange = { _, _ -> })
     }
 
     // Assert
@@ -137,7 +157,12 @@ class TopNavigationBarTest {
 
     // Act
     composeTestRule.setContent {
-      TopNavigationBar(houseHold = testHouseHold, onHamburgerClick = {}, filters = filters)
+      TopNavigationBar(
+          houseHold = testHouseHold,
+          onHamburgerClick = {},
+          filters = filters,
+          selectedFilters = listOf(),
+          onFilterChange = { _, _ -> })
     }
 
     // Click the filter icon to toggle the filter bar visibility
@@ -155,7 +180,12 @@ class TopNavigationBarTest {
 
     // Act
     composeTestRule.setContent {
-      TopNavigationBar(houseHold = testHouseHold, onHamburgerClick = {}, filters = filters)
+      TopNavigationBar(
+          houseHold = testHouseHold,
+          onHamburgerClick = {},
+          filters = filters,
+          selectedFilters = listOf(),
+          onFilterChange = { _, _ -> })
     }
 
     // Click the filter icon to toggle the filter bar visibility
