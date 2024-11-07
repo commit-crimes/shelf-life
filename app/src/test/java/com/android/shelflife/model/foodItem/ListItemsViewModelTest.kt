@@ -1,5 +1,7 @@
 package com.android.shelflife.model.foodItem
 
+import android.util.Log
+import androidx.lifecycle.ViewModel
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepository
@@ -7,6 +9,7 @@ import com.android.shelfLife.model.foodItem.FoodStatus
 import com.android.shelfLife.model.foodItem.FoodStorageLocation
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.google.firebase.Timestamp
+import junit.framework.TestCase
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestScope
@@ -15,20 +18,12 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.*
-import android.util.Log
-import androidx.lifecycle.ViewModel
-import junit.framework.TestCase
-import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mockito
+import org.mockito.kotlin.*
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.shadows.ShadowLog
 
 // Stub Log.e and other Log methods to do nothing
-
-
 
 @RunWith(RobolectricTestRunner::class)
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -74,7 +69,6 @@ class ListFoodItemsViewModelTest {
     // Initialize the ViewModel
     viewModel = ListFoodItemsViewModel(mockRepository)
     ShadowLog.clear()
-
   }
 
   @Test
@@ -222,13 +216,13 @@ class ListFoodItemsViewModelTest {
 
     // Assert that a log entry with Log.e was created
     val logEntries = ShadowLog.getLogs()
-    assertTrue(logEntries.any {
-      it.tag == "ListFoodItemsViewModel" &&
+    assertTrue(
+        logEntries.any {
+          it.tag == "ListFoodItemsViewModel" &&
               it.type == Log.ERROR &&
               it.msg.contains("Error fetching FoodItems: $exception")
-    })
+        })
   }
-
 
   @Test
   fun `Factory creates ListFoodItemsViewModel instance`() {
@@ -236,7 +230,8 @@ class ListFoodItemsViewModelTest {
     val viewModel = factory.create(ListFoodItemsViewModel::class.java)
 
     assertTrue(
-      "Factory should create an instance of FoodFactsViewModel", viewModel is ListFoodItemsViewModel)
+        "Factory should create an instance of FoodFactsViewModel",
+        viewModel is ListFoodItemsViewModel)
   }
 
   @Test

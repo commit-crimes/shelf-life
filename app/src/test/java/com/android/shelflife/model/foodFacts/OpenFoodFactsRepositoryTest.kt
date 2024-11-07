@@ -16,7 +16,10 @@ import org.json.JSONObject
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class OpenFoodFactsRepositoryTest {
 
   private lateinit var mockWebServer: MockWebServer

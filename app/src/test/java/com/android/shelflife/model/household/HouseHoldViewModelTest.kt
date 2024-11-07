@@ -3,8 +3,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.*
 import com.android.shelfLife.model.household.*
-import com.android.shelfLife.model.recipe.OpenAiRecipesRepository
-import com.android.shelfLife.model.recipe.Recipe
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
 import junit.framework.TestCase.assertEquals
@@ -14,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
 import org.junit.After
-import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,7 +45,7 @@ class HouseholdViewModelTest {
 
     householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
 
-    ShadowLog.clear() //to check Error Logs
+    ShadowLog.clear() // to check Error Logs
   }
 
   @After
@@ -249,7 +246,6 @@ class HouseholdViewModelTest {
       null
     }
 
-
     // Act
     householdViewModel.addNewHousehold(householdName)
 
@@ -258,9 +254,11 @@ class HouseholdViewModelTest {
     // Verify that the error was logged
     val logEntries = ShadowLog.getLogs()
     println(logEntries)
-    assertTrue(logEntries.any { it.tag == "HouseholdViewModel" && it.msg == "Error adding household: $exception" })
+    assertTrue(
+        logEntries.any {
+          it.tag == "HouseholdViewModel" && it.msg == "Error adding household: $exception"
+        })
   }
-
 
   @Test
   fun updateHousehold_shouldLogErrorWhenFails() = runTest {
@@ -279,9 +277,11 @@ class HouseholdViewModelTest {
     // Verify that the error was logged
     val logEntries = ShadowLog.getLogs()
     println(logEntries)
-    assertTrue(logEntries.any { it.tag == "HouseholdViewModel" && it.msg == "Error updating household: $exception" })
+    assertTrue(
+        logEntries.any {
+          it.tag == "HouseholdViewModel" && it.msg == "Error updating household: $exception"
+        })
   }
-
 
   @Test
   fun deleteHousehold_shouldLogErrorWhenFails() = runTest {
@@ -300,9 +300,11 @@ class HouseholdViewModelTest {
     // Verify that the error was logged
     val logEntries = ShadowLog.getLogs()
     println(logEntries)
-    assertTrue(logEntries.any { it.tag == "HouseholdViewModel" && it.msg == "Error deleting household: $exception" })
+    assertTrue(
+        logEntries.any {
+          it.tag == "HouseholdViewModel" && it.msg == "Error deleting household: $exception"
+        })
   }
-
 
   /**
    * Uses "hacky" reflection to test private method (Prof. Candea's suggestion:
@@ -321,12 +323,10 @@ class HouseholdViewModelTest {
       null
     }
     val method =
-      HouseholdViewModel::class.java.declaredMethods.firstOrNull {
-        it.name == "loadHouseholds"
-      } ?: throw NoSuchMethodException("Method loadHouseholds not found")
+        HouseholdViewModel::class.java.declaredMethods.firstOrNull { it.name == "loadHouseholds" }
+            ?: throw NoSuchMethodException("Method loadHouseholds not found")
 
     method.isAccessible = true
-
 
     method.invoke(householdViewModel)
     // Act
@@ -335,11 +335,9 @@ class HouseholdViewModelTest {
     val logEntries = ShadowLog.getLogs()
     println(logEntries)
     assertTrue(
-      logEntries.any {
-        it.tag == "HouseholdViewModel" &&
-                it.msg == "Error loading households: $exception"
-      }
-    )
+        logEntries.any {
+          it.tag == "HouseholdViewModel" && it.msg == "Error loading households: $exception"
+        })
   }
 
   @Test
