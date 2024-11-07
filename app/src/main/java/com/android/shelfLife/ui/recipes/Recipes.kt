@@ -80,7 +80,10 @@ fun RecipesScreen(
   val filters = listOf("Soon to expire", "Only household items", "High protein", "Low calories")
 
   HouseHoldSelectionDrawer(
-      scope = scope, drawerState = drawerState, householdViewModel = householdViewModel) {
+      scope = scope,
+      drawerState = drawerState,
+      householdViewModel = householdViewModel,
+      navigationActions = navigationActions) {
         // Filter the recipes based on the search query
         val filteredRecipes =
             if (query.isEmpty()) {
@@ -92,7 +95,7 @@ fun RecipesScreen(
             }
 
         if (selectedHousehold == null) {
-          FirstTimeWelcomeScreen(householdViewModel)
+          FirstTimeWelcomeScreen(navigationActions, householdViewModel)
         } else {
           Scaffold(
               modifier = Modifier.testTag("recipesScreen"),

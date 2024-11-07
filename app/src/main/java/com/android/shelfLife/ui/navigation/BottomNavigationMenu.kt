@@ -9,7 +9,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.tooling.preview.Preview
 
 /**
  * Composable function for the bottom navigation menu.
@@ -51,18 +50,4 @@ fun BottomNavigationMenu(
                   ))
     }
   }
-}
-
-@Preview
-@Composable
-fun BottomNavigationMenuPreview() {
-  BottomNavigationMenu(
-      onTabSelect = {},
-      tabList =
-          listOf(
-              TopLevelDestinations.OVERVIEW,
-              TopLevelDestinations.SCANNER,
-              TopLevelDestinations.RECIPES,
-              TopLevelDestinations.PROFILE),
-      selectedItem = TopLevelDestinations.OVERVIEW.route)
 }

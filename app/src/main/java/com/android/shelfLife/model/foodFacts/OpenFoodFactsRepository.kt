@@ -1,5 +1,6 @@
 package com.android.shelfLife.model.foodFacts
 
+import android.util.Log
 import java.io.IOException
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -53,6 +54,7 @@ class OpenFoodFactsRepository(
                 val body = response.body?.string() ?: ""
                 val foodFactsList = parseFoodFactsResponse(body, searchInput)
                 println("Response: $body") // Logging the response
+                Log.d("OpenFoodFactsRepository", "Food Facts: $foodFactsList")
                 onSuccess(foodFactsList)
               }
             })
@@ -105,6 +107,7 @@ class OpenFoodFactsRepository(
   fun extractFoodFactsFromJson(productObject: JSONObject): FoodFacts {
     val name = productObject.optString("product_name", "Unknown Product")
     val barcode = productObject.optString("code", "")
+    val imageUrl = productObject.optString("image_url", FoodFacts.DEFAULT_IMAGE_URL)
     val quantity = Quantity(amount = 1.0) // Assuming default quantity, adjust as needed
 
     // Map nutrition facts
@@ -129,6 +132,7 @@ class OpenFoodFactsRepository(
         barcode = barcode,
         quantity = quantity,
         category = foodCategory,
-        nutritionFacts = nutritionFacts)
+        nutritionFacts = nutritionFacts,
+        imageUrl = imageUrl)
   }
 }
