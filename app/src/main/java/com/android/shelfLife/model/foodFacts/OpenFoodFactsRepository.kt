@@ -34,7 +34,6 @@ class OpenFoodFactsRepository(
         }
 
     val request = Request.Builder().url(url).build()
-    println("Requesting URL: $url") // Logging the URL
 
     client
         .newCall(request)
