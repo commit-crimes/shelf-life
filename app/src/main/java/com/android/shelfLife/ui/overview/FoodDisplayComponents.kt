@@ -67,7 +67,7 @@ fun ListFoodItems(foodItems: List<FoodItem>, onFoodItemClick: (FoodItem) -> Unit
     LazyColumn(modifier = Modifier.fillMaxSize().testTag("foodItemList")) {
       items(foodItems) { item ->
         // Call a composable that renders each individual to-do item
-        FoodItemCard(foodItem = item, onClick = {onFoodItemClick(item)})
+        FoodItemCard(foodItem = item, onClick = { onFoodItemClick(item) })
       }
     }
   }
@@ -94,7 +94,7 @@ fun FoodItemCard(foodItem: FoodItem, onClick: () -> Unit) {
           Modifier.fillMaxWidth()
               .padding(horizontal = 16.dp, vertical = 8.dp)
               .background(Color.White)
-              .clickable {onClick()}
+              .clickable { onClick() }
               .testTag("foodItemCard")) {
         Row(modifier = Modifier.padding(16.dp)) {
           Column(modifier = Modifier.weight(1f)) {
