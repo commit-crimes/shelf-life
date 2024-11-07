@@ -3,6 +3,8 @@ package com.android.shelfLife.model.foodItem
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.android.shelfLife.model.foodFacts.FoodFactsRepository
+import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -77,12 +79,15 @@ class ListFoodItemsViewModel(private val repository: FoodItemRepository) : ViewM
 
   // create factory
   companion object {
-    val Factory: ViewModelProvider.Factory =
-        object : ViewModelProvider.Factory {
-          @Suppress("UNCHECKED_CAST")
-          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ListFoodItemsViewModel(FoodItemRepositoryFirestore(Firebase.firestore)) as T
+    fun Factory(repository: FoodItemRepository): ViewModelProvider.Factory =
+      object : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+          if (modelClass.isAssignableFrom(ListFoodItemsViewModel::class.java)) {
+            return ListFoodItemsViewModel(repository) as T
           }
+          throw IllegalArgumentException("Unknown ViewModel class")
         }
+      }
   }
 }
