@@ -27,10 +27,19 @@ class TopNavigationBarTest {
   private lateinit var testHouseHold: HouseHold
   private lateinit var testFoodFacts: FoodFacts
   private lateinit var testNutritionFacts: NutritionFacts
+  private lateinit var selectedHouseHold: HouseHold
 
   @Before
   fun setUp() {
     // Set up a valid instance of NutritionFacts
+
+    testHouseHold =
+        HouseHold(
+            uid = "householdId123",
+            name = "Test Household",
+            members = listOf("member1", "member2"),
+            foodItems = emptyList())
+    selectedHouseHold = testHouseHold
     testNutritionFacts =
         NutritionFacts(
             energyKcal = 52,
@@ -73,7 +82,12 @@ class TopNavigationBarTest {
   fun topNavigationBar_hamburgerIconDisplayed() {
     // Act
     composeTestRule.setContent {
-      TopNavigationBar(houseHold = testHouseHold, onHamburgerClick = {}, filters = listOf())
+      TopNavigationBar(
+          houseHold = testHouseHold,
+          onHamburgerClick = {},
+          filters = listOf(),
+          selectedFilters = listOf(),
+          onFilterChange = { _, _ -> })
     }
 
     // Assert
@@ -88,7 +102,12 @@ class TopNavigationBarTest {
   fun topNavigationBar_titleDisplayed() {
     // Act
     composeTestRule.setContent {
-      TopNavigationBar(houseHold = testHouseHold, onHamburgerClick = {}, filters = listOf())
+      TopNavigationBar(
+          houseHold = testHouseHold,
+          onHamburgerClick = {},
+          filters = listOf(),
+          selectedFilters = listOf(),
+          onFilterChange = { _, _ -> })
     }
 
     // Assert
@@ -102,7 +121,12 @@ class TopNavigationBarTest {
 
     // Act
     composeTestRule.setContent {
-      TopNavigationBar(houseHold = testHouseHold, onHamburgerClick = {}, filters = filters)
+      TopNavigationBar(
+          houseHold = testHouseHold,
+          onHamburgerClick = {},
+          filters = filters,
+          selectedFilters = listOf(),
+          onFilterChange = { _, _ -> })
     }
 
     // Assert
@@ -113,7 +137,12 @@ class TopNavigationBarTest {
   fun topNavigationBar_filterIconNotDisplayed_whenNoFilters() {
     // Act
     composeTestRule.setContent {
-      TopNavigationBar(houseHold = testHouseHold, onHamburgerClick = {}, filters = listOf())
+      TopNavigationBar(
+          houseHold = testHouseHold,
+          onHamburgerClick = {},
+          filters = listOf(),
+          selectedFilters = listOf(),
+          onFilterChange = { _, _ -> })
     }
 
     // Assert
@@ -128,7 +157,12 @@ class TopNavigationBarTest {
 
     // Act
     composeTestRule.setContent {
-      TopNavigationBar(houseHold = testHouseHold, onHamburgerClick = {}, filters = filters)
+      TopNavigationBar(
+          houseHold = testHouseHold,
+          onHamburgerClick = {},
+          filters = filters,
+          selectedFilters = listOf(),
+          onFilterChange = { _, _ -> })
     }
 
     // Click the filter icon to toggle the filter bar visibility
@@ -146,7 +180,12 @@ class TopNavigationBarTest {
 
     // Act
     composeTestRule.setContent {
-      TopNavigationBar(houseHold = testHouseHold, onHamburgerClick = {}, filters = filters)
+      TopNavigationBar(
+          houseHold = testHouseHold,
+          onHamburgerClick = {},
+          filters = filters,
+          selectedFilters = listOf(),
+          onFilterChange = { _, _ -> })
     }
 
     // Click the filter icon to toggle the filter bar visibility
@@ -185,4 +224,67 @@ class TopNavigationBarTest {
     // Assert that the selection icon is displayed after selection
     composeTestRule.onNodeWithContentDescription("Selected").assertExists().assertIsDisplayed()
   }
+
+  @Test
+  fun houseHoldElement_displaysCorrectly() {
+    composeTestRule.setContent {
+      HouseHoldElement(
+          household = testHouseHold,
+          selectedHousehold = selectedHouseHold,
+          onHouseholdSelected = {})
+    }
+
+    composeTestRule.onNodeWithText("Test Household").assertExists().assertIsDisplayed()
+  }
+
+  @Test
+  fun houseHoldElement_isSelected() {
+    composeTestRule.setContent {
+      HouseHoldElement(
+          household = testHouseHold,
+          selectedHousehold = selectedHouseHold,
+          onHouseholdSelected = {})
+    }
+
+    composeTestRule
+        .onNodeWithText("Test Household")
+        .assertExists()
+        .assertIsDisplayed()
+        .assert(hasText("Test Household", ignoreCase = true))
+  }
+
+  @Test
+  fun houseHoldElement_onClick() {
+    var clickedHouseHold: HouseHold? = null
+
+    composeTestRule.setContent {
+      HouseHoldElement(
+          household = testHouseHold,
+          selectedHousehold = selectedHouseHold,
+          onHouseholdSelected = { clickedHouseHold = it })
+    }
+
+    composeTestRule.onNodeWithText("Test Household").performClick()
+    assert(clickedHouseHold == testHouseHold)
+  }
+
+  //  @Test
+  //  fun filterChipItem_toggleSelection2() {
+  //    val testFilters = listOf("Filter1", "Filter2", "Filter3")
+  //
+  //    composeTestRule.setContent { FilterBar(filters = testFilters) }
+  //
+  //    // Verify initial state (no filters selected)
+  //    testFilters.forEach { filter ->
+  //      composeTestRule.onNodeWithText(filter).assertExists().assertIsDisplayed()
+  //    }
+  //
+  //    // Select the first filter
+  //    composeTestRule.onNodeWithText("Filter1").performClick()
+  //    composeTestRule.onNodeWithText("Filter1").assertIsSelected()
+  //
+  //    // Deselect the first filter
+  //    composeTestRule.onNodeWithText("Filter1").performClick()
+  //    composeTestRule.onNodeWithText("Filter1").assertIsNotSelected()
+  //  }
 }

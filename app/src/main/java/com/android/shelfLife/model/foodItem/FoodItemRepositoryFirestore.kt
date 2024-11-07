@@ -24,6 +24,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
    * @return A new unique ID.
    */
   override fun getNewUid(): String {
+    Log.d("FoodItemRepository", "getNewUid called")
     return db.collection(COLLECTION_PATH).document().id
   }
 
