@@ -1,12 +1,12 @@
-//import androidx.compose.ui.test.assertIsDisplayed
-//import androidx.compose.ui.test.junit4.createComposeRule
-//import androidx.compose.ui.test.onNodeWithTag
-//import androidx.compose.ui.test.performClick
-//import com.android.shelfLife.ui.utils.DropdownFields
-//import org.junit.Rule
-//import org.junit.Test
+// import androidx.compose.ui.test.assertIsDisplayed
+// import androidx.compose.ui.test.junit4.createComposeRule
+// import androidx.compose.ui.test.onNodeWithTag
+// import androidx.compose.ui.test.performClick
+// import com.android.shelfLife.ui.utils.DropdownFields
+// import org.junit.Rule
+// import org.junit.Test
 //
-//class DropdownFieldsTest {
+// class DropdownFieldsTest {
 //
 //  @get:Rule val composeTestRule = createComposeRule()
 //
@@ -62,4 +62,4 @@
 //
 //    assert(selectedOption == "Option 2")
 //  }
-//}
+// }
