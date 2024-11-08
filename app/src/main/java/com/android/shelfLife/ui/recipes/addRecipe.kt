@@ -54,6 +54,7 @@ import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
+import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
@@ -62,6 +63,8 @@ import com.example.compose.onPrimaryContainerDark
 import com.example.compose.onSecondaryContainerDark
 import com.example.compose.onSecondaryDark
 import com.example.compose.primaryContainerLight
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,10 +74,8 @@ fun AddRecipeScreen(
     listRecipesViewModel: ListRecipesViewModel,
     householdViewModel: HouseholdViewModel
 ) {
-    val scrollState = rememberScrollState()
-
     var title by remember { mutableStateOf("") }
-    var servings by remember { mutableStateOf("0.0") }
+    var servings by remember { mutableStateOf("0") }
     var time by remember { mutableStateOf("0.0") }
     val ingredients = remember { mutableStateListOf<Ingredient>() }
     val instructions = remember { mutableStateListOf("") }
@@ -245,7 +246,14 @@ fun AddRecipeScreen(
                     Spacer(Modifier.width(24.dp))
 
                     Button(
-                        onClick = {},
+                        onClick = {
+                            listRecipesViewModel.addRecipeToList(recipe = Recipe(name = title,
+                                instructions = instructions.toList(),
+                                servings = servings.toInt(),
+                                time = (time.toDouble()*60.0).seconds,
+                                ingredients = ingredients.toList()
+                            ))
+                            navigationActions.goBack()},
                         modifier = Modifier.height(40.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = primaryContainerLight)
                     ) {
