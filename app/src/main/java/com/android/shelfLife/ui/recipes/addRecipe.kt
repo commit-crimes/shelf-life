@@ -138,7 +138,7 @@ fun AddRecipeScreen(
                     label = { Text("Recipe title") },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 20.dp)
+                        .padding(vertical = 10.dp)
                         .testTag("inputRecipeTitle")
                 )
             }
@@ -151,7 +151,7 @@ fun AddRecipeScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 20.dp)
+                        .padding(vertical = 10.dp)
                         .testTag("inputRecipeServings")
                 )
             }
@@ -164,7 +164,7 @@ fun AddRecipeScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 20.dp)
+                        .padding(vertical = 10.dp)
                         .testTag("inputRecipeTime")
                 )
             }
