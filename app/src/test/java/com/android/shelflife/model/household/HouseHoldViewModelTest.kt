@@ -1,4 +1,5 @@
 // Import statements
+
 import androidx.test.platform.app.InstrumentationRegistry
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.*
@@ -8,6 +9,8 @@ import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
@@ -19,12 +22,13 @@ import org.mockito.*
 import org.mockito.Mockito.mockStatic
 import org.mockito.kotlin.*
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.shadows.ShadowLog
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 class HouseholdViewModelTest {
 
-  private lateinit var householdViewModel: HouseholdViewModel
+  @Mock private lateinit var householdViewModel: HouseholdViewModel
 
   @Mock private lateinit var repository: HouseHoldRepository
 
@@ -52,6 +56,10 @@ class HouseholdViewModelTest {
     // Mock FirebaseAuth.getInstance()
     firebaseAuthMock = mockStatic(FirebaseAuth::class.java)
     firebaseAuthMock.`when`<FirebaseAuth> { FirebaseAuth.getInstance() }.thenReturn(firebaseAuth)
+
+    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+
+    ShadowLog.clear() // to check Error Logs
   }
 
   @After
@@ -412,5 +420,152 @@ class HouseholdViewModelTest {
     // Verify that loadHouseholds is called
     verify(repository, atLeastOnce()).getHouseholds(any(), any())
     // Optionally, check that an error is logged with the exception
+  }
+
+  @Test
+  fun addNewHousehold_shouldLogErrorWhenAddingFails() = runTest {
+    // Arrange
+    val householdName = "New Household"
+    val exception = Exception("Test exception")
+
+    whenever(repository.getNewUid()).thenReturn("uid")
+    whenever(repository.addHousehold(any(), any(), any())).thenAnswer { invocation ->
+      val onFailure = invocation.getArgument<(Exception) -> Unit>(2)
+      onFailure(exception)
+      null
+    }
+
+    // Act
+    householdViewModel.addNewHousehold(householdName)
+
+    // Assert
+    assertTrue(householdViewModel.households.value.isEmpty())
+    // Verify that the error was logged
+    val logEntries = ShadowLog.getLogs()
+    assertTrue(
+        logEntries.any {
+          it.tag == "HouseholdViewModel" && it.msg == "Error adding household: $exception"
+        })
+  }
+
+  @Test
+  fun updateHousehold_shouldLogErrorWhenFails() = runTest {
+    // Arrange
+    val household = HouseHold("1", "New household", emptyList(), emptyList())
+    val exception = Exception("Test exception")
+
+    whenever(repository.updateHousehold(any(), any(), any())).thenAnswer { invocation ->
+      val onFailure = invocation.getArgument<(Exception) -> Unit>(2)
+      onFailure(exception)
+      null
+    }
+    // Act
+    householdViewModel.updateHousehold(household)
+
+    // Verify that the error was logged
+    val logEntries = ShadowLog.getLogs()
+    assertTrue(
+        logEntries.any {
+          it.tag == "HouseholdViewModel" && it.msg == "Error updating household: $exception"
+        })
+  }
+
+  @Test
+  fun deleteHousehold_shouldLogErrorWhenFails() = runTest {
+    // Arrange
+    val householdName = "household to delete"
+    val exception = Exception("Test exception")
+
+    whenever(repository.deleteHouseholdById(any(), any(), any())).thenAnswer { invocation ->
+      val onFailure = invocation.getArgument<(Exception) -> Unit>(2)
+      onFailure(exception)
+      null
+    }
+    // Act
+    householdViewModel.deleteHouseholdById(householdName)
+
+    // Verify that the error was logged
+    val logEntries = ShadowLog.getLogs()
+    assertTrue(
+        logEntries.any {
+          it.tag == "HouseholdViewModel" && it.msg == "Error deleting household: $exception"
+        })
+  }
+
+  /**
+   * Uses "hacky" reflection to test private method (Prof. Candea's suggestion:
+   * https://edstem.org/eu/courses/1567/discussion/131808)
+   * - Alex
+   */
+  @Test
+  fun loadHouseholds_shouldLogErrorWhenLoadingFails() = runTest {
+    // Arrange
+    val exception = Exception("Test exception")
+
+    whenever(repository.getHouseholds(any(), any())).thenAnswer { invocation ->
+      val onFailure = invocation.getArgument<(Exception) -> Unit>(1)
+      println("Triggering onFailure with exception: $exception")
+      onFailure(exception)
+      null
+    }
+    val method =
+        HouseholdViewModel::class.java.declaredMethods.firstOrNull { it.name == "loadHouseholds" }
+            ?: throw NoSuchMethodException("Method loadHouseholds not found")
+
+    method.isAccessible = true
+
+    method.invoke(householdViewModel)
+    // Act
+
+    // Assert
+    val logEntries = ShadowLog.getLogs()
+    assertTrue(
+        logEntries.any {
+          it.tag == "HouseholdViewModel" && it.msg == "Error loading households: $exception"
+        })
+  }
+
+  @Test
+  fun setHouseholds_shouldUpdateHouseholdsFlow() = runTest {
+    val households = listOf(HouseHold("1", "Household 1", emptyList(), emptyList()))
+    householdViewModel.setHouseholds(households)
+    assertEquals(households, householdViewModel.households.value)
+  }
+
+  @Test
+  fun setHouseholds_shouldHandleEmptyList() = runTest {
+    val households = emptyList<HouseHold>()
+    householdViewModel.setHouseholds(households)
+    assertTrue(householdViewModel.households.value.isEmpty())
+  }
+
+  @Test
+  fun checkIfHouseholdNameExists_shouldReturnTrueIfNameExists() = runTest {
+    // Arrange
+    val householdName = "Existing Household"
+    val households = listOf(HouseHold("1", householdName, emptyList(), emptyList()))
+    householdViewModel.setHouseholds(households)
+    // Act
+    val result = householdViewModel.checkIfHouseholdNameExists(householdName)
+    // Assert
+    assertTrue(result)
+  }
+
+  @Test
+  fun checkIfHouseholdNameExists_shouldReturnFalseIfHouseholdsListIsEmpty() = runTest {
+    // Arrange
+    val householdName = "Any Household"
+    householdViewModel.setHouseholds(emptyList())
+    // Act
+    val result = householdViewModel.checkIfHouseholdNameExists(householdName)
+    // Assert
+    assertFalse(result)
+  }
+
+  @Test
+  fun factory_shouldCreateHouseholdViewModel() {
+    val modelClass = HouseholdViewModel::class.java
+    val viewModel = HouseholdViewModel.Factory.create(modelClass)
+    assertTrue(viewModel is HouseholdViewModel)
   }
 }
