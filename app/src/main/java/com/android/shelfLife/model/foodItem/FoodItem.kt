@@ -27,7 +27,7 @@ data class FoodItem(
     val expiryDate: Timestamp? = null,
     val openDate: Timestamp? = null,
     val buyDate: Timestamp = Timestamp.now(),
-    val status: FoodStatus = FoodStatus.CLOSED
+    val status: FoodStatus = FoodStatus.CLOSED,
 ) {
   override fun toString(): String {
     return "FoodItem:(" +
@@ -38,9 +38,9 @@ data class FoodItem(
   }
 
   fun getImportantDetails(): String {
-    return "${foodFacts.name}[${foodFacts.nutritionFacts.energyKcal}Kcal," +
-        " ${foodFacts.nutritionFacts.proteins}g protein]: " +
-        "(Expires in ${getRemainingDays()} days, ${foodFacts.quantity})"
+    return "${foodFacts.name}: (${foodFacts.nutritionFacts.energyKcal}Kcal, " +
+        "${foodFacts.nutritionFacts.proteins}g protein, " +
+        "Expires in ${getRemainingDays()} days, ${foodFacts.quantity})"
   }
 
   /** returns the remaining days until the food item expires. */

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -26,6 +27,7 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.overview.AddFoodItemScreen
+import com.android.shelfLife.ui.overview.HouseHoldCreationScreen
 import com.android.shelfLife.ui.overview.OverviewScreen
 import com.android.shelfLife.ui.profile.ProfileScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
@@ -41,7 +43,7 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
-    setContent { ShelfLifeTheme { ShelfLifeApp() } }
+    setContent { ShelfLifeTheme { Surface { ShelfLifeApp() } } }
   }
 }
 
@@ -84,6 +86,9 @@ fun ShelfLifeApp() {
       composable(Screen.OVERVIEW) { OverviewScreen(navigationActions, householdViewModel) }
       composable(Screen.ADD_FOOD) {
         AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
+      }
+      composable(Screen.HOUSEHOLD_CREATION) {
+        HouseHoldCreationScreen(navigationActions, householdViewModel = householdViewModel)
       }
     }
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {

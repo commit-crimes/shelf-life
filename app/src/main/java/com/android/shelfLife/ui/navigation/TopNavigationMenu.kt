@@ -27,7 +27,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,7 +49,9 @@ import com.android.shelfLife.model.household.HouseHold
 fun TopNavigationBar(
     houseHold: HouseHold,
     onHamburgerClick: () -> Unit = {},
-    filters: List<String>
+    filters: List<String>,
+    selectedFilters: List<String>,
+    onFilterChange: (String, Boolean) -> Unit
 ) {
   var showFilterBar by remember { mutableStateOf(false) }
   Column {
@@ -97,7 +98,10 @@ fun TopNavigationBar(
           visible = showFilterBar,
           enter = fadeIn() + expandVertically(),
           exit = fadeOut() + shrinkVertically()) {
-            FilterBar(filters)
+            FilterBar(
+                filters = filters,
+                selectedFilters = selectedFilters,
+                onFilterChange = onFilterChange)
           }
     }
   }
@@ -108,14 +112,16 @@ fun TopNavigationBar(
  * horizontal list of filter chips that can be selected by the user.
  */
 @Composable
-fun FilterBar(filters: List<String>) {
-  // State to track the selection of each filter chip
-  val selectedFilters = remember { mutableStateListOf<String>() }
+fun FilterBar(
+    filters: List<String>,
+    selectedFilters: List<String>,
+    onFilterChange: (String, Boolean) -> Unit
+) {
   val scrollState = rememberScrollState()
 
   Row(
       modifier =
-          Modifier.horizontalScroll(scrollState) // Enables horizontal scrolling
+          Modifier.horizontalScroll(scrollState)
               .padding(horizontal = 8.dp, vertical = 4.dp)
               .testTag("filterBar")) {
         filters.forEach { filter ->
@@ -123,13 +129,7 @@ fun FilterBar(filters: List<String>) {
           FilterChipItem(
               text = filter,
               isSelected = isSelected,
-              onClick = {
-                if (isSelected) {
-                  selectedFilters.remove(filter)
-                } else {
-                  selectedFilters.add(filter)
-                }
-              })
+              onClick = { onFilterChange(filter, !isSelected) })
         }
       }
 }
@@ -175,7 +175,8 @@ fun FilterChipItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
 fun HouseHoldElement(
     household: HouseHold,
     selectedHousehold: HouseHold,
-    onHouseholdSelected: (HouseHold) -> Unit
+    onHouseholdSelected: (HouseHold) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
   NavigationDrawerItem(
       colors =
@@ -193,5 +194,5 @@ fun HouseHoldElement(
       },
       selected = household == selectedHousehold,
       onClick = { onHouseholdSelected(household) },
-      modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding))
+      modifier = modifier.padding(NavigationDrawerItemDefaults.ItemPadding))
 }

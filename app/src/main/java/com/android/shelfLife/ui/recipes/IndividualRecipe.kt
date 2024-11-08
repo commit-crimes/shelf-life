@@ -88,9 +88,12 @@ fun IndividualRecipeScreen(
   val scope = rememberCoroutineScope()
 
   HouseHoldSelectionDrawer(
-      scope = scope, drawerState = drawerState, householdViewModel = householdViewModel) {
+      scope = scope,
+      drawerState = drawerState,
+      householdViewModel = householdViewModel,
+      navigationActions = navigationActions) {
         if (selectedHousehold == null) {
-          FirstTimeWelcomeScreen(householdViewModel)
+          FirstTimeWelcomeScreen(navigationActions, householdViewModel)
         } else {
           // Scaffold that provides the structure for the screen, including top and bottom bars.
           Scaffold(
