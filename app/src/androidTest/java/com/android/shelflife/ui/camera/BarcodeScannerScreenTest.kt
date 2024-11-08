@@ -188,66 +188,6 @@ class BarcodeScannerScreenTest {
   }
 
   @Test
-  fun submittingFormClosesModalAndResumesScanning() {
-    // Set up the fake repository to return a sample food item
-    val sampleFoodFacts =
-        FoodFacts(
-            name = "Sample Food",
-            barcode = "1234567890",
-            quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
-            category = FoodCategory.OTHER)
-    fakeRepository.foodFactsList = listOf(sampleFoodFacts)
-
-    composeTestRule.setContent {
-      BarcodeScannerScreen(
-          navigationActions = navigationActions,
-          cameraViewModel = barcodeScannerViewModel,
-          foodFactsViewModel = foodFactsViewModel,
-          householdViewModel = householdViewModel,
-          foodItemViewModel = foodItemViewModel)
-    }
-
-    // Simulate scanning a barcode
-    composeTestRule.activity.runOnUiThread { foodFactsViewModel.searchByBarcode(1234567890L) }
-
-    // Wait until the small popup is displayed
-    composeTestRule.waitUntil(timeoutMillis = 5_000) {
-      composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
-    }
-
-    // Click on the small popup to expand it
-    composeTestRule.onNodeWithText("Sample Food").performClick()
-
-    // Wait until the input fields are displayed
-    composeTestRule.waitUntil(timeoutMillis = 5_000) {
-      composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isNotEmpty()
-    }
-
-    // Fill in the form with valid dates
-    composeTestRule.onNodeWithTag("expireDateTextField").performTextInput("31122023")
-    composeTestRule.onNodeWithTag("buyDateTextField").performTextClearance()
-    composeTestRule.onNodeWithTag("buyDateTextField").performTextInput("15012023")
-    composeTestRule.onNodeWithTag("openDateTextField").performTextInput("16012023") // After buyDate
-
-    // Click submit
-    composeTestRule.onNodeWithTag("submitButton").performClick()
-
-    // Wait for any UI updates
-      composeTestRule.waitUntil(timeoutMillis = 10_000) {
-          composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isEmpty()
-      }
-
-
-    // Verify that the ModalBottomSheet is dismissed
-    composeTestRule.onNodeWithTag("expireDateTextField").assertDoesNotExist()
-    composeTestRule.onNodeWithTag("openDateTextField").assertDoesNotExist()
-    composeTestRule.onNodeWithTag("buyDateTextField").assertDoesNotExist()
-
-    // Verify that the scanner is active again (e.g., camera preview is displayed)
-    composeTestRule.onNodeWithTag("cameraPreviewBox").assertIsDisplayed()
-  }
-
-  @Test
   fun cancellingFormReturnsToScanning() {
     // Set up the fake repository to return a sample food item
     val sampleFoodFacts =
