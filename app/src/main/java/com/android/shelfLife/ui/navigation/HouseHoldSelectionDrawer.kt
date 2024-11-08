@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Edit
@@ -63,24 +65,26 @@ fun HouseHoldSelectionDrawer(
                   Modifier.padding(vertical = 18.dp, horizontal = 16.dp)
                       .padding(horizontal = 12.dp),
               style = MaterialTheme.typography.labelMedium)
-          userHouseholds.forEachIndexed { index, household ->
-            selectedHousehold?.let {
-              HouseholdDrawerItem(
-                  household = household,
-                  selectedHousehold = it,
-                  editMode = editMode,
-                  onHouseholdSelected = { household ->
-                    if (household != selectedHousehold) {
-                      householdViewModel.selectHousehold(household)
-                    }
-                    scope.launch { drawerState.close() }
-                  },
-                  modifier = Modifier.testTag("householdElement_$index"),
-                  onHouseholdEditSelected = { household ->
-                    householdViewModel.selectHouseholdToEdit(household)
-                    navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
-                  },
-              )
+          LazyColumn {
+            itemsIndexed(userHouseholds) { index, household ->
+              selectedHousehold?.let {
+                HouseholdDrawerItem(
+                    household = household,
+                    selectedHousehold = it,
+                    editMode = editMode,
+                    onHouseholdSelected = { selectedHousehold ->
+                      if (household != selectedHousehold) {
+                        householdViewModel.selectHousehold(household)
+                      }
+                      scope.launch { drawerState.close() }
+                    },
+                    modifier = Modifier.testTag("householdElement_$index"),
+                    onHouseholdEditSelected = { householdToEdit ->
+                      householdViewModel.selectHouseholdToEdit(householdToEdit)
+                      navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
+                    },
+                )
+              }
             }
           }
           HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
