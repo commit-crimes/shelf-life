@@ -49,6 +49,7 @@ class BarcodeScannerScreenTest {
 
     // Mock getUID() to return a valid UID
     every { foodItemViewModel.getUID() } returns "testUID"
+    every { householdViewModel.addFoodItem(any()) } just runs
 
     // Initialize the fake repository and real ViewModel
     fakeRepository = FakeFoodFactsRepository()
@@ -232,9 +233,7 @@ class BarcodeScannerScreenTest {
     composeTestRule.onNodeWithTag("submitButton").performClick()
 
     // Wait for any UI updates
-    composeTestRule.waitUntil(timeoutMillis = 5_000) {
-      composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isEmpty()
-    }
+    composeTestRule.waitForIdle()
 
 
     // Verify that the ModalBottomSheet is dismissed
