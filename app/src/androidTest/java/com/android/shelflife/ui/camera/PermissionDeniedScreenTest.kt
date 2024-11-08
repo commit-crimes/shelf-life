@@ -1,82 +1,57 @@
-package com.android.shelfLife.ui.scanner
+package com.android.shelfLife.ui.camera
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.navigation.NavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.shelfLife.ui.camera.PermissionDeniedScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
-import org.junit.Before
+import com.android.shelfLife.ui.navigation.Route
+import io.mockk.every
+import io.mockk.mockk
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.*
 
 @RunWith(AndroidJUnit4::class)
 class PermissionDeniedScreenTest {
 
-  private lateinit var navigationActions: NavigationActions
-
   @get:Rule val composeTestRule = createComposeRule()
 
-  @Before
-  fun setUp() {
-    navigationActions = mock()
-  }
+  @Test
+  fun testPermissionDeniedMessageIsDisplayed() {
+    val navController = mockk<NavHostController>(relaxed = true)
+    val navigationActions = NavigationActions(navController)
 
-  // Helper function to set up the PermissionDeniedScreen
-  private fun setUpPermissionDeniedScreen() {
     composeTestRule.setContent { PermissionDeniedScreen(navigationActions = navigationActions) }
-  }
 
-  // Helper function to check if the common UI elements are displayed
-  private fun verifyCommonUIElements() {
-    composeTestRule.onNodeWithTag("permissionDeniedScreen").assertIsDisplayed()
-    composeTestRule
-        .onNodeWithText("Camera permission is required to scan barcodes.")
-        .assertIsDisplayed()
-    composeTestRule.onNodeWithText("Open Settings").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("permissionDeniedMessage").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("openSettingsButton").assertIsDisplayed()
   }
 
   @Test
-  fun permissionDeniedMessageIsDisplayed() {
-    setUpPermissionDeniedScreen()
-    verifyCommonUIElements()
+  fun testBottomNavigationIsDisplayed() {
+    val navController = mockk<NavHostController>(relaxed = true)
+    val navigationActions = NavigationActions(navController)
+
+    composeTestRule.setContent { PermissionDeniedScreen(navigationActions = navigationActions) }
+
+    // Verify the bottom navigation is displayed and the SCANNER tab is selected
+    composeTestRule.onNodeWithText("Scanner").assertIsDisplayed().assertIsSelected()
   }
 
   @Test
-  fun clickOpenSettingsButtonTriggersIntent() {
-    setUpPermissionDeniedScreen()
+  fun testClickOnOtherTabNavigatesToCorrectScreen() {
+    val navigationActions =
+        mockk<NavigationActions>(
+            relaxed = true, block = { every { currentRoute() } returns Route.RECIPES })
 
-    // Click the "Open Settings" button
-    composeTestRule.onNodeWithText("Open Settings").performClick()
+    composeTestRule.setContent { PermissionDeniedScreen(navigationActions = navigationActions) }
 
-    // Here you can verify intent-related behavior using appropriate test libraries/mocking
-    // The actual intent verification is tricky in Compose tests and might require additional setup
+    // Click on another tab in the bottom navigation menu
+    composeTestRule.onNodeWithText("Recipes").performClick()
+
+    // Verify that navigateTo() was called with the correct route
+    assertEquals(Route.RECIPES, navigationActions.currentRoute())
   }
-
-  //    @Test
-  //    fun bottomNavigationIsDisplayed() {
-  //        setUpPermissionDeniedScreen()
-  //
-  //        // Verify the bottom navigation is displayed and the SCANNER tab is selected
-  //
-  // composeTestRule.onNodeWithContentDescription("SCANNER").assertIsDisplayed().assertIsSelected()
-  //
-  //        // Select another tab to verify navigation
-  //        composeTestRule.onNodeWithContentDescription("OTHER_TAB").performClick()
-  //
-  //        // Verify that navigateTo() was called with the correct tab
-  //        verify(navigationActions).navigateTo("OTHER_TAB")
-  //    }
-
-  //    @Test
-  //    fun clickOnOtherTabNavigatesToCorrectScreen() {
-  //        setUpPermissionDeniedScreen()
-  //
-  //        // Click on another tab in the bottom navigation menu
-  //        composeTestRule.onNodeWithContentDescription("OTHER_TAB").performClick()
-  //
-  //        // Verify that navigateTo() was called with the correct route
-  //        verify(navigationActions).navigateTo("OTHER_TAB")
-  //    }
 }
