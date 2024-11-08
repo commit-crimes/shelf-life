@@ -8,14 +8,11 @@ import android.net.Uri
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
@@ -34,6 +31,7 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.utils.OnLifecycleEvent
+import kotlinx.coroutines.launch
 
 /**
  * Composable function for the Barcode Scanner Screen.
@@ -62,6 +60,12 @@ fun BarcodeScannerScreen(
   val barcodeScanned = remember { mutableStateOf<String?>(null) }
   val foodFacts = remember { mutableStateOf<FoodFacts?>(null) }
   val searchInProgress = remember { mutableStateOf(false) }
+
+  val isContentExpanded = remember { mutableStateOf(false) }
+  val coroutineScope = rememberCoroutineScope()
+
+  // Bottom sheet state
+  val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
   OnLifecycleEvent(
       onResume = {
@@ -120,7 +124,7 @@ fun BarcodeScannerScreen(
             }
           }
 
-          // Observe searchStatus
+          // Observe searchStatus and update foodScanned.value
           val searchStatus by foodFactsViewModel.searchStatus.collectAsState()
           LaunchedEffect(searchStatus) {
             when (searchStatus) {
@@ -150,40 +154,53 @@ fun BarcodeScannerScreen(
             }
           }
 
-          // Overlay Input Fields
+          // Show the ModalBottomSheet when foodScanned.value is true
           val foodFactsValue = foodFacts.value
+
+          LaunchedEffect(foodScanned.value) {
+            if (foodScanned.value) {
+              sheetState.show()
+              Log.d("ModalBottomSheet", "ModalBottomSheet shown")
+            } else {
+              sheetState.hide()
+              Log.d("ModalBottomSheet", "ModalBottomSheet hidden")
+            }
+          }
+
           if (foodScanned.value && foodFactsValue != null) {
-            Box(
-                modifier =
-                    Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.5f)).clickable {
-                      // Reset states
-                      foodScanned.value = false
-                      isScanningState.value = true
-                    }) {
-                  Column(
-                      modifier =
-                          Modifier.fillMaxWidth()
-                              .align(Alignment.BottomCenter)
-                              .background(
-                                  MaterialTheme.colorScheme.surface,
-                                  shape = MaterialTheme.shapes.large)
-                              .padding(16.dp)) {
-                        FoodInputContent(
-                            foodFacts = foodFactsValue,
-                            onSubmit = { newFoodItem ->
-                              householdViewModel.addFoodItem(newFoodItem)
-                              // Reset states
-                              foodScanned.value = false
-                              isScanningState.value = true
-                            },
-                            onCancel = {
-                              // Reset states
-                              foodScanned.value = false
-                              isScanningState.value = true
-                            },
-                            foodItemViewModel = foodItemViewModel,
-                            householdViewModel = householdViewModel)
-                      }
+            ModalBottomSheet(
+                onDismissRequest = {
+                  // Reset states
+                  foodScanned.value = false
+                  isScanningState.value = true
+                  isContentExpanded.value = false
+                  Log.d("ModalBottomSheet", "Sheet dismissed")
+                },
+                sheetState = sheetState) {
+                  FoodInputContent(
+                      foodFacts = foodFactsValue,
+                      onSubmit = { newFoodItem ->
+                        // Reset states
+                        foodScanned.value = false
+                        isScanningState.value = true
+                        isContentExpanded.value = false
+                        householdViewModel.addFoodItem(newFoodItem)
+                        Log.d("ModalBottomSheet", "Submit clicked")
+                      },
+                      onCancel = {
+                        // Reset states
+                        foodScanned.value = false
+                        isScanningState.value = true
+                        isContentExpanded.value = false
+                        Log.d("ModalBottomSheet", "Cancel clicked")
+                      },
+                      foodItemViewModel = foodItemViewModel,
+                      householdViewModel = householdViewModel,
+                      isExpanded = isContentExpanded.value,
+                      onExpand = {
+                        isContentExpanded.value = true
+                        coroutineScope.launch { sheetState.expand() }
+                      })
                 }
           }
         }
