@@ -180,11 +180,11 @@ fun BarcodeScannerScreen(
                   FoodInputContent(
                       foodFacts = foodFactsValue,
                       onSubmit = { newFoodItem ->
-                        householdViewModel.addFoodItem(newFoodItem)
                         // Reset states
                         foodScanned.value = false
                         isScanningState.value = true
                         isContentExpanded.value = false
+                        householdViewModel.addFoodItem(newFoodItem)
                         Log.d("ModalBottomSheet", "Submit clicked")
                       },
                       onCancel = {
