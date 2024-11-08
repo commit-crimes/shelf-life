@@ -232,7 +232,10 @@ class BarcodeScannerScreenTest {
     composeTestRule.onNodeWithTag("submitButton").performClick()
 
     // Wait for any UI updates
-    composeTestRule.waitForIdle()
+    composeTestRule.waitUntil(timeoutMillis = 5_000) {
+      composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isEmpty()
+    }
+
 
     // Verify that the ModalBottomSheet is dismissed
     composeTestRule.onNodeWithTag("expireDateTextField").assertDoesNotExist()
