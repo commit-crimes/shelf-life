@@ -62,7 +62,10 @@ import com.example.compose.errorContainerDark
 import com.example.compose.onPrimaryContainerDark
 import com.example.compose.onSecondaryContainerDark
 import com.example.compose.onSecondaryDark
+import com.example.compose.primaryContainerDark
 import com.example.compose.primaryContainerLight
+import com.example.compose.secondaryContainerDark
+import com.example.compose.secondaryContainerLight
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -316,7 +319,7 @@ fun InstructionItem(
 
         IconButton(
             onClick = onRemoveClick,
-            enabled = index > 0 // Disable removal for the first item to ensure at least one instruction remains
+            enabled = index >= 0 // Disable removal for the first item to ensure at least one instruction remains
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,
@@ -336,11 +339,11 @@ fun IngredientItem(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ){
-        Text(text = "Ingredient${index} : ${ingredient.foodFacts.name}")
+        Text(text = "Ingredient${index + 1} : ${ingredient.foodFacts.name}")
     }
     IconButton(
         onClick = onRemoveClick,
-        enabled = index > 0 // Disable removal for the first item to ensure at least one instruction remains
+        enabled = index >= 0 // Disable removal for the first item to ensure at least one instruction remains
     ) {
         Icon(
             imageVector = Icons.Default.Delete,
@@ -360,6 +363,8 @@ fun IngredientDialog(
     onDismiss: () -> Unit,
     onAddIngredient: () -> Unit
 ) {
+    var selectedUnit by remember { mutableStateOf<FoodUnit>(FoodUnit.COUNT) }
+
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Add Ingredient") },
@@ -379,20 +384,34 @@ fun IngredientDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 // Quantity Unit Dropdown
-                FoodUnit.values().forEach { unit ->
-                    Button(onClick = { onUnitChange(unit) }) {
-                        Text(text = unit.name)
+                Row{
+                    FoodUnit.values().forEach { unit ->
+                        Button(onClick = { onUnitChange(unit)
+                            selectedUnit = unit },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if(selectedUnit == unit) primaryContainerDark else primaryContainerLight,
+                                contentColor =  if (selectedUnit == unit) secondaryContainerLight else secondaryContainerDark
+                                ),
+                            ) {
+                            Text(text = unit.name)
+                        }
+                        Spacer(Modifier.padding(2.dp))
                     }
                 }
             }
         },
         confirmButton = {
-            Button(onClick = onAddIngredient) {
+            Button(onClick = onAddIngredient,
+                colors = ButtonDefaults.buttonColors(containerColor = primaryContainerLight,
+                    contentColor = secondaryContainerDark)
+            ) {
                 Text("Add Ingredient")
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss) {
+            Button(onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = errorContainerDark)
+            ) {
                 Text("Cancel")
             }
         }
