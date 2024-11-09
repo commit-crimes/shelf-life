@@ -1,6 +1,7 @@
 package com.android.shelfLife.ui.recipes
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,9 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
@@ -23,26 +22,22 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -55,18 +50,13 @@ import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
 import com.example.compose.errorContainerDark
-import com.example.compose.onPrimaryContainerDark
-import com.example.compose.onSecondaryContainerDark
 import com.example.compose.onSecondaryDark
 import com.example.compose.primaryContainerDark
 import com.example.compose.primaryContainerLight
 import com.example.compose.secondaryContainerDark
 import com.example.compose.secondaryContainerLight
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -77,19 +67,22 @@ fun AddRecipeScreen(
     listRecipesViewModel: ListRecipesViewModel,
     householdViewModel: HouseholdViewModel
 ) {
+    val context = LocalContext.current
+
     var title by remember { mutableStateOf("") }
-    var servings by remember { mutableStateOf("0") }
-    var time by remember { mutableStateOf("0.0") }
+    var servings by remember { mutableStateOf("") }
+    var time by remember { mutableStateOf("") }
     val ingredients = remember { mutableStateListOf<Ingredient>() }
-    val instructions = remember { mutableStateListOf("") }
+    val instructions = remember { mutableStateListOf<String>() }
 
     // Dialog visibility state
     var showIngredientDialog by remember { mutableStateOf(false) }
 
-    // Ingredient data state
-    var ingredientName by remember { mutableStateOf("") }
-    var ingredientQuantity by remember { mutableStateOf("") } // Ensure this stays as String for user input
-    var ingredientUnit by remember { mutableStateOf(FoodUnit.COUNT) }
+    var error = false
+    var titleError by remember {mutableStateOf<String?>(null)}
+    var servingsError by remember {mutableStateOf<String?>(null)}
+    var timeError by remember {mutableStateOf<String?>(null)}
+
 
     Scaffold(
         modifier = Modifier.testTag("addRecipeScreen"),
@@ -134,7 +127,8 @@ fun AddRecipeScreen(
             item {
                 OutlinedTextField(
                     value = title,
-                    onValueChange = { title = it },
+                    onValueChange = { title = it
+                                    titleError = if (title.isEmpty()) "Incomplete title" else null},
                     label = { Text("Recipe title") },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -143,10 +137,13 @@ fun AddRecipeScreen(
                 )
             }
 
+            item{ ErrorTextBox(titleError) }
+
             item {
                 OutlinedTextField(
                     value = servings,
-                    onValueChange = { servings = it },
+                    onValueChange = { servings = it
+                                    servingsError = if (servings.isEmpty()) "Incomplete serving number" else null},
                     label = { Text("Servings") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
@@ -156,10 +153,13 @@ fun AddRecipeScreen(
                 )
             }
 
+            item{ ErrorTextBox(servingsError) }
+
             item {
                 OutlinedTextField(
                     value = time,
-                    onValueChange = { time = it },
+                    onValueChange = { time = it
+                                    timeError = if(time.isEmpty()) "Incomplete time" else null},
                     label = { Text("Time in minutes") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier
@@ -168,6 +168,8 @@ fun AddRecipeScreen(
                         .testTag("inputRecipeTime")
                 )
             }
+
+            item{ ErrorTextBox(timeError) }
 
             item {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -211,11 +213,7 @@ fun AddRecipeScreen(
                     onInstructionChange = { newInstruction ->
                         instructions[index] = newInstruction
                     },
-                    onRemoveClick = {
-                        if (instructions.size > 1) {
-                            instructions.removeAt(index)
-                        }
-                    }
+                    onRemoveClick = { instructions.removeAt(index) }
                 )
             }
 
@@ -250,13 +248,24 @@ fun AddRecipeScreen(
 
                     Button(
                         onClick = {
-                            listRecipesViewModel.addRecipeToList(recipe = Recipe(name = title,
-                                instructions = instructions.toList(),
-                                servings = servings.toInt(),
-                                time = (time.toDouble()*60.0).seconds,
-                                ingredients = ingredients.toList()
-                            ))
-                            navigationActions.goBack()},
+                            error = title.isEmpty() || time.isEmpty() || servings.isEmpty() || ingredients.isEmpty() || instructions.isEmpty()
+                            if (!error){
+                                listRecipesViewModel.addRecipeToList(recipe = Recipe(name = title,
+                                    instructions = instructions.toList(),
+                                    servings = servings.toInt(),
+                                    time = (time.toDouble()*60.0).seconds,
+                                    ingredients = ingredients.toList()
+                                ))
+                                navigationActions.goBack()
+                            }
+                            else{
+                                Toast.makeText(
+                                    context,
+                                    "Please correct the errors before submitting.",
+                                    Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                            },
                         modifier = Modifier.height(40.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = primaryContainerLight)
                     ) {
@@ -269,30 +278,9 @@ fun AddRecipeScreen(
         // Ingredient Dialog, now inside the composable block
         if (showIngredientDialog) {
             IngredientDialog(
-                ingredientName = ingredientName,
-                onNameChange = { ingredientName = it },
-                ingredientQuantity = ingredientQuantity,
-                onQuantityChange = { ingredientQuantity = it },
-                ingredientUnit = ingredientUnit,
-                onUnitChange = { ingredientUnit = it },
+                ingredients = ingredients,
                 onDismiss = { showIngredientDialog = false }, // Hide dialog
-                onAddIngredient = {
-                    // Try to safely parse the quantity
-                    val quantity = ingredientQuantity.toDoubleOrNull()
-                    if (quantity != null) {
-                        val newIngredient = Ingredient(
-                            foodFacts = FoodFacts(
-                                name = ingredientName,
-                                quantity = Quantity(quantity, ingredientUnit)
-                            ),
-                            isOwned = false
-                        )
-                        ingredients.add(newIngredient)
-                        showIngredientDialog = false // Dismiss dialog after adding
-                    } else {
-                        // Handle invalid input (e.g., show a message to the user)
-                    }
-                }
+                onAddIngredient = { showIngredientDialog = false} // Dismiss dialog after adding
             )
         }
     }
@@ -319,7 +307,6 @@ fun InstructionItem(
 
         IconButton(
             onClick = onRemoveClick,
-            enabled = index >= 0 // Disable removal for the first item to ensure at least one instruction remains
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,
@@ -343,7 +330,6 @@ fun IngredientItem(
     }
     IconButton(
         onClick = onRemoveClick,
-        enabled = index >= 0 // Disable removal for the first item to ensure at least one instruction remains
     ) {
         Icon(
             imageVector = Icons.Default.Delete,
@@ -354,16 +340,20 @@ fun IngredientItem(
 
 @Composable
 fun IngredientDialog(
-    ingredientName: String,
-    onNameChange: (String) -> Unit,
-    ingredientQuantity: String,
-    onQuantityChange: (String) -> Unit,
-    ingredientUnit: FoodUnit,
-    onUnitChange: (FoodUnit) -> Unit,
+    ingredients: MutableList<Ingredient>,
     onDismiss: () -> Unit,
     onAddIngredient: () -> Unit
 ) {
+    val context = LocalContext.current
+
+    var ingredientName by remember { mutableStateOf("") }
+    var ingredientQuantity by remember { mutableStateOf("") } // Ensure this stays as String for user input
+    var ingredientUnit by remember { mutableStateOf(FoodUnit.COUNT) }
+
     var selectedUnit by remember { mutableStateOf<FoodUnit>(FoodUnit.COUNT) }
+    var ingredientNameError by remember{ mutableStateOf<String?>("") }
+    var quantityError by remember{ mutableStateOf<String?>("") }
+    var error = false
 
     androidx.compose.material3.AlertDialog(
         onDismissRequest = onDismiss,
@@ -372,21 +362,26 @@ fun IngredientDialog(
             Column {
                 OutlinedTextField(
                     value = ingredientName,
-                    onValueChange = onNameChange,
+                    onValueChange ={ingredientName = it
+                        ingredientNameError = if(ingredientName.isEmpty()) "Incomplete name" else null},
                     label = { Text("Ingredient Name") },
                     modifier = Modifier.fillMaxWidth()
                 )
+                ErrorTextBox(ingredientNameError)
+
                 OutlinedTextField(
                     value = ingredientQuantity,
-                    onValueChange = onQuantityChange,
+                    onValueChange = {ingredientQuantity = it
+                        quantityError = if(ingredientQuantity.isEmpty()) "Incomplete quantity" else null},
                     label = { Text("Quantity") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
+                ErrorTextBox(quantityError)
                 // Quantity Unit Dropdown
                 Row{
                     FoodUnit.values().forEach { unit ->
-                        Button(onClick = { onUnitChange(unit)
+                        Button(onClick = { ingredientUnit = unit
                             selectedUnit = unit },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = if(selectedUnit == unit) primaryContainerDark else primaryContainerLight,
@@ -401,7 +396,27 @@ fun IngredientDialog(
             }
         },
         confirmButton = {
-            Button(onClick = onAddIngredient,
+            Button(onClick = {
+                error = ingredientName.isEmpty() || ingredientQuantity.isEmpty()
+                if (!error){
+                    val quantity = ingredientQuantity.toDouble()
+                    val newIngredient = Ingredient(
+                        foodFacts = FoodFacts(
+                            name = ingredientName,
+                            quantity = Quantity(quantity, ingredientUnit)
+                        ),
+                        isOwned = false
+                    )
+                    ingredients.add(newIngredient)
+                    onAddIngredient()
+                }else{
+                    Toast.makeText(
+                        context,
+                        "Please correct the errors before submitting.",
+                        Toast.LENGTH_SHORT)
+                        .show()
+                }
+                             },
                 colors = ButtonDefaults.buttonColors(containerColor = primaryContainerLight,
                     contentColor = secondaryContainerDark)
             ) {
@@ -416,4 +431,15 @@ fun IngredientDialog(
             }
         }
     )
+}
+
+@Composable
+fun ErrorTextBox(string : String?){
+    if(string != null){
+        Text(
+            text = string,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
 }
