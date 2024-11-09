@@ -43,66 +43,59 @@ fun IndividualFoodItemScreen(
     navigationActions: NavigationActions,
     householdViewModel: HouseholdViewModel
 ) {
-    val foodItem = foodItemId?.let { householdViewModel.getFoodItemById(it).collectAsState(initial = null) }
-    val selectedFoodItem = foodItem?.value
-    Scaffold(
-        modifier = Modifier.testTag("IndividualFoodItemScreen"),
-        topBar = {
-            TopAppBar(
-                title = { Text("Food Item Details") },
-                colors = TopAppBarDefaults.topAppBarColors(
+  val foodItem =
+      foodItemId?.let { householdViewModel.getFoodItemById(it).collectAsState(initial = null) }
+  val selectedFoodItem = foodItem?.value
+  Scaffold(
+      modifier = Modifier.testTag("IndividualFoodItemScreen"),
+      topBar = {
+        TopAppBar(
+            title = {},
+            colors =
+                TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                     navigationIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    actionIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer
-                ),
-                modifier = Modifier.testTag("topBar"),
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navigationActions.goBack() },
-                        modifier = Modifier.testTag("IndividualTestScreenGoBack")
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Go back Icon"
-                        )
-                    }
-                }
-            )
-        },
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.OVERVIEW
-            )
-        }
-    ) { paddingValues ->
+                    actionIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer),
+            modifier = Modifier.testTag("topBar"),
+            navigationIcon = {
+              IconButton(
+                  onClick = { navigationActions.goBack() },
+                  modifier = Modifier.testTag("IndividualTestScreenGoBack")) {
+                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Go back Icon")
+                  }
+            })
+      },
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = Route.OVERVIEW)
+      }) { paddingValues ->
         LazyColumn(modifier = Modifier.padding(paddingValues)) {
-            item {
-                if (selectedFoodItem != null) {
-                    Text(
-                        text = selectedFoodItem.foodFacts.name,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(16.dp)
-                    )
+          item {
+            if (selectedFoodItem != null) {
+              Text(
+                  text = selectedFoodItem.foodFacts.name,
+                  fontSize = 24.sp,
+                  fontWeight = FontWeight.Bold,
+                  modifier = Modifier.padding(16.dp).testTag("IndividualFoodItemName"))
 
-                    Image(
-                        painter = painterResource(id = R.drawable.minecraft_rottenflesh),
-                        contentDescription = "Image of ${selectedFoodItem.foodFacts.name}",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1f)
-                            .clip(RoundedCornerShape(8.dp)),
-                        contentScale = ContentScale.Crop
-                    )
+              Image(
+                  painter = painterResource(id = R.drawable.minecraft_rottenflesh),
+                  contentDescription = "Image of ${selectedFoodItem.foodFacts.name}",
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .aspectRatio(1f)
+                          .clip(RoundedCornerShape(8.dp))
+                          .testTag("IndividualFoodItemImage"),
+                  contentScale = ContentScale.Crop)
 
-                    FoodItemDetails(foodItem = selectedFoodItem)
-                } else {
-                    CircularProgressIndicator()
-                }
+              FoodItemDetails(foodItem = selectedFoodItem)
+            } else {
+              CircularProgressIndicator(modifier = Modifier.testTag("CircularProgressIndicator"))
             }
+          }
         }
-    }
+      }
 }

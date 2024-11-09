@@ -1,4 +1,3 @@
-
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -47,7 +46,15 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+            all {
+                it.systemProperty("mockk.android.useInMemoryDex", "true")
+            }
         }
+        animationsDisabled = true
+
+//        execution {
+//            it.systemProperty("mockk.android.useInMemoryDex", "true")
+//        }
     }
 
     buildTypes {
@@ -216,12 +223,11 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.material.icons.extended)
 
-    //Openai
+    // OpenAI
     implementation(libs.aallam.openai.client)
     implementation(libs.ktor.client.apache5)
 
-    //Barcode Scanner
-
+    // Barcode Scanner
     implementation(libs.mlkit.barcode.scanning)
     implementation(libs.camerax.camera2)
     implementation(libs.camerax.lifecycle)

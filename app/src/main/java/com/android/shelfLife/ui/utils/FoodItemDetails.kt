@@ -11,26 +11,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.model.foodItem.FoodItem
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @Composable
 fun FoodItemDetails(foodItem: FoodItem) {
-  val expiryDate = foodItem.expiryDate
+  val textStyle = TextStyle(fontSize = 14.sp)
+
   val formattedExpiryDate =
-      expiryDate?.toDate()?.let {
-        SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault()).format(it)
-      } ?: "No Expiry Date"
-  val formattedOpenDate =
-      foodItem.openDate?.toDate()?.let {
-        SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault()).format(it)
-      } ?: "Not Opened"
-  val formattedBuyDate =
-      SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault())
-          .format(foodItem.buyDate.toDate())
+      foodItem.expiryDate?.let { formatTimestampToDate(it) } ?: "No Expiry Date"
+  val formattedOpenDate = foodItem.openDate?.let { formatTimestampToDate(it) } ?: "Not Opened"
+  val formattedBuyDate = formatTimestampToDate(foodItem.buyDate)
 
   ElevatedCard(
       elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
@@ -41,20 +34,43 @@ fun FoodItemDetails(foodItem: FoodItem) {
               .background(Color.White)
               .testTag("foodItemDetailsCard")) {
         Column(modifier = Modifier.padding(16.dp)) {
-          Text(text = "Category: ${foodItem.foodFacts.category.name}", fontSize = 12.sp)
-          Text(text = "Location: ${foodItem.location.name}", fontSize = 12.sp)
-          Text(text = "Status: ${foodItem.status.name}", fontSize = 12.sp)
-          Text(text = "Expiry Date: $formattedExpiryDate", fontSize = 12.sp)
-          Text(text = "Open Date: $formattedOpenDate", fontSize = 12.sp)
-          Text(text = "Buy Date: $formattedBuyDate", fontSize = 12.sp)
+          Text(
+              text = "Category: ${foodItem.foodFacts.category.name}",
+              style = textStyle,
+              modifier = Modifier.testTag("categoryText"))
+          Text(
+              text = "Location: ${foodItem.location.name}",
+              style = textStyle,
+              modifier = Modifier.testTag("locationText"))
+          Text(
+              text = "Status: ${foodItem.status.name}",
+              style = textStyle,
+              modifier = Modifier.testTag("statusText"))
+          Text(
+              text = "Expiry Date: $formattedExpiryDate",
+              style = textStyle,
+              modifier = Modifier.testTag("expiryDateText"))
+          Text(
+              text = "Open Date: $formattedOpenDate",
+              style = textStyle,
+              modifier = Modifier.testTag("openDateText"))
+          Text(
+              text = "Buy Date: $formattedBuyDate",
+              style = textStyle,
+              modifier = Modifier.testTag("buyDateText"))
           Text(
               text = "Energy: ${foodItem.foodFacts.nutritionFacts.energyKcal} Kcal",
-              fontSize = 12.sp)
-          Text(text = "Proteins: ${foodItem.foodFacts.nutritionFacts.proteins} g", fontSize = 12.sp)
+              style = textStyle,
+              modifier = Modifier.testTag("energyText"))
+          Text(
+              text = "Proteins: ${foodItem.foodFacts.nutritionFacts.proteins} g",
+              style = textStyle,
+              modifier = Modifier.testTag("proteinsText"))
           Text(
               text =
                   "Quantity: ${foodItem.foodFacts.quantity.amount} ${foodItem.foodFacts.quantity.unit}",
-              fontSize = 12.sp)
+              style = textStyle,
+              modifier = Modifier.testTag("quantityText"))
         }
       }
 }

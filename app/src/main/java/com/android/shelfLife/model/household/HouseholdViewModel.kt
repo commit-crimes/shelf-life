@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class HouseholdViewModel(
+open class HouseholdViewModel(
     private val repository: HouseHoldRepository,
     private val listFoodItemsViewModel: ListFoodItemsViewModel
 ) : ViewModel() {
