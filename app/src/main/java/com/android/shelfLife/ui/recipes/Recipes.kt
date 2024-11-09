@@ -126,11 +126,11 @@ fun RecipesScreen(
               },
               // Floating Action Button to add a new food item
               floatingActionButton = {
-                  FloatingActionButton(
-                      onClick = { navigationActions.navigateTo(Screen.ADD_RECIPE) },
-                      content = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                      modifier = Modifier.testTag("addRecipeFab"),
-                      containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                FloatingActionButton(
+                    onClick = { navigationActions.navigateTo(Screen.ADD_RECIPE) },
+                    content = { Icon(Icons.Default.Add, contentDescription = "Add") },
+                    modifier = Modifier.testTag("addRecipeFab"),
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer)
               },
               content = { paddingValues ->
                 Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {

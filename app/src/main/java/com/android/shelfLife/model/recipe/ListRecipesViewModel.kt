@@ -51,7 +51,7 @@ open class ListRecipesViewModel() : ViewModel() {
   }
 
   // list of the recipes, for the moment I have filled up manually
-    private val recipes_ =
+  private val recipes_ =
       MutableStateFlow<List<Recipe>>(
           listOf(
               Recipe(
@@ -117,7 +117,7 @@ open class ListRecipesViewModel() : ViewModel() {
                   // it has an extra long name to show the ... in the card
                   )))
 
-    val recipes: StateFlow<List<Recipe>> = recipes_.asStateFlow()
+  val recipes: StateFlow<List<Recipe>> = recipes_.asStateFlow()
 
   // Selected recipe, i.e the recipe for the detail view
   private val selectedRecipe_ = MutableStateFlow<Recipe?>(null)
@@ -141,7 +141,7 @@ open class ListRecipesViewModel() : ViewModel() {
     recipes_.value += newRecipe
   }
 
-    fun addRecipeToList(recipe:Recipe){
-        recipes_.value = recipes_.value + recipe
-    }
+  fun addRecipeToList(recipe: Recipe) {
+    recipes_.value = recipes_.value + recipe
+  }
 }

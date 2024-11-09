@@ -91,7 +91,7 @@ class RecipesTest {
   private fun verifyBasicUIElements() {
     composeTestRule.onNodeWithTag("recipesScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("recipeSearchBar").assertIsDisplayed()
-      composeTestRule.onNodeWithTag("addRecipeFab").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addRecipeFab").assertIsDisplayed()
   }
 
   @Test
@@ -145,13 +145,12 @@ class RecipesTest {
         .navigateTo(com.android.shelfLife.ui.navigation.Screen.INDIVIDUAL_RECIPE)
   }
 
-    @Test
-    fun clickOnAddRecipeFabNavigatesToAddRecipeScreen(){
-        setUpRecipesScreen()
+  @Test
+  fun clickOnAddRecipeFabNavigatesToAddRecipeScreen() {
+    setUpRecipesScreen()
 
-        composeTestRule.onNodeWithTag("addRecipeFab").performClick()
-        composeTestRule.waitForIdle()
-        verify(navigationActions)
-            .navigateTo(com.android.shelfLife.ui.navigation.Screen.ADD_RECIPE)
-    }
+    composeTestRule.onNodeWithTag("addRecipeFab").performClick()
+    composeTestRule.waitForIdle()
+    verify(navigationActions).navigateTo(com.android.shelfLife.ui.navigation.Screen.ADD_RECIPE)
+  }
 }
