@@ -129,7 +129,7 @@ fun AddRecipeScreen(
           }
 
           // error message if the title is empty
-          item { ErrorTextBox(titleError) }
+          item { ErrorTextBox(titleError, "titleErrorMessage") }
 
           // recipe servings
           item {
@@ -148,7 +148,7 @@ fun AddRecipeScreen(
           }
 
           // error message if the servings is empty
-          item { ErrorTextBox(servingsError) }
+          item { ErrorTextBox(servingsError, "servingsErrorMessage") }
 
           // recipe time
           item {
@@ -165,12 +165,12 @@ fun AddRecipeScreen(
           }
 
           // error message if the time is empty
-          item { ErrorTextBox(timeError) }
+          item { ErrorTextBox(timeError, "timeErrorMessage") }
 
           // recipe Ingredients
           item {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-              Text(text = "Ingredients")
+              Text(text = "Ingredients", modifier = Modifier.testTag("ingredientSection"))
             }
           }
 
@@ -191,7 +191,7 @@ fun AddRecipeScreen(
             Spacer(modifier = Modifier.height(4.dp))
             Button(
                 onClick = { showIngredientDialog = true }, // State change to show dialog
-                modifier = Modifier.height(40.dp),
+                modifier = Modifier.height(40.dp).testTag("addIngredientButton"),
                 content = {
                   Icon(imageVector = Icons.Default.Add, contentDescription = "Add Ingredient")
                 })
@@ -200,7 +200,7 @@ fun AddRecipeScreen(
           // recipe instructions
           item {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-              Text(text = "Instructions")
+              Text(text = "Instructions", modifier = Modifier.testTag("instructionSection"))
             }
           }
 
@@ -218,7 +218,7 @@ fun AddRecipeScreen(
             Spacer(modifier = Modifier.height(4.dp))
             Button(
                 onClick = { instructions.add("") },
-                modifier = Modifier.height(40.dp),
+                modifier = Modifier.height(40.dp).testTag("addInstructionButton"),
                 content = {
                   Icon(imageVector = Icons.Default.Add, contentDescription = "Add Instruction")
                 })
@@ -232,7 +232,7 @@ fun AddRecipeScreen(
                   // Cancel button
                   Button(
                       onClick = { navigationActions.goBack() },
-                      modifier = Modifier.height(40.dp),
+                      modifier = Modifier.height(40.dp).testTag("cancelButton"),
                       colors = ButtonDefaults.buttonColors(containerColor = errorContainerDark)) {
                         Text(text = "Cancel", fontSize = 18.sp)
                       }
@@ -268,7 +268,7 @@ fun AddRecipeScreen(
                               .show()
                         }
                       },
-                      modifier = Modifier.height(40.dp),
+                      modifier = Modifier.height(40.dp).testTag("addButton"),
                       colors =
                           ButtonDefaults.buttonColors(containerColor = primaryContainerLight)) {
                         Text(text = "Add", fontSize = 18.sp, color = onSecondaryDark)
@@ -320,12 +320,10 @@ fun InstructionItem(
         value = instruction,
         onValueChange = onInstructionChange,
         label = { Text("Step ${index + 1}") },
-        modifier = Modifier.weight(1f))
+        modifier = Modifier.weight(1f).testTag("inputRecipeInstruction"))
 
     // delete that step button
-    IconButton(
-        onClick = onRemoveClick,
-    ) {
+    IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteInstructionButton")) {
       Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Step")
     }
   }
@@ -354,12 +352,12 @@ fun InstructionItem(
 fun IngredientItem(index: Int, ingredient: Ingredient, onRemoveClick: () -> Unit) {
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
     // title of ingredient
-    Text(text = "Ingredient${index + 1} : ${ingredient.foodFacts.name}")
+    Text(
+        text = "Ingredient${index + 1} : ${ingredient.foodFacts.name}",
+        modifier = Modifier.testTag("ingredientItem"))
   }
   // delete button
-  IconButton(
-      onClick = onRemoveClick,
-  ) {
+  IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteIngredientButton")) {
     Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Ingredient")
   }
 }
@@ -397,7 +395,7 @@ fun IngredientDialog(
       onDismissRequest = onDismiss,
       title = { Text("Add Ingredient") },
       text = {
-        Column {
+        Column(modifier = Modifier.testTag("addIngredientPopUp")) {
           // ingredient name
           OutlinedTextField(
               value = ingredientName,
@@ -406,9 +404,9 @@ fun IngredientDialog(
                 ingredientNameError = if (ingredientName.isEmpty()) "Incomplete name" else null
               },
               label = { Text("Ingredient Name") },
-              modifier = Modifier.fillMaxWidth())
+              modifier = Modifier.fillMaxWidth().testTag("inputIngredientName"))
           // error message if ingredient name is empty
-          ErrorTextBox(ingredientNameError)
+          ErrorTextBox(ingredientNameError, "ingredientNameErrorMessage")
 
           // ingredient quantity (it is a string but will be transformed later on)
           OutlinedTextField(
@@ -419,10 +417,10 @@ fun IngredientDialog(
               },
               label = { Text("Quantity") },
               keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-              modifier = Modifier.fillMaxWidth())
+              modifier = Modifier.fillMaxWidth().testTag("inputIngredientQuantity"))
 
           // error message if the ingredient quantity is empty
-          ErrorTextBox(quantityError)
+          ErrorTextBox(quantityError, "ingredientQuantityErrorMessage")
 
           // Quantity Unit Dropdown
           Row {
@@ -432,6 +430,7 @@ fun IngredientDialog(
                     ingredientUnit = unit
                     selectedUnit = unit
                   },
+                  modifier = Modifier.testTag("ingredientUnitButton"),
                   // colour of button changes if selected
                   colors =
                       ButtonDefaults.buttonColors(
@@ -474,6 +473,7 @@ fun IngredientDialog(
                     .show()
               }
             },
+            modifier = Modifier.testTag("addIngredientButton2"),
             colors =
                 ButtonDefaults.buttonColors(
                     containerColor = primaryContainerLight,
@@ -485,6 +485,7 @@ fun IngredientDialog(
       dismissButton = {
         Button(
             onClick = onDismiss,
+            modifier = Modifier.testTag("cancelIngredientButton"),
             colors = ButtonDefaults.buttonColors(containerColor = errorContainerDark)) {
               Text("Cancel")
             }
@@ -501,10 +502,11 @@ fun IngredientDialog(
  * @param errorMessage The error message to display. If null or empty, no text is shown.
  */
 @Composable
-fun ErrorTextBox(errorMessage: String?) {
+fun ErrorTextBox(errorMessage: String?, testTag: String) {
   if (errorMessage != null) {
     Text(
         text = errorMessage,
+        modifier = Modifier.testTag(testTag),
         color = MaterialTheme.colorScheme.error,
         style = MaterialTheme.typography.bodySmall,
     )
