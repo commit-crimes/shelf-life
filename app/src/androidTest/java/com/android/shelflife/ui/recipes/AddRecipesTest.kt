@@ -231,4 +231,37 @@ class AddRecipesTest {
     // checks we have navigated back
     verify(navigationActions).goBack()
   }
+
+  @Test
+  fun addInstructionButtonAddsInstructionInput() {
+    setUpAddRecipesScreen()
+    composeTestRule.onNodeWithTag("addInstructionButton").performClick()
+    composeTestRule.onAllNodesWithTag("inputRecipeInstruction").onFirst().assertExists()
+  }
+
+  @Test
+  fun addRecipe() {
+    setUpAddRecipesScreen()
+    // val listRecipesViewModelSizeStart = listRecipesViewModel.toArray().size
+
+    composeTestRule.onNodeWithTag("addRecipeScreen").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("inputRecipeTitle").performTextInput("Smoked salmon")
+    composeTestRule.onNodeWithTag("inputRecipeServings").performTextInput("5")
+    composeTestRule.onNodeWithTag("inputRecipeTime").performTextInput("360")
+
+    composeTestRule.onNodeWithTag("addIngredientButton").performClick()
+    composeTestRule.onNodeWithTag("inputIngredientName").performTextInput("Salmon")
+    composeTestRule.onNodeWithTag("inputIngredientQuantity").performTextInput("5")
+    composeTestRule.onNodeWithTag("addIngredientButton2").performClick()
+
+    composeTestRule.onNodeWithTag("addInstructionButton").performClick()
+    composeTestRule
+        .onNodeWithTag("inputRecipeInstruction")
+        .performTextInput("Add the salmon into the smoker")
+
+    composeTestRule.onNodeWithTag("addButton").performClick()
+
+    verify(navigationActions).goBack()
+  }
 }
