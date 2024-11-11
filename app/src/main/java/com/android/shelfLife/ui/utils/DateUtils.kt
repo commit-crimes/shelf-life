@@ -126,6 +126,7 @@ fun isValidDate(dateStr: String): Boolean {
 // Function to check if a date is not in the past
 fun isValidDateNotPast(dateStr: String): Boolean {
   val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+  sdf.isLenient = false
   val date = sdf.parse(insertSlashes(dateStr)) ?: return false
   val today = sdf.parse(sdf.format(Date())) ?: return false
   return !date.before(today)
@@ -140,16 +141,30 @@ fun isLeapYear(year: Int): Boolean {
 // Function to compare two dates (returns true if date1 >= date2)
 fun isDateAfterOrEqual(dateStr1: String, dateStr2: String): Boolean {
   val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-  val date1 = sdf.parse(insertSlashes(dateStr1)) ?: return false
-  val date2 = sdf.parse(insertSlashes(dateStr2)) ?: return false
+  sdf.isLenient = false // Strict date parsing
+
+  val date1 = try {
+    sdf.parse(insertSlashes(dateStr1))
+  } catch (e: Exception) {
+    return false // dateStr1 is invalid
+  }
+
+  val date2 = try {
+    sdf.parse(insertSlashes(dateStr2))
+  } catch (e: Exception) {
+    return false // dateStr2 is invalid
+  }
+
   return !date1.before(date2)
 }
+
 
 // Function to convert a string date to Timestamp, handling exceptions
 fun formatDateToTimestamp(dateString: String): Timestamp? {
   return try {
     val formattedDateStr = insertSlashes(dateString)
     val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    sdf.isLenient = false
     val date = sdf.parse(formattedDateStr)
     if (date != null) Timestamp(date) else null
   } catch (e: Exception) {
