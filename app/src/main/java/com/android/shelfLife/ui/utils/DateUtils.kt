@@ -40,21 +40,21 @@ class DateVisualTransformation : VisualTransformation {
 
     // Create an OffsetMapping for the cursor position
     val offsetMapping =
-      object : OffsetMapping {
-        override fun originalToTransformed(offset: Int): Int {
-          var transformedOffset = offset
-          if (offset > 2) transformedOffset++
-          if (offset > 4) transformedOffset++
-          return transformedOffset.coerceAtMost(formattedText.length)
-        }
+        object : OffsetMapping {
+          override fun originalToTransformed(offset: Int): Int {
+            var transformedOffset = offset
+            if (offset > 2) transformedOffset++
+            if (offset > 4) transformedOffset++
+            return transformedOffset.coerceAtMost(formattedText.length)
+          }
 
-        override fun transformedToOriginal(offset: Int): Int {
-          var originalOffset = offset
-          if (offset > 2) originalOffset--
-          if (offset > 5) originalOffset--
-          return originalOffset.coerceAtMost(digits.length)
+          override fun transformedToOriginal(offset: Int): Int {
+            var originalOffset = offset
+            if (offset > 2) originalOffset--
+            if (offset > 5) originalOffset--
+            return originalOffset.coerceAtMost(digits.length)
+          }
         }
-      }
 
     return TransformedText(AnnotatedString(formattedText), offsetMapping)
   }
@@ -106,14 +106,14 @@ fun isValidDate(dateStr: String): Boolean {
 
   // Check if day is valid for the given month
   val daysInMonth =
-    when (month) {
-      4,
-      6,
-      9,
-      11 -> 30
-      2 -> if (isLeapYear(year)) 29 else 28
-      else -> 31
-    }
+      when (month) {
+        4,
+        6,
+        9,
+        11 -> 30
+        2 -> if (isLeapYear(year)) 29 else 28
+        else -> 31
+      }
 
   if (day !in 1..daysInMonth) {
     return false
@@ -132,7 +132,6 @@ fun isValidDateNotPast(dateStr: String): Boolean {
   return !date.before(today)
 }
 
-
 // Helper function to check if a year is a leap year
 fun isLeapYear(year: Int): Boolean {
   return (year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0))
@@ -143,21 +142,22 @@ fun isDateAfterOrEqual(dateStr1: String, dateStr2: String): Boolean {
   val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
   sdf.isLenient = false // Strict date parsing
 
-  val date1 = try {
-    sdf.parse(insertSlashes(dateStr1))
-  } catch (e: Exception) {
-    return false // dateStr1 is invalid
-  }
+  val date1 =
+      try {
+        sdf.parse(insertSlashes(dateStr1))
+      } catch (e: Exception) {
+        return false // dateStr1 is invalid
+      }
 
-  val date2 = try {
-    sdf.parse(insertSlashes(dateStr2))
-  } catch (e: Exception) {
-    return false // dateStr2 is invalid
-  }
+  val date2 =
+      try {
+        sdf.parse(insertSlashes(dateStr2))
+      } catch (e: Exception) {
+        return false // dateStr2 is invalid
+      }
 
   return !date1.before(date2)
 }
-
 
 // Function to convert a string date to Timestamp, handling exceptions
 fun formatDateToTimestamp(dateString: String): Timestamp? {
@@ -187,4 +187,3 @@ fun formatTimestampToDate(timestamp: Timestamp): String {
 fun fromCapitalStringToLowercaseString(enum: String): String {
   return enum.lowercase().replaceFirstChar { it.uppercase() }
 }
-

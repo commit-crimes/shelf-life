@@ -3,11 +3,11 @@
 package com.android.shelfLife.ui.utils
 
 import androidx.compose.ui.text.AnnotatedString
-import org.junit.Assert.*
-import org.junit.Test
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
+import org.junit.Assert.*
+import org.junit.Test
 
 class DateUtilsUnitTest {
 
@@ -193,5 +193,4 @@ class DateUtilsUnitTest {
     val totalMinutesNegative = getTotalMinutes(timestampNegative)
     assertEquals(-1, totalMinutesNegative)
   }
-
 }
