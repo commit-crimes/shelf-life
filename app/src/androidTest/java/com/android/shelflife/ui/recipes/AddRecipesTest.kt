@@ -166,6 +166,13 @@ class AddRecipesTest {
     composeTestRule.onNodeWithTag("inputRecipeTime").performTextInput("5")
     composeTestRule.onNodeWithTag("inputRecipeTime").performTextClearance()
     composeTestRule.onNodeWithTag("timeErrorMessage").assertIsDisplayed()
+
+    composeTestRule.onNodeWithTag("addInstructionButton").performClick()
+    composeTestRule
+        .onNodeWithTag("inputRecipeInstruction")
+        .performTextInput("Place the salmon into a smoker")
+    composeTestRule.onNodeWithTag("inputRecipeInstruction").performTextClearance()
+    composeTestRule.onNodeWithTag("instructionErrorMessage").assertIsDisplayed()
   }
 
   @Test

@@ -82,6 +82,12 @@ fun AddRecipeScreen(
   var titleError by remember { mutableStateOf<String?>(null) }
   var servingsError by remember { mutableStateOf<String?>(null) }
   var timeError by remember { mutableStateOf<String?>(null) }
+  var instructionsError by remember { mutableStateOf(false) } // Track if any instruction is empty
+
+  // Helper function to validate if any instruction is empty
+  fun validateInstructions() {
+    instructionsError = instructions.any { it.isBlank() }
+  }
 
   Scaffold(
       modifier = Modifier.testTag("addRecipeScreen"),
@@ -209,7 +215,10 @@ fun AddRecipeScreen(
             InstructionItem(
                 index = index,
                 instruction = instruction,
-                onInstructionChange = { newInstruction -> instructions[index] = newInstruction },
+                onInstructionChange = { newInstruction ->
+                  instructions[index] = newInstruction
+                  validateInstructions() // Check instructions after each change
+                },
                 onRemoveClick = { instructions.removeAt(index) })
           }
 
@@ -243,12 +252,14 @@ fun AddRecipeScreen(
                   Button(
                       // check that everything has been entered
                       onClick = {
+                        validateInstructions()
                         error =
                             title.isEmpty() ||
                                 time.isEmpty() ||
                                 servings.isEmpty() ||
                                 ingredients.isEmpty() ||
-                                instructions.isEmpty()
+                                instructions.isEmpty() ||
+                                instructionsError
                         if (!error) {
                           listRecipesViewModel.addRecipeToList(
                               recipe =
@@ -314,19 +325,22 @@ fun InstructionItem(
     onInstructionChange: (String) -> Unit,
     onRemoveClick: () -> Unit
 ) {
+  var instructionError by remember { mutableStateOf<String?>(null) }
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-    // OTF for the individual step
     OutlinedTextField(
         value = instruction,
-        onValueChange = onInstructionChange,
+        onValueChange = { newInstruction ->
+          onInstructionChange(newInstruction)
+          instructionError = if (newInstruction.isEmpty()) "Incomplete instruction" else null
+        },
         label = { Text("Step ${index + 1}") },
         modifier = Modifier.weight(1f).testTag("inputRecipeInstruction"))
-
-    // delete that step button
     IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteInstructionButton")) {
       Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Step")
     }
   }
+  // Display error message if needed
+  ErrorTextBox(instructionError, "instructionErrorMessage")
 }
 
 /**
