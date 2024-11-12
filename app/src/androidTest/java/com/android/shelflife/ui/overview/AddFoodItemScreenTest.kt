@@ -55,15 +55,15 @@ class AddFoodItemScreenTest {
     }
 
     // Verify that all input fields are displayed
-    composeTestRule.onNodeWithTag("inputFoodName").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputFoodAmount").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputFoodUnit").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputFoodCategory").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputFoodLocation").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputFoodExpireDate").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputFoodOpenDate").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputFoodBuyDate").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("foodSave").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputFoodName").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputFoodAmount").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputFoodUnit").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputFoodCategory").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputFoodLocation").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputFoodExpireDate").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputFoodOpenDate").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputFoodBuyDate").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithTag("foodSave").performScrollTo().assertIsDisplayed()
   }
 
   @Test
@@ -76,7 +76,7 @@ class AddFoodItemScreenTest {
     }
 
     // Enter invalid food name
-    composeTestRule.onNodeWithTag("inputFoodName").performTextInput("@#$%^")
+    composeTestRule.onNodeWithTag("inputFoodName").performScrollTo().performTextInput("@#$%^")
     // Verify error message is displayed
     composeTestRule.onNodeWithText("Food name contains invalid characters.").assertIsDisplayed()
 
@@ -203,12 +203,12 @@ class AddFoodItemScreenTest {
     }
 
     // Click the submit button without filling the form
-    composeTestRule.onNodeWithTag("foodSave").performClick()
+    composeTestRule.onNodeWithTag("foodSave").performScrollTo().performClick()
 
     // Verify that error messages are displayed for required fields
-    composeTestRule.onNodeWithText("Food name cannot be empty.").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Amount cannot be empty.").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Date cannot be empty").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Food name cannot be empty.").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithText("Amount cannot be empty.").performScrollTo().assertIsDisplayed()
+    composeTestRule.onNodeWithText("Date cannot be empty").performScrollTo().assertIsDisplayed()
   }
 
   @Test
@@ -221,22 +221,22 @@ class AddFoodItemScreenTest {
     }
 
     // Fill in valid inputs
-    composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Bananas")
-    composeTestRule.onNodeWithTag("inputFoodAmount").performTextInput("5")
-    composeTestRule.onNodeWithTag("inputFoodUnit").performClick()
-    composeTestRule.onNodeWithTag("dropDownItem_Count").performClick()
-    composeTestRule.onNodeWithTag("inputFoodCategory").performClick()
-    composeTestRule.onNodeWithTag("dropDownItem_Fruit").performClick()
-    composeTestRule.onNodeWithTag("inputFoodLocation").performClick()
-    composeTestRule.onNodeWithTag("dropDownItem_Pantry").performClick()
-    composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextInput("31122030") // Future date
+    composeTestRule.onNodeWithTag("inputFoodName").performScrollTo().performTextInput("Bananas")
+    composeTestRule.onNodeWithTag("inputFoodAmount").performScrollTo().performTextInput("5")
+    composeTestRule.onNodeWithTag("inputFoodUnit").performScrollTo().performClick()
+    composeTestRule.onNodeWithTag("dropDownItem_Count").performScrollTo().performClick()
+    composeTestRule.onNodeWithTag("inputFoodCategory").performScrollTo().performClick()
+    composeTestRule.onNodeWithTag("dropDownItem_Fruit").performScrollTo().performClick()
+    composeTestRule.onNodeWithTag("inputFoodLocation").performScrollTo().performClick()
+    composeTestRule.onNodeWithTag("dropDownItem_Pantry").performScrollTo().performClick()
+    composeTestRule.onNodeWithTag("inputFoodExpireDate").performScrollTo().performTextInput("31122030") // Future date
     // Clear and re-enter buy date to ensure it's valid
-    composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextClearance()
+    composeTestRule.onNodeWithTag("inputFoodBuyDate").performScrollTo().performTextClearance()
     composeTestRule
         .onNodeWithTag("inputFoodBuyDate")
         .performTextInput(formatTimestampToDate(Timestamp.now()))
     // Click the submit button
-    composeTestRule.onNodeWithTag("foodSave").performClick()
+    composeTestRule.onNodeWithTag("foodSave").performScrollTo().performClick()
 
     // Verify that the addFoodItem function was called
     verify { houseHoldViewModel.addFoodItem(any()) }
