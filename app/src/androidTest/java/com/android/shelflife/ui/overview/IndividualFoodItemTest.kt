@@ -1,7 +1,12 @@
 package com.android.shelfLife.ui.overview
 
+import android.content.Context
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.ComposeNavigator
+import androidx.navigation.testing.TestNavHostController
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
@@ -34,10 +39,17 @@ class IndividualFoodItemScreenTest {
   private lateinit var householdViewModel: HouseholdViewModel
   private lateinit var foodItem: FoodItem
   private lateinit var houseHold: HouseHold
+  private lateinit var navController: NavHostController
 
   @Before
   fun setUp() {
-    navigationActions = mock()
+    val context = ApplicationProvider.getApplicationContext<Context>()
+    // Initialize the class-level navController
+    navController = TestNavHostController(context)
+    navController.navigatorProvider.addNavigator(ComposeNavigator())
+
+    // Initialize NavigationActions with the properly initialized navController
+    navigationActions = NavigationActions(navController)
     houseHoldRepository = mock()
     val foodItemRepository = mock<FoodItemRepository>()
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
@@ -109,5 +121,22 @@ class IndividualFoodItemScreenTest {
 
     // Verify that the loading indicator is displayed
     composeTestRule.onNodeWithTag("CircularProgressIndicator").assertIsDisplayed()
+  }
+
+  @Test
+  fun testBackButtonNavigatesBack() = runTest {
+    // Set the selected food item
+    householdViewModel.setSelectedFoodItemById(foodItem)
+
+    composeTestRule.setContent {
+      IndividualFoodItemScreen(
+          navigationActions = navigationActions, householdViewModel = householdViewModel)
+    }
+
+    // Perform click on the back button
+    composeTestRule.onNodeWithTag("IndividualTestScreenGoBack").performClick()
+
+    // Verify that the navigation action was triggered
+    assert(navController.currentBackStackEntry == null)
   }
 }
