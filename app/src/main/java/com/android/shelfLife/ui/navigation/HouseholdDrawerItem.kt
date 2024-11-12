@@ -1,7 +1,9 @@
 package com.android.shelfLife.ui.navigation
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,41 +33,44 @@ fun HouseholdDrawerItem(
     editMode: Boolean,
     onHouseholdSelected: (HouseHold) -> Unit,
     onHouseholdEditSelected: (HouseHold) -> Unit,
+    onHouseholdDeleteSelected: (HouseHold) -> Unit, // New callback
     modifier: Modifier = Modifier
 ) {
-  NavigationDrawerItem(
-      colors =
-          NavigationDrawerItemDefaults.colors(
-              selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-              selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
-          ),
-      label = {
-        Text(
-            text = household.name,
-            fontWeight = if (household == selectedHousehold) FontWeight.Bold else FontWeight.Normal,
-            color =
-                if (household == selectedHousehold) MaterialTheme.colorScheme.primary
-                else Color.Unspecified)
-      },
-      icon = {
-        if (editMode) {
-          IconButton(
-              modifier = Modifier.testTag("editHouseholdIndicatorIcon"),
-              onClick = { onHouseholdEditSelected(household) }) {
-                Icon(
-                    imageVector = Icons.Outlined.Edit,
-                    contentDescription = "Edit Icon",
+    NavigationDrawerItem(
+        colors = NavigationDrawerItemDefaults.colors(
+            selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+            selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ),
+        label = {
+            Row {
+                Text(
+                    text = household.name,
+                    fontWeight = if (household == selectedHousehold) FontWeight.Bold else FontWeight.Normal,
+                    color = if (household == selectedHousehold) MaterialTheme.colorScheme.primary else Color.Unspecified,
+                    modifier = Modifier.weight(1f)
                 )
-              }
-        }
-      },
-      selected = household == selectedHousehold,
-      onClick = {
-        if (editMode) {
-          onHouseholdEditSelected(household)
-        } else {
-          onHouseholdSelected(household)
-        }
-      },
-      modifier = modifier.padding(NavigationDrawerItemDefaults.ItemPadding))
+                if (editMode) {
+                    IconButton(
+                        modifier = Modifier.testTag("deleteHouseholdIcon"),
+                        onClick = { onHouseholdDeleteSelected(household) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Delete,
+                            contentDescription = "Delete Icon",
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+            }
+        },
+        selected = household == selectedHousehold,
+        onClick = {
+            if (editMode) {
+                onHouseholdEditSelected(household)
+            } else {
+                onHouseholdSelected(household)
+            }
+        },
+        modifier = modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+    )
 }

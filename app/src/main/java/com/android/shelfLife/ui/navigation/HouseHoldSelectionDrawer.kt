@@ -90,6 +90,9 @@ fun HouseHoldSelectionDrawer(
                                     householdViewModel.selectHouseholdToEdit(household)
                                     navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
                                 },
+                                onHouseholdDeleteSelected = { household ->
+                                    householdViewModel.deleteHouseholdById(household.uid)
+                                }
                             )
                         }
                     }
