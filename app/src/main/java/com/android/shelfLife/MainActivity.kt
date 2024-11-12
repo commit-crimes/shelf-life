@@ -90,12 +90,9 @@ fun ShelfLifeApp() {
       composable(Screen.HOUSEHOLD_CREATION) {
         HouseHoldCreationScreen(navigationActions, householdViewModel = householdViewModel)
       }
-      composable("${Screen.INDIVIDUAL_FOOD_ITEM}/{foodItemId}") { backStackEntry ->
-        val foodItemId = backStackEntry.arguments?.getString("foodItemId")
+      composable(Screen.INDIVIDUAL_FOOD_ITEM) {
         IndividualFoodItemScreen(
-            foodItemId = foodItemId,
-            navigationActions = navigationActions,
-            householdViewModel = householdViewModel)
+            navigationActions = navigationActions, householdViewModel = householdViewModel)
       }
     }
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {

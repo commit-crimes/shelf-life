@@ -124,7 +124,8 @@ fun OverviewScreen(
               ListFoodItems(
                   foodItems = filteredFoodItems,
                   onFoodItemClick = { selectedFoodItem ->
-                    navigationActions.navigateToIndividualFood(selectedFoodItem.uid)
+                    householdViewModel.setSelectedFoodItemById(selectedFoodItem)
+                    navigationActions.navigateTo(Screen.INDIVIDUAL_FOOD_ITEM)
                   })
             }
           }

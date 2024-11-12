@@ -22,8 +22,8 @@ open class HouseholdViewModel(
   private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
   val selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
 
-  private val _searchedFoodItems = MutableStateFlow<List<FoodItem>>(emptyList())
-  val searchedFoodItems: StateFlow<List<FoodItem>> = _searchedFoodItems.asStateFlow()
+  private val _selectedFoodItem = MutableStateFlow<FoodItem?>(null)
+  val selectedFoodItem: StateFlow<FoodItem?> = _selectedFoodItem.asStateFlow()
 
   private val _householdToEdit = MutableStateFlow<HouseHold?>(null)
   val householdToEdit: StateFlow<HouseHold?> = _householdToEdit.asStateFlow()
@@ -133,10 +133,8 @@ open class HouseholdViewModel(
     }
   }
 
-  fun searchFoodItem(foodItem: FoodItem) {
-    _searchedFoodItems.value =
-        selectedHousehold.value?.foodItems?.filter { it.foodFacts.name == foodItem.foodFacts.name }
-            ?: emptyList()
+  fun setSelectedFoodItemById(foodItem: FoodItem?) {
+    _selectedFoodItem.value = foodItem
   }
 
   fun getFoodItemById(foodItemId: String): StateFlow<FoodItem?> {

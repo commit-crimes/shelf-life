@@ -98,10 +98,6 @@ open class NavigationActions(
     }
   }
 
-  open fun navigateToIndividualFood(foodItemId: String) {
-    navController.navigate("${Screen.INDIVIDUAL_FOOD_ITEM}/$foodItemId")
-  }
-
   /**
    * Navigate to the specified screen.
    *

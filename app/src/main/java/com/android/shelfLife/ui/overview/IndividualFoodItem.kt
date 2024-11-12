@@ -39,13 +39,10 @@ import com.android.shelfLife.ui.utils.FoodItemDetails
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IndividualFoodItemScreen(
-    foodItemId: String?,
     navigationActions: NavigationActions,
     householdViewModel: HouseholdViewModel
 ) {
-  val foodItem =
-      foodItemId?.let { householdViewModel.getFoodItemById(it).collectAsState(initial = null) }
-  val selectedFoodItem = foodItem?.value
+  val foodItem by householdViewModel.selectedFoodItem.collectAsState()
   Scaffold(
       modifier = Modifier.testTag("IndividualFoodItemScreen"),
       topBar = {
@@ -74,16 +71,16 @@ fun IndividualFoodItemScreen(
       }) { paddingValues ->
         LazyColumn(modifier = Modifier.padding(paddingValues)) {
           item {
-            if (selectedFoodItem != null) {
+            if (foodItem != null) {
               Text(
-                  text = selectedFoodItem.foodFacts.name,
+                  text = foodItem!!.foodFacts.name,
                   fontSize = 24.sp,
                   fontWeight = FontWeight.Bold,
                   modifier = Modifier.padding(16.dp).testTag("IndividualFoodItemName"))
 
               Image(
                   painter = painterResource(id = R.drawable.minecraft_rottenflesh),
-                  contentDescription = "Image of ${selectedFoodItem.foodFacts.name}",
+                  contentDescription = "Image of ${foodItem!!.foodFacts.name}",
                   modifier =
                       Modifier.fillMaxWidth()
                           .aspectRatio(1f)
@@ -91,7 +88,7 @@ fun IndividualFoodItemScreen(
                           .testTag("IndividualFoodItemImage"),
                   contentScale = ContentScale.Crop)
 
-              FoodItemDetails(foodItem = selectedFoodItem)
+              FoodItemDetails(foodItem = foodItem!!)
             } else {
               CircularProgressIndicator(modifier = Modifier.testTag("CircularProgressIndicator"))
             }
