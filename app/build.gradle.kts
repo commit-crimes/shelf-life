@@ -46,15 +46,7 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
-            all {
-                it.systemProperty("mockk.android.useInMemoryDex", "true")
-            }
         }
-        animationsDisabled = true
-
-//        execution {
-//            it.systemProperty("mockk.android.useInMemoryDex", "true")
-//        }
     }
 
     buildTypes {
