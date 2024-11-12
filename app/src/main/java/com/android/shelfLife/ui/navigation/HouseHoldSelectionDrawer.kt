@@ -1,11 +1,12 @@
 package com.android.shelfLife.ui.navigation
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Edit
@@ -41,89 +42,91 @@ fun HouseHoldSelectionDrawer(
     content: @Composable () -> Unit
 ) {
 
-  val userHouseholds = householdViewModel.households.collectAsState().value
-  val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
-  var editMode by remember { mutableStateOf(false) }
+    val userHouseholds = householdViewModel.households.collectAsState().value
+    val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
+    var editMode by remember { mutableStateOf(false) }
 
-  // Disable edit mode when the drawer is closed
-  LaunchedEffect(drawerState.isClosed) {
-    if (drawerState.isClosed) {
-      editMode = false
+    // Disable edit mode when the drawer is closed
+    LaunchedEffect(drawerState.isClosed) {
+        if (drawerState.isClosed) {
+            editMode = false
+        }
     }
-  }
 
-  ModalNavigationDrawer(
-      modifier = Modifier.testTag("householdSelectionDrawer"),
-      drawerState = drawerState,
-      drawerContent = {
-          ModalDrawerSheet(
-              drawerContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-          ) {
-              Text(
-                  "Household selection",
-                  modifier =
-                  Modifier.padding(vertical = 18.dp, horizontal = 16.dp)
-                      .padding(horizontal = 12.dp),
-                  style = MaterialTheme.typography.labelMedium
-              )
-              LazyColumn {
-                  itemsIndexed(userHouseholds) { index, household ->
-                      selectedHousehold?.let {
-                          HouseholdDrawerItem(
-                              household = household,
-                              selectedHousehold = it,
-                              editMode = editMode,
-                              onHouseholdSelected = { selectedHousehold ->
-                                  if (household != selectedHousehold) {
-                                      householdViewModel.selectHousehold(household)
-                                  }
-                                  scope.launch { drawerState.close() }
-                              },
-                              modifier = Modifier.testTag("householdElement_$index"),
-                              onHouseholdEditSelected = { householdToEdit ->
-                                  householdViewModel.selectHouseholdToEdit(householdToEdit)
-                                  navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
-                              },
-                          )
-                      }
-                  }
-                  item {
-                      HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
-                  }
-                  item {
-                      Row(
-                          modifier = Modifier
-                              .fillMaxWidth()
-                              .padding(16.dp),
-                          verticalAlignment = Alignment.CenterVertically,
-                          horizontalArrangement = Arrangement.Center
-                      ) {
-                          IconButton(
-                              modifier = Modifier.testTag("addHouseholdIcon"),
-                              onClick = {
-                                  householdViewModel.selectHouseholdToEdit(null)
-                                  navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
-                              }
-                          ) {
-                              Icon(
-                                  imageVector = Icons.Default.Add,
-                                  contentDescription = "Add Household Icon",
-                              )
-                          }
+    ModalNavigationDrawer(
+        modifier = Modifier.testTag("householdSelectionDrawer"),
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(
+                drawerContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+            ) {
+                // Remember the scroll state
+                val scrollState = rememberScrollState()
+                // Wrap content in a Column with verticalScroll
+                Column(
+                    modifier = Modifier.verticalScroll(scrollState)
+                ) {
+                    Text(
+                        "Household selection",
+                        modifier = Modifier
+                            .padding(vertical = 18.dp, horizontal = 16.dp)
+                            .padding(horizontal = 12.dp),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                    userHouseholds.forEachIndexed { index, household ->
+                        selectedHousehold?.let {
+                            HouseholdDrawerItem(
+                                household = household,
+                                selectedHousehold = it,
+                                editMode = editMode,
+                                onHouseholdSelected = { household ->
+                                    if (household != selectedHousehold) {
+                                        householdViewModel.selectHousehold(household)
+                                    }
+                                    scope.launch { drawerState.close() }
+                                },
+                                modifier = Modifier.testTag("householdElement_$index"),
+                                onHouseholdEditSelected = { household ->
+                                    householdViewModel.selectHouseholdToEdit(household)
+                                    navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
+                                },
+                            )
+                        }
+                    }
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        IconButton(
+                            modifier = Modifier.testTag("addHouseholdIcon"),
+                            onClick = {
+                                householdViewModel.selectHouseholdToEdit(null)
+                                navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add Household Icon",
+                            )
+                        }
 
-                          IconButton(
-                              modifier = Modifier.testTag("editHouseholdIcon"),
-                              onClick = { editMode = true }
-                          ) {
-                              Icon(
-                                  imageVector = Icons.Outlined.Edit,
-                                  contentDescription = "Edit Household Icon",
-                              )
-                          }
-                      }
-                  }
-              }
-          }
-      },
-      content = content)
+                        IconButton(
+                            modifier = Modifier.testTag("editHouseholdIcon"),
+                            onClick = { editMode = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Edit,
+                                contentDescription = "Edit Household Icon",
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        content = content
+    )
 }
