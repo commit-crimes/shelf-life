@@ -25,6 +25,9 @@ class HouseholdViewModel(
   private val _householdToEdit = MutableStateFlow<HouseHold?>(null)
   val householdToEdit: StateFlow<HouseHold?> = _householdToEdit.asStateFlow()
 
+  private val _memberEmails = MutableStateFlow<Map<String, String>>(emptyMap())
+  val memberEmails: StateFlow<Map<String, String>> = _memberEmails.asStateFlow()
+
   var finishedLoading = MutableStateFlow(false)
 
   /** Initializes the HouseholdViewModel by loading the list of households from the repository. */
@@ -66,7 +69,19 @@ class HouseholdViewModel(
 
   fun selectHouseholdToEdit(household: HouseHold?) {
     _householdToEdit.value = household
+    household?.let {
+      repository.getUserEmails(it.members) { uidToEmail ->
+        _memberEmails.value = uidToEmail
+      }
+    }
   }
+
+  fun getUserIdsByEmails(emails: List<String>, callback: (Map<String, String>) -> Unit) {
+    repository.getUserIds(emails) { emailToUid ->
+      callback(emailToUid)
+    }
+  }
+
 
   fun checkIfHouseholdNameExists(houseHoldName: String): Boolean {
     return _households.value.any { it.name == houseHoldName }
