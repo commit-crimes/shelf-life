@@ -65,7 +65,7 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
           mapOf(
               "uid" to household.uid,
               "name" to household.name,
-              "members" to household.members.plus(currentUser.uid),
+              "members" to household.members,
               "foodItems" to
                   household.foodItems.map { foodItem ->
                     foodItemRepository.convertFoodItemToMap(foodItem)

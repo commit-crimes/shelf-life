@@ -39,58 +39,52 @@ fun HouseholdDrawerItem(
     onHouseholdDeleteSelected: (HouseHold) -> Unit, // New callback for delete action
     modifier: Modifier = Modifier
 ) {
-    NavigationDrawerItem(
-        colors = NavigationDrawerItemDefaults.colors(
-            selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        ),
-        label = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (editMode) {
-                    // Edit button on the left
-                    IconButton(
-                        modifier = Modifier.testTag("editHouseholdIcon"),
-                        onClick = { onHouseholdEditSelected(household) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Edit,
-                            contentDescription = "Edit Icon",
-                        )
-                    }
+  NavigationDrawerItem(
+      colors =
+          NavigationDrawerItemDefaults.colors(
+              selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+              selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+          ),
+      label = {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+          if (editMode) {
+            // Edit button on the left
+            IconButton(
+                modifier = Modifier.testTag("editHouseholdIndicatorIcon"),
+                onClick = { onHouseholdEditSelected(household) }) {
+                  Icon(
+                      imageVector = Icons.Outlined.Edit,
+                      contentDescription = "Edit Icon",
+                  )
                 }
+          }
 
-                Text(
-                    text = household.name,
-                    fontWeight = if (household == selectedHousehold) FontWeight.Bold else FontWeight.Normal,
-                    color = if (household == selectedHousehold) MaterialTheme.colorScheme.primary else Color.Unspecified,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = if (editMode) 8.dp else 0.dp)
-                )
-                if (editMode) {
-                    // Delete button on the right
-                    IconButton(
-                        modifier = Modifier.testTag("deleteHouseholdIcon"),
-                        onClick = { onHouseholdDeleteSelected(household) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Delete,
-                            contentDescription = "Delete Icon",
-                            tint = MaterialTheme.colorScheme.error
-                        )
-                    }
+          Text(
+              text = household.name,
+              fontWeight =
+                  if (household == selectedHousehold) FontWeight.Bold else FontWeight.Normal,
+              color =
+                  if (household == selectedHousehold) MaterialTheme.colorScheme.primary
+                  else Color.Unspecified,
+              modifier = Modifier.weight(1f).padding(start = if (editMode) 8.dp else 0.dp))
+          if (editMode) {
+            // Delete button on the right
+            IconButton(
+                modifier = Modifier.testTag("deleteHouseholdIcon"),
+                onClick = { onHouseholdDeleteSelected(household) }) {
+                  Icon(
+                      imageVector = Icons.Outlined.Delete,
+                      contentDescription = "Delete Icon",
+                      tint = MaterialTheme.colorScheme.error)
                 }
-            }
-        },
-        selected = household == selectedHousehold,
-        onClick = {
-            if (!editMode) {
-                onHouseholdSelected(household)
-            }
-        },
-        modifier = modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-    )
+          }
+        }
+      },
+      selected = household == selectedHousehold,
+      onClick = {
+        if (!editMode) {
+          onHouseholdSelected(household)
+        }
+      },
+      modifier = modifier.padding(NavigationDrawerItemDefaults.ItemPadding))
 }
