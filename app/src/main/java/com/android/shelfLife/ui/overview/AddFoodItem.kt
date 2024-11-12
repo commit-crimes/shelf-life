@@ -1,5 +1,3 @@
-// AddFoodItemScreen.kt
-
 package com.android.shelfLife.ui.overview
 
 import android.widget.Toast
@@ -152,7 +150,7 @@ fun AddFoodItemScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
-            item {
+            item(key = "foodName") {
                 // Food Name Field with Error Handling
                 OutlinedTextField(
                     value = foodName,
@@ -179,12 +177,11 @@ fun AddFoodItemScreen(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Start
                     )
-
                 }
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            item {
+            item(key = "amount") {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -214,7 +211,8 @@ fun AddFoodItemScreen(
                                 text = amountError!!,
                                 color = MaterialTheme.colorScheme.error,
                                 style = MaterialTheme.typography.bodySmall,
-                                modifier = Modifier.align(Alignment.Start)
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Start
                             )
                         }
                     }
@@ -236,7 +234,7 @@ fun AddFoodItemScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            item {
+            item(key = "category") {
                 // Category Dropdown
                 DropdownFields(
                     label = stringResource(id = R.string.category_label),
@@ -253,7 +251,7 @@ fun AddFoodItemScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            item {
+            item(key = "location") {
                 // Location Dropdown
                 DropdownFields(
                     label = stringResource(id = R.string.location_label),
@@ -270,7 +268,7 @@ fun AddFoodItemScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            item {
+            item(key = "expireDate") {
                 // Expire Date Field with Error Handling
                 OutlinedTextField(
                     value = expireDate,
@@ -309,7 +307,7 @@ fun AddFoodItemScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            item {
+            item(key = "openDate") {
                 // Open Date Field with Error Handling
                 OutlinedTextField(
                     value = openDate,
@@ -348,7 +346,7 @@ fun AddFoodItemScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            item {
+            item(key = "buyDate") {
                 // Buy Date Field with Error Handling
                 OutlinedTextField(
                     value = buyDate,
@@ -395,7 +393,7 @@ fun AddFoodItemScreen(
                 Spacer(modifier = Modifier.height(32.dp))
             }
 
-            item {
+            item(key = "submitButton") {
                 // Submit Button
                 Button(
                     onClick = {
