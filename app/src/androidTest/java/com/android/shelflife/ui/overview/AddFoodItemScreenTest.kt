@@ -228,7 +228,6 @@ class AddFoodItemScreenTest {
                 foodItemViewModel = foodItemViewModel
             )
         }
-
         // Scroll to the submit button
         composeTestRule.onNodeWithTag("addFoodItemScreen")
             .performScrollToNode(hasTestTag("foodSave"))
@@ -236,8 +235,14 @@ class AddFoodItemScreenTest {
         composeTestRule.onNodeWithTag("foodSave").performClick()
 
         // Verify that error messages are displayed for required fields
+        composeTestRule.onNodeWithTag("addFoodItemScreen")
+            .performScrollToNode(hasTestTag("inputFoodName"))
         composeTestRule.onNodeWithText("Food name cannot be empty.").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("addFoodItemScreen")
+            .performScrollToNode(hasTestTag("inputFoodAmount"))
         composeTestRule.onNodeWithText("Amount cannot be empty.").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("addFoodItemScreen")
+            .performScrollToNode(hasTestTag("inputFoodExpireDate"))
         composeTestRule.onNodeWithText("Date cannot be empty").assertIsDisplayed()
     }
 
