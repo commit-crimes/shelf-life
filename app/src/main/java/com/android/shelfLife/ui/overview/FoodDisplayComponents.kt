@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.overview
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
@@ -88,11 +86,9 @@ fun FoodItemCard(foodItem: FoodItem) {
 
   ElevatedCard(
       elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
-      colors = CardDefaults.elevatedCardColors(containerColor = Color.White),
       modifier =
           Modifier.fillMaxWidth()
               .padding(horizontal = 16.dp, vertical = 8.dp)
-              .background(Color.White)
               .testTag("foodItemCard")) {
         Row(modifier = Modifier.padding(16.dp)) {
           Column(modifier = Modifier.weight(1f)) {
@@ -109,7 +105,7 @@ fun FoodItemCard(foodItem: FoodItem) {
                       fontSize = 12.sp)
             }
 
-            Text(text = "Expires on $formattedExpiryDate", fontSize = 12.sp, color = Color.Black)
+            Text(text = "Expires on $formattedExpiryDate", fontSize = 12.sp)
           }
 
           Spacer(modifier = Modifier.width(8.dp))
