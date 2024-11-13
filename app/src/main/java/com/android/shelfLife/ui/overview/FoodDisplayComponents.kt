@@ -89,7 +89,6 @@ fun FoodItemCard(foodItem: FoodItem, onClick: () -> Unit) {
 
   ElevatedCard(
       elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
-      colors = CardDefaults.elevatedCardColors(containerColor = Color.White),
       modifier =
           Modifier.fillMaxWidth()
               .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -111,7 +110,7 @@ fun FoodItemCard(foodItem: FoodItem, onClick: () -> Unit) {
                       fontSize = 12.sp)
             }
 
-            Text(text = "Expires on $formattedExpiryDate", fontSize = 12.sp, color = Color.Black)
+            Text(text = "Expires on $formattedExpiryDate", fontSize = 12.sp)
           }
 
           Spacer(modifier = Modifier.width(8.dp))
