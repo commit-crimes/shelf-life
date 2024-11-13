@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.overview
 
+import android.graphics.Paint.Align
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.ui.utils.getProgressBarState
@@ -117,7 +119,7 @@ fun FoodItemCard(foodItem: FoodItem) {
           AsyncImage(
               model = foodItem.foodFacts.imageUrl,
               contentDescription = "Food Image",
-              modifier = Modifier.size(64.dp).clip(RoundedCornerShape(8.dp)),
+              modifier = Modifier.size(80.dp).clip(RoundedCornerShape(8.dp)).align(Alignment.CenterVertically),
               contentScale = ContentScale.Crop)
         }
         Row {
