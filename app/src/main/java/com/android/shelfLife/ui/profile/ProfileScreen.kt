@@ -56,6 +56,7 @@ fun ProfileScreen(
                     .testTag("profileColumn"),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top) {
+
               // Profile picture using Coil to load the image from a URL
               val profileImageUrl = currentAccount?.photoUrl?.toString()
               if (profileImageUrl == null) {
@@ -73,11 +74,20 @@ fun ProfileScreen(
               }
               Spacer(modifier = Modifier.height(32.dp))
               Text(
-                  text = "Hello, ${currentAccount?.email ?: "Guest"}",
+                  text = currentAccount?.displayName ?: "Guest",
                   fontWeight = FontWeight.Bold,
                   fontSize = 28.sp,
-                  textAlign = TextAlign.Left,
-                  modifier = Modifier.testTag("greetingText"))
+                  textAlign = TextAlign.Center,
+                  modifier = Modifier.testTag("profileNameText"))
+
+              if (currentAccount?.email != null) {
+                Text(
+                    text = currentAccount.email!!,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.testTag("profileEmailText"))
+              }
 
               Spacer(modifier = Modifier.weight(1f))
 
