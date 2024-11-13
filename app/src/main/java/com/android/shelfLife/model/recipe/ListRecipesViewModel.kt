@@ -140,4 +140,8 @@ open class ListRecipesViewModel() : ViewModel() {
     val newRecipe = Recipe(name, instructions, servings, time)
     recipes_.value += newRecipe
   }
+
+  fun addRecipeToList(recipe: Recipe) {
+    recipes_.value = recipes_.value + recipe
+  }
 }
