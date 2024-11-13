@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,74 +20,77 @@ import com.android.shelfLife.model.foodItem.FoodItem
 
 @Composable
 fun FoodItemDetails(foodItem: FoodItem) {
-    val context = LocalContext.current
-    val textStyle = TextStyle(fontSize = 14.sp)
+  val context = LocalContext.current
+  val textStyle = TextStyle(fontSize = 14.sp)
 
-    val formattedExpiryDate =
-        foodItem.expiryDate?.let { formatTimestampToDate(it) } ?: stringResource(R.string.food_item_no_expiry_date)
-    val formattedOpenDate = foodItem.openDate?.let { formatTimestampToDate(it) } ?: stringResource(R.string.food_item_not_opened)
-    val formattedBuyDate = formatTimestampToDate(foodItem.buyDate)
+  val formattedExpiryDate =
+      foodItem.expiryDate?.let { formatTimestampToDate(it) }
+          ?: stringResource(R.string.food_item_no_expiry_date)
+  val formattedOpenDate =
+      foodItem.openDate?.let { formatTimestampToDate(it) }
+          ?: stringResource(R.string.food_item_not_opened)
+  val formattedBuyDate = formatTimestampToDate(foodItem.buyDate)
 
-    ElevatedCard(
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
-        colors = CardDefaults.elevatedCardColors(containerColor = Color.White),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .background(Color.White)
-            .testTag("foodItemDetailsCard")
-    ) {
+  ElevatedCard(
+      modifier =
+          Modifier.fillMaxWidth()
+              .padding(horizontal = 16.dp, vertical = 8.dp)
+              .background(Color.White)
+              .testTag("foodItemDetailsCard")) {
         Column(modifier = Modifier.padding(16.dp)) {
-            FoodItemDetailText(
-                text = stringResource(R.string.food_item_category_label, foodItem.foodFacts.category.name),
-                tag = "categoryText",
-                style = textStyle
-            )
-            FoodItemDetailText(
-                text = stringResource(R.string.food_item_location_label, foodItem.location.name),
-                tag = "locationText",
-                style = textStyle
-            )
-            FoodItemDetailText(
-                text = stringResource(R.string.food_item_status_label, foodItem.status.name),
-                tag = "statusText",
-                style = textStyle
-            )
-            FoodItemDetailText(
-                text = stringResource(R.string.food_item_expiry_date_label, formattedExpiryDate),
-                tag = "expiryDateText",
-                style = textStyle
-            )
-            FoodItemDetailText(
-                text = stringResource(R.string.food_item_open_date_label, formattedOpenDate),
-                tag = "openDateText",
-                style = textStyle
-            )
-            FoodItemDetailText(
-                text = stringResource(R.string.food_item_buy_date_label, formattedBuyDate),
-                tag = "buyDateText",
-                style = textStyle
-            )
-            FoodItemDetailText(
-                text = stringResource(R.string.food_item_energy_label, foodItem.foodFacts.nutritionFacts.energyKcal),
-                tag = "energyText",
-                style = textStyle
-            )
-            FoodItemDetailText(
-                text = stringResource(R.string.food_item_proteins_label, foodItem.foodFacts.nutritionFacts.proteins),
-                tag = "proteinsText",
-                style = textStyle
-            )
-            FoodItemDetailText(
-                text = stringResource(R.string.food_item_quantity_label, foodItem.foodFacts.quantity.amount, foodItem.foodFacts.quantity.unit),
-                tag = "quantityText",
-                style = textStyle
-            )
+          FoodItemDetailText(
+              text =
+                  stringResource(
+                      R.string.food_item_category_label, foodItem.foodFacts.category.name),
+              tag = "categoryText",
+              style = textStyle)
+          FoodItemDetailText(
+              text = stringResource(R.string.food_item_location_label, foodItem.location.name),
+              tag = "locationText",
+              style = textStyle)
+          FoodItemDetailText(
+              text = stringResource(R.string.food_item_status_label, foodItem.status.name),
+              tag = "statusText",
+              style = textStyle)
+          FoodItemDetailText(
+              text = stringResource(R.string.food_item_expiry_date_label, formattedExpiryDate),
+              tag = "expiryDateText",
+              style = textStyle)
+          FoodItemDetailText(
+              text = stringResource(R.string.food_item_open_date_label, formattedOpenDate),
+              tag = "openDateText",
+              style = textStyle)
+          FoodItemDetailText(
+              text = stringResource(R.string.food_item_buy_date_label, formattedBuyDate),
+              tag = "buyDateText",
+              style = textStyle)
+          FoodItemDetailText(
+              text =
+                  stringResource(
+                      R.string.food_item_energy_label,
+                      foodItem.foodFacts.nutritionFacts.energyKcal),
+              tag = "energyText",
+              style = textStyle)
+          FoodItemDetailText(
+              text =
+                  stringResource(
+                      R.string.food_item_proteins_label,
+                      foodItem.foodFacts.nutritionFacts.proteins),
+              tag = "proteinsText",
+              style = textStyle)
+          FoodItemDetailText(
+              text =
+                  stringResource(
+                      R.string.food_item_quantity_label,
+                      foodItem.foodFacts.quantity.amount,
+                      foodItem.foodFacts.quantity.unit),
+              tag = "quantityText",
+              style = textStyle)
         }
-    }
+      }
 }
 
 @Composable
 fun FoodItemDetailText(text: String, tag: String, style: TextStyle) {
-    Text(text = text, style = style, modifier = Modifier.testTag(tag))
+  Text(text = text, style = style, modifier = Modifier.testTag(tag))
 }
