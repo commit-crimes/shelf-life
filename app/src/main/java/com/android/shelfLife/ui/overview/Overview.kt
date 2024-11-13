@@ -50,7 +50,7 @@ fun OverviewScreen(
   val foodItems = selectedHousehold?.foodItems ?: emptyList()
   val userHouseholds = householdViewModel.households.collectAsState().value
   val householdViewModelIsLoaded = householdViewModel.finishedLoading.collectAsState().value
-  var selectedFilters = remember { mutableStateListOf<String>() }
+  val selectedFilters = remember { mutableStateListOf<String>() }
 
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
@@ -59,7 +59,10 @@ fun OverviewScreen(
   val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
 
   HouseHoldSelectionDrawer(
-      scope = scope, drawerState = drawerState, householdViewModel = householdViewModel) {
+      scope = scope,
+      drawerState = drawerState,
+      householdViewModel = householdViewModel,
+      navigationActions = navigationActions) {
         val filteredFoodItems =
             foodItems.filter { item ->
               item.foodFacts.name.contains(searchQuery, ignoreCase = true) &&
@@ -76,7 +79,7 @@ fun OverviewScreen(
             CircularProgressIndicator()
           }
         } else if (selectedHousehold == null && userHouseholds.isEmpty()) {
-          FirstTimeWelcomeScreen(householdViewModel)
+          FirstTimeWelcomeScreen(navigationActions, householdViewModel)
         } else {
           Scaffold(
               modifier = Modifier.testTag("overviewScreen"),

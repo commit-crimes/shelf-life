@@ -1,229 +1,461 @@
 package com.android.shelfLife.ui.overview
 
-import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
-import com.android.shelfLife.model.foodFacts.FoodCategory
-import com.android.shelfLife.model.foodFacts.FoodFacts
-import com.android.shelfLife.model.foodFacts.FoodUnit
-import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.foodItem.FoodItem
-import com.android.shelfLife.model.foodItem.FoodStatus
-import com.android.shelfLife.model.foodItem.FoodStorageLocation
-import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
+import com.android.shelfLife.model.foodFacts.*
+import com.android.shelfLife.model.foodItem.*
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.utils.DropdownFields
-import com.android.shelfLife.ui.utils.ErrorPopUp
-import com.android.shelfLife.ui.utils.formatDateToTimestamp
-import com.android.shelfLife.ui.utils.formatTimestampToDate
-import com.android.shelfLife.ui.utils.fromCapitalStringToLowercaseString
-import com.example.compose.primaryContainerLight
+import com.android.shelfLife.ui.utils.*
 import com.google.firebase.Timestamp
-import java.text.SimpleDateFormat
-import java.util.*
 
+/**
+ * Composable function to display the Add Food Item screen.
+ *
+ * @param navigationActions The navigation actions to be used in the screen.
+ * @param houseHoldViewModel The ViewModel for the household.
+ * @param foodItemViewModel The ViewModel for the food items.
+ * @param paddingValues The padding values to be applied to the screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddFoodItemScreen(
     navigationActions: NavigationActions,
     houseHoldViewModel: HouseholdViewModel,
     foodItemViewModel: ListFoodItemsViewModel,
-    paddingValues: PaddingValues = PaddingValues(8.dp)
+    paddingValues: PaddingValues = PaddingValues(16.dp)
 ) {
-  var foodName by remember { mutableStateOf("") }
-  var amount by remember { mutableStateOf("") }
-  var unit by remember { mutableStateOf(FoodUnit.GRAM) }
-  var category by remember { mutableStateOf(FoodCategory.OTHER) }
-  var location by remember { mutableStateOf(FoodStorageLocation.PANTRY) }
-  var expireDate by remember { mutableStateOf("") }
-  var openDate by remember { mutableStateOf("") }
-  var buyDate by remember { mutableStateOf(formatTimestampToDate(Timestamp.now())) }
 
-  val errorMessages by remember { mutableStateOf(mutableMapOf<String, String>()) }
-  var showDialog by remember { mutableStateOf(false) }
-  var unitExpanded by remember { mutableStateOf(false) }
-  var categoryExpanded by remember { mutableStateOf(false) }
-  var locationExpanded by remember { mutableStateOf(false) }
+    var foodName by remember { mutableStateOf("") }
+    var amount by remember { mutableStateOf("") }
+    var unit by remember { mutableStateOf(FoodUnit.GRAM) }
+    var category by remember { mutableStateOf(FoodCategory.OTHER) }
+    var location by remember { mutableStateOf(FoodStorageLocation.PANTRY) }
+    var expireDate by remember { mutableStateOf("") }
+    var openDate by remember { mutableStateOf("") }
+    var buyDate by remember { mutableStateOf(formatTimestampToDate(Timestamp.now())) }
 
-  Scaffold(
-      modifier = Modifier.fillMaxSize(),
-      topBar = {
-        TopAppBar(
-            title = {
-              Text(
-                  modifier = Modifier.testTag("addFoodItemTitle"),
-                  text = stringResource(id = R.string.add_food_item_title))
-            },
-            navigationIcon = {
-              IconButton(
-                  onClick = { navigationActions.goBack() },
-                  modifier = Modifier.testTag("goBackButton")) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go Back")
-                  }
-            })
-      }) { padding ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(padding).testTag("addFoodItemScreen").verticalScroll(rememberScrollState()),
+    var foodNameError by remember { mutableStateOf<String?>(null) }
+    var amountError by remember { mutableStateOf<String?>(null) }
+    var expireDateError by remember { mutableStateOf<String?>(null) }
+    var openDateError by remember { mutableStateOf<String?>(null) }
+    var buyDateError by remember { mutableStateOf<String?>(null) }
+
+    var unitExpanded by remember { mutableStateOf(false) }
+    var categoryExpanded by remember { mutableStateOf(false) }
+    var locationExpanded by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+
+    // Validation Functions
+
+    /**
+     * Validates the food name.
+     *
+     * @param foodName The food name to validate.
+     * @return The error message if the food name is invalid, null otherwise.
+     */
+    fun validateFoodName(foodName: String): String? {
+        val namePattern = Regex("^[a-zA-Z0-9\\s\\-,'()]+\$")
+        return when {
+            foodName.isBlank() -> "Food name cannot be empty."
+            !namePattern.matches(foodName) -> "Food name contains invalid characters."
+            else -> null
+        }
+    }
+
+    /**
+     * Validates the amount.
+     *
+     * @param amount The amount to validate.
+     * @return The error message if the amount is invalid, null otherwise.
+     */
+    fun validateAmount(amount: String): String? {
+        return when {
+            amount.isBlank() -> "Amount cannot be empty."
+            amount.toDoubleOrNull() == null -> "Amount must be a number."
+            amount.toDouble() <= 0 -> "Amount must be positive."
+            else -> null
+        }
+    }
+
+    /**
+     * Validates the buy date.
+     *
+     * @param buyDate The buy date to validate.
+     * @return The error message if the buy date is invalid, null otherwise.
+     */
+    fun validateBuyDate(buyDate: String): String? {
+        return getDateErrorMessage(buyDate)
+    }
+
+    /**
+     * Validates the expire date.
+     *
+     * @param expireDate The expire date to validate.
+     * @param buyDate The buy date to compare with.
+     * @param buyDateError The error message for the buy date.
+     * @return The error message if the expire date is invalid, null otherwise.
+     */
+    fun validateExpireDate(expireDate: String, buyDate: String, buyDateError: String?): String? {
+        var error = getDateErrorMessage(expireDate)
+        if (error == null && expireDate.length == 8 && buyDateError == null && buyDate.length == 8) {
+            if (!isDateAfterOrEqual(expireDate, buyDate)) {
+                error = "Expire Date cannot be before Buy Date"
+            }
+        }
+        if (error == null && expireDate.length == 8) {
+            if (!isValidDateNotPast(expireDate)) {
+                error = "Expire Date cannot be in the past"
+            }
+        }
+        return error
+    }
+
+    /**
+     * Validates the open date.
+     *
+     * @param openDate The open date to validate.
+     * @param buyDate The buy date to compare with.
+     * @param buyDateError The error message for the buy date.
+     * @param expireDate The expire date to compare with.
+     * @param expireDateError The error message for the expire date.
+     * @return The error message if the open date is invalid, null otherwise.
+     */
+    fun validateOpenDate(
+        openDate: String,
+        buyDate: String,
+        buyDateError: String?,
+        expireDate: String,
+        expireDateError: String?
+    ): String? {
+        var error = getDateErrorMessage(openDate, isRequired = false)
+        if (error == null && openDate.isNotEmpty() && buyDateError == null && openDate.length == 8 && buyDate.length == 8) {
+            if (!isDateAfterOrEqual(openDate, buyDate)) {
+                error = "Open Date cannot be before Buy Date"
+            }
+        }
+        if (error == null && openDate.isNotEmpty() && expireDateError == null && openDate.length == 8 && expireDate.length == 8) {
+            if (!isDateAfterOrEqual(expireDate, openDate)) {
+                error = "Open Date cannot be after Expire Date"
+            }
+        }
+        return error
+    }
+
+    /**
+     * Validates all fields when the submit button is clicked.
+     */
+    fun validateAllFieldsWhenSubmitButton() {
+        foodNameError = validateFoodName(foodName)
+        amountError = validateAmount(amount)
+        buyDateError = validateBuyDate(buyDate)
+        expireDateError = validateExpireDate(expireDate, buyDate, buyDateError)
+        openDateError = validateOpenDate(openDate, buyDate, buyDateError, expireDate, expireDateError)
+    }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        modifier = Modifier.testTag("addFoodItemTitle"),
+                        text = stringResource(id = R.string.add_food_item_title)
+                    )
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navigationActions.goBack() },
+                        modifier = Modifier.testTag("goBackButton")
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go Back")
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(innerPadding)
+                .testTag("addFoodItemScreen"),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top) {
-              OutlinedTextField(
-                  value = foodName,
-                  onValueChange = { foodName = it },
-                  label = { Text(stringResource(id = R.string.food_name_hint)) },
-                  modifier = Modifier.testTag("inputFoodName").fillMaxWidth())
+            verticalArrangement = Arrangement.Top
+        ) {
+            item(key = "foodName") {
+                // Food Name Field with Error Handling
+                OutlinedTextField(
+                    value = foodName,
+                    onValueChange = { newValue ->
+                        foodName = newValue
+                        foodNameError = validateFoodName(foodName)
+                    },
+                    label = { Text(stringResource(id = R.string.food_name_hint)) },
+                    isError = foodNameError != null,
+                    modifier = Modifier
+                        .testTag("inputFoodName")
+                        .fillMaxWidth()
+                )
+                if (foodNameError != null) {
+                    Text(
+                        text = foodNameError!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Start
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
 
-              Row(
-                  modifier = Modifier.fillMaxWidth(),
-                  horizontalArrangement = Arrangement.SpaceBetween) {
-                    OutlinedTextField(
-                        value = amount,
-                        onValueChange = { amount = it },
-                        label = { Text(stringResource(id = R.string.amount_hint)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.testTag("inputFoodAmount").weight(1f).padding(end = 4.dp))
-
+            item(key = "amount") {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        // Amount Field with Error Handling
+                        OutlinedTextField(
+                            value = amount,
+                            onValueChange = { newValue ->
+                                amount = newValue
+                                amountError = validateAmount(amount)
+                            },
+                            label = { Text(stringResource(id = R.string.amount_hint)) },
+                            isError = amountError != null,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            modifier = Modifier
+                                .testTag("inputFoodAmount")
+                                .fillMaxWidth()
+                        )
+                        if (amountError != null) {
+                            Text(
+                                text = amountError!!,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Start
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    // Unit Dropdown
                     DropdownFields(
                         label = stringResource(id = R.string.unit_label),
-                        options = FoodUnit.values(),
+                        options = FoodUnit.entries.toTypedArray(),
                         selectedOption = unit,
                         onOptionSelected = { unit = it },
                         expanded = unitExpanded,
                         onExpandedChange = { unitExpanded = it },
                         optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-                        modifier = Modifier.weight(1f).testTag("inputFoodUnit"))
-                  }
-
-              // Category dropdown
-              DropdownFields(
-                  label = stringResource(id = R.string.category_label),
-                  options = FoodCategory.values(),
-                  selectedOption = category,
-                  onOptionSelected = { category = it },
-                  expanded = categoryExpanded,
-                  onExpandedChange = { categoryExpanded = it },
-                  optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-                  modifier = Modifier.testTag("inputFoodCategory"))
-
-          Spacer(modifier = Modifier.height(8.dp))
-
-              DropdownFields(
-                  label = stringResource(id = R.string.location_label),
-                  options = FoodStorageLocation.values(),
-                  selectedOption = location,
-                  onOptionSelected = { location = it },
-                  expanded = locationExpanded,
-                  onExpandedChange = { locationExpanded = it },
-                  optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-                  modifier = Modifier.testTag("inputFoodLocation"))
-
-              OutlinedTextField(
-                  value = expireDate,
-                  onValueChange = { expireDate = it },
-                  label = { Text(stringResource(id = R.string.expire_date_hint)) },
-                  placeholder = { Text("dd/mm/yyyy") },
-                  modifier = Modifier.testTag("inputFoodExpireDate").fillMaxWidth().padding(bottom = 8.dp)
-              )
-
-              OutlinedTextField(
-                  value = openDate,
-                  onValueChange = { openDate = it },
-                  label = { Text(stringResource(id = R.string.open_date_hint)) },
-                  placeholder = { Text("dd/mm/yyyy") },
-                  modifier = Modifier.testTag("inputFoodOpenDate").fillMaxWidth(),
-              )
-
-              OutlinedTextField(
-                  value = buyDate,
-                  onValueChange = { buyDate = it },
-                  label = { Text(stringResource(id = R.string.buy_date_hint)) },
-                  placeholder = { Text("dd/mm/yyyy") },
-                  modifier = Modifier.testTag("inputFoodBuyDate").fillMaxWidth(),
-              )
-
-              Button(
-                  onClick = {
-                    errorMessages.clear()
-
-                    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
-
-                    try {
-                      val expireDateParsed = sdf.parse(expireDate)
-                      val openDateParsed = sdf.parse(openDate)
-                      val buyDateParsed = sdf.parse(buyDate)
-
-                      // Error if the expiration date is before the open date
-                      if (expireDateParsed.before(openDateParsed)) {
-                        errorMessages["date"] = "Expiration date cannot be before the open date."
-                      }
-
-                      // Error if the buy date is after the open date or expiration date
-                      if (buyDateParsed.after(openDateParsed) ||
-                          buyDateParsed.after(expireDateParsed)) {
-                        errorMessages["buyDate"] =
-                            "Buy date cannot be after the open date or expiration date."
-                      }
-                    } catch (e: Exception) {
-                      errorMessages["dateFormat"] = "Invalid date format. Please use dd/mm/yyyy."
-                    }
-
-                    // Error is the food name field is empty
-                    if (foodName.isBlank()) {
-                      errorMessages["foodName"] = "Food name cannot be empty."
-                    }
-
-                    // Error is the food amount is blank or not a number
-                    if (amount.isBlank()) {
-                      errorMessages["amount"] = "Amount cannot be empty."
-                    } else if (amount.toDoubleOrNull() == null) {
-                      errorMessages["amountFormat"] = "Amount must be a number."
-                    }
-
-                    if (errorMessages.isNotEmpty()) {
-                      showDialog = true
-                    } else {
-                      val foodFacts =
-                          FoodFacts(
-                              name = foodName,
-                              barcode = "",
-                              quantity = Quantity(amount.toDouble(), unit),
-                              category = category)
-                      val newFoodItem =
-                          FoodItem(
-                              uid = foodItemViewModel.getUID(),
-                              foodFacts = foodFacts,
-                              location = location,
-                              expiryDate = formatDateToTimestamp(expireDate),
-                              openDate = formatDateToTimestamp(openDate),
-                              buyDate = formatDateToTimestamp(buyDate),
-                              status = FoodStatus.CLOSED)
-                      houseHoldViewModel.addFoodItem(newFoodItem)
-                      navigationActions.goBack()
-                    }
-                  },
-                  modifier = Modifier.testTag("foodSave").fillMaxWidth().height(50.dp),
-                  colors = ButtonDefaults.buttonColors(containerColor = primaryContainerLight)) {
-                    Text(text = "Submit", fontSize = 18.sp)
-                  }
-
-              ErrorPopUp(
-                  showDialog = showDialog,
-                  onDismiss = { showDialog = false },
-                  errorMessages = errorMessages.values.toList())
+                        modifier = Modifier
+                            .weight(1f)
+                            .testTag("inputFoodUnit")
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
             }
-      }
+
+            item(key = "category") {
+                // Category Dropdown
+                DropdownFields(
+                    label = stringResource(id = R.string.category_label),
+                    options = FoodCategory.entries.toTypedArray(),
+                    selectedOption = category,
+                    onOptionSelected = { category = it },
+                    expanded = categoryExpanded,
+                    onExpandedChange = { categoryExpanded = it },
+                    optionLabel = { fromCapitalStringToLowercaseString(it.name) },
+                    modifier = Modifier
+                        .testTag("inputFoodCategory")
+                        .fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            item(key = "location") {
+                // Location Dropdown
+                DropdownFields(
+                    label = stringResource(id = R.string.location_label),
+                    options = FoodStorageLocation.entries.toTypedArray(),
+                    selectedOption = location,
+                    onOptionSelected = { location = it },
+                    expanded = locationExpanded,
+                    onExpandedChange = { locationExpanded = it },
+                    optionLabel = { fromCapitalStringToLowercaseString(it.name) },
+                    modifier = Modifier
+                        .testTag("inputFoodLocation")
+                        .fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            item(key = "expireDate") {
+                // Expire Date Field with Error Handling
+                OutlinedTextField(
+                    value = expireDate,
+                    onValueChange = { newValue ->
+                        expireDate = newValue.filter { it.isDigit() }
+                        expireDateError = validateExpireDate(expireDate, buyDate, buyDateError)
+                        // Re-validate Open Date since it depends on Expire Date
+                        openDateError = validateOpenDate(openDate, buyDate, buyDateError, expireDate, expireDateError)
+                    },
+                    label = { Text(stringResource(id = R.string.expire_date_hint)) },
+                    placeholder = { Text("dd/mm/yyyy") },
+                    isError = expireDateError != null,
+                    visualTransformation = DateVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                    modifier = Modifier
+                        .testTag("inputFoodExpireDate")
+                        .fillMaxWidth()
+                )
+                if (expireDateError != null) {
+                    Text(
+                        text = expireDateError!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Start
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            item(key = "openDate") {
+                // Open Date Field with Error Handling
+                OutlinedTextField(
+                    value = openDate,
+                    onValueChange = { newValue ->
+                        openDate = newValue.filter { it.isDigit() }
+                        openDateError = validateOpenDate(openDate, buyDate, buyDateError, expireDate, expireDateError)
+                    },
+                    label = { Text(stringResource(id = R.string.open_date_hint)) },
+                    placeholder = { Text("dd/mm/yyyy") },
+                    isError = openDateError != null,
+                    visualTransformation = DateVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                    modifier = Modifier
+                        .testTag("inputFoodOpenDate")
+                        .fillMaxWidth()
+                )
+                if (openDateError != null) {
+                    Text(
+                        text = openDateError!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Start
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            item(key = "buyDate") {
+                // Buy Date Field with Error Handling
+                OutlinedTextField(
+                    value = buyDate,
+                    onValueChange = { newValue ->
+                        buyDate = newValue.filter { it.isDigit() }
+                        buyDateError = validateBuyDate(buyDate)
+                        // Re-validate Expire Date and Open Date since they depend on Buy Date
+                        expireDateError = validateExpireDate(expireDate, buyDate, buyDateError)
+                        openDateError = validateOpenDate(openDate, buyDate, buyDateError, expireDate, expireDateError)
+                    },
+                    label = { Text(stringResource(id = R.string.buy_date_hint)) },
+                    placeholder = { Text("dd/mm/yyyy") },
+                    isError = buyDateError != null,
+                    visualTransformation = DateVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                    modifier = Modifier
+                        .testTag("inputFoodBuyDate")
+                        .fillMaxWidth()
+                )
+                if (buyDateError != null) {
+                    Text(
+                        text = buyDateError!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Start
+                    )
+                }
+                Spacer(modifier = Modifier.height(32.dp))
+            }
+
+            item(key = "submitButton") {
+                // Submit Button
+                Button(
+                    onClick = {
+                        validateAllFieldsWhenSubmitButton()
+                        val isExpireDateValid = expireDateError == null && expireDate.isNotEmpty()
+                        val isOpenDateValid = openDateError == null
+                        val isBuyDateValid = buyDateError == null && buyDate.isNotEmpty()
+                        val isFoodNameValid = foodNameError == null
+                        val isAmountValid = amountError == null
+
+                        val expiryTimestamp = formatDateToTimestamp(expireDate)
+                        val openTimestamp = if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
+                        val buyTimestamp = formatDateToTimestamp(buyDate)
+
+                        if (isExpireDateValid &&
+                            isOpenDateValid &&
+                            isBuyDateValid &&
+                            isFoodNameValid &&
+                            isAmountValid &&
+                            expiryTimestamp != null &&
+                            buyTimestamp != null
+                        ) {
+                            val foodFacts = FoodFacts(
+                                name = foodName,
+                                barcode = "",
+                                quantity = Quantity(amount.toDouble(), unit),
+                                category = category
+                            )
+                            val newFoodItem = FoodItem(
+                                uid = foodItemViewModel.getUID(),
+                                foodFacts = foodFacts,
+                                location = location,
+                                expiryDate = expiryTimestamp,
+                                openDate = openTimestamp,
+                                buyDate = buyTimestamp,
+                                status = FoodStatus.CLOSED
+                            )
+                            houseHoldViewModel.addFoodItem(newFoodItem)
+                            navigationActions.goBack()
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Please correct the errors before submitting.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    },
+                    modifier = Modifier
+                        .testTag("foodSave")
+                        .fillMaxWidth()
+                        .height(50.dp)
+                ) {
+                    Text(text = "Submit", fontSize = 18.sp)
+                }
+            }
+        }
+    }
 }

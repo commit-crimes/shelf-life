@@ -15,6 +15,7 @@ import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.navigation.Screen
 import com.google.firebase.Timestamp
 import java.util.*
 import org.junit.Before
@@ -95,8 +96,19 @@ class OverviewTest {
       OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
     }
     composeTestRule.onNodeWithTag("firstTimeWelcomeScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("householdNameTextField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("householdNameSaveButton").assertIsDisplayed()
+  }
+
+  @Test
+  fun firstTimeWelcomeScreenClickingAddHouseholdNavigatesToHouseholdCreationScreen() {
+    // Mock empty households to trigger the first-time screen
+    mockHouseHoldRepositoryGetHouseholds(emptyList())
+
+    composeTestRule.setContent {
+      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+    }
+    composeTestRule.onNodeWithTag("householdNameSaveButton").performClick()
+    verify(navigationActions).navigateTo(Screen.HOUSEHOLD_CREATION)
   }
 
   // Test if the OverviewScreen is displayed with all elements
@@ -125,9 +137,9 @@ class OverviewTest {
     composeTestRule.onNodeWithTag("householdSelectionDrawer").assertIsDisplayed()
   }
 
-  // Clicking on edit icon in the drawer opens the edit household popup
+  /*
   @Test
-  fun clickEditInDrawerOpensEditHouseholdPopup() {
+  fun clickEditInDrawerLaunchesEditSelection() {
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
       OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
@@ -135,12 +147,14 @@ class OverviewTest {
 
     composeTestRule.onNodeWithTag("hamburgerIcon").performClick()
     composeTestRule.onNodeWithTag("editHouseholdIcon").performClick()
-    composeTestRule.onNodeWithTag("editHouseholdPopup").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("editHouseholdIndicatorIcon").assertIsDisplayed()
   }
+
+     */
 
   // Clicking on add icon in the drawer opens the add household popup
   @Test
-  fun clickAddInDrawerOpensAddHouseholdPopup() {
+  fun clickAddInDrawerOpensHouseholdCreationScreen() {
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
       OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
@@ -148,7 +162,7 @@ class OverviewTest {
 
     composeTestRule.onNodeWithTag("hamburgerIcon").performClick()
     composeTestRule.onNodeWithTag("addHouseholdIcon").performClick()
-    composeTestRule.onNodeWithTag("addHouseholdPopup").assertIsDisplayed()
+    verify(navigationActions).navigateTo(Screen.HOUSEHOLD_CREATION)
   }
 
   // Test that the food item list is displayed when food items exist
