@@ -23,16 +23,31 @@ class ProfileScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   @Test
-  fun testGreetingText_whenAccountIsNull_displaysGuest() {
+  fun testNameText_whenAccountIsNull_displaysGuest() {
     val navigationActions = NavigationActions(mockk<NavHostController>(relaxed = true))
     composeTestRule.setContent {
       ProfileScreen(navigationActions = navigationActions, account = null)
     }
 
-    composeTestRule
-        .onNodeWithTag("greetingText")
-        .assertIsDisplayed()
-        .assertTextEquals("Hello, Guest")
+    composeTestRule.onNodeWithTag("profileNameText").assertIsDisplayed().assertTextEquals("Guest")
+  }
+
+  @Test
+  fun profileScreen_displaysAccountName() {
+    val navigationActions = NavigationActions(mockk<NavHostController>(relaxed = true))
+    val account =
+        mockk<GoogleSignInAccount>(
+            block = {
+              every { displayName } returns "John Smith"
+              every { photoUrl } returns null
+              every { email } returns null
+            })
+
+    composeTestRule.setContent {
+      ProfileScreen(navigationActions = navigationActions, account = account)
+    }
+
+    composeTestRule.onNodeWithTag("profileNameText").assertTextEquals("John Smith")
   }
 
   @Test
@@ -43,6 +58,7 @@ class ProfileScreenTest {
         mockk<GoogleSignInAccount>(
             block = {
               every { email } returns "test@example.com"
+              every { displayName } returns "Jon Smith"
               every { photoUrl } returns
                   Uri.parse(
                       "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg")
@@ -52,9 +68,19 @@ class ProfileScreenTest {
     }
 
     composeTestRule
-        .onNodeWithTag("greetingText")
+        .onNodeWithTag("profileEmailText")
         .assertIsDisplayed()
-        .assertTextEquals("Hello, test@example.com")
+        .assertTextEquals("test@example.com")
+  }
+
+  @Test
+  fun profileScreen_hidesEmailWhenNotAvailable() {
+    val navigationActions = NavigationActions(mockk<NavHostController>(relaxed = true))
+    composeTestRule.setContent {
+      ProfileScreen(navigationActions = navigationActions, account = null)
+    }
+
+    composeTestRule.onNodeWithTag("profileEmailText").assertDoesNotExist()
   }
 
   @Test
