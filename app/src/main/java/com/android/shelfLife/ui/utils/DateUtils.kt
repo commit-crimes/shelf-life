@@ -10,9 +10,10 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * converts a Timestamp into an Int representing the minutes
+ * Converts a Timestamp into an Int representing the minutes.
  *
- * @param timestamp: the timestamp we want to convert
+ * @param timestamp The timestamp to convert.
+ * @return The total minutes as an Int.
  */
 fun getTotalMinutes(timestamp: Timestamp): Int {
   // Convert nanoseconds to seconds and add to the total seconds
@@ -21,9 +22,17 @@ fun getTotalMinutes(timestamp: Timestamp): Int {
   return (totalSeconds / 60).toInt()
 }
 
-// Custom VisualTransformation with proper OffsetMapping
+/**
+ * Custom VisualTransformation with proper OffsetMapping for date input.
+ */
 class DateVisualTransformation : VisualTransformation {
 
+  /**
+   * Filters the input text to format it as a date with slashes.
+   *
+   * @param text The input text to transform.
+   * @return The transformed text with slashes and the offset mapping.
+   */
   override fun filter(text: AnnotatedString): TransformedText {
     // Remove any non-digit characters
     val digits = text.text.filter { it.isDigit() }
@@ -60,7 +69,13 @@ class DateVisualTransformation : VisualTransformation {
   }
 }
 
-// Helper function to get error message for date input
+/**
+ * Helper function to get error message for date input.
+ *
+ * @param dateStr The date string to validate.
+ * @param isRequired Whether the date is required.
+ * @return The error message if the date is invalid, null otherwise.
+ */
 fun getDateErrorMessage(dateStr: String, isRequired: Boolean = true): String? {
   if (dateStr.isEmpty()) {
     return if (isRequired) "Date cannot be empty" else null
@@ -72,7 +87,12 @@ fun getDateErrorMessage(dateStr: String, isRequired: Boolean = true): String? {
   return if (isValidDate(formattedDateStr)) null else "Invalid date"
 }
 
-// Function to insert slashes into the date string
+/**
+ * Function to insert slashes into the date string.
+ *
+ * @param input The input date string without slashes.
+ * @return The formatted date string with slashes.
+ */
 fun insertSlashes(input: String): String {
   // Input is expected to be up to 8 digits
   val sb = StringBuilder()
@@ -86,7 +106,12 @@ fun insertSlashes(input: String): String {
   return sb.toString()
 }
 
-// Function to validate date in dd/MM/yyyy format without using exceptions
+/**
+ * Function to validate date in dd/MM/yyyy format without using exceptions.
+ *
+ * @param dateStr The date string to validate.
+ * @return True if the date is valid, false otherwise.
+ */
 fun isValidDate(dateStr: String): Boolean {
   // Check if the dateStr matches the pattern dd/MM/yyyy
   val datePattern = Regex("""\d{2}/\d{2}/\d{4}""")
@@ -123,7 +148,12 @@ fun isValidDate(dateStr: String): Boolean {
   return true
 }
 
-// Function to check if a date is not in the past
+/**
+ * Function to check if a date is not in the past.
+ *
+ * @param dateStr The date string to check.
+ * @return True if the date is not in the past, false otherwise.
+ */
 fun isValidDateNotPast(dateStr: String): Boolean {
   val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
   sdf.isLenient = false
@@ -132,12 +162,23 @@ fun isValidDateNotPast(dateStr: String): Boolean {
   return !date.before(today)
 }
 
-// Helper function to check if a year is a leap year
+/**
+ * Helper function to check if a year is a leap year.
+ *
+ * @param year The year to check.
+ * @return True if the year is a leap year, false otherwise.
+ */
 fun isLeapYear(year: Int): Boolean {
   return (year % 4 == 0) && ((year % 100 != 0) || (year % 400 == 0))
 }
 
-// Function to compare two dates (returns true if date1 >= date2)
+/**
+ * Function to compare two dates.
+ *
+ * @param dateStr1 The first date string.
+ * @param dateStr2 The second date string.
+ * @return True if date1 is after or equal to date2, false otherwise.
+ */
 fun isDateAfterOrEqual(dateStr1: String, dateStr2: String): Boolean {
   val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
   sdf.isLenient = false // Strict date parsing
@@ -159,7 +200,12 @@ fun isDateAfterOrEqual(dateStr1: String, dateStr2: String): Boolean {
   return !date1.before(date2)
 }
 
-// Function to convert a string date to Timestamp, handling exceptions
+/**
+ * Function to convert a string date to Timestamp, handling exceptions.
+ *
+ * @param dateString The date string to convert.
+ * @return The corresponding Timestamp, or null if the date is invalid.
+ */
 fun formatDateToTimestamp(dateString: String): Timestamp? {
   return try {
     val formattedDateStr = insertSlashes(dateString)
@@ -172,17 +218,22 @@ fun formatDateToTimestamp(dateString: String): Timestamp? {
   }
 }
 
-// Function to format a Timestamp to a date string (stored as digits without slashes)
+/**
+ * Function to format a Timestamp to a date string.
+ *
+ * @param timestamp The Timestamp to format.
+ * @return The formatted date string (stored as digits without slashes).
+ */
 fun formatTimestampToDate(timestamp: Timestamp): String {
   val sdf = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
   return sdf.format(timestamp.toDate())
 }
 
 /**
- * Coverts a string into a lowercase with its first letter as Capital Letter
+ * Converts a string into a lowercase with its first letter as a capital letter.
  *
- * @param enum: string
- * @return string with capital letter and lowercase
+ * @param enum The string to convert.
+ * @return The converted string with a capital letter and lowercase.
  */
 fun fromCapitalStringToLowercaseString(enum: String): String {
   return enum.lowercase().replaceFirstChar { it.uppercase() }

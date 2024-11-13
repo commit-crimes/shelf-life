@@ -25,6 +25,14 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.utils.*
 import com.google.firebase.Timestamp
 
+/**
+ * Composable function to display the Add Food Item screen.
+ *
+ * @param navigationActions The navigation actions to be used in the screen.
+ * @param houseHoldViewModel The ViewModel for the household.
+ * @param foodItemViewModel The ViewModel for the food items.
+ * @param paddingValues The padding values to be applied to the screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddFoodItemScreen(
@@ -56,6 +64,13 @@ fun AddFoodItemScreen(
     val context = LocalContext.current
 
     // Validation Functions
+
+    /**
+     * Validates the food name.
+     *
+     * @param foodName The food name to validate.
+     * @return The error message if the food name is invalid, null otherwise.
+     */
     fun validateFoodName(foodName: String): String? {
         val namePattern = Regex("^[a-zA-Z0-9\\s\\-,'()]+\$")
         return when {
@@ -65,6 +80,12 @@ fun AddFoodItemScreen(
         }
     }
 
+    /**
+     * Validates the amount.
+     *
+     * @param amount The amount to validate.
+     * @return The error message if the amount is invalid, null otherwise.
+     */
     fun validateAmount(amount: String): String? {
         return when {
             amount.isBlank() -> "Amount cannot be empty."
@@ -74,10 +95,24 @@ fun AddFoodItemScreen(
         }
     }
 
+    /**
+     * Validates the buy date.
+     *
+     * @param buyDate The buy date to validate.
+     * @return The error message if the buy date is invalid, null otherwise.
+     */
     fun validateBuyDate(buyDate: String): String? {
         return getDateErrorMessage(buyDate)
     }
 
+    /**
+     * Validates the expire date.
+     *
+     * @param expireDate The expire date to validate.
+     * @param buyDate The buy date to compare with.
+     * @param buyDateError The error message for the buy date.
+     * @return The error message if the expire date is invalid, null otherwise.
+     */
     fun validateExpireDate(expireDate: String, buyDate: String, buyDateError: String?): String? {
         var error = getDateErrorMessage(expireDate)
         if (error == null && expireDate.length == 8 && buyDateError == null && buyDate.length == 8) {
@@ -93,6 +128,16 @@ fun AddFoodItemScreen(
         return error
     }
 
+    /**
+     * Validates the open date.
+     *
+     * @param openDate The open date to validate.
+     * @param buyDate The buy date to compare with.
+     * @param buyDateError The error message for the buy date.
+     * @param expireDate The expire date to compare with.
+     * @param expireDateError The error message for the expire date.
+     * @return The error message if the open date is invalid, null otherwise.
+     */
     fun validateOpenDate(
         openDate: String,
         buyDate: String,
@@ -114,6 +159,9 @@ fun AddFoodItemScreen(
         return error
     }
 
+    /**
+     * Validates all fields when the submit button is clicked.
+     */
     fun validateAllFieldsWhenSubmitButton() {
         foodNameError = validateFoodName(foodName)
         amountError = validateAmount(amount)
