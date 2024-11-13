@@ -17,11 +17,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
@@ -80,7 +83,10 @@ fun RecipesScreen(
   val filters = listOf("Soon to expire", "Only household items", "High protein", "Low calories")
 
   HouseHoldSelectionDrawer(
-      scope = scope, drawerState = drawerState, householdViewModel = householdViewModel) {
+      scope = scope,
+      drawerState = drawerState,
+      householdViewModel = householdViewModel,
+      navigationActions = navigationActions) {
         // Filter the recipes based on the search query
         val filteredRecipes =
             if (query.isEmpty()) {
@@ -92,7 +98,7 @@ fun RecipesScreen(
             }
 
         if (selectedHousehold == null) {
-          FirstTimeWelcomeScreen(householdViewModel)
+          FirstTimeWelcomeScreen(navigationActions, householdViewModel)
         } else {
           Scaffold(
               modifier = Modifier.testTag("recipesScreen"),
@@ -117,6 +123,14 @@ fun RecipesScreen(
                     onTabSelect = { destination -> navigationActions.navigateTo(destination) },
                     tabList = LIST_TOP_LEVEL_DESTINATION,
                     selectedItem = Route.RECIPES)
+              },
+              // Floating Action Button to add a new food item
+              floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { navigationActions.navigateTo(Screen.ADD_RECIPE) },
+                    content = { Icon(Icons.Default.Add, contentDescription = "Add") },
+                    modifier = Modifier.testTag("addRecipeFab"),
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer)
               },
               content = { paddingValues ->
                 Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {

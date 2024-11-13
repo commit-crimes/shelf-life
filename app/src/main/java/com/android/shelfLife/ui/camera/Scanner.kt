@@ -145,7 +145,6 @@ fun BarcodeScannerScreen(
                             Log.d("BarcodeScanner", "Cancelled")
                         },
                         foodItemViewModel = foodItemViewModel,
-                        householdViewModel = householdViewModel
                     )
                 }
                 Spacer(modifier = Modifier.height(70.dp))
