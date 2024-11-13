@@ -5,8 +5,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -36,25 +36,23 @@ fun <T> DropdownFields(
     modifier: Modifier = Modifier
 ) {
   ExposedDropdownMenuBox(
-      expanded = expanded,
-      onExpandedChange = { onExpandedChange(!expanded) },
-      modifier = modifier.testTag("dropDownField")) {
-        OutlinedTextField(
+      expanded = expanded, onExpandedChange = onExpandedChange, modifier = modifier) {
+        TextField(
+            readOnly = true,
             value = optionLabel(selectedOption),
             onValueChange = {},
             label = { Text(label) },
-            readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.fillMaxWidth().menuAnchor())
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+            modifier = Modifier.fillMaxWidth().menuAnchor().testTag("dropdownMenu_$label"))
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { onExpandedChange(false) }) {
-          options.forEach { option ->
+          options.forEach { selectionOption ->
             DropdownMenuItem(
-                text = { Text(optionLabel(option)) },
+                text = { Text(optionLabel(selectionOption)) },
                 onClick = {
-                  onOptionSelected(option)
+                  onOptionSelected(selectionOption)
                   onExpandedChange(false)
                 },
-                modifier = Modifier.testTag("dropDownItem_${optionLabel(option)}"))
+                modifier = Modifier.testTag("dropDownItem_${optionLabel(selectionOption)}"))
           }
         }
       }

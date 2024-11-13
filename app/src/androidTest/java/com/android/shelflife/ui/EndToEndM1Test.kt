@@ -168,26 +168,44 @@ class EndToEndM1Test {
     composeTestRule.onNodeWithTag("addFoodFab").assertHasClickAction()
     composeTestRule.onNodeWithTag("addFoodFab").performClick()
     // Thread.sleep(1000)
-    composeTestRule.onNodeWithTag("addFoodItemTitle").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Apple")
-    composeTestRule.onNodeWithTag("inputFoodAmount").performTextInput("5")
-    composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextInput("29/10/2023")
-    composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextInput("01/12/2023")
-    composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextInput("30/11/2023")
-    // Thread.sleep(1000)
-    composeTestRule.onNodeWithTag("foodSave").performClick()
+      composeTestRule.onNodeWithTag("addFoodItemTitle").assertIsDisplayed()
 
-    // User inputs incorrect data and inputs the correct data again
-    // Thread.sleep(1000)
-    composeTestRule.onNodeWithTag("errorDialog").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("errorDialogDismissButton").performClick()
-    // Thread.sleep(1000)
-    composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextClearance()
-    composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextInput("29/12/2023")
-    composeTestRule.onNodeWithTag("foodSave").performClick()
+      // Scroll to and interact with the input fields
+      val scrollableNode = composeTestRule.onNodeWithTag("addFoodItemScreen")
+
+      scrollableNode.performScrollToNode(hasTestTag("inputFoodName"))
+      composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Apple")
+
+      scrollableNode.performScrollToNode(hasTestTag("inputFoodAmount"))
+      composeTestRule.onNodeWithTag("inputFoodAmount").performTextInput("5")
+
+      scrollableNode.performScrollToNode(hasTestTag("inputFoodExpireDate"))
+      composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextClearance()
+      composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextInput("29102025")
+
+      scrollableNode.performScrollToNode(hasTestTag("inputFoodOpenDate"))
+      composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextClearance()
+      composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextInput("01122025")
+
+      scrollableNode.performScrollToNode(hasTestTag("inputFoodBuyDate"))
+      composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextClearance()
+      composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextInput("30112025")
+
+      // Scroll to and click the submit button
+      scrollableNode.performScrollToNode(hasTestTag("foodSave"))
+      composeTestRule.onNodeWithTag("foodSave").performClick()
+
+      // Verify error message is displayed
+      composeTestRule.onNodeWithText("Expire Date cannot be before Buy Date").assertIsDisplayed()
+
+      // Correct the expire date
+      scrollableNode.performScrollToNode(hasTestTag("inputFoodExpireDate"))
+      composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextClearance()
+      composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextInput("29122025")
+
+      // Scroll to and click the submit button again
+      scrollableNode.performScrollToNode(hasTestTag("foodSave"))
+      composeTestRule.onNodeWithTag("foodSave").performClick()
     // Thread.sleep(1000)
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
     // Thread.sleep(1000)
