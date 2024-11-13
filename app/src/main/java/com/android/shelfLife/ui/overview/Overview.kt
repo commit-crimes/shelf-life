@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
@@ -44,10 +45,11 @@ import kotlinx.coroutines.launch
 fun OverviewScreen(
     navigationActions: NavigationActions,
     householdViewModel: HouseholdViewModel,
+    listFoodItemsViewModel: ListFoodItemsViewModel
 ) {
-  val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
+  val selectedHousehold = householdViewModel.selectedHousehold.collectAsState()
   var searchQuery by remember { mutableStateOf("") }
-  val foodItems = selectedHousehold?.foodItems ?: emptyList()
+  val foodItems = listFoodItemsViewModel.foodItems.collectAsState()
   val userHouseholds = householdViewModel.households.collectAsState().value
   val householdViewModelIsLoaded = householdViewModel.finishedLoading.collectAsState().value
   val selectedFilters = remember { mutableStateListOf<String>() }
@@ -64,7 +66,7 @@ fun OverviewScreen(
       householdViewModel = householdViewModel,
       navigationActions = navigationActions) {
         val filteredFoodItems =
-            foodItems.filter { item ->
+            foodItems.value.filter { item ->
               item.foodFacts.name.contains(searchQuery, ignoreCase = true) &&
                   (selectedFilters.isEmpty() ||
                       selectedFilters.contains(item.foodFacts.category.name))
@@ -78,13 +80,13 @@ fun OverviewScreen(
           ) {
             CircularProgressIndicator()
           }
-        } else if (selectedHousehold == null && userHouseholds.isEmpty()) {
+        } else if (selectedHousehold.value == null && userHouseholds.isEmpty()) {
           FirstTimeWelcomeScreen(navigationActions, householdViewModel)
         } else {
           Scaffold(
               modifier = Modifier.testTag("overviewScreen"),
               topBar = {
-                selectedHousehold?.let {
+                selectedHousehold.value?.let {
                   TopNavigationBar(
                       houseHold = it,
                       onHamburgerClick = { scope.launch { drawerState.open() } },

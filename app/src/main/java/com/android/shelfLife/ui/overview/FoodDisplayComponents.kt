@@ -55,7 +55,6 @@ import java.util.Locale
 @Composable
 fun ListFoodItems(foodItems: List<FoodItem>) {
   if (foodItems.isEmpty()) {
-    // Display a prompt when there are no todos
     Box(
         modifier = Modifier.fillMaxSize().testTag("NoFoodItems"),
         contentAlignment = Alignment.Center) {
