@@ -122,10 +122,13 @@ fun FoodItemCard(foodItem: FoodItem) {
         }
         Row {
           LinearProgressIndicator(
-              progress = progress,
+              progress = { progress },
+              modifier = Modifier.fillMaxWidth().height(8.dp),
               color = progressBarColor,
+              gapSize = 4.dp,
+              drawStopIndicator = {},
               trackColor = LightGray,
-              modifier = Modifier.fillMaxWidth().height(8.dp))
+          )
         }
         Spacer(modifier = Modifier.width(8.dp))
       }
