@@ -10,4 +10,16 @@
     <string name="expire_date_hint">Enter expiration date</string>
     <string name="open_date_hint">Enter open date</string>
     <string name="buy_date_hint">Enter purchase date</string>
+
+    <string name="food_item_category_label">Category: %1$s</string>
+    <string name="food_item_location_label">Location: %1$s</string>
+    <string name="food_item_status_label">Status: %1$s</string>
+    <string name="food_item_expiry_date_label">Expiry Date: %1$s</string>
+    <string name="food_item_open_date_label">Open Date: %1$s</string>
+    <string name="food_item_buy_date_label">Buy Date: %1$s</string>
+    <string name="food_item_energy_label">Energy: %1$d Kcal</string>
+    <string name="food_item_proteins_label">Proteins: %1$d g</string>
+    <string name="food_item_quantity_label">Quantity: %1$.1f %2$s</string>
+    <string name="food_item_no_expiry_date">No Expiry Date</string>
+    <string name="food_item_not_opened">Not Opened</string>
 </resources>
