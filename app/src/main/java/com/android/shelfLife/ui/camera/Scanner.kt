@@ -195,7 +195,6 @@ fun BarcodeScannerScreen(
                         Log.d("ModalBottomSheet", "Cancel clicked")
                       },
                       foodItemViewModel = foodItemViewModel,
-                      householdViewModel = householdViewModel,
                       isExpanded = isContentExpanded.value,
                       onExpand = {
                         isContentExpanded.value = true
