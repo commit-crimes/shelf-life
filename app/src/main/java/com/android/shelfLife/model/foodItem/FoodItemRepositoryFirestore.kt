@@ -222,13 +222,14 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
       val name = map["name"] as? String ?: return null
       val barcode = map["barcode"] as? String ?: ""
       val quantityMap = map["quantity"] as? Map<*, *>
+      val imageUrl = map["imageUrl"] as? String ?: FoodFacts.DEFAULT_IMAGE_URL
 
       val quantity =
           Quantity(
               amount = quantityMap?.get("amount") as? Double ?: 0.0,
               unit = FoodUnit.valueOf(quantityMap?.get("unit") as? String ?: "GRAM"))
 
-      val foodFacts = FoodFacts(name = name, barcode = barcode, quantity = quantity)
+      val foodFacts = FoodFacts(name = name, barcode = barcode, quantity = quantity, imageUrl = imageUrl)
       val expiryDate = map["expiryDate"] as? Timestamp ?: Timestamp.now()
       val status = map["status"] as? String ?: FoodStatus.CLOSED.name
       val foodStatus = FoodStatus.valueOf(status)
@@ -250,6 +251,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
     return mapOf(
         "uid" to foodItem.uid,
         "name" to foodItem.foodFacts.name,
+        "imageUrl" to foodItem.foodFacts.imageUrl,
         "barcode" to foodItem.foodFacts.barcode,
         "quantity" to
             mapOf(
