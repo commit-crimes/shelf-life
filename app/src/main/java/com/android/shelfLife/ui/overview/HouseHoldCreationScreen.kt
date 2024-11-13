@@ -44,10 +44,8 @@ fun HouseHoldCreationScreen(
 
   // Initialize memberEmailList when memberEmails are fetched
   LaunchedEffect(memberEmails) {
-    if (memberEmailList.isEmpty() && memberEmails.isNotEmpty()) {
       memberEmailList.clear()
       memberEmailList.addAll(memberEmails.values)
-    }
   }
 
   // Fetch member emails when the screen is opened for editing
