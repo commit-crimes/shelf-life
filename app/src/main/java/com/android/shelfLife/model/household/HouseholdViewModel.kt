@@ -70,18 +70,13 @@ class HouseholdViewModel(
   fun selectHouseholdToEdit(household: HouseHold?) {
     _householdToEdit.value = household
     household?.let {
-      repository.getUserEmails(it.members) { uidToEmail ->
-        _memberEmails.value = uidToEmail
-      }
+      repository.getUserEmails(it.members) { uidToEmail -> _memberEmails.value = uidToEmail }
     }
   }
 
   fun getUserIdsByEmails(emails: List<String>, callback: (Map<String, String>) -> Unit) {
-    repository.getUserIds(emails) { emailToUid ->
-      callback(emailToUid)
-    }
+    repository.getUserIds(emails) { emailToUid -> callback(emailToUid) }
   }
-
 
   fun checkIfHouseholdNameExists(houseHoldName: String): Boolean {
     return _households.value.any { it.name == houseHoldName }

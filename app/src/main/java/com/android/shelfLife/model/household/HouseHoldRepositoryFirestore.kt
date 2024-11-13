@@ -188,45 +188,44 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
     }
   }
 
-    override fun getUserEmails(userIds: List<String>, callback: (Map<String, String>) -> Unit) {
-        if (userIds.isEmpty()) {
-            callback(emptyMap())
-            return
-        }
-
-        val uidBatches = userIds.chunked(10) // Firestore allows up to 10 values in 'whereIn'
-        val uidToEmail = mutableMapOf<String, String>()
-        var batchesProcessed = 0
-
-        for (uidBatch in uidBatches) {
-            db.collection("users")
-                .whereIn(FieldPath.documentId(), uidBatch)
-                .get()
-                .addOnSuccessListener { querySnapshot ->
-                    for (doc in querySnapshot.documents) {
-                        val email = doc.getString("email")
-                        val userId = doc.id
-                        if (email != null) {
-                            uidToEmail[userId] = email
-                        }
-                    }
-                    batchesProcessed++
-                    if (batchesProcessed == uidBatches.size) {
-                        callback(uidToEmail)
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("HouseholdRepository", "Error fetching emails by user IDs", exception)
-                    batchesProcessed++
-                    if (batchesProcessed == uidBatches.size) {
-                        callback(uidToEmail)
-                    }
-                }
-        }
+  override fun getUserEmails(userIds: List<String>, callback: (Map<String, String>) -> Unit) {
+    if (userIds.isEmpty()) {
+      callback(emptyMap())
+      return
     }
 
+    val uidBatches = userIds.chunked(10) // Firestore allows up to 10 values in 'whereIn'
+    val uidToEmail = mutableMapOf<String, String>()
+    var batchesProcessed = 0
 
-    /**
+    for (uidBatch in uidBatches) {
+      db.collection("users")
+          .whereIn(FieldPath.documentId(), uidBatch)
+          .get()
+          .addOnSuccessListener { querySnapshot ->
+            for (doc in querySnapshot.documents) {
+              val email = doc.getString("email")
+              val userId = doc.id
+              if (email != null) {
+                uidToEmail[userId] = email
+              }
+            }
+            batchesProcessed++
+            if (batchesProcessed == uidBatches.size) {
+              callback(uidToEmail)
+            }
+          }
+          .addOnFailureListener { exception ->
+            Log.e("HouseholdRepository", "Error fetching emails by user IDs", exception)
+            batchesProcessed++
+            if (batchesProcessed == uidBatches.size) {
+              callback(uidToEmail)
+            }
+          }
+    }
+  }
+
+  /**
    * Converts a Firestore document to a HouseHold object.
    *
    * @param doc The Firestore document to convert.
