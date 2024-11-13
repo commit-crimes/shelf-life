@@ -2,6 +2,10 @@ package com.android.shelfLife.ui.utils
 
 import androidx.compose.ui.graphics.Color
 import com.android.shelfLife.model.foodFacts.FoodCategory
+import com.android.shelfLife.ui.theme.expired
+import com.android.shelfLife.ui.theme.expiresInALongTime
+import com.android.shelfLife.ui.theme.expiresLater
+import com.android.shelfLife.ui.theme.expiresSoon
 
 // Data class to hold the red and orange thresholds
 data class Thresholds(val redThreshold: Long, val orangeThreshold: Long)
@@ -33,12 +37,13 @@ fun getThresholdsForCategory(category: FoodCategory): Thresholds {
   }
 }
 
-// Function to determine progress bar fill level and color
+// Function to determine progress bar fill level and color, fill level starts at 1 and decreases
+// 0.25 for each threshold
 fun getProgressBarState(timeRemaining: Long, thresholds: Thresholds): Pair<Float, Color> {
   return when {
-    timeRemaining <= 0 -> Pair(0.25f, Color(0xFF8a0116))
-    timeRemaining <= thresholds.redThreshold -> Pair(0.5f, Color(0xFFF44336))
-    timeRemaining <= thresholds.orangeThreshold -> Pair(0.75f, Color(0xFFFFA500))
-    else -> Pair(1.0f, Color(0xFF4CAF50))
+    timeRemaining <= 0 -> Pair(0.25f, expired)
+    timeRemaining <= thresholds.redThreshold -> Pair(0.5f, expiresSoon)
+    timeRemaining <= thresholds.orangeThreshold -> Pair(0.75f, expiresLater)
+    else -> Pair(1.0f, expiresInALongTime)
   }
 }

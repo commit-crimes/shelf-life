@@ -1,6 +1,11 @@
-package com.example.compose
+package com.android.shelfLife.ui.theme
 
 import androidx.compose.ui.graphics.Color
+
+val expired = Color(0xFF8f0303)
+val expiresSoon = Color(0xFFf77800)
+val expiresLater = Color(0xFF71b504)
+val expiresInALongTime = Color(0xFF4CAF50)
 
 val primaryLight = Color(0xFF39693B)
 val onPrimaryLight = Color(0xFFFFFFFF)
