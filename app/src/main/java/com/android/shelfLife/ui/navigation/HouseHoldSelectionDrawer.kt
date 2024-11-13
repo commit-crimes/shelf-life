@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.navigation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,6 +50,9 @@ fun HouseHoldSelectionDrawer(
       editMode = false
     }
   }
+
+  // Close drawer on back button press if it's open
+  BackHandler(enabled = drawerState.isOpen) { scope.launch { drawerState.close() } }
 
   ModalNavigationDrawer(
       modifier = Modifier.testTag("householdSelectionDrawer"),
