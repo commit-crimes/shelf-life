@@ -75,17 +75,17 @@ class MainActivityTest : TestCase() {
       }
     }
   }
-//
-//  @Test
-//  fun barcodeScannerScreenAccessibleWhenPermissionGranted() {
-//    firebaseAuth.signInAnonymously().addOnCompleteListener {
-//      if (it.isSuccessful) {
-//        composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
-//        composeTestRule.onNodeWithTag("navigateToBarcodeScanner").performClick()
-//        composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
-//      }
-//    }
-//  }
+  //
+  //  @Test
+  //  fun barcodeScannerScreenAccessibleWhenPermissionGranted() {
+  //    firebaseAuth.signInAnonymously().addOnCompleteListener {
+  //      if (it.isSuccessful) {
+  //        composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+  //        composeTestRule.onNodeWithTag("navigateToBarcodeScanner").performClick()
+  //        composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
+  //      }
+  //    }
+  //  }
 
   @Test
   fun recipeScreenAccessibleFromOverview() {

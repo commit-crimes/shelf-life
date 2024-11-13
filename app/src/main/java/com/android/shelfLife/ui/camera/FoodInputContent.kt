@@ -3,7 +3,6 @@ package com.android.shelfLife.ui.camera
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -50,7 +49,6 @@ fun FoodInputContent(
     onSubmit: (FoodItem) -> Unit,
     onCancel: () -> Unit,
     foodItemViewModel: ListFoodItemsViewModel,
-
 ) {
   val context = LocalContext.current
   var location by remember { mutableStateOf(FoodStorageLocation.PANTRY) }
@@ -264,11 +262,10 @@ fun FoodInputContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-      Button(
-          onClick = { onCancel() },
-          modifier = Modifier.fillMaxWidth().height(50.dp).testTag("cancelButton")) {
-            Text(text = "Cancel", fontSize = 18.sp)
-          }
-    }
-
+        Button(
+            onClick = { onCancel() },
+            modifier = Modifier.fillMaxWidth().height(50.dp).testTag("cancelButton")) {
+              Text(text = "Cancel", fontSize = 18.sp)
+            }
+      }
 }
