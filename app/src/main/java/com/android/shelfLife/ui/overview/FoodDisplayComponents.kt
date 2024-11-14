@@ -117,7 +117,10 @@ fun FoodItemCard(foodItem: FoodItem, onClick: () -> Unit) {
           AsyncImage(
               model = foodItem.foodFacts.imageUrl,
               contentDescription = "Food Image",
-              modifier = Modifier.size(64.dp).clip(RoundedCornerShape(8.dp)),
+              modifier =
+                  Modifier.size(80.dp)
+                      .clip(RoundedCornerShape(8.dp))
+                      .align(Alignment.CenterVertically),
               contentScale = ContentScale.Crop)
         }
         Row {
