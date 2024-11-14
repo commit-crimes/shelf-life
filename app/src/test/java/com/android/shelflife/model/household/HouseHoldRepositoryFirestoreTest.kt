@@ -663,17 +663,19 @@ class HouseholdRepositoryFirestoreTest {
     }
 
     // Simulate querySnapshots for each batch
-    val querySnapshots = batches.map { batch ->
-      val querySnapshot: QuerySnapshot = mock()
-      val docSnapshots = batch.map { userId ->
-        val docSnapshot: DocumentSnapshot = mock()
-        `when`(docSnapshot.getString("email")).thenReturn("$userId@example.com")
-        `when`(docSnapshot.id).thenReturn(userId)
-        docSnapshot
-      }
-      `when`(querySnapshot.documents).thenReturn(docSnapshots)
-      querySnapshot
-    }
+    val querySnapshots =
+        batches.map { batch ->
+          val querySnapshot: QuerySnapshot = mock()
+          val docSnapshots =
+              batch.map { userId ->
+                val docSnapshot: DocumentSnapshot = mock()
+                `when`(docSnapshot.getString("email")).thenReturn("$userId@example.com")
+                `when`(docSnapshot.id).thenReturn(userId)
+                docSnapshot
+              }
+          `when`(querySnapshot.documents).thenReturn(docSnapshots)
+          querySnapshot
+        }
 
     // Invoke getUserEmails
     householdRepository.getUserEmails(userIds, callback)
@@ -746,12 +748,13 @@ class HouseholdRepositoryFirestoreTest {
 
     // Simulate querySnapshots, first batch succeeds, second fails
     val querySnapshotSuccess: QuerySnapshot = mock()
-    val docSnapshotsSuccess = batches[0].map { userId ->
-      val docSnapshot: DocumentSnapshot = mock()
-      `when`(docSnapshot.getString("email")).thenReturn("$userId@example.com")
-      `when`(docSnapshot.id).thenReturn(userId)
-      docSnapshot
-    }
+    val docSnapshotsSuccess =
+        batches[0].map { userId ->
+          val docSnapshot: DocumentSnapshot = mock()
+          `when`(docSnapshot.getString("email")).thenReturn("$userId@example.com")
+          `when`(docSnapshot.id).thenReturn(userId)
+          docSnapshot
+        }
     `when`(querySnapshotSuccess.documents).thenReturn(docSnapshotsSuccess)
 
     // Invoke getUserEmails
