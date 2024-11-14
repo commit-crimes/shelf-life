@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
  *
  * @property repository The repository for managing FoodItems.
  */
-class ListFoodItemsViewModel(private val repository: FoodItemRepository) : ViewModel() {
+open class ListFoodItemsViewModel(private val repository: FoodItemRepository) : ViewModel() {
   private val _foodItems = MutableStateFlow<List<FoodItem>>(emptyList())
   val foodItems: StateFlow<List<FoodItem>> = _foodItems.asStateFlow()
 
