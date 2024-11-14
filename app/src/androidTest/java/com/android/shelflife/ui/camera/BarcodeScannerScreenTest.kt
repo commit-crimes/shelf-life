@@ -173,6 +173,8 @@ class BarcodeScannerScreenTest {
     // Click the cancel button
     composeTestRule.onNodeWithTag("cancelButton").performClick()
 
+    composeTestRule.waitForIdle()
+
     // Verify that the BottomSheet is dismissed and scanning resumes
     composeTestRule.onNodeWithTag("expireDateTextField").assertDoesNotExist()
     composeTestRule.onNodeWithTag("openDateTextField").assertDoesNotExist()
