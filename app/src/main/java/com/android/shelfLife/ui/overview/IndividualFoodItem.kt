@@ -83,7 +83,6 @@ fun IndividualFoodItemScreen(
                   modifier =
                       Modifier.fillMaxWidth()
                           .padding(horizontal = 16.dp, vertical = 8.dp)
-                          .background(Color.White)
                           .aspectRatio(1f)
                           .clip(RoundedCornerShape(8.dp))
                           .testTag("IndividualFoodItemImage"),
