@@ -35,7 +35,8 @@ class HouseHoldElementTest {
           selectedHousehold = household,
           editMode = true, // Enable edit mode to show the edit icon
           onHouseholdSelected = {},
-          onHouseholdEditSelected = {})
+          onHouseholdEditSelected = {},
+          onHouseholdDeleteSelected = {})
     }
 
     // Assert: Check if the editHouseholdIndicatorIcon is displayed
@@ -52,7 +53,8 @@ class HouseHoldElementTest {
           selectedHousehold = household,
           editMode = false, // Disable edit mode to hide the edit icon
           onHouseholdSelected = {},
-          onHouseholdEditSelected = {})
+          onHouseholdEditSelected = {},
+          onHouseholdDeleteSelected = {})
     }
 
     // Assert: Check if the editHouseholdIndicatorIcon does not exist

@@ -78,6 +78,7 @@ class IndividualRecipeTest {
 
   // Helper function to set up the IndividualRecipeScreen
   private fun setUpIndividualRecipeScreen(selectedRecipeIndex: Int? = null) {
+    householdViewModel.setHouseholds(listOf(houseHold))
     householdViewModel.selectHousehold(houseHold)
     selectedRecipeIndex?.let {
       listRecipesViewModel.selectRecipe(listRecipesViewModel.recipes.value[it])
@@ -115,6 +116,7 @@ class IndividualRecipeTest {
     val emptyHousehold = houseHold.copy(foodItems = emptyList())
     mockHouseHoldRepositoryGetHouseholds(listOf(emptyHousehold))
 
+    householdViewModel.setHouseholds(listOf(emptyHousehold))
     householdViewModel.selectHousehold(emptyHousehold)
     composeTestRule.setContent {
       IndividualRecipeScreen(
