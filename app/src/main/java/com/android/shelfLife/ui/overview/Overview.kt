@@ -57,7 +57,6 @@ fun OverviewScreen(
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
 
-  // TODO remove hardcoded filters
   val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
 
   HouseHoldSelectionDrawer(

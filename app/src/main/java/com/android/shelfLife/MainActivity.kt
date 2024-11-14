@@ -55,9 +55,9 @@ fun ShelfLifeApp() {
   val listRecipesViewModel: ListRecipesViewModel = viewModel()
   val firebaseFirestore = FirebaseFirestore.getInstance()
   val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
-  val listFoodItemViewModel = ListFoodItemsViewModel(foodItemRepository)
+  val listFoodItemViewModel = viewModel { ListFoodItemsViewModel(foodItemRepository) }
   val foodFactsRepository = OpenFoodFactsRepository(OkHttpClient())
-  val foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)
+  val foodFactsViewModel = viewModel { FoodFactsViewModel(foodFactsRepository) }
   val context = LocalContext.current
 
   val barcodeScannerViewModel: BarcodeScannerViewModel = viewModel()
@@ -72,8 +72,9 @@ fun ShelfLifeApp() {
       }
 
   // Initialize HouseholdViewModel only if the user is logged in
-  val householdViewModel =
-      HouseholdViewModel(HouseholdRepositoryFirestore(firebaseFirestore), listFoodItemViewModel)
+  val householdViewModel = viewModel {
+    HouseholdViewModel(HouseholdRepositoryFirestore(firebaseFirestore), listFoodItemViewModel)
+  }
 
   NavHost(navController = navController, startDestination = startingRoute) {
     // Authentication route
