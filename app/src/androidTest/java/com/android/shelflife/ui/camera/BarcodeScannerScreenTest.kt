@@ -136,48 +136,72 @@ class BarcodeScannerScreenTest {
     composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
   }
 
-  @Test
-  fun cancellingFormReturnsToScanning() {
-    // Set up the fake repository to return a sample food item
-    val sampleFoodFacts =
-        FoodFacts(
+    @Test
+    fun cancellingFormReturnsToScanning() = runTest {
+        // Set up the fake repository to return a sample food item
+        val sampleFoodFacts = FoodFacts(
             name = "Sample Food",
             barcode = "1234567890",
             quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
-            category = FoodCategory.OTHER)
-    fakeRepository.foodFactsList = listOf(sampleFoodFacts)
+            category = FoodCategory.OTHER
+        )
+        fakeRepository.foodFactsList = listOf(sampleFoodFacts)
 
-    composeTestRule.setContent {
-      BarcodeScannerScreen(
-          navigationActions = navigationActions,
-          cameraViewModel = barcodeScannerViewModel,
-          foodFactsViewModel = foodFactsViewModel,
-          householdViewModel = householdViewModel,
-          foodItemViewModel = foodItemViewModel)
+        composeTestRule.setContent {
+            BarcodeScannerScreen(
+                navigationActions = navigationActions,
+                cameraViewModel = barcodeScannerViewModel,
+                foodFactsViewModel = foodFactsViewModel,
+                householdViewModel = householdViewModel,
+                foodItemViewModel = foodItemViewModel
+            )
+        }
+
+        // Simulate scanning a barcode
+        composeTestRule.activity.runOnUiThread {
+            foodFactsViewModel.searchByBarcode(1234567890L)
+        }
+
+        // Advance coroutine dispatcher to process pending tasks
+        advanceUntilIdle()
+
+        // Wait until the bottom sheet is displayed with food details
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Wait until the input fields are displayed
+        composeTestRule.waitUntil(timeoutMillis = 5_000) {
+            composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // Assert that the input form is displayed
+        composeTestRule.onNodeWithTag("locationDropdown").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("expireDateTextField").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("openDateTextField").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("buyDateTextField").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("submitButton").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
+
+        // Scroll to and click the cancel button
+        composeTestRule.onNodeWithTag("cancelButton")
+            .assertIsDisplayed()
+            .performClick()
+
+        // Advance coroutine dispatcher to process pending tasks after click
+        advanceUntilIdle()
+
+        // Wait for Compose to settle
+        composeTestRule.awaitIdle()
+
+        // Verify that the input fields are dismissed
+        composeTestRule.onNodeWithTag("expireDateTextField").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("openDateTextField").assertDoesNotExist()
+        composeTestRule.onNodeWithTag("buyDateTextField").assertDoesNotExist()
+
+        // Verify that the main scanner screen is visible again
+        composeTestRule.onNodeWithTag("cameraPreviewBox").assertIsDisplayed()
     }
-
-    // Simulate scanning a barcode
-    composeTestRule.activity.runOnUiThread { foodFactsViewModel.searchByBarcode(1234567890L) }
-
-    // Wait until the bottom sheet is displayed with food details
-    composeTestRule.waitUntil(timeoutMillis = 5_000) {
-      composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
-    }
-
-
-    // Wait until the input fields are displayed
-    composeTestRule.waitUntil(timeoutMillis = 5_000) {
-      composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isNotEmpty()
-    }
-
-    // Click the cancel button
-    composeTestRule.onNodeWithTag("cancelButton").performClick()
-
-    // Verify that the BottomSheet is dismissed and scanning resumes
-    composeTestRule.onNodeWithTag("expireDateTextField").assertDoesNotExist()
-    composeTestRule.onNodeWithTag("openDateTextField").assertDoesNotExist()
-    composeTestRule.onNodeWithTag("buyDateTextField").assertDoesNotExist()
-  }
 
   @Test
   fun submittingFormWithInvalidDateShowsError() {
