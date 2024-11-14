@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class HouseholdViewModel(
+open class HouseholdViewModel(
     private val repository: HouseHoldRepository,
     private val listFoodItemsViewModel: ListFoodItemsViewModel
 ) : ViewModel() {
@@ -21,6 +21,9 @@ class HouseholdViewModel(
 
   private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
   val selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
+
+  private val _selectedFoodItem = MutableStateFlow<FoodItem?>(null)
+  val selectedFoodItem: StateFlow<FoodItem?> = _selectedFoodItem.asStateFlow()
 
   private val _householdToEdit = MutableStateFlow<HouseHold?>(null)
   val householdToEdit: StateFlow<HouseHold?> = _householdToEdit.asStateFlow()
@@ -48,13 +51,29 @@ class HouseholdViewModel(
     repository.getHouseholds(
         onSuccess = { householdList ->
           _households.value = householdList
-          selectHousehold(householdList.firstOrNull()) // Default to the first household
+          Log.d("HouseholdViewModel", "Households loaded successfully")
+          Log.d("HouseholdViewModel", "Selected household: ${_selectedHousehold.value}")
+          if (_selectedHousehold.value == null) {
+            selectHousehold(householdList.firstOrNull()) // Default to the first household
+          }
+          updateSelectedHousehold()
           finishedLoading.value = true
         },
         onFailure = { exception ->
           Log.e("HouseholdViewModel", "Error loading households: $exception")
           finishedLoading.value = true
         })
+  }
+  /**
+   * Updates the selected household with the latest data from the list of households using the uid,
+   * we may need to add another uid than the name.
+   */
+  private fun updateSelectedHousehold() {
+    selectedHousehold.value?.let { selectedHousehold ->
+      val updatedHousehold = _households.value.find { it.uid == selectedHousehold.uid }
+      _selectedHousehold.value = updatedHousehold
+      listFoodItemsViewModel.setFoodItems(_selectedHousehold.value!!.foodItems)
+    }
   }
 
   /**
@@ -149,16 +168,18 @@ class HouseholdViewModel(
     loadHouseholds()
   }
 
-  /**
-   * Factory for creating a [HouseholdViewModel] with a constructor that takes a
-   * [HouseHoldRepository] and a [ListFoodItemsViewModel].
-   */
+  // TODO this is a bad way to update the food items, we need a plan to separate the food items from
+  // the household
   fun addFoodItem(foodItem: FoodItem) {
     val selectedHousehold = selectedHousehold.value
     if (selectedHousehold != null) {
       updateHousehold(
           selectedHousehold.copy(foodItems = selectedHousehold.foodItems.plus(foodItem)))
     }
+  }
+
+  fun setSelectedFoodItemById(foodItem: FoodItem?) {
+    _selectedFoodItem.value = foodItem
   }
 
   companion object {

@@ -28,6 +28,7 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.overview.AddFoodItemScreen
 import com.android.shelfLife.ui.overview.HouseHoldCreationScreen
+import com.android.shelfLife.ui.overview.IndividualFoodItemScreen
 import com.android.shelfLife.ui.overview.OverviewScreen
 import com.android.shelfLife.ui.profile.ProfileScreen
 import com.android.shelfLife.ui.recipes.AddRecipeScreen
@@ -83,12 +84,18 @@ fun ShelfLifeApp() {
       composable(Screen.AUTH) { SignInScreen(navigationActions) }
     }
     navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
-      composable(Screen.OVERVIEW) { OverviewScreen(navigationActions, householdViewModel) }
+      composable(Screen.OVERVIEW) {
+        OverviewScreen(navigationActions, householdViewModel, listFoodItemViewModel)
+      }
       composable(Screen.ADD_FOOD) {
         AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
       }
       composable(Screen.HOUSEHOLD_CREATION) {
         HouseHoldCreationScreen(navigationActions, householdViewModel = householdViewModel)
+      }
+      composable(Screen.INDIVIDUAL_FOOD_ITEM) {
+        IndividualFoodItemScreen(
+            navigationActions = navigationActions, householdViewModel = householdViewModel)
       }
     }
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {

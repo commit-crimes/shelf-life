@@ -12,7 +12,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -118,7 +117,6 @@ fun SignInScreen(navigationActions: NavigationActions) {
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
   Button(
       onClick = onSignInClick,
-      colors = ButtonDefaults.buttonColors(containerColor = Color.White),
       shape = RoundedCornerShape(50),
       border = BorderStroke(1.dp, Color.LightGray),
       modifier = Modifier.padding(8.dp).height(48.dp).testTag("loginButton")) {
@@ -133,7 +131,6 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
 
               Text(
                   text = "Sign in with Google",
-                  color = Color.Gray,
                   fontSize = 16.sp,
                   fontWeight = FontWeight.Medium)
             }

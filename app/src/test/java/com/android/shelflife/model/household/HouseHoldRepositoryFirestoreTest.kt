@@ -4,6 +4,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
@@ -244,18 +245,23 @@ class HouseholdRepositoryFirestoreTest {
 
     val task: Task<Void> = mock()
     `when`(mockDocumentReference.update(any<Map<String, Any>>())).thenReturn(task)
-    `when`(task.addOnSuccessListener(any())).thenReturn(task)
-    `when`(task.addOnFailureListener(any())).thenReturn(task)
 
+    // Capture the OnCompleteListener correctly with ArgumentCaptor
+    val successCaptor =
+        ArgumentCaptor.forClass(OnCompleteListener::class.java)
+            as ArgumentCaptor<OnCompleteListener<Void>>
+    `when`(task.addOnCompleteListener(successCaptor.capture())).thenReturn(task)
+
+    // Call the function being tested
     householdRepository.updateHousehold(household, onSuccess, onFailure)
 
-    // Capture the success listener and invoke it
-    val successCaptor =
-        ArgumentCaptor.forClass(OnSuccessListener::class.java)
-            as ArgumentCaptor<OnSuccessListener<Void>>
-    verify(task).addOnSuccessListener(capture(successCaptor))
-    successCaptor.value.onSuccess(null)
+    // Simulate a successful task
+    `when`(task.isSuccessful).thenReturn(true)
 
+    // Invoke the captured OnCompleteListener with a successful task
+    successCaptor.value.onComplete(task)
+
+    // Verify that onSuccess was called, and onFailure was never invoked
     verify(onSuccess).invoke()
     verify(onFailure, never()).invoke(any())
   }
@@ -267,19 +273,28 @@ class HouseholdRepositoryFirestoreTest {
 
     val task: Task<Void> = mock()
     `when`(mockDocumentReference.update(any<Map<String, Any>>())).thenReturn(task)
-    `when`(task.addOnSuccessListener(any())).thenReturn(task)
-    `when`(task.addOnFailureListener(any())).thenReturn(task)
+
+    // Use ArgumentCaptor to capture the OnCompleteListener
+    val listenerCaptor =
+        ArgumentCaptor.forClass(OnCompleteListener::class.java)
+            as ArgumentCaptor<OnCompleteListener<Void>>
+
+    `when`(task.addOnCompleteListener(listenerCaptor.capture())).thenReturn(task)
 
     householdRepository.updateHousehold(household, onSuccess, onFailure)
 
-    // Capture the failure listener and invoke it with an exception
-    val failureCaptor =
-        ArgumentCaptor.forClass(OnFailureListener::class.java) as ArgumentCaptor<OnFailureListener>
-    verify(task).addOnFailureListener(capture(failureCaptor))
+    // Simulate a task failure
     val exception = Exception("Firestore update failed")
-    failureCaptor.value.onFailure(exception)
+    `when`(task.isSuccessful).thenReturn(false)
+    `when`(task.exception).thenReturn(exception)
 
+    // Trigger the captured OnCompleteListener with the failed task
+    listenerCaptor.value.onComplete(task)
+
+    // Verify that the onFailure callback is called with the exception
     verify(onFailure).invoke(exception)
+
+    // Verify that onSuccess was never invoked
     verify(onSuccess, never()).invoke()
   }
 

@@ -2,6 +2,13 @@ package com.android.shelfLife.ui.overview
 
 import android.util.Log
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -86,7 +93,6 @@ fun HouseHoldCreationScreen(
             modifier =
                 Modifier.padding(paddingValues).padding(30.dp).padding(top = 50.dp).fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally) {
-              // Household name input field
               OutlinedTextField(
                   value = houseHoldName,
                   onValueChange = { houseHoldName = it },
@@ -105,8 +111,6 @@ fun HouseHoldCreationScreen(
                   placeholder = { Text("Enter Household Name") },
                   modifier =
                       Modifier.padding(30.dp).fillMaxWidth().testTag("HouseHoldNameTextField"))
-
-              // Section title for household members
               Text(
                   "Household Members",
                   style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
@@ -180,11 +184,8 @@ fun HouseHoldCreationScreen(
                                 val missingEmails =
                                     memberEmailList.filter { it !in emailToUid.keys }
                                 if (missingEmails.isNotEmpty()) {
-                                  // Handle missing emails (e.g., show a message)
                                   Log.w(
                                       "HouseHoldCreationScreen", "Emails not found: $missingEmails")
-                                  // Optionally, you can show a dialog or a snackbar to inform the
-                                  // user
                                 }
                                 val memberUids = emailToUid.values.toMutableList()
 
@@ -218,7 +219,6 @@ fun HouseHoldCreationScreen(
                     }
                   }
 
-              // Confirmation dialog for deletion
               if (showConfirmationDialog) {
                 AlertDialog(
                     modifier = Modifier.testTag("DeleteConfirmationDialog"),
