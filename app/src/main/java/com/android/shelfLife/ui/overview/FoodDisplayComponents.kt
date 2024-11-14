@@ -56,7 +56,6 @@ import java.util.Locale
 @Composable
 fun ListFoodItems(foodItems: List<FoodItem>, onFoodItemClick: (FoodItem) -> Unit) {
   if (foodItems.isEmpty()) {
-    // Display a prompt when there are no todos
     Box(
         modifier = Modifier.fillMaxSize().testTag("NoFoodItems"),
         contentAlignment = Alignment.Center) {
@@ -123,10 +122,13 @@ fun FoodItemCard(foodItem: FoodItem, onClick: () -> Unit) {
         }
         Row {
           LinearProgressIndicator(
-              progress = progress,
+              progress = { progress },
+              modifier = Modifier.fillMaxWidth().height(8.dp),
               color = progressBarColor,
+              gapSize = 4.dp,
+              drawStopIndicator = {},
               trackColor = LightGray,
-              modifier = Modifier.fillMaxWidth().height(8.dp))
+          )
         }
         Spacer(modifier = Modifier.width(8.dp))
       }

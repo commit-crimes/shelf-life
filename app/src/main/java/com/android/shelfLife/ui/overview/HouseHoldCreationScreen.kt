@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -111,13 +113,14 @@ fun HouseHoldCreationScreen(
               // TODO add member list here, maybe make it a composable for reuse
             }
         Row(
-            modifier =
-                Modifier.fillMaxSize()
-                    .padding(top = 25.dp, bottom = 60.dp, start = 45.dp, end = 45.dp),
+            modifier = Modifier.fillMaxSize().padding(top = 25.dp, bottom = 60.dp),
             verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.SpaceBetween) {
+            horizontalArrangement = Arrangement.SpaceEvenly) {
               Button(
                   modifier = Modifier.testTag("ConfirmButton"),
+                  colors =
+                      ButtonDefaults.buttonColors(
+                          containerColor = MaterialTheme.colorScheme.secondaryContainer),
                   onClick = {
                     // TODO change logic to include multiple members
 
@@ -136,18 +139,29 @@ fun HouseHoldCreationScreen(
                   },
               ) {
                 Text(
-                    "Confirm",
-                    style = TextStyle(fontSize = 22.sp),
-                    modifier = Modifier.padding(10.dp))
+                    "Save",
+                    style =
+                        TextStyle(
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer),
+                    modifier = Modifier.padding(7.dp).width(70.dp))
               }
               Button(
                   modifier = Modifier.testTag("CancelButton"),
+                  colors =
+                      ButtonDefaults.buttonColors(
+                          containerColor = MaterialTheme.colorScheme.secondaryContainer),
                   onClick = { navigationActions.goBack() },
               ) {
                 Text(
                     "Cancel",
-                    style = TextStyle(fontSize = 22.sp),
-                    modifier = Modifier.padding(10.dp))
+                    style =
+                        TextStyle(
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer),
+                    modifier = Modifier.padding(7.dp).width(70.dp))
               }
             }
         when {
