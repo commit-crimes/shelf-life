@@ -72,10 +72,9 @@ class ListFoodItemsViewModelTest {
   }
 
   @Test
-  fun `init should call repository init and getFoodItems`() = runTest {
-    // Verify that init and getFoodItems are called during ViewModel initialization
+  fun `init should call repository init`() = runTest {
+    // Verify that init is called during ViewModel initialization
     verify(mockRepository).init(any())
-    verify(mockRepository).getFoodItems(any(), any())
   }
 
   @Test
@@ -101,7 +100,7 @@ class ListFoodItemsViewModelTest {
     }
 
     // Act
-    viewModel.getFoodItems()
+    viewModel.getAllFoodItems()
 
     // Assert
     val result = viewModel.foodItems.first()
@@ -212,7 +211,7 @@ class ListFoodItemsViewModelTest {
     }
 
     // Act
-    viewModel.getFoodItems()
+    viewModel.getAllFoodItems()
 
     // Assert that a log entry with Log.e was created
     val logEntries = ShadowLog.getLogs()
