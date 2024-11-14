@@ -166,12 +166,14 @@ fun HouseHoldCreationScreen(
 
               // Confirm and Cancel buttons
               Row(
-                  modifier =
-                      Modifier.fillMaxWidth().padding(bottom = 60.dp, start = 45.dp, end = 45.dp),
+                  modifier = Modifier.fillMaxSize().padding(top = 25.dp, bottom = 60.dp),
                   verticalAlignment = Alignment.Bottom,
                   horizontalArrangement = Arrangement.SpaceBetween) {
                     Button(
                         modifier = Modifier.testTag("ConfirmButton"),
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer),
                         onClick = {
                           if (householdViewModel.checkIfHouseholdNameExists(houseHoldName) &&
                               (householdToEdit == null ||
@@ -203,18 +205,29 @@ fun HouseHoldCreationScreen(
                         },
                     ) {
                       Text(
-                          "Confirm",
-                          style = TextStyle(fontSize = 22.sp),
-                          modifier = Modifier.padding(10.dp))
+                          "Save",
+                          style =
+                              TextStyle(
+                                  fontSize = 20.sp,
+                                  textAlign = TextAlign.Center,
+                                  color = MaterialTheme.colorScheme.onSecondaryContainer),
+                          modifier = Modifier.padding(7.dp).width(70.dp))
                     }
                     Button(
                         modifier = Modifier.testTag("CancelButton"),
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer),
                         onClick = { navigationActions.goBack() },
                     ) {
                       Text(
                           "Cancel",
-                          style = TextStyle(fontSize = 22.sp),
-                          modifier = Modifier.padding(10.dp))
+                          style =
+                              TextStyle(
+                                  fontSize = 20.sp,
+                                  textAlign = TextAlign.Center,
+                                  color = MaterialTheme.colorScheme.onSecondaryContainer),
+                          modifier = Modifier.padding(7.dp).width(70.dp))
                     }
                   }
 
