@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Button
@@ -38,6 +39,7 @@ import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.utils.DropdownFields
 import com.example.compose.LocalThemeMode
 import com.example.compose.LocalThemeToggler
 import com.example.compose.LocalThemeTogglerProvider
@@ -59,11 +61,22 @@ fun ProfileScreen(
   // Get the current theme mode and the theme toggler from ShelfLifeTheme
   val currentThemeMode = LocalThemeMode.current
   val themeToggler = LocalThemeTogglerProvider.current
+
   val themeModeLabel = when (currentThemeMode) {
     ThemeMode.LIGHT -> "Light"
     ThemeMode.DARK -> "Dark"
     ThemeMode.SYSTEM_DEFAULT -> "System Default"
   }
+
+  val options = arrayOf(ThemeMode.LIGHT, ThemeMode.DARK, ThemeMode.SYSTEM_DEFAULT)
+  val optionLabels = mapOf(
+    ThemeMode.LIGHT to "Light",
+    ThemeMode.DARK to "Dark",
+    ThemeMode.SYSTEM_DEFAULT to "System Default"
+  )
+
+  val color = MaterialTheme.colorScheme
+
 
   Scaffold(
       modifier = Modifier.testTag("profileScaffold"),
@@ -101,6 +114,7 @@ fun ProfileScreen(
               Text(
                   text = currentAccount?.displayName ?: "Guest",
                   fontWeight = FontWeight.Bold,
+                color = color.primary,
                   fontSize = 28.sp,
                   textAlign = TextAlign.Center,
                   modifier = Modifier.testTag("profileNameText"))
@@ -114,69 +128,46 @@ fun ProfileScreen(
                     modifier = Modifier.testTag("profileEmailText"))
               }
 
+            Spacer(modifier = Modifier.weight(0.2f))
+
+          ////
+          Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(16.dp)
+          ) {
 
 
-          //
-          Spacer(modifier = Modifier.weight(0.2f))
-
-
-
-          Text("App Theme:")
-
-          // Dropdown menu
-          // Dropdown menu
-          Box {
-            // Dropdown menu trigger
-            Text(
-              text = themeModeLabel,
-              modifier = Modifier
-                .padding(8.dp)
-                .clickable { expanded = true }
-                .background(Color.LightGray)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+            DropdownFields(
+              label = "App Theme",
+              options = options,
+              selectedOption = currentThemeMode,
+              onOptionSelected = { selectedOption ->
+                themeToggler.toggleTheme(selectedOption)
+              },
+              expanded = expanded,
+              onExpandedChange = { expanded = it },
+              optionLabel = { option -> (optionLabels[option] ?: "System Default") + " Mode" },
+              modifier = Modifier.padding(horizontal = 16.dp)
             )
 
-            // Dropdown menu content
-            DropdownMenu(
-              expanded = expanded,
-              onDismissRequest = { expanded = false }
-            ) {
-              DropdownMenuItem(
-                text = { Text("Light") },
-                onClick = {
-                  themeToggler.toggleTheme(ThemeMode.LIGHT)
-                  expanded = false
-                }
-              )
-              DropdownMenuItem(
-                text = { Text("Dark") },
-                onClick = {
-                  themeToggler.toggleTheme(ThemeMode.DARK)
-                  expanded = false
-                }
-              )
-              DropdownMenuItem(
-                text = { Text("System Default") },
-                onClick = {
-                  themeToggler.toggleTheme(ThemeMode.SYSTEM_DEFAULT)
-                  expanded = false
-                }
-              )
-            }
-          }
-          Spacer(modifier = Modifier.weight(1f))
 
-          // Logout button
-          OutlinedButton(
-              onClick = {
-                // Sign out the user
-                signOutUser()
-              },
-              modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
-              border = BorderStroke(1.dp, Color.Red) // Outline color matches the current status
-            ) {
-              Text(text = "Log out", color = Color.Red)
             }
+
+          //
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // Logout button
+            OutlinedButton(
+                onClick = {
+                  // Sign out the user
+                  signOutUser()
+                },
+                modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
+                border = BorderStroke(1.dp, Color.Red) // Outline color matches the current status
+              ) {
+                Text(text = "Log out", color = Color.Red)
+              }
           }
       }
 }
