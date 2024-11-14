@@ -118,10 +118,6 @@ class HouseholdViewModel(
     loadHouseholds()
   }
 
-  /**
-   * Factory for creating a [HouseholdViewModel] with a constructor that takes a
-   * [HouseHoldRepository] and a [ListFoodItemsViewModel].
-   */
   fun addFoodItem(foodItem: FoodItem) {
     val selectedHousehold = selectedHousehold.value
     if (selectedHousehold != null) {
@@ -130,6 +126,18 @@ class HouseholdViewModel(
     }
   }
 
+  fun editFoodItem(newFoodItem: FoodItem, oldFoodItem: FoodItem) {
+      val selectedHousehold = selectedHousehold.value
+      if (selectedHousehold != null) {
+          updateHousehold(
+              selectedHousehold.copy(foodItems = selectedHousehold.foodItems.minus(oldFoodItem).plus(newFoodItem)))
+      }
+  }
+
+  /**
+   * Factory for creating a [HouseholdViewModel] with a constructor that takes a
+   * [HouseHoldRepository] and a [ListFoodItemsViewModel].
+   */
   companion object {
     val Factory: ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {

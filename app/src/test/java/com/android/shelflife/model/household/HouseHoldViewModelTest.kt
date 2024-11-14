@@ -235,6 +235,59 @@ class HouseholdViewModelTest {
   }
 
   @Test
+  fun `editFoodItem should remove old food item and add new food item to selected household and update it`() = runTest {
+    // Arrange
+    val foodFacts =
+      FoodFacts(
+        name = "Apple",
+        barcode = "123456789",
+        quantity = Quantity(1.0, FoodUnit.COUNT),
+        category = FoodCategory.FRUIT,
+        nutritionFacts = NutritionFacts(energyKcal = 52))
+
+    val foodItem =
+      FoodItem(
+        uid = "1",
+        foodFacts = foodFacts,
+        location = FoodStorageLocation.PANTRY,
+        expiryDate = Timestamp.now(),
+        status = FoodStatus.CLOSED)
+
+    val newFoodItem =
+      FoodItem(
+        uid = "2",
+        foodFacts = foodFacts,
+        location = FoodStorageLocation.FRIDGE,
+        expiryDate = Timestamp.now(),
+        status = FoodStatus.CLOSED)
+
+    val household = HouseHold("1", "Household 1", emptyList(), List(1) { foodItem })
+
+    val updatedHousehold = household.copy(foodItems = household.foodItems - foodItem + newFoodItem)
+    val households = listOf(updatedHousehold)
+
+    whenever(repository.updateHousehold(any(), any(), any())).thenAnswer { invocation ->
+      val onSuccess = invocation.getArgument<() -> Unit>(1)
+      onSuccess()
+      null
+    }
+    whenever(repository.getHouseholds(any(), any())).thenAnswer { invocation ->
+      val onSuccess = invocation.getArgument<(List<HouseHold>) -> Unit>(0)
+      onSuccess(households)
+      null
+    }
+
+    householdViewModel.selectHousehold(household)
+
+    // Act
+    householdViewModel.editFoodItem(newFoodItem, foodItem)
+
+    // Assert
+    verify(repository).updateHousehold(eq(updatedHousehold), any(), any())
+    assertEquals(households, householdViewModel.households.value)
+  }
+
+  @Test
   fun addNewHousehold_shouldLogErrorWhenAddingFails() = runTest {
     // Arrange
     val householdName = "New Household"
