@@ -585,4 +585,195 @@ class HouseholdRepositoryFirestoreTest {
     val expectedMap = batches[0].associateWith { it.replace("@example.com", "Id") }
     verify(callback).invoke(expectedMap)
   }
+
+  @Test
+  fun `getUserEmails calls callback with empty map when userIds is empty`() {
+    val callback = mock<(Map<String, String>) -> Unit>()
+
+    // Invoke getUserEmails with an empty list
+    householdRepository.getUserEmails(emptyList(), callback)
+
+    // Verify that the callback is called with an empty map
+    verify(callback).invoke(emptyMap())
+  }
+
+  @Test
+  fun `getUserEmails retrieves emails when userIds list is less than batch size and Firestore query succeeds`() {
+    val userIds = listOf("user1Id", "user2Id")
+    val callback = mock<(Map<String, String>) -> Unit>()
+
+    // Mock Firestore behavior
+    val usersCollectionRef: CollectionReference = mock()
+    `when`(mockFirestore.collection("users")).thenReturn(usersCollectionRef)
+
+    val query: Query = mock()
+    `when`(usersCollectionRef.whereIn(eq(FieldPath.documentId()), eq(userIds))).thenReturn(query)
+
+    val taskQuerySnapshot: Task<QuerySnapshot> = mock()
+    `when`(query.get()).thenReturn(taskQuerySnapshot)
+    `when`(taskQuerySnapshot.addOnSuccessListener(any())).thenReturn(taskQuerySnapshot)
+    `when`(taskQuerySnapshot.addOnFailureListener(any())).thenReturn(taskQuerySnapshot)
+
+    // Simulate the querySnapshot
+    val querySnapshot: QuerySnapshot = mock()
+    val docSnapshot1: DocumentSnapshot = mock()
+    val docSnapshot2: DocumentSnapshot = mock()
+    `when`(docSnapshot1.getString("email")).thenReturn("user1@example.com")
+    `when`(docSnapshot1.id).thenReturn("user1Id")
+    `when`(docSnapshot2.getString("email")).thenReturn("user2@example.com")
+    `when`(docSnapshot2.id).thenReturn("user2Id")
+    val docSnapshots = listOf(docSnapshot1, docSnapshot2)
+    `when`(querySnapshot.documents).thenReturn(docSnapshots)
+
+    // Invoke getUserEmails
+    householdRepository.getUserEmails(userIds, callback)
+
+    // Capture and invoke the success listener
+    val successCaptor = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
+    verify(taskQuerySnapshot).addOnSuccessListener(successCaptor.capture())
+    successCaptor.firstValue.onSuccess(querySnapshot)
+
+    // Verify the callback is called with the correct mapping
+    val expectedMap = mapOf("user1Id" to "user1@example.com", "user2Id" to "user2@example.com")
+    verify(callback).invoke(expectedMap)
+  }
+
+  @Test
+  fun `getUserEmails retrieves emails when userIds list exceeds batch size and Firestore queries succeed`() {
+    val userIds = (1..15).map { "user${it}Id" }
+    val callback = mock<(Map<String, String>) -> Unit>()
+
+    // Mock Firestore behavior
+    val usersCollectionRef: CollectionReference = mock()
+    `when`(mockFirestore.collection("users")).thenReturn(usersCollectionRef)
+
+    val batches = userIds.chunked(10)
+    val tasks = mutableListOf<Task<QuerySnapshot>>()
+
+    for (batch in batches) {
+      val query: Query = mock()
+      val taskQuerySnapshot: Task<QuerySnapshot> = mock()
+
+      `when`(usersCollectionRef.whereIn(eq(FieldPath.documentId()), eq(batch))).thenReturn(query)
+      `when`(query.get()).thenReturn(taskQuerySnapshot)
+      `when`(taskQuerySnapshot.addOnSuccessListener(any())).thenReturn(taskQuerySnapshot)
+      `when`(taskQuerySnapshot.addOnFailureListener(any())).thenReturn(taskQuerySnapshot)
+
+      tasks.add(taskQuerySnapshot)
+    }
+
+    // Simulate querySnapshots for each batch
+    val querySnapshots = batches.map { batch ->
+      val querySnapshot: QuerySnapshot = mock()
+      val docSnapshots = batch.map { userId ->
+        val docSnapshot: DocumentSnapshot = mock()
+        `when`(docSnapshot.getString("email")).thenReturn("$userId@example.com")
+        `when`(docSnapshot.id).thenReturn(userId)
+        docSnapshot
+      }
+      `when`(querySnapshot.documents).thenReturn(docSnapshots)
+      querySnapshot
+    }
+
+    // Invoke getUserEmails
+    householdRepository.getUserEmails(userIds, callback)
+
+    // Capture and invoke success listeners for each batch
+    tasks.zip(querySnapshots).forEach { (task, querySnapshot) ->
+      val successCaptor = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
+      verify(task).addOnSuccessListener(successCaptor.capture())
+      successCaptor.firstValue.onSuccess(querySnapshot)
+    }
+
+    // Verify the callback is called with the correct mapping
+    val expectedMap = userIds.associateWith { "$it@example.com" }
+    verify(callback).invoke(expectedMap)
+  }
+
+  @Test
+  fun `getUserEmails handles Firestore query failure and calls callback with empty map`() {
+    val userIds = listOf("user1Id", "user2Id")
+    val callback = mock<(Map<String, String>) -> Unit>()
+
+    // Mock Firestore behavior
+    val usersCollectionRef: CollectionReference = mock()
+    `when`(mockFirestore.collection("users")).thenReturn(usersCollectionRef)
+
+    val query: Query = mock()
+    `when`(usersCollectionRef.whereIn(eq(FieldPath.documentId()), eq(userIds))).thenReturn(query)
+
+    val taskQuerySnapshot: Task<QuerySnapshot> = mock()
+    `when`(query.get()).thenReturn(taskQuerySnapshot)
+    `when`(taskQuerySnapshot.addOnSuccessListener(any())).thenReturn(taskQuerySnapshot)
+    `when`(taskQuerySnapshot.addOnFailureListener(any())).thenReturn(taskQuerySnapshot)
+
+    // Invoke getUserEmails
+    householdRepository.getUserEmails(userIds, callback)
+
+    // Capture and invoke the failure listener
+    val failureCaptor = argumentCaptor<OnFailureListener>()
+    verify(taskQuerySnapshot).addOnFailureListener(failureCaptor.capture())
+    val exception = Exception("Firestore query failed")
+    failureCaptor.firstValue.onFailure(exception)
+
+    // Verify the callback is called with an empty map due to failure
+    verify(callback).invoke(emptyMap())
+  }
+
+  @Test
+  fun `getUserEmails processes all batches even if some fail`() {
+    val userIds = (1..20).map { "user${it}Id" }
+    val callback = mock<(Map<String, String>) -> Unit>()
+
+    // Mock Firestore behavior
+    val usersCollectionRef: CollectionReference = mock()
+    `when`(mockFirestore.collection("users")).thenReturn(usersCollectionRef)
+
+    val batches = userIds.chunked(10)
+    val tasks = mutableListOf<Task<QuerySnapshot>>()
+
+    batches.forEachIndexed { index, batch ->
+      val query: Query = mock()
+      val taskQuerySnapshot: Task<QuerySnapshot> = mock()
+
+      `when`(usersCollectionRef.whereIn(eq(FieldPath.documentId()), eq(batch))).thenReturn(query)
+      `when`(query.get()).thenReturn(taskQuerySnapshot)
+      `when`(taskQuerySnapshot.addOnSuccessListener(any())).thenReturn(taskQuerySnapshot)
+      `when`(taskQuerySnapshot.addOnFailureListener(any())).thenReturn(taskQuerySnapshot)
+
+      tasks.add(taskQuerySnapshot)
+    }
+
+    // Simulate querySnapshots, first batch succeeds, second fails
+    val querySnapshotSuccess: QuerySnapshot = mock()
+    val docSnapshotsSuccess = batches[0].map { userId ->
+      val docSnapshot: DocumentSnapshot = mock()
+      `when`(docSnapshot.getString("email")).thenReturn("$userId@example.com")
+      `when`(docSnapshot.id).thenReturn(userId)
+      docSnapshot
+    }
+    `when`(querySnapshotSuccess.documents).thenReturn(docSnapshotsSuccess)
+
+    // Invoke getUserEmails
+    householdRepository.getUserEmails(userIds, callback)
+
+    // Capture and invoke success/failure listeners
+    tasks.forEachIndexed { index, task ->
+      val successCaptor = argumentCaptor<OnSuccessListener<QuerySnapshot>>()
+      val failureCaptor = argumentCaptor<OnFailureListener>()
+      verify(task).addOnSuccessListener(successCaptor.capture())
+      verify(task).addOnFailureListener(failureCaptor.capture())
+
+      if (index == 0) {
+        successCaptor.firstValue.onSuccess(querySnapshotSuccess)
+      } else {
+        val exception = Exception("Firestore query failed")
+        failureCaptor.firstValue.onFailure(exception)
+      }
+    }
+
+    // Verify the callback is called with mapping from the successful batch
+    val expectedMap = batches[0].associateWith { "$it@example.com" }
+    verify(callback).invoke(expectedMap)
+  }
 }
