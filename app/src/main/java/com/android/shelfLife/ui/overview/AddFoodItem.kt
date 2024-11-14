@@ -63,16 +63,14 @@ fun AddFoodItemScreen(
 
   val context = LocalContext.current
 
-    /**
-     * Validates all fields when the submit button is clicked.
-     */
-    fun validateAllFieldsWhenSubmitButton() {
-        foodNameError = validateFoodName(foodName)
-        amountError = validateAmount(amount)
-        buyDateError = validateBuyDate(buyDate)
-        expireDateError = validateExpireDate(expireDate, buyDate, buyDateError)
-        openDateError = validateOpenDate(openDate, buyDate, buyDateError, expireDate, expireDateError)
-    }
+  /** Validates all fields when the submit button is clicked. */
+  fun validateAllFieldsWhenSubmitButton() {
+    foodNameError = validateFoodName(foodName)
+    amountError = validateAmount(amount)
+    buyDateError = validateBuyDate(buyDate)
+    expireDateError = validateExpireDate(expireDate, buyDate, buyDateError)
+    openDateError = validateOpenDate(openDate, buyDate, buyDateError, expireDate, expireDateError)
+  }
 
   Scaffold(
       modifier = Modifier.fillMaxSize(),

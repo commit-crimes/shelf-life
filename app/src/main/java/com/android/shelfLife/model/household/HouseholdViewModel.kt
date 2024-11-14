@@ -145,11 +145,12 @@ class HouseholdViewModel(
   }
 
   fun editFoodItem(newFoodItem: FoodItem, oldFoodItem: FoodItem) {
-      val selectedHousehold = selectedHousehold.value
-      if (selectedHousehold != null) {
-          updateHousehold(
-              selectedHousehold.copy(foodItems = selectedHousehold.foodItems.minus(oldFoodItem).plus(newFoodItem)))
-      }
+    val selectedHousehold = selectedHousehold.value
+    if (selectedHousehold != null) {
+      updateHousehold(
+          selectedHousehold.copy(
+              foodItems = selectedHousehold.foodItems.minus(oldFoodItem).plus(newFoodItem)))
+    }
   }
 
   /**

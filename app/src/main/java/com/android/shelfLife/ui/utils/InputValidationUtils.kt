@@ -7,12 +7,12 @@ package com.android.shelfLife.ui.utils
  * @return The error message if the food name is invalid, null otherwise.
  */
 fun validateFoodName(foodName: String): String? {
-    val namePattern = Regex("^[a-zA-Z0-9\\s\\-,'()]+\$")
-    return when {
-        foodName.isBlank() -> "Food name cannot be empty."
-        !namePattern.matches(foodName) -> "Food name contains invalid characters."
-        else -> null
-    }
+  val namePattern = Regex("^[a-zA-Z0-9\\s\\-,'()]+\$")
+  return when {
+    foodName.isBlank() -> "Food name cannot be empty."
+    !namePattern.matches(foodName) -> "Food name contains invalid characters."
+    else -> null
+  }
 }
 
 /**
@@ -22,12 +22,12 @@ fun validateFoodName(foodName: String): String? {
  * @return The error message if the amount is invalid, null otherwise.
  */
 fun validateAmount(amount: String): String? {
-    return when {
-        amount.isBlank() -> "Amount cannot be empty."
-        amount.toDoubleOrNull() == null -> "Amount must be a number."
-        amount.toDouble() <= 0 -> "Amount must be positive."
-        else -> null
-    }
+  return when {
+    amount.isBlank() -> "Amount cannot be empty."
+    amount.toDoubleOrNull() == null -> "Amount must be a number."
+    amount.toDouble() <= 0 -> "Amount must be positive."
+    else -> null
+  }
 }
 
 /**
@@ -37,7 +37,7 @@ fun validateAmount(amount: String): String? {
  * @return The error message if the buy date is invalid, null otherwise.
  */
 fun validateBuyDate(buyDate: String): String? {
-    return getDateErrorMessage(buyDate)
+  return getDateErrorMessage(buyDate)
 }
 
 /**
@@ -49,18 +49,18 @@ fun validateBuyDate(buyDate: String): String? {
  * @return The error message if the expire date is invalid, null otherwise.
  */
 fun validateExpireDate(expireDate: String, buyDate: String, buyDateError: String?): String? {
-    var error = getDateErrorMessage(expireDate)
-    if (error == null && expireDate.length == 8 && buyDateError == null && buyDate.length == 8) {
-        if (!isDateAfterOrEqual(expireDate, buyDate)) {
-            error = "Expire Date cannot be before Buy Date"
-        }
+  var error = getDateErrorMessage(expireDate)
+  if (error == null && expireDate.length == 8 && buyDateError == null && buyDate.length == 8) {
+    if (!isDateAfterOrEqual(expireDate, buyDate)) {
+      error = "Expire Date cannot be before Buy Date"
     }
-    if (error == null && expireDate.length == 8) {
-        if (!isValidDateNotPast(expireDate)) {
-            error = "Expire Date cannot be in the past"
-        }
+  }
+  if (error == null && expireDate.length == 8) {
+    if (!isValidDateNotPast(expireDate)) {
+      error = "Expire Date cannot be in the past"
     }
-    return error
+  }
+  return error
 }
 
 /**
@@ -80,16 +80,24 @@ fun validateOpenDate(
     expireDate: String,
     expireDateError: String?
 ): String? {
-    var error = getDateErrorMessage(openDate, isRequired = false)
-    if (error == null && openDate.isNotEmpty() && buyDateError == null && openDate.length == 8 && buyDate.length == 8) {
-        if (!isDateAfterOrEqual(openDate, buyDate)) {
-            error = "Open Date cannot be before Buy Date"
-        }
+  var error = getDateErrorMessage(openDate, isRequired = false)
+  if (error == null &&
+      openDate.isNotEmpty() &&
+      buyDateError == null &&
+      openDate.length == 8 &&
+      buyDate.length == 8) {
+    if (!isDateAfterOrEqual(openDate, buyDate)) {
+      error = "Open Date cannot be before Buy Date"
     }
-    if (error == null && openDate.isNotEmpty() && expireDateError == null && openDate.length == 8 && expireDate.length == 8) {
-        if (!isDateAfterOrEqual(expireDate, openDate)) {
-            error = "Open Date cannot be after Expire Date"
-        }
+  }
+  if (error == null &&
+      openDate.isNotEmpty() &&
+      expireDateError == null &&
+      openDate.length == 8 &&
+      expireDate.length == 8) {
+    if (!isDateAfterOrEqual(expireDate, openDate)) {
+      error = "Open Date cannot be after Expire Date"
     }
-    return error
+  }
+  return error
 }
