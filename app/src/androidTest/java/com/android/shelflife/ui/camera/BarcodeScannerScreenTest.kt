@@ -135,7 +135,6 @@ class BarcodeScannerScreenTest {
     composeTestRule.onNodeWithTag("submitButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
   }
-
     @Test
     fun cancellingFormReturnsToScanning() {
         // Set up the fake repository to return a sample food item
@@ -172,28 +171,21 @@ class BarcodeScannerScreenTest {
             composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isNotEmpty()
         }
 
-        // Assert that the input form is displayed
-        composeTestRule.onNodeWithTag("locationDropdown").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("expireDateTextField").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("openDateTextField").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("buyDateTextField").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("submitButton").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
-
         // Scroll to and click the cancel button
         composeTestRule.onNodeWithTag("cancelButton")
+            .performScrollTo() // Ensure the button is visible
             .assertIsDisplayed()
+            .assertIsEnabled()
             .performClick()
 
-        // Wait until the input fields are dismissed
+        // Wait until the input fields are dismissed, indicating that the modal has closed
         composeTestRule.waitUntil(timeoutMillis = 10_000) {
             composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isEmpty()
         }
 
-        // Verify that the main scanner screen is visible again
+        // Verify that the camera scanner view is visible again
         composeTestRule.onNodeWithTag("cameraPreviewBox").assertIsDisplayed()
     }
-
   @Test
   fun submittingFormWithInvalidDateShowsError() {
     // Set up the fake repository to return a sample food item

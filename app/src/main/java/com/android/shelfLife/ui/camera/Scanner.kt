@@ -1,3 +1,4 @@
+// BarcodeScannerScreen.kt
 package com.android.shelfLife.ui.camera
 
 import android.content.Intent
@@ -52,173 +53,180 @@ fun BarcodeScannerScreen(
     householdViewModel: HouseholdViewModel,
     foodItemViewModel: ListFoodItemsViewModel
 ) {
-  val context = LocalContext.current
-  val permissionGranted = cameraViewModel.permissionGranted
+    val context = LocalContext.current
+    val permissionGranted = cameraViewModel.permissionGranted
 
-  // State variables
-  val isScanningState = remember { mutableStateOf(true) }
-  val foodScanned = remember { mutableStateOf(false) }
-  val barcodeScanned = remember { mutableStateOf<String?>(null) }
-  val foodFacts = remember { mutableStateOf<FoodFacts?>(null) }
-  val searchInProgress = remember { mutableStateOf(false) }
+    // State variables
+    val isScanningState = remember { mutableStateOf(true) }
+    val foodScanned = remember { mutableStateOf(false) }
+    val barcodeScanned = remember { mutableStateOf<String?>(null) }
+    val foodFacts = remember { mutableStateOf<FoodFacts?>(null) }
+    val searchInProgress = remember { mutableStateOf(false) }
 
-  val coroutineScope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
 
-  // Bottom sheet scaffold state with initial state as Hidden
-  val sheetScaffoldState =
-      rememberBottomSheetScaffoldState(
-          bottomSheetState =
-              rememberStandardBottomSheetState(
-                  initialValue = SheetValue.Hidden, skipHiddenState = false))
+    // Bottom sheet scaffold state with initial state as Hidden
+    val sheetScaffoldState =
+        rememberBottomSheetScaffoldState(
+            bottomSheetState =
+            rememberStandardBottomSheetState(
+                initialValue = SheetValue.Hidden, skipHiddenState = false
+            )
+        )
 
-  OnLifecycleEvent(
-      onResume = {
-        cameraViewModel.checkCameraPermission()
-        isScanningState.value = true
-      },
-      onPause = {
-        isScanningState.value = false
-        coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
-      })
-
-  LaunchedEffect(permissionGranted) {
-    if (!permissionGranted) {
-      navigationActions.navigateTo(Screen.PERMISSION_HANDLER)
-    }
-  }
-
-  // Listen to BottomSheetScaffold state changes
-  LaunchedEffect(sheetScaffoldState.bottomSheetState) {
-    snapshotFlow { sheetScaffoldState.bottomSheetState.currentValue }
-        .collect { sheetState ->
-          if (sheetState == SheetValue.Hidden || sheetState == SheetValue.PartiallyExpanded) {
-            // Resume scanning when the sheet is hidden
+    OnLifecycleEvent(
+        onResume = {
+            cameraViewModel.checkCameraPermission()
             isScanningState.value = true
-            foodScanned.value = false
-            barcodeScanned.value = null
-            foodFacts.value = null
-          }
+        },
+        onPause = {
+            isScanningState.value = false
+            coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
         }
-  }
+    )
 
-  // Parent Scaffold to host the Bottom Navigation Bar
-  Scaffold(
-      modifier = Modifier.testTag("barcodeScannerScreen"),
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { selected -> navigationActions.navigateTo(selected) },
-            tabList = LIST_TOP_LEVEL_DESTINATION,
-            selectedItem = Route.SCANNER)
-      }) { innerPadding ->
+    LaunchedEffect(permissionGranted) {
+        if (!permissionGranted) {
+            navigationActions.navigateTo(Screen.PERMISSION_HANDLER)
+        }
+    }
+
+    // Listen to BottomSheetScaffold state changes
+    LaunchedEffect(sheetScaffoldState.bottomSheetState) {
+        snapshotFlow { sheetScaffoldState.bottomSheetState.currentValue }
+            .collect { sheetState ->
+                if (sheetState == SheetValue.Hidden || sheetState == SheetValue.PartiallyExpanded) {
+                    // Resume scanning when the sheet is hidden
+                    isScanningState.value = true
+                    foodScanned.value = false
+                    barcodeScanned.value = null
+                    foodFacts.value = null
+                }
+            }
+    }
+
+    // Parent Scaffold to host the Bottom Navigation Bar
+    Scaffold(
+        modifier = Modifier.testTag("barcodeScannerScreen"),
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelect = { selected -> navigationActions.navigateTo(selected) },
+                tabList = LIST_TOP_LEVEL_DESTINATION,
+                selectedItem = Route.SCANNER
+            )
+        }
+    ) { innerPadding ->
         // BottomSheetScaffold inside the parent Scaffold
         BottomSheetScaffold(
             scaffoldState = sheetScaffoldState,
             sheetContent = {
-              val foodFactsValue = foodFacts.value
-              if (foodScanned.value && foodFactsValue != null) {
-                FoodInputContent(
-                    foodFacts = foodFactsValue,
-                    onSubmit = { newFoodItem ->
-                      // Reset states
-                      foodScanned.value = false
-                      isScanningState.value = true
-                      coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
-                      householdViewModel.addFoodItem(newFoodItem)
-                      Log.d("BarcodeScanner", "Food item added")
-                    },
-                    onCancel = {
-                      // Reset states
-                      foodScanned.value = false
-                      isScanningState.value = true
-                      coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
-                      Log.d("BarcodeScanner", "Cancelled")
-                    },
-                    foodItemViewModel = foodItemViewModel,
-                )
-              }
-              Spacer(modifier = Modifier.height(70.dp))
-            },
-            modifier =
-                Modifier.padding(innerPadding) // Apply the inner padding from the parent Scaffold
-            ) {
-              Box(
-                  modifier =
-                      Modifier.fillMaxSize()
-                          .clickable {
+                val foodFactsValue = foodFacts.value
+                if (foodScanned.value && foodFactsValue != null) {
+                    FoodInputContent(
+                        foodFacts = foodFactsValue,
+                        onSubmit = { newFoodItem ->
                             // Reset states
                             foodScanned.value = false
                             isScanningState.value = true
                             coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
-                          }
-                          .testTag("cameraPreviewBox")) {
-                    // ROI calculation
-                    val roiRectF = remember { mutableStateOf<RectF?>(null) }
-                    val screenWidth = LocalContext.current.resources.displayMetrics.widthPixels
-                    val screenHeight = LocalContext.current.resources.displayMetrics.heightPixels
-
-                    val calculatedRoiRectF =
-                        calculateRoiRectF(screenWidth.toFloat(), screenHeight.toFloat())
-                    roiRectF.value = calculatedRoiRectF
-
-                    // Camera Preview
-                    CameraPreviewView(
-                        modifier = Modifier.fillMaxSize(),
-                        onBarcodeScanned = { scannedBarcode ->
-                          Log.d("BarcodeScanner", "Scanned barcode: $scannedBarcode")
-                          beep()
-                          Toast.makeText(
-                                  context, "Scanned barcode: $scannedBarcode", Toast.LENGTH_SHORT)
-                              .show()
-                          barcodeScanned.value = scannedBarcode
-                          isScanningState.value = false
-                          searchInProgress.value = true
+                            householdViewModel.addFoodItem(newFoodItem)
+                            Log.d("BarcodeScanner", "Food item added")
                         },
-                        onPreviewViewCreated = {},
-                        roiRect = roiRectF.value ?: RectF(0f, 0f, 1f, 1f),
-                        shouldScan = { isScanningState.value && !foodScanned.value })
+                        onCancel = {
+                            // Reset states
+                            foodScanned.value = false
+                            isScanningState.value = true
+                            coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
+                            Log.d("BarcodeScanner", "Cancelled")
+                        },
+                        foodItemViewModel = foodItemViewModel,
+                    )
+                }
+                Spacer(modifier = Modifier.height(70.dp)) // Additional space to ensure visibility
+            },
+            modifier =
+            Modifier.padding(innerPadding) // Apply the inner padding from the parent Scaffold
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable {
+                        // Reset states
+                        foodScanned.value = false
+                        isScanningState.value = true
+                        coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
+                    }
+                    .testTag("cameraPreviewBox")
+            ) {
+                // ROI calculation
+                val roiRectF = remember { mutableStateOf<RectF?>(null) }
+                val screenWidth = LocalContext.current.resources.displayMetrics.widthPixels
+                val screenHeight = LocalContext.current.resources.displayMetrics.heightPixels
 
-                    // Scanner Overlay on top
-                    ScannerOverlay()
-                  }
+                val calculatedRoiRectF =
+                    calculateRoiRectF(screenWidth.toFloat(), screenHeight.toFloat())
+                roiRectF.value = calculatedRoiRectF
+
+                // Camera Preview
+                CameraPreviewView(
+                    modifier = Modifier.fillMaxSize(),
+                    onBarcodeScanned = { scannedBarcode ->
+                        Log.d("BarcodeScanner", "Scanned barcode: $scannedBarcode")
+                        beep()
+                        Toast.makeText(
+                            context, "Scanned barcode: $scannedBarcode", Toast.LENGTH_SHORT
+                        ).show()
+                        barcodeScanned.value = scannedBarcode
+                        isScanningState.value = false
+                        searchInProgress.value = true
+                    },
+                    onPreviewViewCreated = {},
+                    roiRect = roiRectF.value ?: RectF(0f, 0f, 1f, 1f),
+                    shouldScan = { isScanningState.value && !foodScanned.value }
+                )
+
+                // Scanner Overlay on top
+                ScannerOverlay()
             }
-      }
-
-  // Handle barcode scanning and search
-  val currentBarcode = barcodeScanned.value
-  if (searchInProgress.value && currentBarcode != null) {
-    LaunchedEffect(currentBarcode) { foodFactsViewModel.searchByBarcode(currentBarcode.toLong()) }
-  }
-
-  // Observe searchStatus and update foodScanned.value
-  val searchStatus by foodFactsViewModel.searchStatus.collectAsState()
-  LaunchedEffect(searchStatus) {
-    when (searchStatus) {
-      is SearchStatus.Success -> {
-        val suggestions = foodFactsViewModel.foodFactsSuggestions.value
-        if (suggestions.isNotEmpty()) {
-          foodFacts.value = suggestions[0]
-          foodScanned.value = true
-          coroutineScope.launch { sheetScaffoldState.bottomSheetState.expand() }
-        } else {
-          Toast.makeText(context, "Food Not Found", Toast.LENGTH_SHORT).show()
-          navigationActions.navigateTo(Screen.ADD_FOOD)
         }
-        // Reset states
-        barcodeScanned.value = null
-        searchInProgress.value = false
-        foodFactsViewModel.resetSearchStatus()
-      }
-      is SearchStatus.Failure -> {
-        Toast.makeText(context, "Search failed", Toast.LENGTH_SHORT).show()
-        barcodeScanned.value = null
-        searchInProgress.value = false
-        foodFactsViewModel.resetSearchStatus()
-      }
-      else -> {
-        // Do nothing for Idle or Loading
-      }
     }
-  }
+
+    // Handle barcode scanning and search
+    val currentBarcode = barcodeScanned.value
+    if (searchInProgress.value && currentBarcode != null) {
+        LaunchedEffect(currentBarcode) { foodFactsViewModel.searchByBarcode(currentBarcode.toLong()) }
+    }
+
+    // Observe searchStatus and update foodScanned.value
+    val searchStatus by foodFactsViewModel.searchStatus.collectAsState()
+    LaunchedEffect(searchStatus) {
+        when (searchStatus) {
+            is SearchStatus.Success -> {
+                val suggestions = foodFactsViewModel.foodFactsSuggestions.value
+                if (suggestions.isNotEmpty()) {
+                    foodFacts.value = suggestions[0]
+                    foodScanned.value = true
+                    coroutineScope.launch { sheetScaffoldState.bottomSheetState.expand() }
+                } else {
+                    Toast.makeText(context, "Food Not Found", Toast.LENGTH_SHORT).show()
+                    navigationActions.navigateTo(Screen.ADD_FOOD)
+                }
+                // Reset states
+                barcodeScanned.value = null
+                searchInProgress.value = false
+                foodFactsViewModel.resetSearchStatus()
+            }
+            is SearchStatus.Failure -> {
+                Toast.makeText(context, "Search failed", Toast.LENGTH_SHORT).show()
+                barcodeScanned.value = null
+                searchInProgress.value = false
+                foodFactsViewModel.resetSearchStatus()
+            }
+            else -> {
+                // Do nothing for Idle or Loading
+            }
+        }
+    }
 }
 
 /**
@@ -228,44 +236,50 @@ fun BarcodeScannerScreen(
  */
 @Composable
 fun PermissionDeniedScreen(navigationActions: NavigationActions) {
-  val context = LocalContext.current
-  Scaffold(
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { selected -> navigationActions.navigateTo(selected) },
-            tabList = LIST_TOP_LEVEL_DESTINATION,
-            selectedItem = Route.SCANNER)
-      },
-      modifier = Modifier.semantics { testTag = "permissionDeniedScreen" }) { paddingVals ->
+    val context = LocalContext.current
+    Scaffold(
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelect = { selected -> navigationActions.navigateTo(selected) },
+                tabList = LIST_TOP_LEVEL_DESTINATION,
+                selectedItem = Route.SCANNER
+            )
+        },
+        modifier = Modifier.semantics { testTag = "permissionDeniedScreen" }
+    ) { paddingVals ->
         Column(
-            modifier =
-                Modifier.fillMaxSize().padding(paddingVals).semantics {
-                  testTag = "permissionDeniedColumn"
-                },
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingVals)
+                .semantics { testTag = "permissionDeniedColumn" },
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally) {
-              Text(
-                  text = "Camera permission is required to scan barcodes.",
-                  modifier = Modifier.semantics { testTag = "permissionDeniedMessage" })
-              Spacer(modifier = Modifier.height(16.dp))
-              Button(
-                  onClick = {
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Camera permission is required to scan barcodes.",
+                modifier = Modifier.semantics { testTag = "permissionDeniedMessage" }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = {
                     // Open app settings
                     val intent =
                         Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                          data = Uri.fromParts("package", context.packageName, null)
+                            data = Uri.fromParts("package", context.packageName, null)
                         }
                     context.startActivity(intent)
-                  },
-                  modifier = Modifier.semantics { testTag = "openSettingsButton" }) {
-                    Text(text = "Open Settings")
-                  }
+                },
+                modifier = Modifier.semantics { testTag = "openSettingsButton" }
+            ) {
+                Text(text = "Open Settings")
             }
-      }
+        }
+    }
 }
 
 /** Function to play a beep sound. */
 fun beep() {
-  val toneGen = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
-  toneGen.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
+    val toneGen = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+    toneGen.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
 }
+
