@@ -78,6 +78,7 @@ class RecipesTest {
 
   // Helper function to set up the screen with RecipesScreen content
   private fun setUpRecipesScreen() {
+    householdViewModel.setHouseholds(listOf(houseHold))
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
       RecipesScreen(

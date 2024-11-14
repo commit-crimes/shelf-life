@@ -93,7 +93,10 @@ class OverviewTest {
     mockHouseHoldRepositoryGetHouseholds(emptyList())
 
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
     }
     composeTestRule.onNodeWithTag("firstTimeWelcomeScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("householdNameSaveButton").assertIsDisplayed()
@@ -105,18 +108,29 @@ class OverviewTest {
     mockHouseHoldRepositoryGetHouseholds(emptyList())
 
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
     }
     composeTestRule.onNodeWithTag("householdNameSaveButton").performClick()
     verify(navigationActions).navigateTo(Screen.HOUSEHOLD_CREATION)
   }
 
+  private fun selectHousehold(houseHold: HouseHold) {
+    householdViewModel.setHouseholds(listOf(houseHold))
+    householdViewModel.selectHousehold(houseHold)
+  }
+
   // Test if the OverviewScreen is displayed with all elements
   @Test
   fun overviewScreenDisplayedCorrectly() {
-    householdViewModel.selectHousehold(houseHold)
+    selectHousehold(houseHold)
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
     }
 
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
@@ -128,9 +142,12 @@ class OverviewTest {
   // Clicking on hamburger icon opens the household selection drawer
   @Test
   fun clickHamburgerIconOpensHouseholdSelectionDrawer() {
-    householdViewModel.selectHousehold(houseHold)
+    selectHousehold(houseHold)
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
     }
 
     composeTestRule.onNodeWithTag("hamburgerIcon").performClick()
@@ -155,9 +172,12 @@ class OverviewTest {
   // Clicking on add icon in the drawer opens the add household popup
   @Test
   fun clickAddInDrawerOpensHouseholdCreationScreen() {
-    householdViewModel.selectHousehold(houseHold)
+    selectHousehold(houseHold)
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
     }
 
     composeTestRule.onNodeWithTag("hamburgerIcon").performClick()
@@ -168,9 +188,12 @@ class OverviewTest {
   // Test that the food item list is displayed when food items exist
   @Test
   fun foodItemListIsDisplayedWhenFoodItemsExist() {
-    householdViewModel.selectHousehold(houseHold)
+    selectHousehold(houseHold)
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
     }
 
     // Check that the food item list is displayed
@@ -189,9 +212,12 @@ class OverviewTest {
     // Mock the repository to return the household with no food items
     mockHouseHoldRepositoryGetHouseholds(listOf(emptyHousehold))
 
-    householdViewModel.selectHousehold(emptyHousehold)
+    selectHousehold(emptyHousehold)
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
     }
 
     // Check that the "No food available" message is displayed
@@ -224,9 +250,12 @@ class OverviewTest {
     // Mock the repository to return the household with multiple food items
     mockHouseHoldRepositoryGetHouseholds(listOf(householdWithMultipleItems))
 
-    householdViewModel.selectHousehold(householdWithMultipleItems)
+    selectHousehold(householdWithMultipleItems)
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
     }
 
     // Initially, both items should be displayed
@@ -253,9 +282,12 @@ class OverviewTest {
   // Test that the floating action button navigates to the add food screen
   @Test
   fun clickAddFoodFabNavigatesToAddFoodScreen() {
-    householdViewModel.selectHousehold(houseHold)
+    selectHousehold(houseHold)
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
     }
 
     // Click on the add food FAB
