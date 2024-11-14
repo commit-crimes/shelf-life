@@ -1,6 +1,7 @@
 package com.example.compose
 
 import android.app.Activity
+import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -9,8 +10,16 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -263,30 +272,65 @@ data class ColorFamily(
 val unspecified_scheme =
     ColorFamily(Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified)
 
+
+enum class ThemeMode { LIGHT, DARK, SYSTEM_DEFAULT }
+
+// Define LocalThemeToggler as an object with a toggleTheme function placeholder
+object LocalThemeToggler {
+    var toggleTheme: (ThemeMode) -> Unit = {}
+}
+
+// Define the CompositionLocal for LocalThemeToggler
+val LocalThemeTogglerProvider = compositionLocalOf { LocalThemeToggler }
+val LocalThemeMode = compositionLocalOf { ThemeMode.SYSTEM_DEFAULT }
+
 @Composable
 fun ShelfLifeTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit
 ) {
-  val colorScheme =
-      when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-          val context = LocalContext.current
-          if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-        darkTheme -> darkScheme
-        else -> lightScheme
-      }
-  val view = LocalView.current
-  if (!view.isInEditMode) {
-    SideEffect {
-      val window = (view.context as Activity).window
-      window.statusBarColor = Color.Transparent.toArgb()
-      WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
-    }
-  }
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
-  MaterialTheme(colorScheme = colorScheme, typography = AppTypography, content = content)
+    // Initialize themeMode from shared preferences
+    var themeMode by rememberSaveable {
+        mutableStateOf(
+            ThemeMode.valueOf(
+                sharedPreferences.getString("theme_mode", ThemeMode.SYSTEM_DEFAULT.name)
+                    ?: ThemeMode.SYSTEM_DEFAULT.name
+            )
+        )
+    }
+
+    // Function to toggle the theme and save to shared preferences
+    fun toggleTheme(newThemeMode: ThemeMode) {
+        themeMode = newThemeMode
+        sharedPreferences.edit().putString("theme_mode", newThemeMode.name).apply()
+    }
+
+    val darkTheme = when (themeMode) {
+        ThemeMode.SYSTEM_DEFAULT -> isSystemInDarkTheme()
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+    }
+    val colorScheme = if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    } else if (darkTheme) darkScheme else lightScheme
+
+    // Update the LocalThemeToggler's toggleTheme function
+    DisposableEffect(Unit) {
+        LocalThemeToggler.toggleTheme = ::toggleTheme
+        onDispose {
+            LocalThemeToggler.toggleTheme = {}
+        }
+    }
+
+    // Provide LocalThemeToggler in CompositionLocalProvider
+    CompositionLocalProvider(
+        LocalThemeTogglerProvider provides LocalThemeToggler,
+        LocalThemeMode provides themeMode)
+    {
+        MaterialTheme(colorScheme = colorScheme, typography = AppTypography, content = content)
+    }
 }
+
