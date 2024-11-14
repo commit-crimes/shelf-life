@@ -54,13 +54,6 @@ fun ProfileScreen(
   val currentThemeMode = LocalThemeMode.current
   val themeToggler = LocalThemeTogglerProvider.current
 
-  val themeModeLabel =
-      when (currentThemeMode) {
-        ThemeMode.LIGHT -> "Light"
-        ThemeMode.DARK -> "Dark"
-        ThemeMode.SYSTEM_DEFAULT -> "System Default"
-      }
-
   val options = arrayOf(ThemeMode.LIGHT, ThemeMode.DARK, ThemeMode.SYSTEM_DEFAULT)
   val optionLabels =
       mapOf(
