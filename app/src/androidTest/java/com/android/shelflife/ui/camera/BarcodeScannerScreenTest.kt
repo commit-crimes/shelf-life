@@ -185,6 +185,7 @@ class BarcodeScannerScreenTest {
 
         // Scroll to and click the cancel button
         composeTestRule.onNodeWithTag("cancelButton")
+            .performScrollTo()
             .assertIsDisplayed()
             .performClick()
 
