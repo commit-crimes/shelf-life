@@ -136,7 +136,7 @@ fun BarcodeScannerScreen(
                     foodItemViewModel = foodItemViewModel,
                 )
               }
-              Spacer(modifier = Modifier.height(70.dp))
+              Spacer(modifier = Modifier.height(100.dp))
             },
             modifier =
                 Modifier.padding(innerPadding) // Apply the inner padding from the parent Scaffold

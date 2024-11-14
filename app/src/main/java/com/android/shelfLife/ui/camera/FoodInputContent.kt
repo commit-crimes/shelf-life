@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -218,54 +219,54 @@ fun FoodInputContent(
               modifier = Modifier.align(Alignment.Start))
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = {
-              // Validate all inputs before proceeding
-              val isExpireDateValid = expireDateError == null && expireDate.isNotEmpty()
-              val isOpenDateValid =
-                  openDateError == null // No need to check length since it's optional
-              val isBuyDateValid = buyDateError == null && buyDate.isNotEmpty()
-
-              val expiryTimestamp = formatDateToTimestamp(expireDate)
-              val openTimestamp =
-                  if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
-              val buyTimestamp = formatDateToTimestamp(buyDate)
-
-              if (isExpireDateValid &&
-                  isOpenDateValid &&
-                  isBuyDateValid &&
-                  expiryTimestamp != null &&
-                  buyTimestamp != null) {
-                val newFoodItem =
-                    FoodItem(
-                        uid = foodItemViewModel.getUID(),
-                        foodFacts = foodFacts,
-                        location = location,
-                        expiryDate = expiryTimestamp,
-                        openDate = openTimestamp,
-                        buyDate = buyTimestamp,
-                        // Additional logic for status if needed
-                    )
-                onSubmit(newFoodItem)
-              } else {
-                // Handle the case where validation fails
-                Toast.makeText(
-                        context, "Please correct the errors before submitting.", Toast.LENGTH_SHORT)
-                    .show()
-              }
-            },
-            modifier = Modifier.fillMaxWidth().height(50.dp).testTag("submitButton")) {
-              Text(text = "Submit", fontSize = 18.sp)
-            }
-
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = { onCancel() },
-            modifier = Modifier.fillMaxWidth().height(50.dp).testTag("cancelButton")) {
+      Row(
+          modifier = Modifier.fillMaxWidth(),
+          horizontalArrangement = Arrangement.spacedBy(8.dp)
+      ) {
+          Button(
+              onClick = {
+                  val isExpireDateValid = expireDateError == null && expireDate.isNotEmpty()
+                  val isOpenDateValid = openDateError == null
+                  val isBuyDateValid = buyDateError == null && buyDate.isNotEmpty()
+
+                  val expiryTimestamp = formatDateToTimestamp(expireDate)
+                  val openTimestamp = if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
+                  val buyTimestamp = formatDateToTimestamp(buyDate)
+
+                  if (isExpireDateValid && isOpenDateValid && isBuyDateValid && expiryTimestamp != null && buyTimestamp != null) {
+                      val newFoodItem = FoodItem(
+                          uid = foodItemViewModel.getUID(),
+                          foodFacts = foodFacts,
+                          location = location,
+                          expiryDate = expiryTimestamp,
+                          openDate = openTimestamp,
+                          buyDate = buyTimestamp
+                      )
+                      onSubmit(newFoodItem)
+                  } else {
+                      Toast.makeText(context, "Please correct the errors before submitting.", Toast.LENGTH_SHORT).show()
+                  }
+              },
+              modifier = Modifier
+                  .weight(1f)
+                  .height(50.dp)
+                  .testTag("submitButton")
+          ) {
+              Text(text = "Submit", fontSize = 18.sp)
+          }
+
+          Button(
+              onClick = { onCancel() },
+              modifier = Modifier
+                  .weight(1f)
+                  .height(50.dp)
+                  .testTag("cancelButton")
+          ) {
               Text(text = "Cancel", fontSize = 18.sp)
-            }
+          }
+      }
+
       }
 }
