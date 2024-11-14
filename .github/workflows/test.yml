@@ -54,7 +54,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-34-pixelxl-customsize
+          key: avd-34-pixxelxl
 
       # 7. Create AVD and generate snapshot for caching if cache miss occurs
       - name: Create AVD and generate snapshot for caching
@@ -72,16 +72,8 @@ jobs:
             -noaudio
             -no-boot-anim
             -camera-back none
-          emulator-boot-timeout: 180000  # Increased boot timeout to 3 minutes
           disable-animations: false
-          pre-emulator-launch-script: |
-            #!/bin/bash
-            CONFIG_FILE="$HOME/.android/avd/test.avd/config.ini"
-            # Set larger screen resolution
-            sed -i 's/^hw.lcd.width=.*/hw.lcd.width=1440/' "$CONFIG_FILE"
-            sed -i 's/^hw.lcd.height=.*/hw.lcd.height=2560/' "$CONFIG_FILE"
-            # Optionally, adjust screen density
-            sed -i 's/^hw.lcd.density=.*/hw.lcd.density=560/' "$CONFIG_FILE"
+          script: echo "Generated AVD snapshot for caching."
 
       # 8. Decode and set up sensitive secrets
       - name: Decode secrets
@@ -124,7 +116,6 @@ jobs:
             -noaudio
             -no-boot-anim
             -camera-back none
-          emulator-boot-timeout: 180000  # Increased boot timeout to 3 minutes
           disable-animations: true
           script: ./gradlew connectedCheck --parallel --build-cache
 
