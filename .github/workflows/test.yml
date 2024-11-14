@@ -54,17 +54,17 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-34-customscreen
+          key: avd-34-pixxelxl
 
       # 7. Create AVD and generate snapshot for caching if cache miss occurs
-      - name: create AVD and generate snapshot for caching
+      - name: Create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
           target: google_apis
           arch: x86_64
-          profile: pixel_4_xl  # Use the 'profile' input instead of 'device'
+          profile: pixel_xl  # Use a supported profile
           force-avd-creation: false
           emulator-options: >
             -no-window
@@ -72,7 +72,6 @@ jobs:
             -noaudio
             -no-boot-anim
             -camera-back none
-            -skin 1080x1920  # Set custom screen resolution
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
@@ -108,7 +107,7 @@ jobs:
           api-level: 34
           target: google_apis
           arch: x86_64
-          profile: pixel_4_xl  # Use the same 'profile' as above
+          profile: pixel_xl  # Ensure the same profile is used
           force-avd-creation: false
           emulator-options: >
             -no-snapshot-save
@@ -117,14 +116,12 @@ jobs:
             -noaudio
             -no-boot-anim
             -camera-back none
-            -skin 1080x1920  # Set custom screen resolution
           disable-animations: true
           script: ./gradlew connectedCheck --parallel --build-cache
 
       # 14. Generate code coverage report using JaCoCo
       - name: Generate Coverage Report
-        run: |
-          ./gradlew jacocoTestReport
+        run: ./gradlew jacocoTestReport
 
       # 15. Upload coverage and analysis report to SonarCloud
       - name: Upload report to SonarCloud
