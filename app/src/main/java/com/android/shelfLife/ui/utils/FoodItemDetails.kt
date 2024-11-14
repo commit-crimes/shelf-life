@@ -35,7 +35,6 @@ fun FoodItemDetails(foodItem: FoodItem) {
       modifier =
           Modifier.fillMaxWidth()
               .padding(horizontal = 16.dp, vertical = 8.dp)
-              .background(Color.White)
               .testTag("foodItemDetailsCard")) {
         Column(modifier = Modifier.padding(16.dp)) {
           FoodItemDetailText(
