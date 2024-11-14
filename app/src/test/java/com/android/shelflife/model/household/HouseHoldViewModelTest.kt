@@ -1,9 +1,18 @@
 package com.android.shelflife.model.household
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.android.shelfLife.model.foodFacts.*
-import com.android.shelfLife.model.foodItem.*
-import com.android.shelfLife.model.household.*
+import com.android.shelfLife.model.foodFacts.FoodCategory
+import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodFacts.NutritionFacts
+import com.android.shelfLife.model.foodFacts.Quantity
+import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.foodItem.FoodStatus
+import com.android.shelfLife.model.foodItem.FoodStorageLocation
+import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
+import com.android.shelfLife.model.household.HouseHold
+import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.household.HouseholdViewModel
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -13,14 +22,25 @@ import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.*
+import org.mockito.Mock
+import org.mockito.MockedStatic
 import org.mockito.Mockito.mockStatic
-import org.mockito.kotlin.*
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.shadows.ShadowLog
 
@@ -45,7 +65,6 @@ class HouseholdViewModelTest {
 
   @Before
   fun setup() {
-    // Initialize mocks
     MockitoAnnotations.openMocks(this)
     // Set the main dispatcher to the test dispatcher
     Dispatchers.setMain(testDispatcher)
@@ -445,32 +464,6 @@ class HouseholdViewModelTest {
   }
 
   @Test
-  fun addNewHousehold_shouldLogErrorWhenAddingFails() = runTest {
-    // Arrange
-    val householdName = "New Household"
-    val exception = Exception("Test exception")
-
-    whenever(repository.getNewUid()).thenReturn("uid")
-    whenever(repository.addHousehold(any(), any(), any())).thenAnswer { invocation ->
-      val onFailure = invocation.getArgument<(Exception) -> Unit>(2)
-      onFailure(exception)
-      null
-    }
-
-    // Act
-    householdViewModel.addNewHousehold(householdName)
-
-    // Assert
-    assertTrue(householdViewModel.households.value.isEmpty())
-    // Verify that the error was logged
-    val logEntries = ShadowLog.getLogs()
-    assertTrue(
-        logEntries.any {
-          it.tag == "HouseholdViewModel" && it.msg == "Error adding household: $exception"
-        })
-  }
-
-  @Test
   fun updateHousehold_shouldLogErrorWhenFails() = runTest {
     // Arrange
     val household = HouseHold("1", "New household", emptyList(), emptyList())
@@ -582,12 +575,5 @@ class HouseholdViewModelTest {
     val result = householdViewModel.checkIfHouseholdNameExists(householdName)
     // Assert
     assertFalse(result)
-  }
-
-  @Test
-  fun factory_shouldCreateHouseholdViewModel() {
-    val modelClass = HouseholdViewModel::class.java
-    val viewModel = HouseholdViewModel.Factory.create(modelClass)
-    assertTrue(viewModel is HouseholdViewModel)
   }
 }

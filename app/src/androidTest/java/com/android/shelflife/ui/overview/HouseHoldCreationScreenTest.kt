@@ -4,12 +4,9 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
-import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
@@ -19,24 +16,12 @@ import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.overview.HouseHoldCreationScreen
 import io.mockk.MockKAnnotations
-import io.mockk.every
 import io.mockk.mockk
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertTrue
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.setMain
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyString
-import org.mockito.ArgumentMatchers.eq
-import org.mockito.Mockito.doAnswer
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 
 class HouseHoldCreationScreenTest {
@@ -186,12 +171,11 @@ class HouseHoldCreationScreenTest {
     householdViewModel.selectHouseholdToEdit(null)
     composeTestRule.setContent {
       HouseHoldCreationScreen(
-        navigationActions = navigationActions, householdViewModel = householdViewModel)
+          navigationActions = navigationActions, householdViewModel = householdViewModel)
     }
     val email = "example@example.com"
     composeTestRule.onNodeWithTag("EmailInputField").performTextInput(email)
     composeTestRule.onNodeWithTag("AddEmailButton").performClick()
     composeTestRule.onNodeWithTag("EmailInputField").assertIsDisplayed()
   }
-
 }

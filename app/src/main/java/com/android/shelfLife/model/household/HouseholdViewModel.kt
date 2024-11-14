@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.google.common.annotations.VisibleForTesting
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -78,26 +77,6 @@ open class HouseholdViewModel(
   }
 
   /**
-    * Sets the household to edit and updates the member emails.
-    *
-    * @param value - The household to edit.
-   */
-  @VisibleForTesting
-  fun setHouseholdToEdit(value: HouseHold?) {
-    _householdToEdit.value = value
-  }
-
-  /**
-   * Sets the member emails and updates the member emails.
-   *
-   * @param value - The member emails.
-   */
-  @VisibleForTesting
-  fun setMemberEmails(value: Map<String, String>) {
-    _memberEmails.value = value
-  }
-
-  /**
    * Selects a household and updates the selected household and the list of food items.
    *
    * @param household - The household to select.
@@ -145,10 +124,7 @@ open class HouseholdViewModel(
 
         repository.addHousehold(
             householdWithMembers,
-            onSuccess = {
-              loadHouseholds()
-              Log.d("HouseholdViewModel", "Household added successfully")
-            },
+            onSuccess = { Log.d("HouseholdViewModel", "Household added successfully") },
             onFailure = { exception ->
               Log.e("HouseholdViewModel", "Error adding household: $exception")
             })
