@@ -7,7 +7,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.key
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -47,7 +46,7 @@ class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
-    setContent { ShelfLifeTheme {Surface { ShelfLifeApp() } } }
+    setContent { ShelfLifeTheme { Surface { ShelfLifeApp() } } }
   }
 }
 
@@ -86,7 +85,6 @@ fun ShelfLifeApp() {
     }
     onDispose {} // No cleanup necessary
   }
-
 
   NavHost(navController = navController, startDestination = startingRoute) {
     // Authentication route
