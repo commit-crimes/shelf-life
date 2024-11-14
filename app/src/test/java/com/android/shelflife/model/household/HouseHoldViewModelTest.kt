@@ -100,7 +100,7 @@ class HouseholdViewModelTest {
 
     householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
 
-    // Act
+    householdViewModel.setHouseholds(listOf(household))
     householdViewModel.selectHousehold(household)
 
     // Assert
@@ -183,6 +183,7 @@ class HouseholdViewModelTest {
     householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
 
     // Act
+
     householdViewModel.deleteHouseholdById(householdId)
 
     // Assert
@@ -224,6 +225,7 @@ class HouseholdViewModelTest {
       null
     }
 
+    householdViewModel.setHouseholds(listOf(household))
     householdViewModel.selectHousehold(household)
 
     // Act

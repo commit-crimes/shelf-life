@@ -51,12 +51,12 @@ import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.example.compose.errorContainerDark
-import com.example.compose.onSecondaryDark
-import com.example.compose.primaryContainerDark
-import com.example.compose.primaryContainerLight
-import com.example.compose.secondaryContainerDark
-import com.example.compose.secondaryContainerLight
+import com.android.shelfLife.ui.theme.errorContainerDark
+import com.android.shelfLife.ui.theme.onSecondaryDark
+import com.android.shelfLife.ui.theme.primaryContainerDark
+import com.android.shelfLife.ui.theme.primaryContainerLight
+import com.android.shelfLife.ui.theme.secondaryContainerDark
+import com.android.shelfLife.ui.theme.secondaryContainerLight
 import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")

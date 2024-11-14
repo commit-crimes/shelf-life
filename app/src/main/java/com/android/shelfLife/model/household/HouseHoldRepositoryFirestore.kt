@@ -111,10 +111,13 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
       db.collection(collectionPath)
           .document(household.uid)
           .update(householdData)
-          .addOnSuccessListener { onSuccess() }
-          .addOnFailureListener { exception ->
-            Log.e("HouseholdRepository", "Error updating household", exception)
-            onFailure(exception)
+          .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+              onSuccess()
+            } else {
+              Log.e("HouseholdRepository", "Error updating household", task.exception)
+              task.exception?.let { onFailure(it) }
+            }
           }
     } else {
       Log.e("HouseholdRepository", "User not logged in")
