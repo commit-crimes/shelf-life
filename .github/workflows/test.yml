@@ -17,30 +17,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout the repository
       - name: Checkout
         uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
 
+      # 2. Remove existing Gradle cache to ensure a clean build
       - name: Remove current gradle cache
         run: rm -rf ~/.gradle
 
+      # 3. Enable KVM group permissions for better emulator performance
       - name: Enable KVM group perms
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      # 4. Setup Java Development Kit (JDK) version 17
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "17"
 
+      # 5. Setup Gradle with caching
       - name: Gradle cache
         uses: gradle/actions/setup-gradle@v3
 
+      # 6. Cache Android Virtual Device (AVD) and ADB files
       - name: AVD cache
         uses: actions/cache@v4
         id: avd-cache
@@ -48,8 +54,9 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-34
+          key: avd-34-pixel4xl-1080x1920  # Updated cache key to reflect device and resolution
 
+      # 7. Create AVD and generate snapshot for caching if cache miss occurs
       - name: create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
@@ -57,11 +64,19 @@ jobs:
           api-level: 34
           target: google_apis
           arch: x86_64
+          device: pixel_4_xl  # Specify a device with a larger screen
           force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: >
+            -no-window
+            -gpu swiftshader_indirect
+            -noaudio
+            -no-boot-anim
+            -camera-back none
+            -skin 1080x1920  # Set custom screen resolution
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
+      # 8. Decode and set up sensitive secrets
       - name: Decode secrets
         env:
           GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES }}
@@ -70,35 +85,48 @@ jobs:
           echo "$GOOGLE_SERVICES" | base64 --decode > ./app/google-services.json
           echo "$LOCAL_PROPERTIES" | base64 --decode > ./local.properties
 
+      # 9. Grant execute permission to the Gradle wrapper
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
+      # 10. Check Kotlin code formatting
       - name: ktfmt Check
         run: ./gradlew ktfmtCheck
 
+      # 11. Assemble the project and run lint checks
       - name: Assemble and Link
         run: ./gradlew assemble lint --parallel --build-cache
 
+      # 12. Run all tests (unit and integration)
       - name: Run tests
         run: ./gradlew check --parallel --build-cache
 
+      # 13. Run Android instrumentation tests on the emulator
       - name: Run android tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
           target: google_apis
           arch: x86_64
+          device: pixel_4_xl  # Ensure the same device is used for testing
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: >
+            -no-snapshot-save
+            -no-window
+            -gpu swiftshader_indirect
+            -noaudio
+            -no-boot-anim
+            -camera-back none
+            -skin 1080x1920  # Set custom screen resolution
           disable-animations: true
           script: ./gradlew connectedCheck --parallel --build-cache
 
-      # This step generates the coverage report which will be uploaded to sonar
+      # 14. Generate code coverage report using JaCoCo
       - name: Generate Coverage Report
         run: |
           ./gradlew jacocoTestReport
 
-
+      # 15. Upload coverage and analysis report to SonarCloud
       - name: Upload report to SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
