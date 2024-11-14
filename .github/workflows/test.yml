@@ -54,7 +54,7 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-34-pixel4xl-1080x1920  # Updated cache key to reflect device and resolution
+          key: avd-34-customscreen
 
       # 7. Create AVD and generate snapshot for caching if cache miss occurs
       - name: create AVD and generate snapshot for caching
@@ -64,7 +64,7 @@ jobs:
           api-level: 34
           target: google_apis
           arch: x86_64
-          device: pixel_4_xl  # Specify a device with a larger screen
+          profile: pixel_4_xl  # Use the 'profile' input instead of 'device'
           force-avd-creation: false
           emulator-options: >
             -no-window
@@ -108,7 +108,7 @@ jobs:
           api-level: 34
           target: google_apis
           arch: x86_64
-          device: pixel_4_xl  # Ensure the same device is used for testing
+          profile: pixel_4_xl  # Use the same 'profile' as above
           force-avd-creation: false
           emulator-options: >
             -no-snapshot-save
