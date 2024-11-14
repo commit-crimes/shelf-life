@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
+import com.google.common.annotations.VisibleForTesting
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,10 +18,10 @@ open class HouseholdViewModel(
     private val listFoodItemsViewModel: ListFoodItemsViewModel
 ) : ViewModel() {
   private val _households = MutableStateFlow<List<HouseHold>>(emptyList())
-  val households: StateFlow<List<HouseHold>> = _households.asStateFlow()
+  var households: StateFlow<List<HouseHold>> = _households.asStateFlow()
 
   private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
-  val selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
+  var selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
 
   private val _selectedFoodItem = MutableStateFlow<FoodItem?>(null)
   val selectedFoodItem: StateFlow<FoodItem?> = _selectedFoodItem.asStateFlow()
@@ -74,6 +75,26 @@ open class HouseholdViewModel(
       _selectedHousehold.value = updatedHousehold
       listFoodItemsViewModel.setFoodItems(_selectedHousehold.value!!.foodItems)
     }
+  }
+
+  /**
+    * Sets the household to edit and updates the member emails.
+    *
+    * @param value - The household to edit.
+   */
+  @VisibleForTesting
+  fun setHouseholdToEdit(value: HouseHold?) {
+    _householdToEdit.value = value
+  }
+
+  /**
+   * Sets the member emails and updates the member emails.
+   *
+   * @param value - The member emails.
+   */
+  @VisibleForTesting
+  fun setMemberEmails(value: Map<String, String>) {
+    _memberEmails.value = value
   }
 
   /**

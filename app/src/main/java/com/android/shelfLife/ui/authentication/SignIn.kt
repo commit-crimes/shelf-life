@@ -129,10 +129,7 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
                   contentDescription = "Google Logo",
                   modifier = Modifier.size(30.dp).padding(end = 8.dp))
 
-              Text(
-                  text = "Sign in with Google",
-                  fontSize = 16.sp,
-                  fontWeight = FontWeight.Medium)
+              Text(text = "Sign in with Google", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
       }
 }

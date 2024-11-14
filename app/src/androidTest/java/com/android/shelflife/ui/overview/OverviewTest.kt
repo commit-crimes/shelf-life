@@ -105,7 +105,10 @@ class OverviewTest {
     selectHousehold(householdWithGramItem)
 
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
     }
 
     // Check that the quantity text displays "500g"
@@ -131,7 +134,10 @@ class OverviewTest {
     selectHousehold(householdWithMlItem)
 
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
     }
 
     // Check that the quantity text displays "1000ml"
@@ -158,7 +164,10 @@ class OverviewTest {
     selectHousehold(householdWithNoExpiryItem)
 
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
     }
 
     // Check that the text "No Expiry Date" is displayed
@@ -184,7 +193,10 @@ class OverviewTest {
     selectHousehold(householdWithCountItem)
 
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
     }
 
     // Check that the quantity text displays "12 in stock"
@@ -310,33 +322,35 @@ class OverviewTest {
     composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
   }
 
-    @Test
-    fun foodItemWithNullFoodFactsDisplaysPlaceholder() {
-        val nullFoodFactsItem =
-            FoodItem(
-                uid = "foodItemNullFacts",
-                foodFacts =
+  @Test
+  fun foodItemWithNullFoodFactsDisplaysPlaceholder() {
+    val nullFoodFactsItem =
+        FoodItem(
+            uid = "foodItemNullFacts",
+            foodFacts =
                 FoodFacts(
                     name = "",
                     barcode = "",
                     quantity = Quantity(0.0, FoodUnit.COUNT),
                     category = FoodCategory.OTHER),
-                expiryDate = null)
+            expiryDate = null)
 
-        val householdWithNullFactsItem = houseHold.copy(foodItems = listOf(nullFoodFactsItem))
-        householdViewModel.selectHousehold(householdWithNullFactsItem)
+    val householdWithNullFactsItem = houseHold.copy(foodItems = listOf(nullFoodFactsItem))
+    householdViewModel.selectHousehold(householdWithNullFactsItem)
 
-        composeTestRule.setContent {
-            OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
-        }
-
-        // Check that the placeholder text or image is displayed
-        composeTestRule
-            .onNodeWithText("No Name")
-            .assertDoesNotExist() // Assuming "No Name" is not displayed
-        // Additional assertions can be added based on how the UI handles null or empty values
+    composeTestRule.setContent {
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
     }
 
+    // Check that the placeholder text or image is displayed
+    composeTestRule
+        .onNodeWithText("No Name")
+        .assertDoesNotExist() // Assuming "No Name" is not displayed
+    // Additional assertions can be added based on how the UI handles null or empty values
+  }
 
   // Test that "No food available" message is displayed when no food items exist
   @Test
@@ -421,7 +435,10 @@ class OverviewTest {
 
     selectHousehold(emptyHousehold)
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
     }
 
     // Check that the "No food available" message is displayed

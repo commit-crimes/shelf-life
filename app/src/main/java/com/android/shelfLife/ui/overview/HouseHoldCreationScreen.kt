@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -149,7 +148,7 @@ fun HouseHoldCreationScreen(
                         onValueChange = { emailInput = it },
                         label = { Text("Friend's Email") },
                         placeholder = { Text("Enter email") },
-                        modifier = Modifier.weight(1f))
+                        modifier = Modifier.weight(1f).testTag("EmailInputField"))
                     IconButton(
                         onClick = {
                           if (emailInput.isNotBlank()) {

@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.ui.utils.*
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ShelfLifeUtilsTest {
@@ -75,31 +76,42 @@ class ShelfLifeUtilsTest {
   fun `getProgressBarState returns correct state and color when expired`() {
     val thresholds = Thresholds(daysToSeconds(3), daysToSeconds(7))
     val (fill, color) = getProgressBarState(0, thresholds)
-    assertEquals(1f, fill, 0.0f)
-    assertEquals(Color(0xFFF44336), color)
+    assertEquals(0.25f, fill, 0.0f)
+    assertEquals(Color(0xFF8F0303), color)
   }
 
   @Test
   fun `getProgressBarState returns correct state and color when within red threshold`() {
     val thresholds = Thresholds(daysToSeconds(3), daysToSeconds(7))
     val (fill, color) = getProgressBarState(daysToSeconds(2), thresholds)
-    assertEquals(1f, fill, 0.0f)
-    assertEquals(Color(0xFFF44336), color)
+    assertEquals(0.5f, fill, 0.0f)
+    assertTrue(colorsApproximatelyEqual(color, Color(0xFFF67800)))
   }
 
   @Test
   fun `getProgressBarState returns correct state and color when within orange threshold`() {
     val thresholds = Thresholds(daysToSeconds(3), daysToSeconds(7))
     val (fill, color) = getProgressBarState(daysToSeconds(5), thresholds)
-    assertEquals(0.5f, fill, 0.0f)
-    assertEquals(Color(0xFFFFA500), color)
+    assertEquals(0.75f, fill, 0.0f)
+    assertEquals(Color(0xFF71B504), color)
   }
 
   @Test
   fun `getProgressBarState returns correct state and color when within green threshold`() {
     val thresholds = Thresholds(daysToSeconds(3), daysToSeconds(7))
     val (fill, color) = getProgressBarState(daysToSeconds(10), thresholds)
-    assertEquals(0.25f, fill, 0.0f)
+    assertEquals(1.0f, fill, 0.0f)
     assertEquals(Color(0xFF4CAF50), color)
+  }
+
+  private fun colorsApproximatelyEqual(
+      color1: Color,
+      color2: Color,
+      tolerance: Float = 0.01f
+  ): Boolean {
+    return (Math.abs(color1.red - color2.red) < tolerance) &&
+        (Math.abs(color1.green - color2.green) < tolerance) &&
+        (Math.abs(color1.blue - color2.blue) < tolerance) &&
+        (Math.abs(color1.alpha - color2.alpha) < tolerance)
   }
 }
