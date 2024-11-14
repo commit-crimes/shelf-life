@@ -1,5 +1,6 @@
 package com.example.compose
 
+import android.app.Activity
 import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -12,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +24,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.android.shelfLife.ui.theme.*
 import com.example.ui.theme.AppTypography
 
 private val lightScheme =
@@ -314,6 +317,14 @@ fun ShelfLifeTheme(dynamicColor: Boolean = false, content: @Composable () -> Uni
         if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
       } else if (darkTheme) darkScheme else lightScheme
 
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = Color.Transparent.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+        }
+    }
   // Update the LocalThemeToggler's toggleTheme function
   DisposableEffect(Unit) {
     LocalThemeToggler.toggleTheme = ::toggleTheme
