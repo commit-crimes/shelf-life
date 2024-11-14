@@ -1,13 +1,37 @@
 package com.android.shelfLife.ui.overview
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -18,55 +42,55 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
-import com.android.shelfLife.model.foodFacts.*
-import com.android.shelfLife.model.foodItem.*
+import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.Quantity
+import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.foodItem.FoodStatus
+import com.android.shelfLife.model.foodItem.FoodStorageLocation
+import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.utils.*
-import com.google.firebase.Timestamp
+import com.android.shelfLife.ui.utils.DateVisualTransformation
+import com.android.shelfLife.ui.utils.DropdownFields
+import com.android.shelfLife.ui.utils.formatDateToTimestamp
+import com.android.shelfLife.ui.utils.formatTimestampToDate
+import com.android.shelfLife.ui.utils.fromCapitalStringToLowercaseString
+import com.android.shelfLife.ui.utils.validateAmount
+import com.android.shelfLife.ui.utils.validateBuyDate
+import com.android.shelfLife.ui.utils.validateExpireDate
+import com.android.shelfLife.ui.utils.validateOpenDate
 
-/**
- * Composable function to display the Add Food Item screen.
- *
- * @param navigationActions The navigation actions to be used in the screen.
- * @param houseHoldViewModel The ViewModel for the household.
- * @param foodItemViewModel The ViewModel for the food items.
- * @param paddingValues The padding values to be applied to the screen.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddFoodItemScreen(
+fun EditFoodItemScreen(
     navigationActions: NavigationActions,
     houseHoldViewModel: HouseholdViewModel,
     foodItemViewModel: ListFoodItemsViewModel,
     paddingValues: PaddingValues = PaddingValues(16.dp)
 ) {
+  val selectedFoodItem by foodItemViewModel.selectedFoodItem.collectAsState()
+  val selectedFood = selectedFoodItem ?: return
 
-  var foodName by remember { mutableStateOf("") }
-  var amount by remember { mutableStateOf("") }
-  var unit by remember { mutableStateOf(FoodUnit.GRAM) }
-  var category by remember { mutableStateOf(FoodCategory.OTHER) }
-  var location by remember { mutableStateOf(FoodStorageLocation.PANTRY) }
-  var expireDate by remember { mutableStateOf("") }
-  var openDate by remember { mutableStateOf("") }
-  var buyDate by remember { mutableStateOf(formatTimestampToDate(Timestamp.now())) }
+  var amount by remember { mutableStateOf(selectedFood.foodFacts.quantity.amount.toString()) }
+  var location by remember { mutableStateOf(selectedFood.location) }
+  var expireDate by remember { mutableStateOf(formatTimestampToDate(selectedFood.expiryDate!!)) }
+  var openDate by
+      if (selectedFood.openDate == null) {
+        remember { mutableStateOf("") }
+      } else remember { mutableStateOf(formatTimestampToDate(selectedFood.openDate)) }
 
-  var foodNameError by remember { mutableStateOf<String?>(null) }
+  var buyDate by remember { mutableStateOf(formatTimestampToDate(selectedFood.buyDate)) }
+
   var amountError by remember { mutableStateOf<String?>(null) }
   var expireDateError by remember { mutableStateOf<String?>(null) }
   var openDateError by remember { mutableStateOf<String?>(null) }
   var buyDateError by remember { mutableStateOf<String?>(null) }
 
-  var unitExpanded by remember { mutableStateOf(false) }
-  var categoryExpanded by remember { mutableStateOf(false) }
   var locationExpanded by remember { mutableStateOf(false) }
 
   val context = LocalContext.current
 
-  /** Validates all fields when the submit button is clicked. */
   fun validateAllFieldsWhenSubmitButton() {
-    foodNameError = validateFoodName(foodName)
-    amountError = validateAmount(amount)
     buyDateError = validateBuyDate(buyDate)
     expireDateError = validateExpireDate(expireDate, buyDate, buyDateError)
     openDateError = validateOpenDate(openDate, buyDate, buyDateError, expireDate, expireDateError)
@@ -75,10 +99,10 @@ fun AddFoodItemScreen(
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
-        TopAppBar(
+        androidx.compose.material3.TopAppBar(
             title = {
               Text(
-                  modifier = Modifier.testTag("addFoodItemTitle"),
+                  modifier = Modifier.testTag("editFoodItemTitle"),
                   text = stringResource(id = R.string.add_food_item_title))
             },
             navigationIcon = {
@@ -94,31 +118,9 @@ fun AddFoodItemScreen(
                 Modifier.fillMaxSize()
                     .padding(paddingValues)
                     .padding(innerPadding)
-                    .testTag("addFoodItemScreen"),
+                    .testTag("editFoodItemScreen"),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top) {
-              item(key = "foodName") {
-                // Food Name Field with Error Handling
-                OutlinedTextField(
-                    value = foodName,
-                    onValueChange = { newValue ->
-                      foodName = newValue
-                      foodNameError = validateFoodName(foodName)
-                    },
-                    label = { Text(stringResource(id = R.string.food_name_hint)) },
-                    isError = foodNameError != null,
-                    modifier = Modifier.testTag("inputFoodName").fillMaxWidth())
-                if (foodNameError != null) {
-                  Text(
-                      text = foodNameError!!,
-                      color = MaterialTheme.colorScheme.error,
-                      style = MaterialTheme.typography.bodySmall,
-                      modifier = Modifier.fillMaxWidth(),
-                      textAlign = TextAlign.Start)
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-              }
-
               item(key = "amount") {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -134,7 +136,7 @@ fun AddFoodItemScreen(
                             label = { Text(stringResource(id = R.string.amount_hint)) },
                             isError = amountError != null,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.testTag("inputFoodAmount").fillMaxWidth())
+                            modifier = Modifier.testTag("editFoodAmount").fillMaxWidth())
                         if (amountError != null) {
                           Text(
                               text = amountError!!,
@@ -145,31 +147,14 @@ fun AddFoodItemScreen(
                         }
                       }
                       Spacer(modifier = Modifier.width(8.dp))
-                      // Unit Dropdown
-                      DropdownFields(
-                          label = stringResource(id = R.string.unit_label),
-                          options = FoodUnit.entries.toTypedArray(),
-                          selectedOption = unit,
-                          onOptionSelected = { unit = it },
-                          expanded = unitExpanded,
-                          onExpandedChange = { unitExpanded = it },
-                          optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-                          modifier = Modifier.weight(1f).testTag("inputFoodUnit"))
+                      // Unit
+                      // TODO this doesnt look good on the UI
+                      Card(
+                          border = CardDefaults.outlinedCardBorder(),
+                          modifier = Modifier.testTag("editFoodUnit")) {
+                            Text(text = selectedFood.foodFacts.quantity.unit.name)
+                          }
                     }
-                Spacer(modifier = Modifier.height(16.dp))
-              }
-
-              item(key = "category") {
-                // Category Dropdown
-                DropdownFields(
-                    label = stringResource(id = R.string.category_label),
-                    options = FoodCategory.entries.toTypedArray(),
-                    selectedOption = category,
-                    onOptionSelected = { category = it },
-                    expanded = categoryExpanded,
-                    onExpandedChange = { categoryExpanded = it },
-                    optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-                    modifier = Modifier.testTag("inputFoodCategory").fillMaxWidth())
                 Spacer(modifier = Modifier.height(16.dp))
               }
 
@@ -183,7 +168,7 @@ fun AddFoodItemScreen(
                     expanded = locationExpanded,
                     onExpandedChange = { locationExpanded = it },
                     optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-                    modifier = Modifier.testTag("inputFoodLocation").fillMaxWidth())
+                    modifier = Modifier.testTag("editFoodLocation").fillMaxWidth())
                 Spacer(modifier = Modifier.height(16.dp))
               }
 
@@ -204,7 +189,7 @@ fun AddFoodItemScreen(
                     isError = expireDateError != null,
                     visualTransformation = DateVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    modifier = Modifier.testTag("inputFoodExpireDate").fillMaxWidth())
+                    modifier = Modifier.testTag("editFoodExpireDate").fillMaxWidth())
                 if (expireDateError != null) {
                   Text(
                       text = expireDateError!!,
@@ -231,7 +216,7 @@ fun AddFoodItemScreen(
                     isError = openDateError != null,
                     visualTransformation = DateVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    modifier = Modifier.testTag("inputFoodOpenDate").fillMaxWidth())
+                    modifier = Modifier.testTag("editFoodOpenDate").fillMaxWidth())
                 if (openDateError != null) {
                   Text(
                       text = openDateError!!,
@@ -261,7 +246,7 @@ fun AddFoodItemScreen(
                     isError = buyDateError != null,
                     visualTransformation = DateVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    modifier = Modifier.testTag("inputFoodBuyDate").fillMaxWidth())
+                    modifier = Modifier.testTag("editFoodBuyDate").fillMaxWidth())
                 if (buyDateError != null) {
                   Text(
                       text = buyDateError!!,
@@ -281,8 +266,6 @@ fun AddFoodItemScreen(
                       val isExpireDateValid = expireDateError == null && expireDate.isNotEmpty()
                       val isOpenDateValid = openDateError == null
                       val isBuyDateValid = buyDateError == null && buyDate.isNotEmpty()
-                      val isFoodNameValid = foodNameError == null
-                      val isAmountValid = amountError == null
 
                       val expiryTimestamp = formatDateToTimestamp(expireDate)
                       val openTimestamp =
@@ -292,16 +275,17 @@ fun AddFoodItemScreen(
                       if (isExpireDateValid &&
                           isOpenDateValid &&
                           isBuyDateValid &&
-                          isFoodNameValid &&
-                          isAmountValid &&
                           expiryTimestamp != null &&
                           buyTimestamp != null) {
                         val foodFacts =
                             FoodFacts(
-                                name = foodName,
-                                barcode = "",
-                                quantity = Quantity(amount.toDouble(), unit),
-                                category = category)
+                                name = selectedFood.foodFacts.name,
+                                barcode = selectedFood.foodFacts.barcode,
+                                quantity =
+                                    Quantity(
+                                        amount.toDouble(), selectedFood.foodFacts.quantity.unit),
+                                category = selectedFood.foodFacts.category)
+
                         val newFoodItem =
                             FoodItem(
                                 uid = foodItemViewModel.getUID(),
@@ -311,7 +295,7 @@ fun AddFoodItemScreen(
                                 openDate = openTimestamp,
                                 buyDate = buyTimestamp,
                                 status = FoodStatus.CLOSED)
-                        houseHoldViewModel.addFoodItem(newFoodItem)
+                        houseHoldViewModel.editFoodItem(newFoodItem, selectedFood)
                         navigationActions.goBack()
                       } else {
                         Toast.makeText(
@@ -323,6 +307,19 @@ fun AddFoodItemScreen(
                     },
                     modifier = Modifier.testTag("foodSave").fillMaxWidth().height(50.dp)) {
                       Text(text = "Submit", fontSize = 18.sp)
+                    }
+
+                Spacer(modifier = Modifier.height(16.dp))
+              }
+
+              item(key = "cancelButton") {
+                Button(
+                    onClick = { navigationActions.goBack() },
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary),
+                    modifier = Modifier.fillMaxWidth().height(50.dp).testTag("cancelButton")) {
+                      Text(text = "Cancel", fontSize = 18.sp)
                     }
               }
             }
