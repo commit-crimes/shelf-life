@@ -24,7 +24,10 @@ open class ListFoodItemsViewModel(private val repository: FoodItemRepository) : 
    * Initializes the ListFoodItemsViewModel by loading the list of FoodItems from the repository.
    */
   init {
-    repository.init(onSuccess = { getFoodItems() })
+    repository.init(
+        onSuccess = {
+          // getFoodItems()
+        })
   }
 
   /**
@@ -42,7 +45,7 @@ open class ListFoodItemsViewModel(private val repository: FoodItemRepository) : 
   }
 
   /** Gets all FoodItem documents */
-  fun getFoodItems() {
+  fun getAllFoodItems() {
     repository.getFoodItems(onSuccess = { _foodItems.value = it }, onFailure = ::_onFail)
   }
 
@@ -54,18 +57,18 @@ open class ListFoodItemsViewModel(private val repository: FoodItemRepository) : 
   /** Adds a FoodItem document */
   fun addFoodItem(foodItem: FoodItem) {
     repository.addFoodItem(
-        foodItem = foodItem, onSuccess = { getFoodItems() }, onFailure = ::_onFail)
+        foodItem = foodItem, onSuccess = { getAllFoodItems() }, onFailure = ::_onFail)
   }
 
   /** Updates a FoodItem document */
   fun updateFoodItem(foodItem: FoodItem) {
     repository.updateFoodItem(
-        foodItem = foodItem, onSuccess = { getFoodItems() }, onFailure = ::_onFail)
+        foodItem = foodItem, onSuccess = { getAllFoodItems() }, onFailure = ::_onFail)
   }
 
   /** Deletes a FoodItem document by ID */
   fun deleteFoodItemById(id: String) {
-    repository.deleteFoodItemById(id = id, onSuccess = { getFoodItems() }, onFailure = ::_onFail)
+    repository.deleteFoodItemById(id = id, onSuccess = { getAllFoodItems() }, onFailure = ::_onFail)
   }
 
   /** Selects a FoodItem document */
