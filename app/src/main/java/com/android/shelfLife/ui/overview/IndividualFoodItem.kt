@@ -77,16 +77,6 @@ fun IndividualFoodItemScreen(
                   fontSize = 24.sp,
                   fontWeight = FontWeight.Bold,
                   modifier = Modifier.padding(16.dp).testTag("IndividualFoodItemName"))
-
-              //              Image(
-              //                  painter = painterResource(id = R.drawable.minecraft_rottenflesh),
-              //                  contentDescription = "Image of ${foodItem!!.foodFacts.name}",
-              //                  modifier =
-              //                      Modifier.fillMaxWidth()
-              //                          .aspectRatio(1f)
-              //                          .clip(RoundedCornerShape(8.dp))
-              //                          .testTag("IndividualFoodItemImage"),
-              //                  contentScale = ContentScale.Crop)
               AsyncImage(
                   model = foodItem!!.foodFacts.imageUrl,
                   contentDescription = "Food Image",
