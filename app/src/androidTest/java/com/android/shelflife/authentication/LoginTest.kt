@@ -1,4 +1,4 @@
-package com.android.shelfLife
+package com.android.shelflife.authentication
 
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertIsDisplayed
@@ -10,6 +10,7 @@ import androidx.test.espresso.intent.Intents.intended
 import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.shelfLife.MainActivity
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
 import com.google.firebase.auth.FirebaseAuth
@@ -75,17 +76,6 @@ class MainActivityTest : TestCase() {
       }
     }
   }
-  //
-  //  @Test
-  //  fun barcodeScannerScreenAccessibleWhenPermissionGranted() {
-  //    firebaseAuth.signInAnonymously().addOnCompleteListener {
-  //      if (it.isSuccessful) {
-  //        composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
-  //        composeTestRule.onNodeWithTag("navigateToBarcodeScanner").performClick()
-  //        composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
-  //      }
-  //    }
-  //  }
 
   @Test
   fun recipeScreenAccessibleFromOverview() {

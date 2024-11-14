@@ -215,7 +215,6 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
             }) {}
       }
 }
-// todo ask Paul where does the filter management comes into to play, the screen or the top bar
 
 @Composable
 /**

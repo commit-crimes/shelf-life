@@ -127,9 +127,13 @@ class EndToEndM1Test {
 
   @Test
   fun overviewScreenDisplayedCorrectly() {
+    householdViewModel.setHouseholds(listOf(houseHold))
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel = listFoodItemsViewModel)
     }
 
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
@@ -140,10 +144,13 @@ class EndToEndM1Test {
 
   @Test
   fun testEndToEndFlow() {
+    householdViewModel.setHouseholds(listOf(houseHold))
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
       NavHost(navController = navController, startDestination = Route.OVERVIEW) {
-        composable(Route.OVERVIEW) { OverviewScreen(navigationActions, householdViewModel) }
+        composable(Route.OVERVIEW) {
+          OverviewScreen(navigationActions, householdViewModel, listFoodItemsViewModel)
+        }
         composable(Screen.ADD_FOOD) {
           AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemsViewModel)
         }
