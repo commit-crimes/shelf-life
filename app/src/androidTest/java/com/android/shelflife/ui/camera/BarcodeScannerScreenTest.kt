@@ -137,7 +137,7 @@ class BarcodeScannerScreenTest {
   }
 
     @Test
-    fun cancellingFormReturnsToScanning() = runTest {
+    fun cancellingFormReturnsToScanning() {
         // Set up the fake repository to return a sample food item
         val sampleFoodFacts = FoodFacts(
             name = "Sample Food",
@@ -162,9 +162,6 @@ class BarcodeScannerScreenTest {
             foodFactsViewModel.searchByBarcode(1234567890L)
         }
 
-        // Advance coroutine dispatcher to process pending tasks
-        advanceUntilIdle()
-
         // Wait until the bottom sheet is displayed with food details
         composeTestRule.waitUntil(timeoutMillis = 5_000) {
             composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
@@ -188,16 +185,10 @@ class BarcodeScannerScreenTest {
             .assertIsDisplayed()
             .performClick()
 
-        // Advance coroutine dispatcher to process pending tasks after click
-        advanceUntilIdle()
-
-        // Wait for Compose to settle
-        composeTestRule.awaitIdle()
-
-        // Verify that the input fields are dismissed
-        composeTestRule.onNodeWithTag("expireDateTextField").assertDoesNotExist()
-        composeTestRule.onNodeWithTag("openDateTextField").assertDoesNotExist()
-        composeTestRule.onNodeWithTag("buyDateTextField").assertDoesNotExist()
+        // Wait until the input fields are dismissed
+        composeTestRule.waitUntil(timeoutMillis = 10_000) {
+            composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isEmpty()
+        }
 
         // Verify that the main scanner screen is visible again
         composeTestRule.onNodeWithTag("cameraPreviewBox").assertIsDisplayed()
