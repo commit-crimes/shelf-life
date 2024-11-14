@@ -22,9 +22,7 @@ fun getTotalMinutes(timestamp: Timestamp): Int {
   return (totalSeconds / 60).toInt()
 }
 
-/**
- * Custom VisualTransformation with proper OffsetMapping for date input.
- */
+/** Custom VisualTransformation with proper OffsetMapping for date input. */
 class DateVisualTransformation : VisualTransformation {
 
   /**

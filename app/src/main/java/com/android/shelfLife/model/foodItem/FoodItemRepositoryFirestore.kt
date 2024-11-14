@@ -229,7 +229,8 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
               amount = quantityMap?.get("amount") as? Double ?: 0.0,
               unit = FoodUnit.valueOf(quantityMap?.get("unit") as? String ?: "GRAM"))
 
-      val foodFacts = FoodFacts(name = name, barcode = barcode, quantity = quantity, imageUrl = imageUrl)
+      val foodFacts =
+          FoodFacts(name = name, barcode = barcode, quantity = quantity, imageUrl = imageUrl)
       val expiryDate = map["expiryDate"] as? Timestamp ?: Timestamp.now()
       val status = map["status"] as? String ?: FoodStatus.CLOSED.name
       val foodStatus = FoodStatus.valueOf(status)

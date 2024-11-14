@@ -1,9 +1,7 @@
 // FoodInputContent.kt
 package com.android.shelfLife.ui.camera
 
-import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,13 +27,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodStorageLocation
@@ -106,11 +102,10 @@ fun FoodInputContent(
           }
 
           AsyncImage(
-            model = foodFacts.imageUrl,
-            contentDescription = "Food Image",
-            modifier = Modifier.size(64.dp).clip(RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop)
-
+              model = foodFacts.imageUrl,
+              contentDescription = "Food Image",
+              modifier = Modifier.size(64.dp).clip(RoundedCornerShape(8.dp)),
+              contentScale = ContentScale.Crop)
         }
 
         if (isExpanded) {
@@ -270,7 +265,6 @@ fun FoodInputContent(
                           buyDate = buyTimestamp,
                           // Additional logic for status if needed
                       )
-                  Log.d("FoodInputContent", "New Food Item ImageURL: ${newFoodItem.foodFacts.imageUrl}")
                   onSubmit(newFoodItem)
                 } else {
                   // Handle the case where validation fails
