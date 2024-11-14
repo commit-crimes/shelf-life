@@ -221,52 +221,54 @@ fun FoodInputContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-      Row(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalArrangement = Arrangement.spacedBy(8.dp)
-      ) {
-          Button(
-              onClick = {
-                  val isExpireDateValid = expireDateError == null && expireDate.isNotEmpty()
-                  val isOpenDateValid = openDateError == null
-                  val isBuyDateValid = buyDateError == null && buyDate.isNotEmpty()
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+              Button(
+                  onClick = {
+                    val isExpireDateValid = expireDateError == null && expireDate.isNotEmpty()
+                    val isOpenDateValid = openDateError == null
+                    val isBuyDateValid = buyDateError == null && buyDate.isNotEmpty()
 
-                  val expiryTimestamp = formatDateToTimestamp(expireDate)
-                  val openTimestamp = if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
-                  val buyTimestamp = formatDateToTimestamp(buyDate)
+                    val expiryTimestamp = formatDateToTimestamp(expireDate)
+                    val openTimestamp =
+                        if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
+                    val buyTimestamp = formatDateToTimestamp(buyDate)
 
-                  if (isExpireDateValid && isOpenDateValid && isBuyDateValid && expiryTimestamp != null && buyTimestamp != null) {
-                      val newFoodItem = FoodItem(
-                          uid = foodItemViewModel.getUID(),
-                          foodFacts = foodFacts,
-                          location = location,
-                          expiryDate = expiryTimestamp,
-                          openDate = openTimestamp,
-                          buyDate = buyTimestamp
-                      )
+                    if (isExpireDateValid &&
+                        isOpenDateValid &&
+                        isBuyDateValid &&
+                        expiryTimestamp != null &&
+                        buyTimestamp != null) {
+                      val newFoodItem =
+                          FoodItem(
+                              uid = foodItemViewModel.getUID(),
+                              foodFacts = foodFacts,
+                              location = location,
+                              expiryDate = expiryTimestamp,
+                              openDate = openTimestamp,
+                              buyDate = buyTimestamp)
                       onSubmit(newFoodItem)
-                  } else {
-                      Toast.makeText(context, "Please correct the errors before submitting.", Toast.LENGTH_SHORT).show()
+                    } else {
+                      Toast.makeText(
+                              context,
+                              "Please correct the errors before submitting.",
+                              Toast.LENGTH_SHORT)
+                          .show()
+                    }
+                  },
+                  modifier = Modifier.weight(1f).height(50.dp).testTag("submitButton")) {
+                    Text(text = "Submit", fontSize = 18.sp)
                   }
-              },
-              modifier = Modifier
-                  .weight(1f)
-                  .height(50.dp)
-                  .testTag("submitButton")
-          ) {
-              Text(text = "Submit", fontSize = 18.sp)
-          }
 
-          Button(
-              onClick = { onCancel() },
-              modifier = Modifier
-                  .weight(1f)
-                  .height(50.dp)
-                  .testTag("cancelButton")
-          ) {
-              Text(text = "Cancel", fontSize = 18.sp)
-          }
-      }
-
+              Button(
+                  onClick = { onCancel() },
+                  colors =
+                      ButtonDefaults.buttonColors(
+                          containerColor = MaterialTheme.colorScheme.secondary),
+                  modifier = Modifier.weight(1f).height(50.dp).testTag("cancelButton")) {
+                    Text(text = "Cancel", fontSize = 18.sp)
+                  }
+            }
       }
 }

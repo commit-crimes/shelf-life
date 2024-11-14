@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -124,7 +123,8 @@ fun EditFoodItemScreen(
               item(key = "amount") {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically) {
                       Column(modifier = Modifier.weight(1f)) {
                         // Amount Field with Error Handling
                         OutlinedTextField(
@@ -136,7 +136,7 @@ fun EditFoodItemScreen(
                             label = { Text(stringResource(id = R.string.amount_hint)) },
                             isError = amountError != null,
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.testTag("editFoodAmount").fillMaxWidth())
+                            modifier = Modifier.testTag("editFoodAmount"))
                         if (amountError != null) {
                           Text(
                               text = amountError!!,
@@ -146,13 +146,14 @@ fun EditFoodItemScreen(
                               textAlign = TextAlign.Start)
                         }
                       }
-                      Spacer(modifier = Modifier.width(8.dp))
-                      // Unit
-                      // TODO this doesnt look good on the UI
+
                       Card(
                           border = CardDefaults.outlinedCardBorder(),
+                          shape = MaterialTheme.shapes.large,
                           modifier = Modifier.testTag("editFoodUnit")) {
-                            Text(text = selectedFood.foodFacts.quantity.unit.name)
+                            Text(
+                                text = selectedFood.foodFacts.quantity.unit.name,
+                                modifier = Modifier.padding(12.dp))
                           }
                     }
                 Spacer(modifier = Modifier.height(16.dp))
