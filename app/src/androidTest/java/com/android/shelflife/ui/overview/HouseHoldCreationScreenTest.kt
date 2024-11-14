@@ -5,7 +5,9 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
@@ -13,6 +15,8 @@ import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.overview.HouseHoldCreationScreen
+import io.mockk.MockKAnnotations
+import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -27,6 +31,8 @@ class HouseHoldCreationScreenTest {
   private lateinit var listFoodItemsViewModel: ListFoodItemsViewModel
   private lateinit var houseHoldRepository: HouseHoldRepository
   private lateinit var householdViewModel: HouseholdViewModel
+  private lateinit var mockedNavigationActions: NavigationActions
+  private lateinit var mockedHouseholdViewModel: HouseholdViewModel
 
   private lateinit var houseHold: HouseHold
 
@@ -39,6 +45,10 @@ class HouseHoldCreationScreenTest {
     foodItemRepository = mock(FoodItemRepository::class.java)
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
     householdViewModel = HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel)
+
+    MockKAnnotations.init(this)
+    mockedNavigationActions = mockk(relaxed = true)
+    mockedHouseholdViewModel = mockk(relaxed = true)
 
     houseHold =
         HouseHold(
@@ -107,36 +117,6 @@ class HouseHoldCreationScreenTest {
     verify(navigationActions).goBack()
   }
 
-  /*
-  // Not that great of a test, but it's a start
-  @Test
-  fun clickingConfirmVerifiesHouseHoldName(){
-      householdViewModel.selectHouseholdToEdit(null)
-      composeTestRule.setContent {
-          HouseHoldCreationScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
-      }
-      composeTestRule.onNodeWithTag("HouseHoldNameTextField").performClick()
-      composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextInput(houseHold.name)
-      composeTestRule.onNodeWithTag("ConfirmButton").performClick()
-      composeTestRule.onNodeWithTag("HouseHoldNameTextField").assert(hasText(houseHold.name))
-  }
-
-   */
-
-  /*
-  @Test
-  fun clickingConfirmButtonSavesHouseHold(){
-      householdViewModel.selectHouseholdToEdit(null)
-      composeTestRule.setContent {
-          HouseHoldCreationScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
-      }
-      composeTestRule.onNodeWithTag("HouseHoldNameTextField").performClick()
-      composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextInput("New Household")
-      composeTestRule.onNodeWithTag("ConfirmButton").performClick()
-  }
-
-   */
-
   @Test
   fun clickingDeleteButtonShowsConfirmationDialog() {
     householdViewModel.selectHouseholdToEdit(houseHold)
@@ -170,5 +150,32 @@ class HouseHoldCreationScreenTest {
     composeTestRule.onNodeWithTag("DeleteButton").performClick()
     composeTestRule.onNodeWithTag("CancelDeleteButton").performClick()
     composeTestRule.onNodeWithTag("DeleteConfirmationDialog").assertDoesNotExist()
+  }
+
+  @Test
+  fun addingEmailDisplaysInMemberList() {
+    householdViewModel.selectHouseholdToEdit(null)
+    composeTestRule.setContent {
+      HouseHoldCreationScreen(
+          navigationActions = navigationActions, householdViewModel = householdViewModel)
+    }
+    val email = "test@example.com"
+    composeTestRule.onNodeWithTag("EmailInputField").performTextInput(email)
+    composeTestRule.onNodeWithTag("AddEmailButton").performClick()
+
+    composeTestRule.onNodeWithText(email).assertIsDisplayed()
+  }
+
+  @Test
+  fun addingEmailAddsNewTextBox() {
+    householdViewModel.selectHouseholdToEdit(null)
+    composeTestRule.setContent {
+      HouseHoldCreationScreen(
+          navigationActions = navigationActions, householdViewModel = householdViewModel)
+    }
+    val email = "example@example.com"
+    composeTestRule.onNodeWithTag("EmailInputField").performTextInput(email)
+    composeTestRule.onNodeWithTag("AddEmailButton").performClick()
+    composeTestRule.onNodeWithTag("EmailInputField").assertIsDisplayed()
   }
 }
