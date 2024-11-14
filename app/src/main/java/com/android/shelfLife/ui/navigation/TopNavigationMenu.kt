@@ -152,8 +152,7 @@ fun FilterChipItem(text: String, isSelected: Boolean, onClick: () -> Unit) {
           if (isSelected) {
             { Icon(imageVector = Icons.Default.Check, contentDescription = "Selected") }
           } else null,
-      colors =
-          FilterChipDefaults.filterChipColors(),
+      colors = FilterChipDefaults.filterChipColors(),
       modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp) // Add padding between chips
       )
 }

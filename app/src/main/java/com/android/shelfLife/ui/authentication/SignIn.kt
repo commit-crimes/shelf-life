@@ -38,6 +38,8 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -54,6 +56,18 @@ fun SignInScreen(navigationActions: NavigationActions) {
       rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
+
+            // Get the current user
+            val currentUser = Firebase.auth.currentUser
+            if (currentUser != null) {
+              val db = FirebaseFirestore.getInstance()
+              val userDoc = db.collection("users").document(currentUser.uid)
+              val userData = mapOf("email" to currentUser.email, "name" to currentUser.displayName)
+              userDoc.set(userData, SetOptions.merge())
+            } else {
+              Log.e("SignInScreen", "Current user is null after sign-in")
+            }
+
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(TopLevelDestinations.OVERVIEW)
           },
@@ -115,10 +129,7 @@ fun GoogleSignInButton(onSignInClick: () -> Unit) {
                   contentDescription = "Google Logo",
                   modifier = Modifier.size(30.dp).padding(end = 8.dp))
 
-              Text(
-                  text = "Sign in with Google",
-                  fontSize = 16.sp,
-                  fontWeight = FontWeight.Medium)
+              Text(text = "Sign in with Google", fontSize = 16.sp, fontWeight = FontWeight.Medium)
             }
       }
 }
