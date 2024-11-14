@@ -70,7 +70,6 @@ class BarcodeScannerScreenTest {
     // Check that the main screen is displayed
     composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("cameraPreviewBox").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("scannerOverlay").assertIsDisplayed()
   }
 
   @Test
@@ -102,7 +101,6 @@ class BarcodeScannerScreenTest {
             category = FoodCategory.OTHER)
     fakeRepository.foodFactsList = listOf(sampleFoodFacts)
 
-    // Simulate the scanning process
     composeTestRule.setContent {
       BarcodeScannerScreen(
           navigationActions = navigationActions,
@@ -115,16 +113,14 @@ class BarcodeScannerScreenTest {
     // Simulate scanning a barcode
     composeTestRule.activity.runOnUiThread { foodFactsViewModel.searchByBarcode(1234567890L) }
 
-    // Wait until the small popup is displayed
+    // Wait until the bottom sheet is displayed with food details
     composeTestRule.waitUntil(timeoutMillis = 5_000) {
       composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
     }
 
-    // Assert that the small popup is displayed
+    // Assert that the food details are displayed in the bottom sheet
     composeTestRule.onNodeWithText("Sample Food").assertIsDisplayed()
 
-    // Click on the small popup to expand it
-    composeTestRule.onNodeWithText("Sample Food").performClick()
 
     // Wait until the input fields are displayed
     composeTestRule.waitUntil(timeoutMillis = 5_000) {
@@ -150,53 +146,6 @@ class BarcodeScannerScreenTest {
   }
 
   @Test
-  fun smallPopupExpandsOnClick() {
-    // Set up the fake repository to return a sample food item
-    val sampleFoodFacts =
-        FoodFacts(
-            name = "Sample Food",
-            barcode = "1234567890",
-            quantity = Quantity(amount = 1.0, unit = FoodUnit.COUNT),
-            category = FoodCategory.OTHER)
-    fakeRepository.foodFactsList = listOf(sampleFoodFacts)
-
-    composeTestRule.setContent {
-      BarcodeScannerScreen(
-          navigationActions = navigationActions,
-          cameraViewModel = barcodeScannerViewModel,
-          foodFactsViewModel = foodFactsViewModel,
-          householdViewModel = householdViewModel,
-          foodItemViewModel = foodItemViewModel)
-    }
-
-    // Simulate scanning a barcode
-    composeTestRule.activity.runOnUiThread { foodFactsViewModel.searchByBarcode(1234567890L) }
-
-    // Wait until the small popup is displayed
-    composeTestRule.waitUntil(timeoutMillis = 5_000) {
-      composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
-    }
-
-    // Assert that the small popup is displayed with minimal content
-    composeTestRule.onNodeWithText("Sample Food").assertIsDisplayed()
-    // Ensure that the input fields are not displayed yet
-    composeTestRule.onNodeWithTag("expireDateTextField").assertDoesNotExist()
-
-    // Click on the small popup to expand it
-    composeTestRule.onNodeWithText("Sample Food").performClick()
-
-    // Wait until the input fields are displayed
-    composeTestRule.waitUntil(timeoutMillis = 5_000) {
-      composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isNotEmpty()
-    }
-
-    // Assert that the input fields are now displayed
-    composeTestRule.onNodeWithTag("expireDateTextField").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("openDateTextField").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("buyDateTextField").assertIsDisplayed()
-  }
-
-  @Test
   fun cancellingFormReturnsToScanning() {
     // Set up the fake repository to return a sample food item
     val sampleFoodFacts =
@@ -219,13 +168,11 @@ class BarcodeScannerScreenTest {
     // Simulate scanning a barcode
     composeTestRule.activity.runOnUiThread { foodFactsViewModel.searchByBarcode(1234567890L) }
 
-    // Wait until the small popup is displayed
+    // Wait until the bottom sheet is displayed with food details
     composeTestRule.waitUntil(timeoutMillis = 5_000) {
       composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
     }
 
-    // Click on the small popup to expand it
-    composeTestRule.onNodeWithText("Sample Food").performClick()
 
     // Wait until the input fields are displayed
     composeTestRule.waitUntil(timeoutMillis = 5_000) {
@@ -235,7 +182,7 @@ class BarcodeScannerScreenTest {
     // Click the cancel button
     composeTestRule.onNodeWithTag("cancelButton").performClick()
 
-    // Verify that the ModalBottomSheet is dismissed and scanning resumes
+    // Verify that the BottomSheet is dismissed and scanning resumes
     composeTestRule.onNodeWithTag("expireDateTextField").assertDoesNotExist()
     composeTestRule.onNodeWithTag("openDateTextField").assertDoesNotExist()
     composeTestRule.onNodeWithTag("buyDateTextField").assertDoesNotExist()
@@ -264,13 +211,11 @@ class BarcodeScannerScreenTest {
     // Simulate scanning a barcode
     composeTestRule.activity.runOnUiThread { foodFactsViewModel.searchByBarcode(1234567890L) }
 
-    // Wait until the small popup is displayed
+    // Wait until the bottom sheet is displayed with food details
     composeTestRule.waitUntil(timeoutMillis = 5_000) {
       composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
     }
 
-    // Click on the small popup to expand it
-    composeTestRule.onNodeWithText("Sample Food").performClick()
 
     // Wait until the input fields are displayed
     composeTestRule.waitUntil(timeoutMillis = 5_000) {
@@ -313,13 +258,11 @@ class BarcodeScannerScreenTest {
     // Simulate scanning a barcode
     composeTestRule.activity.runOnUiThread { foodFactsViewModel.searchByBarcode(1234567890L) }
 
-    // Wait until the small popup is displayed
+    // Wait until the bottom sheet is displayed with food details
     composeTestRule.waitUntil(timeoutMillis = 5_000) {
       composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
     }
 
-    // Click on the small popup to expand it
-    composeTestRule.onNodeWithText("Sample Food").performClick()
 
     // Wait until the input fields are displayed
     composeTestRule.waitUntil(timeoutMillis = 5_000) {
@@ -336,8 +279,6 @@ class BarcodeScannerScreenTest {
             SemanticsMatcher.expectValue(
                 SemanticsProperties.EditableText, AnnotatedString("31/12/2023")))
   }
-
-  // Additional tests can be added as needed
 
   // Include the FakeFoodFactsRepository within the test class or as a nested class
   inner class FakeFoodFactsRepository : FoodFactsRepository {

@@ -8,6 +8,7 @@ import android.net.Uri
 import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -61,18 +62,24 @@ fun BarcodeScannerScreen(
   val foodFacts = remember { mutableStateOf<FoodFacts?>(null) }
   val searchInProgress = remember { mutableStateOf(false) }
 
-  val isContentExpanded = remember { mutableStateOf(false) }
   val coroutineScope = rememberCoroutineScope()
 
-  // Bottom sheet state
-  val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+  // Bottom sheet scaffold state with initial state as Hidden
+  val sheetScaffoldState =
+      rememberBottomSheetScaffoldState(
+          bottomSheetState =
+              rememberStandardBottomSheetState(
+                  initialValue = SheetValue.Hidden, skipHiddenState = false))
 
   OnLifecycleEvent(
       onResume = {
         cameraViewModel.checkCameraPermission()
         isScanningState.value = true
       },
-      onPause = { isScanningState.value = false })
+      onPause = {
+        isScanningState.value = false
+        coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
+      })
 
   LaunchedEffect(permissionGranted) {
     if (!permissionGranted) {
@@ -80,6 +87,21 @@ fun BarcodeScannerScreen(
     }
   }
 
+  // Listen to BottomSheetScaffold state changes
+  LaunchedEffect(sheetScaffoldState.bottomSheetState) {
+    snapshotFlow { sheetScaffoldState.bottomSheetState.currentValue }
+        .collect { sheetState ->
+          if (sheetState == SheetValue.Hidden || sheetState == SheetValue.PartiallyExpanded) {
+            // Resume scanning when the sheet is hidden
+            isScanningState.value = true
+            foodScanned.value = false
+            barcodeScanned.value = null
+            foodFacts.value = null
+          }
+        }
+  }
+
+  // Parent Scaffold to host the Bottom Navigation Bar
   Scaffold(
       modifier = Modifier.testTag("barcodeScannerScreen"),
       bottomBar = {
@@ -88,122 +110,115 @@ fun BarcodeScannerScreen(
             tabList = LIST_TOP_LEVEL_DESTINATION,
             selectedItem = Route.SCANNER)
       }) { innerPadding ->
-        Box(modifier = Modifier.fillMaxSize().padding(innerPadding).testTag("cameraPreviewBox")) {
-          // ROI calculation
-          val roiRectF = remember { mutableStateOf<RectF?>(null) }
-          val screenWidth = LocalContext.current.resources.displayMetrics.widthPixels
-          val screenHeight = LocalContext.current.resources.displayMetrics.heightPixels
-
-          val calculatedRoiRectF = calculateRoiRectF(screenWidth.toFloat(), screenHeight.toFloat())
-          roiRectF.value = calculatedRoiRectF
-
-          // Camera Preview
-          CameraPreviewView(
-              modifier = Modifier.fillMaxSize(),
-              onBarcodeScanned = { scannedBarcode ->
-                Log.d("BarcodeScanner", "Scanned barcode: $scannedBarcode")
-                beep()
-                Toast.makeText(context, "Scanned barcode: $scannedBarcode", Toast.LENGTH_SHORT)
-                    .show()
-                barcodeScanned.value = scannedBarcode
-                isScanningState.value = false
-                searchInProgress.value = true
-              },
-              onPreviewViewCreated = {},
-              roiRect = roiRectF.value ?: RectF(0f, 0f, 1f, 1f),
-              shouldScan = { isScanningState.value && !foodScanned.value })
-
-          // Scanner Overlay on top
-          ScannerOverlay()
-
-          // Start the search when searchInProgress is true
-          val currentBarcode = barcodeScanned.value
-          if (searchInProgress.value && currentBarcode != null) {
-            LaunchedEffect(currentBarcode) {
-              foodFactsViewModel.searchByBarcode(currentBarcode.toLong())
-            }
-          }
-
-          // Observe searchStatus and update foodScanned.value
-          val searchStatus by foodFactsViewModel.searchStatus.collectAsState()
-          LaunchedEffect(searchStatus) {
-            when (searchStatus) {
-              is SearchStatus.Success -> {
-                val suggestions = foodFactsViewModel.foodFactsSuggestions.value
-                if (suggestions.isNotEmpty()) {
-                  foodFacts.value = suggestions[0]
-                  foodScanned.value = true
-                } else {
-                  Toast.makeText(context, "Food Not Found", Toast.LENGTH_SHORT).show()
-                  navigationActions.navigateTo(Screen.ADD_FOOD)
-                }
-                // Reset states
-                barcodeScanned.value = null
-                searchInProgress.value = false
-                foodFactsViewModel.resetSearchStatus()
+        // BottomSheetScaffold inside the parent Scaffold
+        BottomSheetScaffold(
+            scaffoldState = sheetScaffoldState,
+            sheetContent = {
+              val foodFactsValue = foodFacts.value
+              if (foodScanned.value && foodFactsValue != null) {
+                FoodInputContent(
+                    foodFacts = foodFactsValue,
+                    onSubmit = { newFoodItem ->
+                      // Reset states
+                      foodScanned.value = false
+                      isScanningState.value = true
+                      coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
+                      householdViewModel.addFoodItem(newFoodItem)
+                      Log.d("BarcodeScanner", "Food item added")
+                    },
+                    onCancel = {
+                      // Reset states
+                      foodScanned.value = false
+                      isScanningState.value = true
+                      coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
+                      Log.d("BarcodeScanner", "Cancelled")
+                    },
+                    foodItemViewModel = foodItemViewModel,
+                )
               }
-              is SearchStatus.Failure -> {
-                Toast.makeText(context, "Search failed", Toast.LENGTH_SHORT).show()
-                barcodeScanned.value = null
-                searchInProgress.value = false
-                foodFactsViewModel.resetSearchStatus()
-              }
-              else -> {
-                // Do nothing for Idle or Loading
-              }
+              Spacer(modifier = Modifier.height(100.dp))
+            },
+            modifier =
+                Modifier.padding(innerPadding) // Apply the inner padding from the parent Scaffold
+            ) {
+              Box(
+                  modifier =
+                      Modifier.fillMaxSize()
+                          .clickable {
+                            // Reset states
+                            foodScanned.value = false
+                            isScanningState.value = true
+                            coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
+                          }
+                          .testTag("cameraPreviewBox")) {
+                    // ROI calculation
+                    val roiRectF = remember { mutableStateOf<RectF?>(null) }
+                    val screenWidth = LocalContext.current.resources.displayMetrics.widthPixels
+                    val screenHeight = LocalContext.current.resources.displayMetrics.heightPixels
+
+                    val calculatedRoiRectF =
+                        calculateRoiRectF(screenWidth.toFloat(), screenHeight.toFloat())
+                    roiRectF.value = calculatedRoiRectF
+
+                    // Camera Preview
+                    CameraPreviewView(
+                        modifier = Modifier.fillMaxSize(),
+                        onBarcodeScanned = { scannedBarcode ->
+                          Log.d("BarcodeScanner", "Scanned barcode: $scannedBarcode")
+                          beep()
+                          Toast.makeText(
+                                  context, "Scanned barcode: $scannedBarcode", Toast.LENGTH_SHORT)
+                              .show()
+                          barcodeScanned.value = scannedBarcode
+                          isScanningState.value = false
+                          searchInProgress.value = true
+                        },
+                        onPreviewViewCreated = {},
+                        roiRect = roiRectF.value ?: RectF(0f, 0f, 1f, 1f),
+                        shouldScan = { isScanningState.value && !foodScanned.value })
+
+                    // Scanner Overlay on top
+                    ScannerOverlay()
+                  }
             }
-          }
-
-          // Show the ModalBottomSheet when foodScanned.value is true
-          val foodFactsValue = foodFacts.value
-
-          LaunchedEffect(foodScanned.value) {
-            if (foodScanned.value) {
-              sheetState.show()
-              Log.d("ModalBottomSheet", "ModalBottomSheet shown")
-            } else {
-              sheetState.hide()
-              Log.d("ModalBottomSheet", "ModalBottomSheet hidden")
-            }
-          }
-
-          if (foodScanned.value && foodFactsValue != null) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                  // Reset states
-                  foodScanned.value = false
-                  isScanningState.value = true
-                  isContentExpanded.value = false
-                  Log.d("ModalBottomSheet", "Sheet dismissed")
-                },
-                sheetState = sheetState) {
-                  FoodInputContent(
-                      foodFacts = foodFactsValue,
-                      onSubmit = { newFoodItem ->
-                        // Reset states
-                        foodScanned.value = false
-                        isScanningState.value = true
-                        isContentExpanded.value = false
-                        householdViewModel.addFoodItem(newFoodItem)
-                        Log.d("ModalBottomSheet", "Submit clicked")
-                      },
-                      onCancel = {
-                        // Reset states
-                        foodScanned.value = false
-                        isScanningState.value = true
-                        isContentExpanded.value = false
-                        Log.d("ModalBottomSheet", "Cancel clicked")
-                      },
-                      foodItemViewModel = foodItemViewModel,
-                      isExpanded = isContentExpanded.value,
-                      onExpand = {
-                        isContentExpanded.value = true
-                        coroutineScope.launch { sheetState.expand() }
-                      })
-                }
-          }
-        }
       }
+
+  // Handle barcode scanning and search
+  val currentBarcode = barcodeScanned.value
+  if (searchInProgress.value && currentBarcode != null) {
+    LaunchedEffect(currentBarcode) { foodFactsViewModel.searchByBarcode(currentBarcode.toLong()) }
+  }
+
+  // Observe searchStatus and update foodScanned.value
+  val searchStatus by foodFactsViewModel.searchStatus.collectAsState()
+  LaunchedEffect(searchStatus) {
+    when (searchStatus) {
+      is SearchStatus.Success -> {
+        val suggestions = foodFactsViewModel.foodFactsSuggestions.value
+        if (suggestions.isNotEmpty()) {
+          foodFacts.value = suggestions[0]
+          foodScanned.value = true
+          coroutineScope.launch { sheetScaffoldState.bottomSheetState.expand() }
+        } else {
+          Toast.makeText(context, "Food Not Found", Toast.LENGTH_SHORT).show()
+          navigationActions.navigateTo(Screen.ADD_FOOD)
+        }
+        // Reset states
+        barcodeScanned.value = null
+        searchInProgress.value = false
+        foodFactsViewModel.resetSearchStatus()
+      }
+      is SearchStatus.Failure -> {
+        Toast.makeText(context, "Search failed", Toast.LENGTH_SHORT).show()
+        barcodeScanned.value = null
+        searchInProgress.value = false
+        foodFactsViewModel.resetSearchStatus()
+      }
+      else -> {
+        // Do nothing for Idle or Loading
+      }
+    }
+  }
 }
 
 /**
