@@ -17,13 +17,16 @@ class HouseholdViewModel(
     private val listFoodItemsViewModel: ListFoodItemsViewModel
 ) : ViewModel() {
   private val _households = MutableStateFlow<List<HouseHold>>(emptyList())
-  val households: StateFlow<List<HouseHold>> = _households.asStateFlow()
+  var households: StateFlow<List<HouseHold>> = _households.asStateFlow()
 
   private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
-  val selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
+  var selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
 
   private val _householdToEdit = MutableStateFlow<HouseHold?>(null)
   val householdToEdit: StateFlow<HouseHold?> = _householdToEdit.asStateFlow()
+
+  private val _memberEmails = MutableStateFlow<Map<String, String>>(emptyMap())
+  val memberEmails: StateFlow<Map<String, String>> = _memberEmails.asStateFlow()
 
   var finishedLoading = MutableStateFlow(false)
 
@@ -45,13 +48,29 @@ class HouseholdViewModel(
     repository.getHouseholds(
         onSuccess = { householdList ->
           _households.value = householdList
-          selectHousehold(householdList.firstOrNull()) // Default to the first household
+          Log.d("HouseholdViewModel", "Households loaded successfully")
+          Log.d("HouseholdViewModel", "Selected household: ${_selectedHousehold.value}")
+          if (_selectedHousehold.value == null) {
+            selectHousehold(householdList.firstOrNull()) // Default to the first household
+          }
+          updateSelectedHousehold()
           finishedLoading.value = true
         },
         onFailure = { exception ->
           Log.e("HouseholdViewModel", "Error loading households: $exception")
           finishedLoading.value = true
         })
+  }
+  /**
+   * Updates the selected household with the latest data from the list of households using the uid,
+   * we may need to add another uid than the name.
+   */
+  private fun updateSelectedHousehold() {
+    selectedHousehold.value?.let { selectedHousehold ->
+      val updatedHousehold = _households.value.find { it.uid == selectedHousehold.uid }
+      _selectedHousehold.value = updatedHousehold
+      listFoodItemsViewModel.setFoodItems(_selectedHousehold.value!!.foodItems)
+    }
   }
 
   /**
@@ -66,6 +85,13 @@ class HouseholdViewModel(
 
   fun selectHouseholdToEdit(household: HouseHold?) {
     _householdToEdit.value = household
+    household?.let {
+      repository.getUserEmails(it.members) { uidToEmail -> _memberEmails.value = uidToEmail }
+    }
+  }
+
+  fun getUserIdsByEmails(emails: List<String>, callback: (Map<String, String>) -> Unit) {
+    repository.getUserIds(emails) { emailToUid -> callback(emailToUid) }
   }
 
   fun checkIfHouseholdNameExists(houseHoldName: String): Boolean {
@@ -77,14 +103,32 @@ class HouseholdViewModel(
    *
    * @param householdName - The name of the household to be added.
    */
-  fun addNewHousehold(householdName: String) {
-    val household = HouseHold(repository.getNewUid(), householdName, emptyList(), emptyList())
-    repository.addHousehold(
-        household,
-        onSuccess = { Log.d("HouseholdViewModel", "Household added successfully") },
-        onFailure = { exception ->
-          Log.e("HouseholdViewModel", "Error adding household: $exception")
-        })
+  fun addNewHousehold(householdName: String, friendEmails: List<String> = emptyList()) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    if (currentUser != null) {
+      val householdUid = repository.getNewUid()
+      val household = HouseHold(householdUid, householdName, emptyList(), emptyList())
+
+      // Get user IDs corresponding to friend emails
+      repository.getUserIds(friendEmails) { emailToUserId ->
+        val emailsNotFound = friendEmails.filter { it !in emailToUserId.keys }
+        if (emailsNotFound.isNotEmpty()) {
+          Log.w("HouseholdViewModel", "Emails not found: $emailsNotFound")
+        }
+        val friendUserIds = emailToUserId.values.toList()
+        val allMembers = friendUserIds.plus(currentUser.uid)
+        val householdWithMembers = household.copy(members = allMembers)
+
+        repository.addHousehold(
+            householdWithMembers,
+            onSuccess = { Log.d("HouseholdViewModel", "Household added successfully") },
+            onFailure = { exception ->
+              Log.e("HouseholdViewModel", "Error adding household: $exception")
+            })
+      }
+    } else {
+      Log.e("HouseholdViewModel", "User not logged in")
+    }
     loadHouseholds()
   }
 
@@ -118,10 +162,8 @@ class HouseholdViewModel(
     loadHouseholds()
   }
 
-  /**
-   * Factory for creating a [HouseholdViewModel] with a constructor that takes a
-   * [HouseHoldRepository] and a [ListFoodItemsViewModel].
-   */
+  // TODO this is a bad way to update the food items, we need a plan to separate the food items from
+  // the household
   fun addFoodItem(foodItem: FoodItem) {
     val selectedHousehold = selectedHousehold.value
     if (selectedHousehold != null) {
@@ -130,6 +172,19 @@ class HouseholdViewModel(
     }
   }
 
+  fun editFoodItem(newFoodItem: FoodItem, oldFoodItem: FoodItem) {
+    val selectedHousehold = selectedHousehold.value
+    if (selectedHousehold != null) {
+      updateHousehold(
+          selectedHousehold.copy(
+              foodItems = selectedHousehold.foodItems.minus(oldFoodItem).plus(newFoodItem)))
+    }
+  }
+
+  /**
+   * Factory for creating a [HouseholdViewModel] with a constructor that takes a
+   * [HouseHoldRepository] and a [ListFoodItemsViewModel].
+   */
   companion object {
     val Factory: ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {

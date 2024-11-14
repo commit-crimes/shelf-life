@@ -1,6 +1,7 @@
 package com.android.shelfLife.ui.overview
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -53,9 +54,8 @@ import java.util.Locale
  * @param foodItems The list of food items to display
  */
 @Composable
-fun ListFoodItems(foodItems: List<FoodItem>) {
+fun ListFoodItems(foodItems: List<FoodItem>, onFoodItemClick: (FoodItem) -> Unit) {
   if (foodItems.isEmpty()) {
-    // Display a prompt when there are no todos
     Box(
         modifier = Modifier.fillMaxSize().testTag("NoFoodItems"),
         contentAlignment = Alignment.Center) {
@@ -66,14 +66,14 @@ fun ListFoodItems(foodItems: List<FoodItem>) {
     LazyColumn(modifier = Modifier.fillMaxSize().testTag("foodItemList")) {
       items(foodItems) { item ->
         // Call a composable that renders each individual to-do item
-        FoodItemCard(foodItem = item)
+        FoodItemCard(foodItem = item, onClick = { onFoodItemClick(item) })
       }
     }
   }
 }
 
 @Composable
-fun FoodItemCard(foodItem: FoodItem) {
+fun FoodItemCard(foodItem: FoodItem, onClick: () -> Unit) {
   val expiryDate = foodItem.expiryDate
   val currentDate = Timestamp.now()
 
@@ -88,11 +88,11 @@ fun FoodItemCard(foodItem: FoodItem) {
 
   ElevatedCard(
       elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
-      colors = CardDefaults.elevatedCardColors(containerColor = Color.White),
       modifier =
           Modifier.fillMaxWidth()
               .padding(horizontal = 16.dp, vertical = 8.dp)
               .background(Color.White)
+              .clickable { onClick() }
               .testTag("foodItemCard")) {
         Row(modifier = Modifier.padding(16.dp)) {
           Column(modifier = Modifier.weight(1f)) {
@@ -109,7 +109,7 @@ fun FoodItemCard(foodItem: FoodItem) {
                       fontSize = 12.sp)
             }
 
-            Text(text = "Expires on $formattedExpiryDate", fontSize = 12.sp, color = Color.Black)
+            Text(text = "Expires on $formattedExpiryDate", fontSize = 12.sp)
           }
 
           Spacer(modifier = Modifier.width(8.dp))
@@ -117,15 +117,21 @@ fun FoodItemCard(foodItem: FoodItem) {
           AsyncImage(
               model = foodItem.foodFacts.imageUrl,
               contentDescription = "Food Image",
-              modifier = Modifier.size(64.dp).clip(RoundedCornerShape(8.dp)),
+              modifier =
+                  Modifier.size(80.dp)
+                      .clip(RoundedCornerShape(8.dp))
+                      .align(Alignment.CenterVertically),
               contentScale = ContentScale.Crop)
         }
         Row {
           LinearProgressIndicator(
-              progress = progress,
+              progress = { progress },
+              modifier = Modifier.fillMaxWidth().height(8.dp),
               color = progressBarColor,
+              gapSize = 4.dp,
+              drawStopIndicator = {},
               trackColor = LightGray,
-              modifier = Modifier.fillMaxWidth().height(8.dp))
+          )
         }
         Spacer(modifier = Modifier.width(8.dp))
       }

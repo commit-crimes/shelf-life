@@ -1,7 +1,10 @@
 package com.android.shelfLife.ui.navigation
 
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -10,10 +13,12 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.android.shelfLife.model.household.HouseHold
 
 /**
@@ -31,6 +36,7 @@ fun HouseholdDrawerItem(
     editMode: Boolean,
     onHouseholdSelected: (HouseHold) -> Unit,
     onHouseholdEditSelected: (HouseHold) -> Unit,
+    onHouseholdDeleteSelected: (HouseHold) -> Unit, // New callback for delete action
     modifier: Modifier = Modifier
 ) {
   NavigationDrawerItem(
@@ -40,30 +46,43 @@ fun HouseholdDrawerItem(
               selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
           ),
       label = {
-        Text(
-            text = household.name,
-            fontWeight = if (household == selectedHousehold) FontWeight.Bold else FontWeight.Normal,
-            color =
-                if (household == selectedHousehold) MaterialTheme.colorScheme.primary
-                else Color.Unspecified)
-      },
-      icon = {
-        if (editMode) {
-          IconButton(
-              modifier = Modifier.testTag("editHouseholdIndicatorIcon"),
-              onClick = { onHouseholdEditSelected(household) }) {
-                Icon(
-                    imageVector = Icons.Outlined.Edit,
-                    contentDescription = "Edit Icon",
-                )
-              }
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+          if (editMode) {
+            // Edit button on the left
+            IconButton(
+                modifier = Modifier.testTag("editHouseholdIndicatorIcon"),
+                onClick = { onHouseholdEditSelected(household) }) {
+                  Icon(
+                      imageVector = Icons.Outlined.Edit,
+                      contentDescription = "Edit Icon",
+                  )
+                }
+          }
+
+          Text(
+              text = household.name,
+              fontWeight =
+                  if (household == selectedHousehold) FontWeight.Bold else FontWeight.Normal,
+              color =
+                  if (household == selectedHousehold) MaterialTheme.colorScheme.primary
+                  else Color.Unspecified,
+              modifier = Modifier.weight(1f).padding(start = if (editMode) 8.dp else 0.dp))
+          if (editMode) {
+            // Delete button on the right
+            IconButton(
+                modifier = Modifier.testTag("deleteHouseholdIcon"),
+                onClick = { onHouseholdDeleteSelected(household) }) {
+                  Icon(
+                      imageVector = Icons.Outlined.Delete,
+                      contentDescription = "Delete Icon",
+                      tint = MaterialTheme.colorScheme.error)
+                }
+          }
         }
       },
       selected = household == selectedHousehold,
       onClick = {
-        if (editMode) {
-          onHouseholdEditSelected(household)
-        } else {
+        if (!editMode) {
           onHouseholdSelected(household)
         }
       },

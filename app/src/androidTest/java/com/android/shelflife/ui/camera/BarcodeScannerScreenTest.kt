@@ -134,6 +134,15 @@ class BarcodeScannerScreenTest {
     composeTestRule.onNodeWithTag("buyDateTextField").assertIsDisplayed()
     composeTestRule.onNodeWithTag("submitButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
+
+    // test dropdown
+    composeTestRule.onNodeWithTag("locationDropdown").performClick()
+    composeTestRule.onNodeWithTag("locationOption_PANTRY").performClick()
+    composeTestRule.onNodeWithTag("locationTextField").assertTextContains("pantry")
+
+    composeTestRule.onNodeWithTag("locationDropdown").performClick()
+    composeTestRule.onNodeWithTag("locationOption_FRIDGE").performClick()
+    composeTestRule.onNodeWithTag("locationTextField").assertTextContains("fridge")
   }
 
   @Test

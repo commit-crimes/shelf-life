@@ -4,6 +4,7 @@ import android.util.Log
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 
 class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHoldRepository {
@@ -65,7 +66,7 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
           mapOf(
               "uid" to household.uid,
               "name" to household.name,
-              "members" to household.members.plus(currentUser.uid),
+              "members" to household.members,
               "foodItems" to
                   household.foodItems.map { foodItem ->
                     foodItemRepository.convertFoodItemToMap(foodItem)
@@ -111,10 +112,13 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
       db.collection(collectionPath)
           .document(household.uid)
           .update(householdData)
-          .addOnSuccessListener { onSuccess() }
-          .addOnFailureListener { exception ->
-            Log.e("HouseholdRepository", "Error updating household", exception)
-            onFailure(exception)
+          .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+              onSuccess()
+            } else {
+              Log.e("HouseholdRepository", "Error updating household", task.exception)
+              task.exception?.let { onFailure(it) }
+            }
           }
     } else {
       Log.e("HouseholdRepository", "User not logged in")
@@ -147,6 +151,80 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
     } else {
       Log.e("HouseholdRepository", "User not logged in")
       onFailure(Exception("User not logged in"))
+    }
+  }
+
+  override fun getUserIds(users: List<String>, callback: (Map<String, String>) -> Unit) {
+    if (users.isEmpty()) {
+      callback(emptyMap())
+      return
+    }
+
+    val emailBatches = users.chunked(10) // Firestore allows up to 10 values in 'whereIn'
+    val emailToUserId = mutableMapOf<String, String>()
+    var batchesProcessed = 0
+
+    for (emailBatch in emailBatches) {
+      db.collection("users")
+          .whereIn("email", emailBatch)
+          .get()
+          .addOnSuccessListener { querySnapshot ->
+            for (doc in querySnapshot.documents) {
+              val email = doc.getString("email")
+              val userId = doc.id
+              if (email != null) {
+                emailToUserId[email] = userId
+              }
+            }
+            batchesProcessed++
+            if (batchesProcessed == emailBatches.size) {
+              callback(emailToUserId)
+            }
+          }
+          .addOnFailureListener { exception ->
+            Log.e("HouseholdRepository", "Error fetching user IDs by emails", exception)
+            batchesProcessed++
+            if (batchesProcessed == emailBatches.size) {
+              callback(emailToUserId)
+            }
+          }
+    }
+  }
+
+  override fun getUserEmails(userIds: List<String>, callback: (Map<String, String>) -> Unit) {
+    if (userIds.isEmpty()) {
+      callback(emptyMap())
+      return
+    }
+
+    val uidBatches = userIds.chunked(10) // Firestore allows up to 10 values in 'whereIn'
+    val uidToEmail = mutableMapOf<String, String>()
+    var batchesProcessed = 0
+
+    for (uidBatch in uidBatches) {
+      db.collection("users")
+          .whereIn(FieldPath.documentId(), uidBatch)
+          .get()
+          .addOnSuccessListener { querySnapshot ->
+            for (doc in querySnapshot.documents) {
+              val email = doc.getString("email")
+              val userId = doc.id
+              if (email != null) {
+                uidToEmail[userId] = email
+              }
+            }
+            batchesProcessed++
+            if (batchesProcessed == uidBatches.size) {
+              callback(uidToEmail)
+            }
+          }
+          .addOnFailureListener { exception ->
+            Log.e("HouseholdRepository", "Error fetching emails by user IDs", exception)
+            batchesProcessed++
+            if (batchesProcessed == uidBatches.size) {
+              callback(uidToEmail)
+            }
+          }
     }
   }
 

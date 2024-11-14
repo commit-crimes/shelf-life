@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.android.shelfLife.ui.theme.*
 import com.example.ui.theme.AppTypography
 
 private val lightScheme =
