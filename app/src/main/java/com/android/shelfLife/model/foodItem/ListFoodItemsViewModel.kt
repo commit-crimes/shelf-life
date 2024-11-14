@@ -72,7 +72,7 @@ open class ListFoodItemsViewModel(private val repository: FoodItemRepository) : 
   }
 
   /** Selects a FoodItem document */
-  fun selectFoodItem(foodItem: FoodItem) {
+  fun selectFoodItem(foodItem: FoodItem?) {
     _selectedFoodItem.value = foodItem
   }
 

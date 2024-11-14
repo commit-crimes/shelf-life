@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
-import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -40,9 +40,9 @@ import com.android.shelfLife.ui.utils.FoodItemDetails
 @Composable
 fun IndividualFoodItemScreen(
     navigationActions: NavigationActions,
-    householdViewModel: HouseholdViewModel
+    foodItemViewModel: ListFoodItemsViewModel
 ) {
-  val foodItem by householdViewModel.selectedFoodItem.collectAsState()
+  val foodItem by foodItemViewModel.selectedFoodItem.collectAsState()
   Scaffold(
       modifier = Modifier.testTag("IndividualFoodItemScreen"),
       topBar = {

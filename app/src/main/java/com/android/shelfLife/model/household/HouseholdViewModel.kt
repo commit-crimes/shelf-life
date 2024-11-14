@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-open class HouseholdViewModel(
+class HouseholdViewModel(
     private val repository: HouseHoldRepository,
     private val listFoodItemsViewModel: ListFoodItemsViewModel
 ) : ViewModel() {
@@ -21,9 +21,6 @@ open class HouseholdViewModel(
 
   private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
   var selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
-
-  private val _selectedFoodItem = MutableStateFlow<FoodItem?>(null)
-  val selectedFoodItem: StateFlow<FoodItem?> = _selectedFoodItem.asStateFlow()
 
   private val _householdToEdit = MutableStateFlow<HouseHold?>(null)
   val householdToEdit: StateFlow<HouseHold?> = _householdToEdit.asStateFlow()
@@ -175,10 +172,19 @@ open class HouseholdViewModel(
     }
   }
 
-  fun setSelectedFoodItemById(foodItem: FoodItem?) {
-    _selectedFoodItem.value = foodItem
+  fun editFoodItem(newFoodItem: FoodItem, oldFoodItem: FoodItem) {
+    val selectedHousehold = selectedHousehold.value
+    if (selectedHousehold != null) {
+      updateHousehold(
+          selectedHousehold.copy(
+              foodItems = selectedHousehold.foodItems.minus(oldFoodItem).plus(newFoodItem)))
+    }
   }
 
+  /**
+   * Factory for creating a [HouseholdViewModel] with a constructor that takes a
+   * [HouseHoldRepository] and a [ListFoodItemsViewModel].
+   */
   companion object {
     val Factory: ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {
