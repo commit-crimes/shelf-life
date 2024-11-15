@@ -317,14 +317,14 @@ fun ShelfLifeTheme(dynamicColor: Boolean = false, content: @Composable () -> Uni
         if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
       } else if (darkTheme) darkScheme else lightScheme
 
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            val window = (view.context as Activity).window
-            window.statusBarColor = Color.Transparent.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
-        }
+  val view = LocalView.current
+  if (!view.isInEditMode) {
+    SideEffect {
+      val window = (view.context as Activity).window
+      window.statusBarColor = Color.Transparent.toArgb()
+      WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
     }
+  }
   // Update the LocalThemeToggler's toggleTheme function
   DisposableEffect(Unit) {
     LocalThemeToggler.toggleTheme = ::toggleTheme
