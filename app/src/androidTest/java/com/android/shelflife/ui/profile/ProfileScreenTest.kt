@@ -1,6 +1,5 @@
 package com.android.shelflife.ui.profile
 
-import android.content.SharedPreferences
 import android.net.Uri
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.assertIsDisplayed
@@ -10,9 +9,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.profile.ProfileScreen
-import com.example.compose.LocalThemeToggler
-import com.example.compose.ShelfLifeTheme
-import com.example.compose.ThemeMode
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import io.mockk.every
 import io.mockk.mockk
@@ -20,10 +16,6 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
 
 @RunWith(AndroidJUnit4::class)
 class ProfileScreenTest {
@@ -150,14 +142,11 @@ class ProfileScreenTest {
   @Test
   fun displaysCorrectThemeLabel() {
     val navigationActions =
-      mockk<NavigationActions>(
-        relaxed = true, block = { every { currentRoute() } returns Route.PROFILE })
+        mockk<NavigationActions>(
+            relaxed = true, block = { every { currentRoute() } returns Route.PROFILE })
 
     composeTestRule.setContent {
-      ProfileScreen(
-        navigationActions = navigationActions,
-        account = null
-      )
+      ProfileScreen(navigationActions = navigationActions, account = null)
     }
 
     composeTestRule.onNodeWithTag("dropdownMenu_App Theme").performClick()
