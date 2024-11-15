@@ -56,7 +56,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
         }
 
         debug {
@@ -186,6 +185,34 @@ tasks.named("ktfmtCheckMain") {
 
 tasks.named("ktfmtCheckTest") {
     dependsOn(tasks.named("ktfmtFormatTest"))
+}
+
+// Task to copy APKs to app/releases/
+tasks.register<Copy>("copyApks") {
+    // Ensure the APK is built before copying
+    dependsOn("assembleDebug")
+
+    val sourceDir = "$buildDir/outputs/apk/debug/"
+    val destinationDir = "$projectDir/releases/"
+
+    from(sourceDir)
+    into(destinationDir)
+
+    include("*.apk")
+
+    doFirst {
+        println("Listing APK files in source directory: $sourceDir")
+        fileTree(sourceDir).forEach {
+            println("Found file: ${it.name}")
+        }
+    }
+
+    doLast {
+        println("APKs copied to $destinationDir")
+        fileTree(destinationDir).forEach {
+            println("Copied APK: ${it.name}")
+        }
+    }
 }
 
 // Dependencies
