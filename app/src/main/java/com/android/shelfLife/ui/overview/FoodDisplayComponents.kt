@@ -32,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.LightGray
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
@@ -91,7 +90,7 @@ fun FoodItemCard(foodItem: FoodItem, onClick: () -> Unit) {
       modifier =
           Modifier.fillMaxWidth()
               .padding(horizontal = 16.dp, vertical = 8.dp)
-              .background(Color.White)
+              .background(MaterialTheme.colorScheme.background)
               .clickable { onClick() }
               .testTag("foodItemCard")) {
         Row(modifier = Modifier.padding(16.dp)) {
