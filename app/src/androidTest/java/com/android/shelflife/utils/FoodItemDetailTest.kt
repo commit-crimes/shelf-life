@@ -4,7 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.*
 import com.android.shelfLife.ui.utils.FoodItemDetails
-import com.android.shelfLife.ui.utils.formatTimestampToDate
+import com.android.shelfLife.ui.utils.formatTimestampToDisplayDate
 import com.google.firebase.Timestamp
 import java.util.Date
 import org.junit.Rule
@@ -46,13 +46,13 @@ class FoodItemDetailsTest {
     composeTestRule.onNodeWithTag("statusText").assertTextEquals("Status: OPEN")
 
     val expectedExpiryDate =
-        "Expiry Date: ${foodItem.expiryDate?.let { formatTimestampToDate(it) }}"
+        "Expiry Date: ${foodItem.expiryDate?.let { formatTimestampToDisplayDate(it) }}"
     composeTestRule.onNodeWithTag("expiryDateText").assertTextEquals(expectedExpiryDate)
 
-    val expectedOpenDate = "Open Date: ${foodItem.openDate?.let { formatTimestampToDate(it) }}"
+    val expectedOpenDate = "Open Date: ${foodItem.openDate?.let { formatTimestampToDisplayDate(it) }}"
     composeTestRule.onNodeWithTag("openDateText").assertTextEquals(expectedOpenDate)
 
-    val expectedBuyDate = "Buy Date: ${formatTimestampToDate(foodItem.buyDate)}"
+    val expectedBuyDate = "Buy Date: ${formatTimestampToDisplayDate(foodItem.buyDate)}"
     composeTestRule.onNodeWithTag("buyDateText").assertTextEquals(expectedBuyDate)
 
     composeTestRule.onNodeWithTag("energyText").assertTextEquals("Energy: 0 Kcal")
