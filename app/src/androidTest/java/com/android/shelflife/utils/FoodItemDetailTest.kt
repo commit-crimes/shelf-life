@@ -49,7 +49,8 @@ class FoodItemDetailsTest {
         "Expiry Date: ${foodItem.expiryDate?.let { formatTimestampToDisplayDate(it) }}"
     composeTestRule.onNodeWithTag("expiryDateText").assertTextEquals(expectedExpiryDate)
 
-    val expectedOpenDate = "Open Date: ${foodItem.openDate?.let { formatTimestampToDisplayDate(it) }}"
+    val expectedOpenDate =
+        "Open Date: ${foodItem.openDate?.let { formatTimestampToDisplayDate(it) }}"
     composeTestRule.onNodeWithTag("openDateText").assertTextEquals(expectedOpenDate)
 
     val expectedBuyDate = "Buy Date: ${formatTimestampToDisplayDate(foodItem.buyDate)}"
