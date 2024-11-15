@@ -186,7 +186,10 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
       val expiryDate = doc.getTimestamp("expiryDate") ?: Timestamp.now()
       val buyDate = doc.getTimestamp("buyDate") ?: Timestamp.now()
       val status = doc.getString("status") ?: FoodStatus.CLOSED.name
-      val foodStatus = FoodStatus.valueOf(status)
+      var foodStatus = FoodStatus.valueOf(status)
+      val isExpired = foodStatus == FoodStatus.EXPIRED || expiryDate.toDate().time < System.currentTimeMillis()
+      foodStatus = if (isExpired) FoodStatus.EXPIRED else foodStatus
+      //TODO: update expiration status to Firebase!
 
       val locationMap = doc["location"] as? Map<*, *>
       val foodStorageLocation =
@@ -196,6 +199,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
           } else {
             FoodStorageLocation.PANTRY
           }
+
 
       // Create the FoodItem object using FoodFacts
       FoodItem(
