@@ -188,6 +188,8 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
       val status = doc.getString("status") ?: FoodStatus.CLOSED.name
       val foodStatus = FoodStatus.valueOf(status)
 
+      // TODO: update expiration status to Firebase!
+
       val locationMap = doc["location"] as? Map<*, *>
       val foodStorageLocation =
           if (locationMap != null) {
@@ -240,7 +242,14 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
       val status = map["status"] as? String ?: FoodStatus.CLOSED.name
       val foodStatus = FoodStatus.valueOf(status)
 
-      FoodItem(uid = uid, foodFacts = foodFacts, location=location, expiryDate = expiryDate, status = foodStatus, buyDate = buyDate, openDate = openDate)
+      FoodItem(
+          uid = uid,
+          foodFacts = foodFacts,
+          location = location,
+          expiryDate = expiryDate,
+          status = foodStatus,
+          buyDate = buyDate,
+          openDate = openDate)
     } catch (e: Exception) {
       Log.e("FoodItemRepository", "Error converting map to FoodItem", e)
       null

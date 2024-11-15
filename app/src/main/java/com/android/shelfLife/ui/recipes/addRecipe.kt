@@ -369,10 +369,10 @@ fun IngredientItem(index: Int, ingredient: Ingredient, onRemoveClick: () -> Unit
     Text(
         text = "Ingredient${index + 1} : ${ingredient.foodFacts.name}",
         modifier = Modifier.testTag("ingredientItem"))
-  }
-  // delete button
-  IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteIngredientButton")) {
-    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Ingredient")
+    // delete button
+    IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteIngredientButton")) {
+      Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Ingredient")
+    }
   }
 }
 
