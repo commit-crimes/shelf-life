@@ -297,6 +297,7 @@ fun EditFoodItemScreen(
                                 buyDate = buyTimestamp,
                                 status = FoodStatus.CLOSED)
                         houseHoldViewModel.editFoodItem(newFoodItem, selectedFood)
+                        foodItemViewModel.selectFoodItem(newFoodItem)
                         navigationActions.goBack()
                       } else {
                         Toast.makeText(
