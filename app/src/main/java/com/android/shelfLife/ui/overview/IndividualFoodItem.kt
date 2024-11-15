@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.overview
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -8,8 +7,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +23,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -34,6 +34,7 @@ import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.utils.FoodItemDetails
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,6 +63,14 @@ fun IndividualFoodItemScreen(
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Go back Icon")
                   }
             })
+      },
+      // Floating Action Button to edit the food item
+      floatingActionButton = {
+        FloatingActionButton(
+            onClick = { navigationActions.navigateTo(Screen.EDIT_FOOD) },
+            content = { Icon(Icons.Default.Edit, contentDescription = "Edit") },
+            modifier = Modifier.testTag("editFoodFab"),
+            containerColor = MaterialTheme.colorScheme.secondaryContainer)
       },
       bottomBar = {
         BottomNavigationMenu(

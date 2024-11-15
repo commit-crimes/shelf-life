@@ -14,7 +14,6 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import io.mockk.*
-import kotlinx.coroutines.test.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -121,7 +120,6 @@ class BarcodeScannerScreenTest {
     // Assert that the food details are displayed in the bottom sheet
     composeTestRule.onNodeWithText("Sample Food").assertIsDisplayed()
 
-
     // Wait until the input fields are displayed
     composeTestRule.waitUntil(timeoutMillis = 5_000) {
       composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isNotEmpty()
@@ -173,7 +171,6 @@ class BarcodeScannerScreenTest {
       composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
     }
 
-
     // Wait until the input fields are displayed
     composeTestRule.waitUntil(timeoutMillis = 5_000) {
       composeTestRule.onAllNodesWithTag("expireDateTextField").fetchSemanticsNodes().isNotEmpty()
@@ -215,7 +212,6 @@ class BarcodeScannerScreenTest {
     composeTestRule.waitUntil(timeoutMillis = 5_000) {
       composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
     }
-
 
     // Wait until the input fields are displayed
     composeTestRule.waitUntil(timeoutMillis = 5_000) {
@@ -262,7 +258,6 @@ class BarcodeScannerScreenTest {
     composeTestRule.waitUntil(timeoutMillis = 5_000) {
       composeTestRule.onAllNodesWithText("Sample Food").fetchSemanticsNodes().isNotEmpty()
     }
-
 
     // Wait until the input fields are displayed
     composeTestRule.waitUntil(timeoutMillis = 5_000) {

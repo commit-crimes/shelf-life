@@ -182,10 +182,13 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
               nutritionFacts = nutritionFacts)
 
       // Extract FoodItem-specific properties
+      val openDate = doc.getTimestamp("openDate") ?: Timestamp.now()
       val expiryDate = doc.getTimestamp("expiryDate") ?: Timestamp.now()
       val buyDate = doc.getTimestamp("buyDate") ?: Timestamp.now()
       val status = doc.getString("status") ?: FoodStatus.CLOSED.name
       val foodStatus = FoodStatus.valueOf(status)
+
+      // TODO: update expiration status to Firebase!
 
       val locationMap = doc["location"] as? Map<*, *>
       val foodStorageLocation =
@@ -203,7 +206,8 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
           status = foodStatus,
           location = foodStorageLocation,
           expiryDate = expiryDate,
-          buyDate = buyDate)
+          buyDate = buyDate,
+          openDate = openDate)
     } catch (e: Exception) {
       Log.e("FoodItemRepository", "Error converting document to FoodItem", e)
       null
@@ -223,7 +227,8 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
       val barcode = map["barcode"] as? String ?: ""
       val quantityMap = map["quantity"] as? Map<*, *>
       val imageUrl = map["imageUrl"] as? String ?: FoodFacts.DEFAULT_IMAGE_URL
-
+      val locationStr = map["location"] as? String ?: FoodStorageLocation.PANTRY.name
+      val location = FoodStorageLocation.valueOf(locationStr)
       val quantity =
           Quantity(
               amount = quantityMap?.get("amount") as? Double ?: 0.0,
@@ -232,10 +237,19 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
       val foodFacts =
           FoodFacts(name = name, barcode = barcode, quantity = quantity, imageUrl = imageUrl)
       val expiryDate = map["expiryDate"] as? Timestamp ?: Timestamp.now()
+      val openDate = map["openDate"] as? Timestamp ?: Timestamp.now()
+      val buyDate = map["buyDate"] as? Timestamp ?: Timestamp.now()
       val status = map["status"] as? String ?: FoodStatus.CLOSED.name
       val foodStatus = FoodStatus.valueOf(status)
 
-      FoodItem(uid = uid, foodFacts = foodFacts, expiryDate = expiryDate, status = foodStatus)
+      FoodItem(
+          uid = uid,
+          foodFacts = foodFacts,
+          location = location,
+          expiryDate = expiryDate,
+          status = foodStatus,
+          buyDate = buyDate,
+          openDate = openDate)
     } catch (e: Exception) {
       Log.e("FoodItemRepository", "Error converting map to FoodItem", e)
       null
@@ -260,6 +274,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
                 "unit" to foodItem.foodFacts.quantity.unit.name),
         "expiryDate" to foodItem.expiryDate,
         "buyDate" to foodItem.buyDate,
+        "openDate" to foodItem.openDate,
         "status" to foodItem.status.name,
         "location" to foodItem.location.name,
         "nutritionFacts" to

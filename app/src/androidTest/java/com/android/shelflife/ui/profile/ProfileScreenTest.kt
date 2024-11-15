@@ -1,5 +1,6 @@
 package com.android.shelflife.ui.profile
 
+import android.content.SharedPreferences
 import android.net.Uri
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.assertIsDisplayed
@@ -9,6 +10,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.profile.ProfileScreen
+import com.example.compose.LocalThemeToggler
+import com.example.compose.ShelfLifeTheme
+import com.example.compose.ThemeMode
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import io.mockk.every
 import io.mockk.mockk
@@ -16,6 +20,10 @@ import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 
 @RunWith(AndroidJUnit4::class)
 class ProfileScreenTest {
@@ -23,16 +31,31 @@ class ProfileScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   @Test
-  fun testGreetingText_whenAccountIsNull_displaysGuest() {
+  fun testNameText_whenAccountIsNull_displaysGuest() {
     val navigationActions = NavigationActions(mockk<NavHostController>(relaxed = true))
     composeTestRule.setContent {
       ProfileScreen(navigationActions = navigationActions, account = null)
     }
 
-    composeTestRule
-        .onNodeWithTag("greetingText")
-        .assertIsDisplayed()
-        .assertTextEquals("Hello, Guest")
+    composeTestRule.onNodeWithTag("profileNameText").assertIsDisplayed().assertTextEquals("Guest")
+  }
+
+  @Test
+  fun profileScreen_displaysAccountName() {
+    val navigationActions = NavigationActions(mockk<NavHostController>(relaxed = true))
+    val account =
+        mockk<GoogleSignInAccount>(
+            block = {
+              every { displayName } returns "John Smith"
+              every { photoUrl } returns null
+              every { email } returns null
+            })
+
+    composeTestRule.setContent {
+      ProfileScreen(navigationActions = navigationActions, account = account)
+    }
+
+    composeTestRule.onNodeWithTag("profileNameText").assertTextEquals("John Smith")
   }
 
   @Test
@@ -43,6 +66,7 @@ class ProfileScreenTest {
         mockk<GoogleSignInAccount>(
             block = {
               every { email } returns "test@example.com"
+              every { displayName } returns "Jon Smith"
               every { photoUrl } returns
                   Uri.parse(
                       "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg")
@@ -52,9 +76,19 @@ class ProfileScreenTest {
     }
 
     composeTestRule
-        .onNodeWithTag("greetingText")
+        .onNodeWithTag("profileEmailText")
         .assertIsDisplayed()
-        .assertTextEquals("Hello, test@example.com")
+        .assertTextEquals("test@example.com")
+  }
+
+  @Test
+  fun profileScreen_hidesEmailWhenNotAvailable() {
+    val navigationActions = NavigationActions(mockk<NavHostController>(relaxed = true))
+    composeTestRule.setContent {
+      ProfileScreen(navigationActions = navigationActions, account = null)
+    }
+
+    composeTestRule.onNodeWithTag("profileEmailText").assertDoesNotExist()
   }
 
   @Test
@@ -111,5 +145,23 @@ class ProfileScreenTest {
     composeTestRule.onNodeWithText("Recipes").performClick()
 
     assertEquals(Route.RECIPES, navigationActions.currentRoute())
+  }
+
+  @Test
+  fun displaysCorrectThemeLabel() {
+    val navigationActions =
+      mockk<NavigationActions>(
+        relaxed = true, block = { every { currentRoute() } returns Route.PROFILE })
+
+    composeTestRule.setContent {
+      ProfileScreen(
+        navigationActions = navigationActions,
+        account = null
+      )
+    }
+
+    composeTestRule.onNodeWithTag("dropdownMenu_App Theme").performClick()
+    composeTestRule.onNodeWithTag("dropDownItem_Light Mode").assertTextEquals("Light Mode")
+    composeTestRule.onNodeWithTag("dropDownItem_Light Mode").performClick()
   }
 }
