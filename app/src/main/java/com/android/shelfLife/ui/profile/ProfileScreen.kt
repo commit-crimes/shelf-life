@@ -7,11 +7,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,6 +32,10 @@ import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.utils.DropdownFields
+import com.example.compose.LocalThemeMode
+import com.example.compose.LocalThemeTogglerProvider
+import com.example.compose.ThemeMode
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 
@@ -39,6 +47,21 @@ fun ProfileScreen(
 ) {
   val context = LocalContext.current
   val currentAccount = remember { account ?: getGoogleAccount(context) }
+
+  var expanded by remember { mutableStateOf(false) }
+
+  // Get the current theme mode and the theme toggler from ShelfLifeTheme
+  val currentThemeMode = LocalThemeMode.current
+  val themeToggler = LocalThemeTogglerProvider.current
+
+  val options = arrayOf(ThemeMode.LIGHT, ThemeMode.DARK, ThemeMode.SYSTEM_DEFAULT)
+  val optionLabels =
+      mapOf(
+          ThemeMode.LIGHT to "Light",
+          ThemeMode.DARK to "Dark",
+          ThemeMode.SYSTEM_DEFAULT to "System Default")
+
+  val color = MaterialTheme.colorScheme
 
   Scaffold(
       modifier = Modifier.testTag("profileScaffold"),
@@ -56,6 +79,7 @@ fun ProfileScreen(
                     .testTag("profileColumn"),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top) {
+
               // Profile picture using Coil to load the image from a URL
               val profileImageUrl = currentAccount?.photoUrl?.toString()
               if (profileImageUrl == null) {
@@ -73,11 +97,44 @@ fun ProfileScreen(
               }
               Spacer(modifier = Modifier.height(32.dp))
               Text(
-                  text = "Hello, ${currentAccount?.email ?: "Guest"}",
+                  text = currentAccount?.displayName ?: "Guest",
                   fontWeight = FontWeight.Bold,
+                  color = color.primary,
                   fontSize = 28.sp,
-                  textAlign = TextAlign.Left,
-                  modifier = Modifier.testTag("greetingText"))
+                  textAlign = TextAlign.Center,
+                  modifier = Modifier.testTag("profileNameText"))
+
+              if (currentAccount?.email != null) {
+                Text(
+                    text = currentAccount.email!!,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.testTag("profileEmailText"))
+              }
+
+              Spacer(modifier = Modifier.weight(0.2f))
+
+              ////
+              Row(
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.padding(16.dp)) {
+                    DropdownFields(
+                        label = "App Theme",
+                        options = options,
+                        selectedOption = currentThemeMode,
+                        onOptionSelected = { selectedOption ->
+                          themeToggler.toggleTheme(selectedOption)
+                        },
+                        expanded = expanded,
+                        onExpandedChange = { expanded = it },
+                        optionLabel = { option ->
+                          (optionLabels[option] ?: "System Default") + " Mode"
+                        },
+                        modifier = Modifier.padding(horizontal = 16.dp))
+                  }
+
+              //
 
               Spacer(modifier = Modifier.weight(1f))
 
