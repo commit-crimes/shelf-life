@@ -49,16 +49,6 @@ android {
         }
     }
 
-    signingConfigs {
-        // Use debug signing configuration for both debug and release builds
-        getByName("debug") {
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
-            storeFile = file("${System.getProperty("user.home")}/.android/debug.keystore")
-            storePassword = "android"
-        }
-    }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -66,13 +56,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug") // Use debug signing for release
         }
 
         debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
-            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
