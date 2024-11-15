@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # You can use ubuntu-latest, but macOS is better for M1 chips
+    runs-on: ubuntu-latest
 
     steps:
       # Checkout the repository
@@ -37,24 +37,17 @@ jobs:
         run: |
           echo "$GOOGLE_SERVICES" | base64 --decode > ./app/google-services.json
 
-      # Give gradle permission
+      # Grant execute permission for gradlew
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
-
-      # Generate debug keystore
-      - name: Generate debug keystore
-        run: |
-          mkdir -p ~/.android/
-          keytool -genkey -v \
-            -keystore ~/.android/debug.keystore \
-            -storepass android -keypass android \
-            -alias androiddebugkey \
-            -dname "CN=Android Debug,O=Android,C=US" \
-            -keyalg RSA -keysize 2048 -validity 10000
 
       # Build and Copy APK
       - name: Build and Copy APK
         run: ./gradlew copyApks
+
+      # List APK files in releases directory
+      - name: List APK files
+        run: ls -l app/releases/
 
       # Upload the APK as an artifact
       - name: Upload APK

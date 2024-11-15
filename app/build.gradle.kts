@@ -190,15 +190,28 @@ tasks.named("ktfmtCheckTest") {
 // Task to copy APKs to app/releases/
 tasks.register<Copy>("copyApks") {
     // Ensure the APK is built before copying
-    dependsOn("assembleDebug") // Use "assembleRelease" for release builds, or both
+    dependsOn("assembleDebug")
 
-    from("$buildDir/outputs/apk/")
-    into("$projectDir/releases/")
+    val sourceDir = "$buildDir/outputs/apk/debug/"
+    val destinationDir = "$projectDir/releases/"
 
-    include("**/*.apk")
+    from(sourceDir)
+    into(destinationDir)
+
+    include("*.apk")
+
+    doFirst {
+        println("Listing APK files in source directory: $sourceDir")
+        fileTree(sourceDir).forEach {
+            println("Found file: ${it.name}")
+        }
+    }
 
     doLast {
-        println("APKs copied to ${project.projectDir}/releases/")
+        println("APKs copied to $destinationDir")
+        fileTree(destinationDir).forEach {
+            println("Copied APK: ${it.name}")
+        }
     }
 }
 
