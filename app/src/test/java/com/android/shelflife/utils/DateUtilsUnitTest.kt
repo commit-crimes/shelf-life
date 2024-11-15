@@ -115,6 +115,15 @@ class DateUtilsUnitTest {
   }
 
   @Test
+  fun testFormatTimestampToDisplayDate() {
+    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    val date = sdf.parse("01/01/2020")
+    val timestamp = Timestamp(date!!)
+    val dateStr = formatTimestampToDisplayDate(timestamp)
+    assertEquals("01/01/2020", dateStr)
+  }
+
+  @Test
   fun testFromCapitalStringToLowercaseString() {
     val input = "HELLO"
     val expected = "Hello"

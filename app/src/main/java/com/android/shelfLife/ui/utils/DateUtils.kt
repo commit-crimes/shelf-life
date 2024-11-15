@@ -228,6 +228,17 @@ fun formatTimestampToDate(timestamp: Timestamp): String {
 }
 
 /**
+ * Function to format a Timestamp to a date string to be displayed (includes the slashes).
+ *
+ * @param timestamp The Timestamp to format.
+ * @return The formatted date string (stored as digits without slashes).
+ */
+fun formatTimestampToDisplayDate(timestamp: Timestamp): String {
+  val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+  return sdf.format(timestamp.toDate())
+}
+
+/**
  * Converts a string into a lowercase with its first letter as a capital letter.
  *
  * @param enum The string to convert.

@@ -22,12 +22,12 @@ fun FoodItemDetails(foodItem: FoodItem) {
   val textStyle = TextStyle(fontSize = 14.sp)
 
   val formattedExpiryDate =
-      foodItem.expiryDate?.let { formatTimestampToDate(it) }
+      foodItem.expiryDate?.let { formatTimestampToDisplayDate(it) }
           ?: stringResource(R.string.food_item_no_expiry_date)
   val formattedOpenDate =
-      foodItem.openDate?.let { formatTimestampToDate(it) }
+      foodItem.openDate?.let { formatTimestampToDisplayDate(it) }
           ?: stringResource(R.string.food_item_not_opened)
-  val formattedBuyDate = formatTimestampToDate(foodItem.buyDate)
+  val formattedBuyDate = formatTimestampToDisplayDate(foodItem.buyDate)
 
   ElevatedCard(
       modifier =
