@@ -49,6 +49,16 @@ android {
         }
     }
 
+    signingConfigs {
+        // Use debug signing configuration for both debug and release builds
+        getByName("debug") {
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+            storeFile = file("${System.getProperty("user.home")}/.android/debug.keystore")
+            storePassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -56,12 +66,13 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("debug") // Use debug signing for release
         }
 
         debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
@@ -186,6 +197,21 @@ tasks.named("ktfmtCheckMain") {
 
 tasks.named("ktfmtCheckTest") {
     dependsOn(tasks.named("ktfmtFormatTest"))
+}
+
+// Task to copy APKs to app/releases/
+tasks.register<Copy>("copyApks") {
+    // Ensure the APK is built before copying
+    dependsOn("assembleDebug") // Use "assembleRelease" for release builds, or both
+
+    from("$buildDir/outputs/apk/")
+    into("$projectDir/releases/")
+
+    include("**/*.apk")
+
+    doLast {
+        println("APKs copied to ${project.projectDir}/releases/")
+    }
 }
 
 // Dependencies
