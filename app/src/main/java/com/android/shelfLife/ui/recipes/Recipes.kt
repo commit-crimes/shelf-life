@@ -51,6 +51,7 @@ import com.android.shelfLife.R
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
+import com.android.shelfLife.model.recipe.RecipesRepository
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -87,15 +88,31 @@ fun RecipesScreen(
       drawerState = drawerState,
       householdViewModel = householdViewModel,
       navigationActions = navigationActions) {
-        // Filter the recipes based on the search query
-        val filteredRecipes =
-            if (query.isEmpty()) {
-              recipeList // Use the collected recipe list
-            } else {
-              recipeList.filter { recipe ->
-                recipe.name.contains(query, ignoreCase = true) // Filter by recipe name
-              }
+
+        //filtered based on selected filters
+        val filteredRecipesSelectedFilters =
+            if (selectedFilters.isEmpty()){
+                recipeList
+            }else{
+                recipeList.filter { recipe ->
+                    selectedFilters.any { filter ->
+                        recipe.recipeType == stringToSearchRecipeType(filter)
+                    }
+                }
             }
+
+        //Filtered based on searched query
+        val filteredRecipesQuery ={
+            if (query.isEmpty()){
+                recipeList
+            }else{
+                recipeList.filter { recipe ->
+                    recipe.name.contains(query, ignoreCase = true)}
+            }
+        }
+
+        //gets the intersection between the the filtered recipes based on the filters and the query
+        val filteredRecipes = filteredRecipesSelectedFilters.filter {it in filteredRecipesQuery()}
 
         if (selectedHousehold == null) {
           FirstTimeWelcomeScreen(navigationActions, householdViewModel)
@@ -318,4 +335,14 @@ fun RecipeItem(
     navigationActions.navigateTo(
         Screen.INDIVIDUAL_RECIPE) // Navigate to the individual recipe screen
   }
+}
+
+fun stringToSearchRecipeType(string: String): RecipesRepository.SearchRecipeType{
+    return when(string){
+        "Soon to expire" -> RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE
+        "Only household items" -> RecipesRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS
+        "High protein" -> RecipesRepository.SearchRecipeType.HIGH_PROTEIN
+        "Low calories" -> RecipesRepository.SearchRecipeType.LOW_CALORIE
+        else -> throw IllegalArgumentException("Unknown recipe type: $string")
+    }
 }
