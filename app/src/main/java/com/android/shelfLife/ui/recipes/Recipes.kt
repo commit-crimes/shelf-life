@@ -100,7 +100,6 @@ fun RecipesScreen(
                     }
                 }
             }
-
         //Filtered based on searched query
         val filteredRecipesQuery ={
             if (query.isEmpty()){
@@ -158,7 +157,7 @@ fun RecipesScreen(
                   if (filteredRecipes.isEmpty()) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        content = { Text(text = "No recipes available", modifier = Modifier) },
+                        content = { Text(text = "No recipes available", modifier = Modifier.testTag("noRecipesAvailableText")) },
                         contentAlignment = Alignment.Center)
                   } else {
                     // LazyColumn for displaying the list of filtered recipes
@@ -211,9 +210,7 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
             placeholder = {
               Text("Search recipes") // Placeholder text shown when the query is empty
             },
-            onSearch = {
-              // Logic to handle the search action can be added here if necessary
-            },
+            onSearch = {},
             active = isActive, // Determines whether the search bar is in an active state
             onActiveChange = { active -> isActive = active }, // Callback to update the active state
             modifier =
@@ -337,6 +334,21 @@ fun RecipeItem(
   }
 }
 
+/**
+ * Converts a string representation of a recipe type into a corresponding
+ * `RecipesRepository.SearchRecipeType` enumeration value.
+ *
+ * @param string A string describing the type of recipe to search for.
+ *               Possible values include:
+ *               - "Soon to expire": Recipes with ingredients that are nearing expiration.
+ *               - "Only household items": Recipes using only ingredients available in the household.
+ *               - "High protein": Recipes with a high protein content.
+ *               - "Low calories": Recipes with low caloric content.
+ *
+ * @return The corresponding `RecipesRepository.SearchRecipeType` enum value.
+ *
+ * @throws IllegalArgumentException If the input string does not match any known recipe type.
+ * */
 fun stringToSearchRecipeType(string: String): RecipesRepository.SearchRecipeType{
     return when(string){
         "Soon to expire" -> RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE
