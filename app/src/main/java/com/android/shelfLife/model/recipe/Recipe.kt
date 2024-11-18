@@ -10,6 +10,7 @@ data class Recipe(
     val time: Duration, // time it takes to cook
     val ingredients: List<Ingredient> =
         listOf(), // ingredients in recipe todo check with Alex about this
+    val recipeType : RecipesRepository.SearchRecipeType
 )
 
 data class Ingredient(
