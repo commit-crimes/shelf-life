@@ -127,6 +127,7 @@ class HouseholdViewModel(
             },
             onFailure = { exception ->
               Log.e("HouseholdViewModel", "Error adding household: $exception")
+              loadHouseholds()
             })
       }
     } else {

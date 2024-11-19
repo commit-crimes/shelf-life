@@ -25,6 +25,7 @@ fun DeletionConfirmationPopUp(
         onDismissRequest = { onDismiss() },
         title = { Text("Delete Household") },
         text = { Text("Are you sure you want to delete '${householdToDelete!!.name}'?") },
+        modifier = Modifier.testTag("DeleteConfirmationDialog"),
         confirmButton = {
           TextButton(
               onClick = {

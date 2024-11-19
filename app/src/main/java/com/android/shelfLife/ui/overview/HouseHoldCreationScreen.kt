@@ -204,7 +204,7 @@ fun HouseHoldCreationScreen(
                 }
 
                 FloatingActionButton(
-                    modifier = Modifier.padding(top = 20.dp, bottom = 20.dp),
+                    modifier = Modifier.padding(top = 20.dp, bottom = 20.dp).testTag("AddEmailFab"),
                     onClick = { showEmailTextField = !showEmailTextField },
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 ) {
