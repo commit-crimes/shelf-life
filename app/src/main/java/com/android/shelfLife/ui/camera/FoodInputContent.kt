@@ -225,6 +225,14 @@ fun FoodInputContent(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)) {
               Button(
+                  onClick = { onCancel() },
+                  colors =
+                      ButtonDefaults.buttonColors(
+                          containerColor = MaterialTheme.colorScheme.secondary),
+                  modifier = Modifier.weight(1f).height(50.dp).testTag("cancelButton")) {
+                    Text(text = "Cancel", fontSize = 18.sp)
+                  }
+              Button(
                   onClick = {
                     val isExpireDateValid = expireDateError == null && expireDate.isNotEmpty()
                     val isOpenDateValid = openDateError == null
@@ -248,6 +256,8 @@ fun FoodInputContent(
                               expiryDate = expiryTimestamp,
                               openDate = openTimestamp,
                               buyDate = buyTimestamp)
+
+                      Toast.makeText(context, "Food item added", Toast.LENGTH_SHORT).show()
                       onSubmit(newFoodItem)
                     } else {
                       Toast.makeText(
@@ -259,15 +269,6 @@ fun FoodInputContent(
                   },
                   modifier = Modifier.weight(1f).height(50.dp).testTag("submitButton")) {
                     Text(text = "Submit", fontSize = 18.sp)
-                  }
-
-              Button(
-                  onClick = { onCancel() },
-                  colors =
-                      ButtonDefaults.buttonColors(
-                          containerColor = MaterialTheme.colorScheme.secondary),
-                  modifier = Modifier.weight(1f).height(50.dp).testTag("cancelButton")) {
-                    Text(text = "Cancel", fontSize = 18.sp)
                   }
             }
       }
