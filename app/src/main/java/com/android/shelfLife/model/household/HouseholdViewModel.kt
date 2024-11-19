@@ -121,7 +121,10 @@ class HouseholdViewModel(
 
         repository.addHousehold(
             householdWithMembers,
-            onSuccess = { Log.d("HouseholdViewModel", "Household added successfully") },
+            onSuccess = {
+              Log.d("HouseholdViewModel", "Household added successfully")
+              loadHouseholds()
+            },
             onFailure = { exception ->
               Log.e("HouseholdViewModel", "Error adding household: $exception")
             })
@@ -129,7 +132,6 @@ class HouseholdViewModel(
     } else {
       Log.e("HouseholdViewModel", "User not logged in")
     }
-    loadHouseholds()
   }
 
   /**

@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.utils.DeletionConfirmationPopUp
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,7 +55,7 @@ fun HouseHoldCreationScreen(
   var emailInput by rememberSaveable { mutableStateOf("") }
   var showEmailTextField by remember { mutableStateOf(false) }
 
-  var columnScrollState = rememberScrollState()
+  val columnScrollState = rememberScrollState()
 
   // Initialize memberEmailList when memberEmails are fetched
   LaunchedEffect(memberEmails) {
@@ -76,6 +77,7 @@ fun HouseHoldCreationScreen(
   // Function to add email card to the list and scroll to the bottom
   fun addEmailCard() {
     if (emailInput.isNotBlank()) {
+      // TODO check if email is valid
       memberEmailList.add(emailInput.trim())
       emailInput = ""
     }
@@ -280,34 +282,15 @@ fun HouseHoldCreationScreen(
                     }
                   }
 
-              if (showConfirmationDialog) {
-                AlertDialog(
-                    modifier = Modifier.testTag("DeleteConfirmationDialog"),
-                    onDismissRequest = { showConfirmationDialog = false },
-                    title = { Text("Delete household") },
-                    text = { Text("Are you sure?") },
-                    confirmButton = {
-                      TextButton(
-                          modifier = Modifier.testTag("ConfirmDeleteButton"),
-                          onClick = {
-                            if (householdToEdit != null) {
-                              householdViewModel.deleteHouseholdById(householdToEdit!!.uid)
-                            }
-                            navigationActions.goBack()
-                            showConfirmationDialog = false
-                          }) {
-                            Text("Confirm")
-                          }
-                    },
-                    dismissButton = {
-                      TextButton(
-                          modifier = Modifier.testTag("CancelDeleteButton"),
-                          onClick = { showConfirmationDialog = false }) {
-                            Text("Cancel")
-                          }
-                    },
-                )
-              }
+              // Confirmation Dialog for Deletion
+              DeletionConfirmationPopUp(
+                  showDeleteDialog = showConfirmationDialog,
+                  onDismiss = { showConfirmationDialog = false },
+                  onConfirm = {
+                    navigationActions.goBack()
+                    showConfirmationDialog = false
+                  },
+                  householdViewModel = householdViewModel)
             }
       }
 }
