@@ -41,9 +41,6 @@
     <string name="error_message_ingredient_quantity">Incomplete quantity</string>
     <string name="add_ingredient">Add Ingredient</string>
 
-    context.getString(R.string.error_message_instructions)
-
-
     <string name="cancel_button">Cancel</string>
     <string name="add_button">Add</string>
 
