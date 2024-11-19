@@ -45,15 +45,15 @@ fun HouseHoldCreationScreen(
   val householdToEdit by householdViewModel.householdToEdit.collectAsState()
   val memberEmails by householdViewModel.memberEmails.collectAsState()
 
-  var isError by remember { mutableStateOf(false) }
+  var isError by rememberSaveable { mutableStateOf(false) }
   var houseHoldName by rememberSaveable { mutableStateOf(householdToEdit?.name ?: "") }
 
-  var showConfirmationDialog by remember { mutableStateOf(false) }
+  var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
 
   // Mutable state list to hold member emails
-  val memberEmailList = remember { mutableStateListOf<String>() }
+  val memberEmailList = rememberSaveable { mutableStateListOf<String>() }
   var emailInput by rememberSaveable { mutableStateOf("") }
-  var showEmailTextField by remember { mutableStateOf(false) }
+  var showEmailTextField by rememberSaveable { mutableStateOf(false) }
 
   val columnScrollState = rememberScrollState()
 
