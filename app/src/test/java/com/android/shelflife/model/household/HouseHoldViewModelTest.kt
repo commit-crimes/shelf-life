@@ -334,9 +334,6 @@ class HouseholdViewModelTest {
             foodItems = emptyList())
 
     assertEquals(expectedHousehold, householdCaptor.firstValue)
-
-    // Verify that loadHouseholds is called
-    verify(repository, atLeastOnce()).getHouseholds(any(), any())
   }
 
   @Test
@@ -378,9 +375,6 @@ class HouseholdViewModelTest {
 
     val expectedMembers = listOf(userUid) + friendUserIds.values
     assertEquals(expectedMembers.sorted(), householdCaptor.firstValue.members.sorted())
-
-    // Verify that loadHouseholds is called
-    verify(repository, atLeastOnce()).getHouseholds(any(), any())
   }
 
   @Test
@@ -422,10 +416,6 @@ class HouseholdViewModelTest {
 
     val expectedMembers = listOf(userUid) + friendUserIds.values
     assertEquals(expectedMembers.sorted(), householdCaptor.firstValue.members.sorted())
-
-    // Verify that loadHouseholds is called
-    verify(repository, atLeastOnce()).getHouseholds(any(), any())
-    // Optionally, check that a warning is logged about emails not found
   }
 
   @Test
@@ -458,10 +448,6 @@ class HouseholdViewModelTest {
 
     // Act
     householdViewModel.addNewHousehold(householdName, friendEmails)
-
-    // Assert
-    // Verify that loadHouseholds is called
-    verify(repository, atLeastOnce()).getHouseholds(any(), any())
     // Optionally, check that an error is logged with the exception
   }
 

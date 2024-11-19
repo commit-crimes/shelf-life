@@ -186,7 +186,7 @@ class HouseholdViewModel(
     _households.value
         .find { it.uid == householdId }
         ?.let { _households.value = _households.value.minus(it) }
-    if (householdId == _selectedHousehold.value!!.uid) {
+    if (_selectedHousehold.value == null || householdId == _selectedHousehold.value!!.uid) {
       // If the deleted household was selected, deselect it
       selectHousehold(_households.value.firstOrNull())
     }
