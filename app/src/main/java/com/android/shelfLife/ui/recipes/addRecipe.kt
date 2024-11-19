@@ -270,7 +270,8 @@ fun AddRecipeScreen(
                                       servings = servings.toInt(),
                                       time = (time.toDouble() * 60.0).seconds,
                                       ingredients = ingredients.toList(),
-                                      recipeType = RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE))
+                                      recipeType =
+                                          RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE))
                           navigationActions.goBack()
                         } else {
                           // if not a Toast appears

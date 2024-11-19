@@ -89,29 +89,28 @@ fun RecipesScreen(
       householdViewModel = householdViewModel,
       navigationActions = navigationActions) {
 
-        //filtered based on selected filters
+        // filtered based on selected filters
         val filteredRecipesSelectedFilters =
-            if (selectedFilters.isEmpty()){
-                recipeList
-            }else{
-                recipeList.filter { recipe ->
-                    selectedFilters.any { filter ->
-                        recipe.recipeType == stringToSearchRecipeType(filter)
-                    }
+            if (selectedFilters.isEmpty()) {
+              recipeList
+            } else {
+              recipeList.filter { recipe ->
+                selectedFilters.any { filter ->
+                  recipe.recipeType == stringToSearchRecipeType(filter)
                 }
+              }
             }
-        //Filtered based on searched query
-        val filteredRecipesQuery ={
-            if (query.isEmpty()){
-                recipeList
-            }else{
-                recipeList.filter { recipe ->
-                    recipe.name.contains(query, ignoreCase = true)}
-            }
+        // Filtered based on searched query
+        val filteredRecipesQuery = {
+          if (query.isEmpty()) {
+            recipeList
+          } else {
+            recipeList.filter { recipe -> recipe.name.contains(query, ignoreCase = true) }
+          }
         }
 
-        //gets the intersection between the the filtered recipes based on the filters and the query
-        val filteredRecipes = filteredRecipesSelectedFilters.filter {it in filteredRecipesQuery()}
+        // gets the intersection between the the filtered recipes based on the filters and the query
+        val filteredRecipes = filteredRecipesSelectedFilters.filter { it in filteredRecipesQuery() }
 
         if (selectedHousehold == null) {
           FirstTimeWelcomeScreen(navigationActions, householdViewModel)
@@ -157,7 +156,11 @@ fun RecipesScreen(
                   if (filteredRecipes.isEmpty()) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        content = { Text(text = "No recipes available", modifier = Modifier.testTag("noRecipesAvailableText")) },
+                        content = {
+                          Text(
+                              text = "No recipes available",
+                              modifier = Modifier.testTag("noRecipesAvailableText"))
+                        },
                         contentAlignment = Alignment.Center)
                   } else {
                     // LazyColumn for displaying the list of filtered recipes
@@ -338,23 +341,21 @@ fun RecipeItem(
  * Converts a string representation of a recipe type into a corresponding
  * `RecipesRepository.SearchRecipeType` enumeration value.
  *
- * @param string A string describing the type of recipe to search for.
- *               Possible values include:
- *               - "Soon to expire": Recipes with ingredients that are nearing expiration.
- *               - "Only household items": Recipes using only ingredients available in the household.
- *               - "High protein": Recipes with a high protein content.
- *               - "Low calories": Recipes with low caloric content.
+ * @param string A string describing the type of recipe to search for. Possible values include:
+ *     - "Soon to expire": Recipes with ingredients that are nearing expiration.
+ *     - "Only household items": Recipes using only ingredients available in the household.
+ *     - "High protein": Recipes with a high protein content.
+ *     - "Low calories": Recipes with low caloric content.
  *
  * @return The corresponding `RecipesRepository.SearchRecipeType` enum value.
- *
  * @throws IllegalArgumentException If the input string does not match any known recipe type.
- * */
-fun stringToSearchRecipeType(string: String): RecipesRepository.SearchRecipeType{
-    return when(string){
-        "Soon to expire" -> RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE
-        "Only household items" -> RecipesRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS
-        "High protein" -> RecipesRepository.SearchRecipeType.HIGH_PROTEIN
-        "Low calories" -> RecipesRepository.SearchRecipeType.LOW_CALORIE
-        else -> throw IllegalArgumentException("Unknown recipe type: $string")
-    }
+ */
+fun stringToSearchRecipeType(string: String): RecipesRepository.SearchRecipeType {
+  return when (string) {
+    "Soon to expire" -> RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE
+    "Only household items" -> RecipesRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS
+    "High protein" -> RecipesRepository.SearchRecipeType.HIGH_PROTEIN
+    "Low calories" -> RecipesRepository.SearchRecipeType.LOW_CALORIE
+    else -> throw IllegalArgumentException("Unknown recipe type: $string")
+  }
 }
