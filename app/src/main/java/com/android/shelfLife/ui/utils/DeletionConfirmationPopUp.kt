@@ -30,10 +30,6 @@ fun DeletionConfirmationPopUp(
           TextButton(
               onClick = {
                 householdViewModel.deleteHouseholdById(householdToDelete!!.uid)
-                if (householdToDelete == selectedHousehold) {
-                  // If the deleted household was selected, deselect it
-                  householdViewModel.selectHousehold(null)
-                }
                 onConfirm()
               },
               modifier = Modifier.testTag("confirmDeleteHouseholdButton")) {

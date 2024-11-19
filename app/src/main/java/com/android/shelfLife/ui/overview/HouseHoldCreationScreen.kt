@@ -64,6 +64,7 @@ fun HouseHoldCreationScreen(
   // Initialize memberEmailList when memberEmails are fetched
   LaunchedEffect(memberEmails) { memberEmailList.addAll(memberEmails.values) }
 
+  // Scroll to the bottom and focus on the email input field when the email input field is shown
   LaunchedEffect(showEmailTextField) {
     if (showEmailTextField) {
       coroutineScope.launch { columnScrollState.animateScrollTo(columnScrollState.maxValue) }
