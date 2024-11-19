@@ -59,13 +59,14 @@ open class ListRecipesViewModel() : ViewModel() {
                   instructions = listOf("cook"),
                   servings = 4,
                   time = 5400.seconds, // 5400 seconds = 90 minutes
-                  recipeType = RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE),
+                  recipeTypes = listOf(RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE)),
               Recipe(
                   name = "Fideua",
                   instructions = listOf("cry"),
                   servings = 3,
                   time = 60.minutes, // 3600 seconds = 60 minutes
-                  recipeType = RecipesRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS),
+                  recipeTypes =
+                      listOf(RecipesRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS)),
               Recipe(
                   name = "Tortilla de patata",
                   instructions =
@@ -97,26 +98,29 @@ open class ListRecipesViewModel() : ViewModel() {
                                   quantity = Quantity(amount = 20.75, unit = FoodUnit.ML)),
                               true),
                       ),
-                  recipeType = RecipesRepository.SearchRecipeType.HIGH_PROTEIN),
+                  recipeTypes = listOf(RecipesRepository.SearchRecipeType.HIGH_PROTEIN)),
               Recipe(
                   name = "Costillas a la brasa",
                   instructions = listOf("cry"),
                   servings = 3,
                   time = 60.minutes, // 3600 seconds = 60 minutes
-                  recipeType = RecipesRepository.SearchRecipeType.LOW_CALORIE),
+                  recipeTypes =
+                      listOf(
+                          RecipesRepository.SearchRecipeType.LOW_CALORIE,
+                          RecipesRepository.SearchRecipeType.HIGH_PROTEIN)),
               Recipe(
                   name = "Curry rojo",
                   instructions = listOf("cook"),
                   servings = 4,
                   time = 5400.seconds, // 5400 seconds = 90 minutes
-                  recipeType = RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE),
+                  recipeTypes = listOf(RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE)),
               Recipe(
                   name = "Butifarra con boniato al horno",
                   instructions = listOf("cry"),
                   servings = 3,
                   time = 3600.seconds, // 3600 seconds = 60 minutes
                   // it has an extra long name to show the ... in the card
-                  recipeType = RecipesRepository.SearchRecipeType.LOW_CALORIE)))
+                  recipeTypes = listOf(RecipesRepository.SearchRecipeType.LOW_CALORIE))))
 
   val recipes: StateFlow<List<Recipe>> = recipes_.asStateFlow()
 
@@ -142,9 +146,9 @@ open class ListRecipesViewModel() : ViewModel() {
       instructions: List<String>,
       servings: Int,
       time: Duration,
-      recipeType: RecipesRepository.SearchRecipeType
+      recipeTypes: List<RecipesRepository.SearchRecipeType>
   ) {
-    val newRecipe = Recipe(name, instructions, servings, time, recipeType = recipeType)
+    val newRecipe = Recipe(name, instructions, servings, time, recipeTypes = recipeTypes)
     recipes_.value += newRecipe
   }
 

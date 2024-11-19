@@ -75,6 +75,10 @@ class OpenAiRecipesRepository(
       RecipesRepository.SearchRecipeType.LOW_CALORIE -> {
         LOW_CALORIE_SYSTEM_PROMPT to "$LOW_CALORIE_USER_PROMPT$foodItemsNames."
       }
+      RecipesRepository.SearchRecipeType.PERSONAL -> {
+        throw IllegalArgumentException(
+            "SearchRecipeType.PERSONAL is not supported in getPromptsForMode.")
+      }
     }
   }
 
@@ -158,7 +162,7 @@ class OpenAiRecipesRepository(
                   servings = toolResponse.servings,
                   time = toolResponse.time,
                   ingredients = toolResponse.ingredients,
-                  recipeType = searchRecipeType)
+                  recipeTypes = listOf(searchRecipeType))
 
           onSuccess(listOf(generatedRecipe)) // Return the generated recipe
         } ?: onFailure(Exception("No tool call generated"))
@@ -201,6 +205,6 @@ class OpenAiRecipesRepository(
         instructions = instructions,
         servings = servings,
         time = time,
-        recipeType = recipeType)
+        recipeTypes = listOf(recipeType))
   }
 }

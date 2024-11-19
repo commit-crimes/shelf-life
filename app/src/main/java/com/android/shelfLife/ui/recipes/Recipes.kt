@@ -81,7 +81,8 @@ fun RecipesScreen(
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
 
-  val filters = listOf("Soon to expire", "Only household items", "High protein", "Low calories")
+  val filters =
+      listOf("Soon to expire", "Only household items", "High protein", "Low calories", "Personal")
 
   HouseHoldSelectionDrawer(
       scope = scope,
@@ -96,7 +97,9 @@ fun RecipesScreen(
             } else {
               recipeList.filter { recipe ->
                 selectedFilters.any { filter ->
-                  recipe.recipeType == stringToSearchRecipeType(filter)
+                  recipe.recipeTypes.any { recipeType ->
+                    recipeType == stringToSearchRecipeType(filter)
+                  }
                 }
               }
             }
@@ -356,6 +359,7 @@ fun stringToSearchRecipeType(string: String): RecipesRepository.SearchRecipeType
     "Only household items" -> RecipesRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS
     "High protein" -> RecipesRepository.SearchRecipeType.HIGH_PROTEIN
     "Low calories" -> RecipesRepository.SearchRecipeType.LOW_CALORIE
+    "Personal" -> RecipesRepository.SearchRecipeType.PERSONAL
     else -> throw IllegalArgumentException("Unknown recipe type: $string")
   }
 }
