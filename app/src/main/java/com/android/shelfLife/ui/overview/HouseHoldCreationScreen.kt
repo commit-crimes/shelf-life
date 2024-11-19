@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -70,6 +71,16 @@ fun HouseHoldCreationScreen(
   // Fetch member emails when the screen is opened for editing
   LaunchedEffect(householdToEdit) {
     householdToEdit?.let { householdViewModel.selectHouseholdToEdit(it) }
+  }
+
+  // Function to add email card to the list and scroll to the bottom
+  fun addEmailCard() {
+    if (emailInput.isNotBlank()) {
+      memberEmailList.add(emailInput.trim())
+      emailInput = ""
+    }
+    showEmailTextField = false
+    coroutineScope.launch { columnScrollState.scrollTo(columnScrollState.maxValue) }
   }
 
   Scaffold(
@@ -178,18 +189,10 @@ fun HouseHoldCreationScreen(
                             label = { Text("Friend's Email") },
                             placeholder = { Text("Enter email") },
                             singleLine = true,
+                            keyboardActions = KeyboardActions(onDone = { addEmailCard() }),
                             modifier = Modifier.weight(1f).testTag("EmailInputField"))
                         IconButton(
-                            onClick = {
-                              if (emailInput.isNotBlank()) {
-                                memberEmailList.add(emailInput.trim())
-                                emailInput = ""
-                              }
-                              showEmailTextField = false
-                              coroutineScope.launch {
-                                columnScrollState.scrollTo(columnScrollState.maxValue)
-                              }
-                            },
+                            onClick = { addEmailCard() },
                             modifier = Modifier.testTag("AddEmailButton")) {
                               Icon(
                                   imageVector = Icons.Default.Check,
