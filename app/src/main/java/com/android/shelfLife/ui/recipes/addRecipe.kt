@@ -1,7 +1,6 @@
 package com.android.shelfLife.ui.recipes
 
 import android.annotation.SuppressLint
-import android.provider.Settings.Global.getString
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -45,7 +44,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContentProviderCompat.requireContext
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
@@ -131,7 +129,9 @@ fun AddRecipeScreen(
                 value = title,
                 onValueChange = {
                   title = it
-                    titleError = if (title.isEmpty()) context.getString(R.string.error_message_title_of_recipe) else null // todo add the string.xlm
+                  titleError =
+                      if (title.isEmpty()) context.getString(R.string.error_message_title_of_recipe)
+                      else null
                 },
                 label = { Text(stringResource(R.string.title_of_recipe)) },
                 modifier =
@@ -147,7 +147,9 @@ fun AddRecipeScreen(
                 value = servings,
                 onValueChange = {
                   servings = it
-                  servingsError = if (servings.isEmpty()) context.getString(R.string.error_message_servings) else null // todo add the string.xlm
+                  servingsError =
+                      if (servings.isEmpty()) context.getString(R.string.error_message_servings)
+                      else null
                 },
                 label = { Text(stringResource(R.string.servings)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -166,7 +168,8 @@ fun AddRecipeScreen(
                 value = time,
                 onValueChange = {
                   time = it
-                  timeError = if (time.isEmpty()) context.getString(R.string.error_message_time) else null // todo add the string.xlm
+                  timeError =
+                      if (time.isEmpty()) context.getString(R.string.error_message_time) else null
                 },
                 label = { Text(stringResource(R.string.time)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -180,7 +183,9 @@ fun AddRecipeScreen(
           // recipe Ingredients
           item {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-              Text(text = stringResource(R.string.ingredients), modifier = Modifier.testTag("ingredientSection"))
+              Text(
+                  text = stringResource(R.string.ingredients),
+                  modifier = Modifier.testTag("ingredientSection"))
             }
           }
 
@@ -210,7 +215,9 @@ fun AddRecipeScreen(
           // recipe instructions
           item {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-              Text(text = stringResource(R.string.instructions), modifier = Modifier.testTag("instructionSection"))
+              Text(
+                  text = stringResource(R.string.instructions),
+                  modifier = Modifier.testTag("instructionSection"))
             }
           }
 
@@ -286,7 +293,10 @@ fun AddRecipeScreen(
                       modifier = Modifier.height(40.dp).testTag("addButton"),
                       colors =
                           ButtonDefaults.buttonColors(containerColor = primaryContainerLight)) {
-                        Text(text = stringResource(R.string.add_button), fontSize = 18.sp, color = onSecondaryDark)
+                        Text(
+                            text = stringResource(R.string.add_button),
+                            fontSize = 18.sp,
+                            color = onSecondaryDark)
                       }
                 }
           }
@@ -329,18 +339,19 @@ fun InstructionItem(
     onInstructionChange: (String) -> Unit,
     onRemoveClick: () -> Unit
 ) {
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    var instructionError by remember { mutableStateOf<String?>(null) }
+  var instructionError by remember { mutableStateOf<String?>(null) }
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
     OutlinedTextField(
         value = instruction,
         onValueChange = { newInstruction ->
           onInstructionChange(newInstruction)
-          instructionError = if (newInstruction.isEmpty()) context.getString(R.string.error_message_instructions) else null // todo add the string.xlm
+          instructionError =
+              if (newInstruction.isEmpty()) context.getString(R.string.error_message_instructions)
+              else null
         },
-
-        label = { Text(stringResource(R.string.instruction_step, index+1)) },
+        label = { Text(stringResource(R.string.instruction_step, index + 1)) },
         modifier = Modifier.weight(1f).testTag("inputRecipeInstruction"))
     IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteInstructionButton")) {
       Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Step")
@@ -374,7 +385,7 @@ fun IngredientItem(index: Int, ingredient: Ingredient, onRemoveClick: () -> Unit
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
     // title of ingredient
     Text(
-        text = stringResource(R.string.ingredient_item, index+1),
+        text = stringResource(R.string.ingredient_item, index + 1, ingredient.foodFacts.name),
         modifier = Modifier.testTag("ingredientItem"))
     // delete button
     IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteIngredientButton")) {
@@ -422,7 +433,10 @@ fun IngredientDialog(
               value = ingredientName,
               onValueChange = {
                 ingredientName = it
-                ingredientNameError = if (ingredientName.isEmpty()) context.getString(R.string.error_message_ingredient_name) else null // todo add the string.xlm
+                ingredientNameError =
+                    if (ingredientName.isEmpty())
+                        context.getString(R.string.error_message_ingredient_name)
+                    else null
               },
               label = { Text(stringResource(R.string.ingredient_name)) },
               modifier = Modifier.fillMaxWidth().testTag("inputIngredientName"))
@@ -434,7 +448,10 @@ fun IngredientDialog(
               value = ingredientQuantity,
               onValueChange = {
                 ingredientQuantity = it
-                quantityError = if (ingredientQuantity.isEmpty()) context.getString(R.string.error_message_ingredient_quantity) else null // todo add the string.xlm
+                quantityError =
+                    if (ingredientQuantity.isEmpty())
+                        context.getString(R.string.error_message_ingredient_quantity)
+                    else null
               },
               label = { Text(stringResource(R.string.ingredient_quantity)) },
               keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),

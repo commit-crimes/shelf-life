@@ -34,7 +34,7 @@
     <string name="instructions">Instructions</string>
     <string name="error_message_instructions">Incomplete instruction</string>
     <string name="instruction_step">Step %1$s</string>
-    <string name="ingredient_item">Ingredient%1$s</string>
+    <string name="ingredient_item">Ingredient%1$s : %2$s</string>
     <string name="ingredient_name">Ingredient Name</string>
     <string name="error_message_ingredient_name">Incomplete name</string>
     <string name="ingredient_quantity">Quantity</string>
