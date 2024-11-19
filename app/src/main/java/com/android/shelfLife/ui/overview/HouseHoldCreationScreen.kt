@@ -23,6 +23,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
@@ -51,21 +53,21 @@ fun HouseHoldCreationScreen(
   var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
 
   // Mutable state list to hold member emails
-  val memberEmailList = rememberSaveable { mutableStateListOf<String>() }
+  val memberEmailList = rememberSaveable { mutableSetOf<String>() }
   var emailInput by rememberSaveable { mutableStateOf("") }
   var showEmailTextField by rememberSaveable { mutableStateOf(false) }
 
   val columnScrollState = rememberScrollState()
 
+  val focusRequester = remember { FocusRequester() }
+
   // Initialize memberEmailList when memberEmails are fetched
-  LaunchedEffect(memberEmails) {
-    memberEmailList.clear()
-    memberEmailList.addAll(memberEmails.values)
-  }
+  LaunchedEffect(memberEmails) { memberEmailList.addAll(memberEmails.values) }
 
   LaunchedEffect(showEmailTextField) {
     if (showEmailTextField) {
       coroutineScope.launch { columnScrollState.animateScrollTo(columnScrollState.maxValue) }
+      focusRequester.requestFocus()
     }
   }
 
@@ -152,7 +154,7 @@ fun HouseHoldCreationScreen(
                           .verticalScroll(columnScrollState)
                           .weight(1f),
               ) {
-                memberEmailList.forEachIndexed { index, email ->
+                memberEmailList.forEach { email ->
                   ElevatedCard(
                       elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
                       modifier =
@@ -169,7 +171,7 @@ fun HouseHoldCreationScreen(
                                   style = TextStyle(fontSize = 16.sp),
                                   modifier = Modifier.weight(1f))
                               IconButton(
-                                  onClick = { memberEmailList.removeAt(index) },
+                                  onClick = { memberEmailList.remove(email) },
                                   modifier = Modifier.testTag("RemoveEmailButton")) {
                                     Icon(
                                         imageVector = Icons.Default.Delete,
@@ -184,7 +186,9 @@ fun HouseHoldCreationScreen(
                   Row(
                       verticalAlignment = Alignment.CenterVertically,
                       modifier =
-                          Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+                          Modifier.fillMaxWidth()
+                              .padding(horizontal = 16.dp, vertical = 8.dp)
+                              .focusRequester(focusRequester)) {
                         OutlinedTextField(
                             value = emailInput,
                             onValueChange = { emailInput = it },
@@ -232,7 +236,8 @@ fun HouseHoldCreationScreen(
                             isError = true
                           } else {
                             coroutineScope.launch {
-                              householdViewModel.getUserIdsByEmails(memberEmailList) { emailToUid ->
+                              householdViewModel.getUserIdsByEmails(memberEmailList.toList()) {
+                                  emailToUid ->
                                 val missingEmails =
                                     memberEmailList.filter { it !in emailToUid.keys }
                                 if (missingEmails.isNotEmpty()) {
@@ -247,7 +252,8 @@ fun HouseHoldCreationScreen(
                                           name = houseHoldName, members = memberUids)
                                   householdViewModel.updateHousehold(updatedHouseHold)
                                 } else {
-                                  householdViewModel.addNewHousehold(houseHoldName, memberEmailList)
+                                  householdViewModel.addNewHousehold(
+                                      houseHoldName, memberEmailList.toList())
                                 }
                                 navigationActions.goBack()
                               }
