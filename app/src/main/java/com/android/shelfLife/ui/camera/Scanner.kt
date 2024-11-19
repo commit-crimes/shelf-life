@@ -164,11 +164,8 @@ fun BarcodeScannerScreen(
                     CameraPreviewView(
                         modifier = Modifier.fillMaxSize(),
                         onBarcodeScanned = { scannedBarcode ->
-                          Log.d("BarcodeScanner", "Scanned barcode: $scannedBarcode")
+                          Log.i("BarcodeScanner", "Scanned barcode: $scannedBarcode")
                           beep()
-                          Toast.makeText(
-                                  context, "Scanned barcode: $scannedBarcode", Toast.LENGTH_SHORT)
-                              .show()
                           barcodeScanned.value = scannedBarcode
                           isScanningState.value = false
                           searchInProgress.value = true
@@ -200,7 +197,7 @@ fun BarcodeScannerScreen(
           foodScanned.value = true
           coroutineScope.launch { sheetScaffoldState.bottomSheetState.expand() }
         } else {
-          Toast.makeText(context, "Food Not Found", Toast.LENGTH_SHORT).show()
+          Toast.makeText(context, "Food Not Found in Database", Toast.LENGTH_SHORT).show()
           navigationActions.navigateTo(Screen.ADD_FOOD)
         }
         // Reset states
@@ -209,7 +206,8 @@ fun BarcodeScannerScreen(
         foodFactsViewModel.resetSearchStatus()
       }
       is SearchStatus.Failure -> {
-        Toast.makeText(context, "Search failed", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Search failed, check internet connection", Toast.LENGTH_SHORT)
+            .show()
         barcodeScanned.value = null
         searchInProgress.value = false
         foodFactsViewModel.resetSearchStatus()
