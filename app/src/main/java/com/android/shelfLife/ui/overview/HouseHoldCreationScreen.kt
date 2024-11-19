@@ -1,6 +1,7 @@
 package com.android.shelfLife.ui.overview
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,8 +9,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
@@ -47,11 +51,20 @@ fun HouseHoldCreationScreen(
   // Mutable state list to hold member emails
   val memberEmailList = remember { mutableStateListOf<String>() }
   var emailInput by rememberSaveable { mutableStateOf("") }
+  var showEmailTextField by remember { mutableStateOf(false) }
+
+  var columnScrollState = rememberScrollState()
 
   // Initialize memberEmailList when memberEmails are fetched
   LaunchedEffect(memberEmails) {
     memberEmailList.clear()
     memberEmailList.addAll(memberEmails.values)
+  }
+
+  LaunchedEffect(showEmailTextField) {
+    if (showEmailTextField) {
+      coroutineScope.launch { columnScrollState.animateScrollTo(columnScrollState.maxValue) }
+    }
   }
 
   // Fetch member emails when the screen is opened for editing
@@ -118,55 +131,88 @@ fun HouseHoldCreationScreen(
                       Modifier.fillMaxWidth().padding(top = 20.dp).testTag("HouseHoldMembersText"))
 
               // Display the list of member emails
-              Column(modifier = Modifier.fillMaxWidth()) {
+              Column(
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .padding(top = 20.dp)
+                          .verticalScroll(columnScrollState)
+                          .weight(1f),
+              ) {
                 memberEmailList.forEachIndexed { index, email ->
-                  Row(
-                      verticalAlignment = Alignment.CenterVertically,
+                  ElevatedCard(
+                      elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
                       modifier =
-                          Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 8.dp)) {
-                        Text(
-                            text = email,
-                            style = TextStyle(fontSize = 16.sp),
-                            modifier = Modifier.weight(1f))
-                        IconButton(
-                            onClick = { memberEmailList.removeAt(index) },
-                            modifier = Modifier.testTag("RemoveEmailButton")) {
-                              Icon(
-                                  imageVector = Icons.Default.Delete,
-                                  contentDescription = "Remove Email")
+                          Modifier.fillMaxWidth()
+                              .padding(horizontal = 16.dp, vertical = 8.dp)
+                              .background(MaterialTheme.colorScheme.background)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier =
+                                Modifier.fillMaxWidth()
+                                    .padding(horizontal = 20.dp, vertical = 8.dp)) {
+                              Text(
+                                  text = email,
+                                  style = TextStyle(fontSize = 16.sp),
+                                  modifier = Modifier.weight(1f))
+                              IconButton(
+                                  onClick = { memberEmailList.removeAt(index) },
+                                  modifier = Modifier.testTag("RemoveEmailButton")) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "Remove Email")
+                                  }
                             }
                       }
                 }
+
+                if (showEmailTextField) {
+                  // Email input field and add button
+                  Row(
+                      verticalAlignment = Alignment.CenterVertically,
+                      modifier =
+                          Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+                        OutlinedTextField(
+                            value = emailInput,
+                            onValueChange = { emailInput = it },
+                            label = { Text("Friend's Email") },
+                            placeholder = { Text("Enter email") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f).testTag("EmailInputField"))
+                        IconButton(
+                            onClick = {
+                              if (emailInput.isNotBlank()) {
+                                memberEmailList.add(emailInput.trim())
+                                emailInput = ""
+                              }
+                              showEmailTextField = false
+                              coroutineScope.launch {
+                                columnScrollState.scrollTo(columnScrollState.maxValue)
+                              }
+                            },
+                            modifier = Modifier.testTag("AddEmailButton")) {
+                              Icon(
+                                  imageVector = Icons.Default.Check,
+                                  contentDescription = "Add Email")
+                            }
+                      }
+                }
+
+                FloatingActionButton(
+                    modifier = Modifier.padding(top = 20.dp, bottom = 20.dp),
+                    onClick = { showEmailTextField = !showEmailTextField },
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                ) {
+                  Icon(
+                      imageVector = Icons.Default.Add,
+                      contentDescription = "Add Email",
+                      tint = MaterialTheme.colorScheme.onSecondaryContainer)
+                }
               }
-
-              // Email input field and add button
-              Row(
-                  verticalAlignment = Alignment.CenterVertically,
-                  modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 8.dp)) {
-                    OutlinedTextField(
-                        value = emailInput,
-                        onValueChange = { emailInput = it },
-                        label = { Text("Friend's Email") },
-                        placeholder = { Text("Enter email") },
-                        modifier = Modifier.weight(1f).testTag("EmailInputField"))
-                    IconButton(
-                        onClick = {
-                          if (emailInput.isNotBlank()) {
-                            memberEmailList.add(emailInput.trim())
-                            emailInput = ""
-                          }
-                        },
-                        modifier = Modifier.testTag("AddEmailButton")) {
-                          Icon(imageVector = Icons.Default.Add, contentDescription = "Add Email")
-                        }
-                  }
-
-              // Spacer to push buttons to the bottom
-              Spacer(modifier = Modifier.weight(1f))
 
               // Confirm and Cancel buttons
               Row(
-                  modifier = Modifier.fillMaxSize().padding(top = 25.dp, bottom = 60.dp),
+                  modifier = Modifier.fillMaxWidth().padding(top = 25.dp, bottom = 60.dp),
                   verticalAlignment = Alignment.Bottom,
                   horizontalArrangement = Arrangement.SpaceBetween) {
                     Button(
