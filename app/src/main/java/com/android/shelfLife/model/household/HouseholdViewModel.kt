@@ -1,20 +1,26 @@
 package com.android.shelfLife.model.household
 
 import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.foodItem.FoodItem
-import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class HouseholdViewModel(
     private val repository: HouseHoldRepository,
-    private val listFoodItemsViewModel: ListFoodItemsViewModel
+    private val listFoodItemsViewModel: ListFoodItemsViewModel,
+    private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
   private val _households = MutableStateFlow<List<HouseHold>>(emptyList())
   var households: StateFlow<List<HouseHold>> = _households.asStateFlow()
@@ -30,12 +36,29 @@ class HouseholdViewModel(
 
   var finishedLoading = MutableStateFlow(false)
 
+  val KEY = stringPreferencesKey("household_uid")
+
   /** Initializes the HouseholdViewModel by loading the list of households from the repository. */
   init {
+    Log.d("HouseholdViewModel", "Initializing HouseholdViewModel")
     FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
       if (firebaseAuth.currentUser != null) {
         loadHouseholds()
       }
+    }
+  }
+
+  /** Save the selected household UID to DataStore. */
+  private suspend fun saveSelectedHouseholdUid(uid: String?) {
+    Log.d("HouseholdViewModel", "Saving selected household UID: $uid")
+    dataStore.edit { preferences -> preferences[KEY] = uid ?: "" }
+  }
+
+  /** Load the selected household UID from DataStore. */
+  private fun loadSelectedHouseholdUid(callback: (String?) -> Unit) {
+    viewModelScope.launch {
+      val uid = dataStore.data.map { preferences -> preferences[KEY] }.first()
+      callback(uid)
     }
   }
 
@@ -45,16 +68,19 @@ class HouseholdViewModel(
 
   /** Loads the list of households from the repository and updates the [_households] flow. */
   private fun loadHouseholds() {
+    Log.d("HouseholdViewModel", "Loading households  ${Throwable().stackTrace[1]}")
     repository.getHouseholds(
         onSuccess = { householdList ->
           _households.value = householdList
           Log.d("HouseholdViewModel", "Households loaded successfully")
           Log.d("HouseholdViewModel", "Selected household: ${_selectedHousehold.value}")
-          if (_selectedHousehold.value == null) {
-            selectHousehold(householdList.firstOrNull()) // Default to the first household
+          loadSelectedHouseholdUid { uid ->
+            if (uid != null) {
+              selectHousehold(householdList.find { it.uid == uid } ?: householdList.firstOrNull())
+            }
+            updateSelectedHousehold()
+            finishedLoading.value = true
           }
-          updateSelectedHousehold()
-          finishedLoading.value = true
         },
         onFailure = { exception ->
           Log.e("HouseholdViewModel", "Error loading households: $exception")
@@ -63,6 +89,7 @@ class HouseholdViewModel(
   }
 
   private fun updateViewModelStateWithHousehold(household: HouseHold) {
+    Log.d("HouseholdViewModel", "Updating view model state with household: $household")
     val currentHouseholds = _households.value
     val existingHousehold = currentHouseholds.find { it.uid == household.uid }
 
@@ -76,6 +103,7 @@ class HouseholdViewModel(
 
     // Update the selected household if necessary
     if (_selectedHousehold.value == null) {
+      Log.d("HouseholdViewModel", "Selected household is null")
       selectHousehold(_households.value.firstOrNull()) // Default to the first household
     } else {
       updateSelectedHousehold()
@@ -83,13 +111,14 @@ class HouseholdViewModel(
   }
 
   /**
-   * Updates the selected household with the latest data from the list of households using the uid,
-   * we may need to add another uid than the name.
+   * Updates the selected household with the latest data from the list of households using the uid.
    */
   private fun updateSelectedHousehold() {
-    selectedHousehold.value?.let { selectedHousehold ->
+    Log.d("HouseholdViewModel", "Updating selected household")
+    _selectedHousehold.value?.let { selectedHousehold ->
       val updatedHousehold = _households.value.find { it.uid == selectedHousehold.uid }
       _selectedHousehold.value = updatedHousehold
+      Log.d("HouseholdViewModel", "Selected household updated: $updatedHousehold")
       listFoodItemsViewModel.setFoodItems(_selectedHousehold.value!!.foodItems)
     }
   }
@@ -100,7 +129,17 @@ class HouseholdViewModel(
    * @param household - The household to select.
    */
   fun selectHousehold(household: HouseHold?) {
+    // Save the selected household UID to DataStore
+    if (_selectedHousehold.value == null || _selectedHousehold.value!!.uid != household?.uid) {
+      viewModelScope.launch {
+        Log.d("HouseholdViewModel", "Saving selected household UID: ${household?.uid}")
+        saveSelectedHouseholdUid(household?.uid)
+      }
+    }
     _selectedHousehold.value = household
+    Log.d(
+        "HouseholdViewModel",
+        "Selected household: $household stacktrace: ${Throwable().stackTrace[1]}")
     household?.let { listFoodItemsViewModel.setFoodItems(it.foodItems) }
   }
 
@@ -195,7 +234,7 @@ class HouseholdViewModel(
   // TODO this is a bad way to update the food items, we need a plan to separate the food items from
   // the household
   fun addFoodItem(foodItem: FoodItem) {
-    val selectedHousehold = selectedHousehold.value
+    val selectedHousehold = _selectedHousehold.value
     if (selectedHousehold != null) {
       updateHousehold(
           selectedHousehold.copy(foodItems = selectedHousehold.foodItems.plus(foodItem)))
@@ -203,29 +242,11 @@ class HouseholdViewModel(
   }
 
   fun editFoodItem(newFoodItem: FoodItem, oldFoodItem: FoodItem) {
-    val selectedHousehold = selectedHousehold.value
+    val selectedHousehold = _selectedHousehold.value
     if (selectedHousehold != null) {
       updateHousehold(
           selectedHousehold.copy(
               foodItems = selectedHousehold.foodItems.minus(oldFoodItem).plus(newFoodItem)))
     }
-  }
-
-  /**
-   * Factory for creating a [HouseholdViewModel] with a constructor that takes a
-   * [HouseHoldRepository] and a [ListFoodItemsViewModel].
-   */
-  companion object {
-    val Factory: ViewModelProvider.Factory =
-        object : ViewModelProvider.Factory {
-          @Suppress("UNCHECKED_CAST")
-          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            val firebaseFirestore = FirebaseFirestore.getInstance()
-            val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
-            val listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
-            val repository = HouseholdRepositoryFirestore(firebaseFirestore)
-            return HouseholdViewModel(repository, listFoodItemsViewModel) as T
-          }
-        }
   }
 }

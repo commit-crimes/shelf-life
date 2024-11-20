@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.overview
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,8 +53,6 @@ fun OverviewScreen(
   val userHouseholds by householdViewModel.households.collectAsState()
   val householdViewModelIsLoaded by householdViewModel.finishedLoading.collectAsState()
   val selectedFilters = remember { mutableStateListOf<String>() }
-
-  Log.d("OverviewScreen", "Selected household: $selectedHousehold ${userHouseholds.size}")
 
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
