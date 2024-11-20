@@ -261,6 +261,7 @@ class EndToEndM2Test {
     composeTestRule.onNodeWithTag("HouseHoldCreationScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextClearance()
     composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextInput("My House Rocks")
+    composeTestRule.onNodeWithTag("AddEmailFab").performClick()
     composeTestRule.onNodeWithTag("EmailInputField").performTextClearance()
     composeTestRule.onNodeWithTag("EmailInputField").performTextInput("dogwaterson@gmail.com")
     composeTestRule.onNodeWithTag("ConfirmButton").performClick()
