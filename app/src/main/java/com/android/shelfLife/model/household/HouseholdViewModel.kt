@@ -36,7 +36,7 @@ class HouseholdViewModel(
 
   var finishedLoading = MutableStateFlow(false)
 
-  val KEY = stringPreferencesKey("household_uid")
+  private val KEY = stringPreferencesKey("household_uid")
 
   /** Initializes the HouseholdViewModel by loading the list of households from the repository. */
   init {
@@ -48,10 +48,20 @@ class HouseholdViewModel(
     }
   }
 
+  /**
+   * Sets the list of households to a new list of households. This is used for testing purposes
+   * only.
+   *
+   * @param households - The new list of household.
+   */
+  fun setHouseholds(households: List<HouseHold>) {
+    _households.value = households
+  }
+
   /** Save the selected household UID to DataStore. */
-  private suspend fun saveSelectedHouseholdUid(uid: String?) {
+  private fun saveSelectedHouseholdUid(uid: String?) {
     Log.d("HouseholdViewModel", "Saving selected household UID: $uid")
-    dataStore.edit { preferences -> preferences[KEY] = uid ?: "" }
+    viewModelScope.launch { dataStore.edit { preferences -> preferences[KEY] = uid ?: "" } }
   }
 
   /** Load the selected household UID from DataStore. */
@@ -62,18 +72,12 @@ class HouseholdViewModel(
     }
   }
 
-  fun setHouseholds(households: List<HouseHold>) {
-    _households.value = households
-  }
-
   /** Loads the list of households from the repository and updates the [_households] flow. */
   private fun loadHouseholds() {
-    Log.d("HouseholdViewModel", "Loading households  ${Throwable().stackTrace[1]}")
     repository.getHouseholds(
         onSuccess = { householdList ->
           _households.value = householdList
           Log.d("HouseholdViewModel", "Households loaded successfully")
-          Log.d("HouseholdViewModel", "Selected household: ${_selectedHousehold.value}")
           loadSelectedHouseholdUid { uid ->
             if (uid != null) {
               selectHousehold(householdList.find { it.uid == uid } ?: householdList.firstOrNull())
@@ -88,6 +92,11 @@ class HouseholdViewModel(
         })
   }
 
+  /**
+   * Updates the view model state with a new household.
+   *
+   * @param household - The household to update the view model state with.
+   */
   private fun updateViewModelStateWithHousehold(household: HouseHold) {
     Log.d("HouseholdViewModel", "Updating view model state with household: $household")
     val currentHouseholds = _households.value
@@ -117,9 +126,7 @@ class HouseholdViewModel(
     Log.d("HouseholdViewModel", "Updating selected household")
     _selectedHousehold.value?.let { selectedHousehold ->
       val updatedHousehold = _households.value.find { it.uid == selectedHousehold.uid }
-      _selectedHousehold.value = updatedHousehold
-      Log.d("HouseholdViewModel", "Selected household updated: $updatedHousehold")
-      listFoodItemsViewModel.setFoodItems(_selectedHousehold.value!!.foodItems)
+      selectHousehold(updatedHousehold)
     }
   }
 
@@ -131,18 +138,17 @@ class HouseholdViewModel(
   fun selectHousehold(household: HouseHold?) {
     // Save the selected household UID to DataStore
     if (_selectedHousehold.value == null || _selectedHousehold.value!!.uid != household?.uid) {
-      viewModelScope.launch {
-        Log.d("HouseholdViewModel", "Saving selected household UID: ${household?.uid}")
-        saveSelectedHouseholdUid(household?.uid)
-      }
+      saveSelectedHouseholdUid(household?.uid)
     }
     _selectedHousehold.value = household
-    Log.d(
-        "HouseholdViewModel",
-        "Selected household: $household stacktrace: ${Throwable().stackTrace[1]}")
     household?.let { listFoodItemsViewModel.setFoodItems(it.foodItems) }
   }
 
+  /**
+   * Selects a household to edit and loads the list of member emails.
+   *
+   * @param household - The household to edit.
+   */
   fun selectHouseholdToEdit(household: HouseHold?) {
     _householdToEdit.value = household
     household?.let {
@@ -150,10 +156,22 @@ class HouseholdViewModel(
     }
   }
 
+  /**
+   * Gets the user IDs corresponding to a list of emails.
+   *
+   * @param emails - The list of emails to get user IDs for.
+   * @param callback - The callback to be invoked with the map of email to user ID.
+   */
   fun getUserIdsByEmails(emails: List<String>, callback: (Map<String, String>) -> Unit) {
     repository.getUserIds(emails) { emailToUid -> callback(emailToUid) }
   }
 
+  /**
+   * Checks if a household name already exists in the list of households.
+   *
+   * @param houseHoldName - The name of the household to check.
+   * @return True if the household name already exists, false otherwise.
+   */
   fun checkIfHouseholdNameExists(houseHoldName: String): Boolean {
     return _households.value.any { it.name == houseHoldName }
   }
