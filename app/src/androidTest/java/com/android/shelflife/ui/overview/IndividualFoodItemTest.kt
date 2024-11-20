@@ -122,4 +122,23 @@ class IndividualFoodItemScreenTest {
     // Verify that the navigation action was triggered
     io.mockk.verify { navigationActions.goBack() }
   }
+
+  @Test
+  fun testDeleteFoodItem() = runTest {
+    composeTestRule.setContent {
+      IndividualFoodItemScreen(
+          navigationActions = navigationActions,
+          houseHoldViewModel = houseHoldViewModel,
+          foodItemViewModel = foodItemViewModel)
+    }
+
+    // Perform click on the delete icon
+    composeTestRule.onNodeWithTag("deleteFoodItem").performClick()
+
+    // Verify that the deleteFoodItem function was called
+    io.mockk.verify { houseHoldViewModel.deleteFoodItem(foodItem) }
+
+    // Verify that the navigation action was triggered
+    io.mockk.verify { navigationActions.goBack() }
+  }
 }
