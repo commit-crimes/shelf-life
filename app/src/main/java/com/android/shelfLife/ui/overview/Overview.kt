@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
@@ -57,19 +58,34 @@ fun OverviewScreen(
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
 
-  val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
+  val filters = listOf("Fruit", "Vegetable", "Meat", "Fish", "Dairy", "Grain", "Beverage", "Snack", "Other")
 
   HouseHoldSelectionDrawer(
       scope = scope,
       drawerState = drawerState,
       householdViewModel = householdViewModel,
       navigationActions = navigationActions) {
-        val filteredFoodItems =
-            foodItems.value.filter { item ->
-              item.foodFacts.name.contains(searchQuery, ignoreCase = true) &&
-                  (selectedFilters.isEmpty() ||
-                      selectedFilters.contains(item.foodFacts.category.name))
-            }
+
+      val filteredFoodItemsByFilters =
+          if (selectedFilters.isEmpty()) {
+              foodItems.value
+          } else {
+              foodItems.value.filter { foodItem ->
+                  selectedFilters.any { filter ->
+                      foodItem.foodFacts.category == stringToCategory(filter)
+                  }
+              }
+          }
+
+      val filteredFoodItemsByQuery = {
+          if (searchQuery.isEmpty()){
+              foodItems.value
+          }else{
+                foodItems.value.filter { item -> item.foodFacts.name.contains(searchQuery, ignoreCase = true) }
+          }
+      }
+
+      val filteredFoodItems = filteredFoodItemsByFilters.filter { it in filteredFoodItemsByQuery() }
 
         if (!householdViewModelIsLoaded) {
           Column(
@@ -132,4 +148,21 @@ fun OverviewScreen(
           }
         }
       }
+}
+
+fun stringToCategory(string: String): FoodCategory {
+    return when(string){
+        "Dairy" -> FoodCategory.DAIRY
+        "Meat" -> FoodCategory.MEAT
+        "Fish" -> FoodCategory.FISH
+        "Fruit" -> FoodCategory.FRUIT
+        "Vegetable" -> FoodCategory.VEGETABLE
+        "Grain" -> FoodCategory.GRAIN
+        "Beverage" -> FoodCategory.BEVERAGE
+        "Snack" -> FoodCategory.SNACK
+        "Other" -> FoodCategory.OTHER
+        else -> throw IllegalArgumentException("Unknown food category: $string")
+    }
+
+
 }
