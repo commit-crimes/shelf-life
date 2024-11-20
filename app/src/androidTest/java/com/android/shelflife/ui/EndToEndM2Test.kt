@@ -167,7 +167,7 @@ class EndToEndM2Test {
         }
         composable(Screen.INDIVIDUAL_FOOD_ITEM) {
           IndividualFoodItemScreen(
-              navigationActions = navigationActions, foodItemViewModel = listFoodItemsViewModel)
+              navigationActions = navigationActions, houseHoldViewModel = householdViewModel, foodItemViewModel = listFoodItemsViewModel)
         }
         composable(Route.RECIPES) {
           RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
