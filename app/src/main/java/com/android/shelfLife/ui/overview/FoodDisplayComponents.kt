@@ -41,8 +41,8 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.ui.utils.getExpiryMessageBasedOnDays
 import com.android.shelfLife.ui.utils.getProgressBarState
-import com.android.shelfLife.ui.utils.getThresholdsForCategory
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -76,15 +76,20 @@ fun FoodItemCard(foodItem: FoodItem, onClick: () -> Unit) {
   val expiryDate = foodItem.expiryDate
   val currentDate = Timestamp.now()
 
-  val timeRemaining = expiryDate?.seconds?.minus(currentDate.seconds) ?: 0L
-  val thresholds = getThresholdsForCategory(foodItem.foodFacts.category)
+  // Calculate time remaining in days
+  val timeRemainingInDays =
+      expiryDate?.let { ((it.seconds - currentDate.seconds) / (60 * 60 * 24)).toInt() } ?: -1
 
-  val (progress, progressBarColor) = getProgressBarState(timeRemaining, thresholds)
+  // Get progress bar state
+  val (progress, progressBarColor) = getProgressBarState(timeRemainingInDays)
 
+  // Get formatted expiry date and message
   val formattedExpiryDate =
       expiryDate?.toDate()?.let { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it) }
           ?: "No Expiry Date"
+  val expiryDateMessage = getExpiryMessageBasedOnDays(timeRemainingInDays, formattedExpiryDate)
 
+  // Composable UI
   ElevatedCard(
       elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
       modifier =
@@ -93,46 +98,46 @@ fun FoodItemCard(foodItem: FoodItem, onClick: () -> Unit) {
               .background(MaterialTheme.colorScheme.background)
               .clickable { onClick() }
               .testTag("foodItemCard")) {
-        Row(modifier = Modifier.padding(16.dp)) {
-          Column(modifier = Modifier.weight(1f)) {
-            Text(text = foodItem.foodFacts.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Column(modifier = Modifier.padding(16.dp)) {
+          // Row for details
+          Row {
+            Column(modifier = Modifier.weight(1f)) {
+              Text(text = foodItem.foodFacts.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
-            when (foodItem.foodFacts.quantity.unit) {
-              FoodUnit.GRAM ->
-                  Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}g", fontSize = 12.sp)
-              FoodUnit.ML ->
-                  Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}ml", fontSize = 12.sp)
-              FoodUnit.COUNT ->
-                  Text(
-                      text = "${foodItem.foodFacts.quantity.amount.toInt()} in stock",
-                      fontSize = 12.sp)
+              when (foodItem.foodFacts.quantity.unit) {
+                FoodUnit.GRAM ->
+                    Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}g", fontSize = 12.sp)
+                FoodUnit.ML ->
+                    Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}ml", fontSize = 12.sp)
+                FoodUnit.COUNT ->
+                    Text(
+                        text = "${foodItem.foodFacts.quantity.amount.toInt()} in stock",
+                        fontSize = 12.sp)
+              }
+
+              Text(text = expiryDateMessage, fontSize = 12.sp)
             }
 
-            Text(text = "Expires on $formattedExpiryDate", fontSize = 12.sp)
+            Spacer(modifier = Modifier.width(8.dp))
+
+            AsyncImage(
+                model = foodItem.foodFacts.imageUrl,
+                contentDescription = "Food Image",
+                modifier =
+                    Modifier.size(80.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .align(Alignment.CenterVertically),
+                contentScale = ContentScale.Crop)
           }
 
-          Spacer(modifier = Modifier.width(8.dp))
-
-          AsyncImage(
-              model = foodItem.foodFacts.imageUrl,
-              contentDescription = "Food Image",
-              modifier =
-                  Modifier.size(80.dp)
-                      .clip(RoundedCornerShape(8.dp))
-                      .align(Alignment.CenterVertically),
-              contentScale = ContentScale.Crop)
-        }
-        Row {
+          // Progress bar
+          Spacer(modifier = Modifier.height(8.dp))
           LinearProgressIndicator(
-              progress = { progress },
+              progress = progress,
               modifier = Modifier.fillMaxWidth().height(8.dp),
               color = progressBarColor,
-              gapSize = 4.dp,
-              drawStopIndicator = {},
-              trackColor = LightGray,
-          )
+              trackColor = LightGray)
         }
-        Spacer(modifier = Modifier.width(8.dp))
       }
 }
 

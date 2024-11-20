@@ -1,117 +1,111 @@
-package com.android.shelflife.model
+// ExpiryUtilsTest.kt
 
-import androidx.compose.ui.graphics.Color
-import com.android.shelfLife.model.foodFacts.FoodCategory
-import com.android.shelfLife.ui.utils.*
+package com.android.shelfLife.ui.utils
+
+import com.android.shelfLife.ui.theme.expired
+import com.android.shelfLife.ui.theme.expiresInALongTime
+import com.android.shelfLife.ui.theme.expiresLater
+import com.android.shelfLife.ui.theme.expiresSoon
+import java.text.SimpleDateFormat
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class ShelfLifeUtilsTest {
-
-  @Test
-  fun `daysToSeconds converts days to seconds correctly`() {
-    assertEquals(86400L, daysToSeconds(1)) // 1 day = 86400 seconds
-    assertEquals(172800L, daysToSeconds(2)) // 2 days = 172800 seconds
-    assertEquals(2592000L, daysToSeconds(30)) // 30 days = 2592000 seconds
-  }
-
-  @Test
-  fun `getThresholdsForCategory returns correct thresholds for MEAT`() {
-    val thresholds = getThresholdsForCategory(FoodCategory.MEAT)
-    assertEquals(daysToSeconds(3), thresholds.redThreshold)
-    assertEquals(daysToSeconds(7), thresholds.orangeThreshold)
-  }
-
-  @Test
-  fun `getThresholdsForCategory returns correct thresholds for FRUIT`() {
-    val thresholds = getThresholdsForCategory(FoodCategory.FRUIT)
-    assertEquals(daysToSeconds(2), thresholds.redThreshold)
-    assertEquals(daysToSeconds(5), thresholds.orangeThreshold)
-  }
-
-  @Test
-  fun `getThresholdsForCategory returns correct thresholds for VEGETABLE`() {
-    val thresholds = getThresholdsForCategory(FoodCategory.VEGETABLE)
-    assertEquals(daysToSeconds(3), thresholds.redThreshold)
-    assertEquals(daysToSeconds(7), thresholds.orangeThreshold)
-  }
-
-  @Test
-  fun `getThresholdsForCategory returns correct thresholds for DAIRY`() {
-    val thresholds = getThresholdsForCategory(FoodCategory.DAIRY)
-    assertEquals(daysToSeconds(5), thresholds.redThreshold)
-    assertEquals(daysToSeconds(10), thresholds.orangeThreshold)
-  }
-
-  @Test
-  fun `getThresholdsForCategory returns correct thresholds for GRAIN`() {
-    val thresholds = getThresholdsForCategory(FoodCategory.GRAIN)
-    assertEquals(daysToSeconds(30), thresholds.redThreshold)
-    assertEquals(daysToSeconds(90), thresholds.orangeThreshold)
-  }
-
-  @Test
-  fun `getThresholdsForCategory returns correct thresholds for BEVERAGE`() {
-    val thresholds = getThresholdsForCategory(FoodCategory.BEVERAGE)
-    assertEquals(daysToSeconds(30), thresholds.redThreshold)
-    assertEquals(daysToSeconds(90), thresholds.orangeThreshold)
-  }
-
-  @Test
-  fun `getThresholdsForCategory returns correct thresholds for SNACK`() {
-    val thresholds = getThresholdsForCategory(FoodCategory.SNACK)
-    assertEquals(daysToSeconds(15), thresholds.redThreshold)
-    assertEquals(daysToSeconds(30), thresholds.orangeThreshold)
-  }
-
-  @Test
-  fun `getThresholdsForCategory returns correct thresholds for OTHER`() {
-    val thresholds = getThresholdsForCategory(FoodCategory.OTHER)
-    assertEquals(daysToSeconds(7), thresholds.redThreshold)
-    assertEquals(daysToSeconds(14), thresholds.orangeThreshold)
-  }
+class ThresholdsTests {
 
   @Test
   fun `getProgressBarState returns correct state and color when expired`() {
-    val thresholds = Thresholds(daysToSeconds(3), daysToSeconds(7))
-    val (fill, color) = getProgressBarState(0, thresholds)
+    val (fill, color) = getProgressBarState(-1)
     assertEquals(0.25f, fill, 0.0f)
-    assertEquals(Color(0xFF8F0303), color)
+    assertEquals(expired, color)
   }
 
   @Test
-  fun `getProgressBarState returns correct state and color when within red threshold`() {
-    val thresholds = Thresholds(daysToSeconds(3), daysToSeconds(7))
-    val (fill, color) = getProgressBarState(daysToSeconds(2), thresholds)
+  fun `getProgressBarState returns correct state and color when daysDifference is zero`() {
+    val (fill, color) = getProgressBarState(0)
     assertEquals(0.5f, fill, 0.0f)
-    assertTrue(colorsApproximatelyEqual(color, Color(0xFFF67800)))
+    assertEquals(expiresSoon, color)
   }
 
   @Test
-  fun `getProgressBarState returns correct state and color when within orange threshold`() {
-    val thresholds = Thresholds(daysToSeconds(3), daysToSeconds(7))
-    val (fill, color) = getProgressBarState(daysToSeconds(5), thresholds)
+  fun `getProgressBarState returns correct state and color when within expiresSoon threshold`() {
+    val (fill, color) = getProgressBarState(3)
+    assertEquals(0.5f, fill, 0.0f)
+    assertEquals(expiresSoon, color)
+  }
+
+  @Test
+  fun `getProgressBarState returns correct state and color when within expiresLater threshold`() {
+    val (fill, color) = getProgressBarState(10)
     assertEquals(0.75f, fill, 0.0f)
-    assertEquals(Color(0xFF71B504), color)
+    assertEquals(expiresLater, color)
   }
 
   @Test
-  fun `getProgressBarState returns correct state and color when within green threshold`() {
-    val thresholds = Thresholds(daysToSeconds(3), daysToSeconds(7))
-    val (fill, color) = getProgressBarState(daysToSeconds(10), thresholds)
+  fun `getProgressBarState returns correct state and color when expiresInALongTime`() {
+    val (fill, color) = getProgressBarState(20)
     assertEquals(1.0f, fill, 0.0f)
-    assertEquals(Color(0xFF4CAF50), color)
+    assertEquals(expiresInALongTime, color)
   }
 
-  private fun colorsApproximatelyEqual(
-      color1: Color,
-      color2: Color,
-      tolerance: Float = 0.01f
-  ): Boolean {
-    return (Math.abs(color1.red - color2.red) < tolerance) &&
-        (Math.abs(color1.green - color2.green) < tolerance) &&
-        (Math.abs(color1.blue - color2.blue) < tolerance) &&
-        (Math.abs(color1.alpha - color2.alpha) < tolerance)
+  @Test
+  fun `getExpiryMessageBasedOnDays returns correct message when expired`() {
+    val message = getExpiryMessageBasedOnDays(-1, "18/11/2024")
+    assertEquals("Expired", message)
+  }
+
+  @Test
+  fun `getExpiryMessageBasedOnDays returns correct message when expires today`() {
+    val message = getExpiryMessageBasedOnDays(0, "18/11/2024")
+    assertEquals("Expires today", message)
+  }
+
+  @Test
+  fun `getExpiryMessageBasedOnDays returns correct message when expires tomorrow`() {
+    val message = getExpiryMessageBasedOnDays(1, "19/11/2024")
+    assertEquals("Expires tomorrow", message)
+  }
+
+  @Test
+  fun `getExpiryMessageBasedOnDays returns correct message when expires in few days`() {
+    val message = getExpiryMessageBasedOnDays(3, "21/11/2024")
+    assertEquals("Expires in 3 days", message)
+  }
+
+  @Test
+  fun `getExpiryMessageBasedOnDays returns correct message when expires in a week`() {
+    val message = getExpiryMessageBasedOnDays(10, "28/11/2024")
+    assertEquals("Expires in a week", message)
+  }
+
+  @Test
+  fun `getExpiryMessageBasedOnDays returns correct message when expires on specific date`() {
+    val message = getExpiryMessageBasedOnDays(20, "08/12/2024")
+    assertEquals("Expires on 08/12/2024", message)
+  }
+
+  @Test
+  fun `getExpiryInfo returns correct message and progress bar state for valid date`() {
+    val currentDate = SimpleDateFormat("dd/MM/yyyy").parse("18/11/2024")!!
+    val expiryDateString = "19/11/2024"
+    val (message, progressBarState) = getExpiryInfo(expiryDateString, currentDate)
+    assertEquals("Expires tomorrow", message)
+    assertEquals(0.5f, progressBarState.first, 0.0f)
+    assertEquals(expiresSoon, progressBarState.second)
+  }
+
+  @Test
+  fun `getExpiryInfo returns correct message and progress bar state when date is null`() {
+    val (message, progressBarState) = getExpiryInfo(null)
+    assertEquals("No Expiry Date", message)
+    assertEquals(0f, progressBarState.first, 0.0f)
+    assertEquals(expired, progressBarState.second)
+  }
+
+  @Test
+  fun `getExpiryInfo returns correct message and progress bar state for invalid date format`() {
+    val (message, progressBarState) = getExpiryInfo("invalid date")
+    assertEquals("Invalid Date Format", message)
+    assertEquals(0f, progressBarState.first, 0.0f)
+    assertEquals(expired, progressBarState.second)
   }
 }
