@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.overview
 
-import android.util.Log
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -66,21 +65,19 @@ fun IndividualFoodItemScreen(
                   modifier = Modifier.testTag("IndividualTestScreenGoBack")) {
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Go back Icon")
                   }
-            } ,
+            },
             actions = {
-                IconButton(
-                    onClick = {
-                        foodItem?.let {
-                            houseHoldViewModel.deleteFoodItem(it)
-                            navigationActions.goBack()
-                        }
-                    },
-                    modifier = Modifier.testTag("deleteFoodItem")
-                ) {
+              IconButton(
+                  onClick = {
+                    foodItem?.let {
+                      houseHoldViewModel.deleteFoodItem(it)
+                      navigationActions.goBack()
+                    }
+                  },
+                  modifier = Modifier.testTag("deleteFoodItem")) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
-                }
-            }
-        )
+                  }
+            })
       },
       // Floating Action Button to edit the food item
       floatingActionButton = {

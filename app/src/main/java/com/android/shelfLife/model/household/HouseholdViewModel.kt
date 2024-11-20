@@ -185,10 +185,7 @@ class HouseholdViewModel(
     val selectedHousehold = selectedHousehold.value
     if (selectedHousehold != null) {
       updateHousehold(
-        selectedHousehold.copy(
-          foodItems = selectedHousehold.foodItems.minus(foodItem)
-        )
-      )
+          selectedHousehold.copy(foodItems = selectedHousehold.foodItems.minus(foodItem)))
     }
   }
 

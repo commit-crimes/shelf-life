@@ -102,7 +102,7 @@ fun ShelfLifeApp() {
       }
       composable(Screen.INDIVIDUAL_FOOD_ITEM) {
         IndividualFoodItemScreen(
-            navigationActions = navigationActions, householdViewModel,  listFoodItemViewModel)
+            navigationActions = navigationActions, householdViewModel, listFoodItemViewModel)
       }
     }
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
