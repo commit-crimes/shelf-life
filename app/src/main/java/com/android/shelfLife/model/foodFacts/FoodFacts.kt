@@ -55,7 +55,7 @@ enum class FoodCategory {
   FRUIT, // Fruit category
   VEGETABLE, // Vegetable category
   MEAT, // Meat category
-    FISH, // Fish category
+  FISH, // Fish category
   DAIRY, // Dairy category
   GRAIN, // Grain category
   BEVERAGE, // Beverage category

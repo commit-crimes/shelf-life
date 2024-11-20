@@ -58,34 +58,37 @@ fun OverviewScreen(
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
 
-  val filters = listOf("Fruit", "Vegetable", "Meat", "Fish", "Dairy", "Grain", "Beverage", "Snack", "Other")
+  val filters =
+      listOf("Fruit", "Vegetable", "Meat", "Fish", "Dairy", "Grain", "Beverage", "Snack", "Other")
 
   HouseHoldSelectionDrawer(
       scope = scope,
       drawerState = drawerState,
       householdViewModel = householdViewModel,
       navigationActions = navigationActions) {
-
-      val filteredFoodItemsByFilters =
-          if (selectedFilters.isEmpty()) {
+        val filteredFoodItemsByFilters =
+            if (selectedFilters.isEmpty()) {
               foodItems.value
-          } else {
+            } else {
               foodItems.value.filter { foodItem ->
-                  selectedFilters.any { filter ->
-                      foodItem.foodFacts.category == stringToCategory(filter)
-                  }
+                selectedFilters.any { filter ->
+                  foodItem.foodFacts.category == stringToCategory(filter)
+                }
               }
-          }
+            }
 
-      val filteredFoodItemsByQuery = {
-          if (searchQuery.isEmpty()){
-              foodItems.value
-          }else{
-                foodItems.value.filter { item -> item.foodFacts.name.contains(searchQuery, ignoreCase = true) }
+        val filteredFoodItemsByQuery = {
+          if (searchQuery.isEmpty()) {
+            foodItems.value
+          } else {
+            foodItems.value.filter { item ->
+              item.foodFacts.name.contains(searchQuery, ignoreCase = true)
+            }
           }
-      }
+        }
 
-      val filteredFoodItems = filteredFoodItemsByFilters.filter { it in filteredFoodItemsByQuery() }
+        val filteredFoodItems =
+            filteredFoodItemsByFilters.filter { it in filteredFoodItemsByQuery() }
 
         if (!householdViewModelIsLoaded) {
           Column(
@@ -151,18 +154,16 @@ fun OverviewScreen(
 }
 
 fun stringToCategory(string: String): FoodCategory {
-    return when(string){
-        "Dairy" -> FoodCategory.DAIRY
-        "Meat" -> FoodCategory.MEAT
-        "Fish" -> FoodCategory.FISH
-        "Fruit" -> FoodCategory.FRUIT
-        "Vegetable" -> FoodCategory.VEGETABLE
-        "Grain" -> FoodCategory.GRAIN
-        "Beverage" -> FoodCategory.BEVERAGE
-        "Snack" -> FoodCategory.SNACK
-        "Other" -> FoodCategory.OTHER
-        else -> throw IllegalArgumentException("Unknown food category: $string")
-    }
-
-
+  return when (string) {
+    "Dairy" -> FoodCategory.DAIRY
+    "Meat" -> FoodCategory.MEAT
+    "Fish" -> FoodCategory.FISH
+    "Fruit" -> FoodCategory.FRUIT
+    "Vegetable" -> FoodCategory.VEGETABLE
+    "Grain" -> FoodCategory.GRAIN
+    "Beverage" -> FoodCategory.BEVERAGE
+    "Snack" -> FoodCategory.SNACK
+    "Other" -> FoodCategory.OTHER
+    else -> throw IllegalArgumentException("Unknown food category: $string")
+  }
 }

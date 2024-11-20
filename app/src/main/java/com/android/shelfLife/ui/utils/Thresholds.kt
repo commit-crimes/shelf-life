@@ -2,7 +2,6 @@ package com.android.shelfLife.ui.utils
 
 import androidx.compose.ui.graphics.Color
 import com.android.shelfLife.model.foodFacts.FoodCategory
-import com.android.shelfLife.model.foodItem.FoodStatus
 import com.android.shelfLife.ui.theme.expired
 import com.android.shelfLife.ui.theme.expiresInALongTime
 import com.android.shelfLife.ui.theme.expiresLater
@@ -23,7 +22,7 @@ fun getThresholdsForCategory(category: FoodCategory): Thresholds {
         Thresholds(redThreshold = daysToSeconds(3), orangeThreshold = daysToSeconds(7))
     FoodCategory.FISH ->
         Thresholds(redThreshold = daysToSeconds(3), orangeThreshold = daysToSeconds(7))
-      FoodCategory.FRUIT ->
+    FoodCategory.FRUIT ->
         Thresholds(redThreshold = daysToSeconds(2), orangeThreshold = daysToSeconds(5))
     FoodCategory.VEGETABLE ->
         Thresholds(redThreshold = daysToSeconds(3), orangeThreshold = daysToSeconds(7))

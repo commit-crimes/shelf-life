@@ -77,6 +77,60 @@ class OverviewTest {
     mockHouseHoldRepositoryGetHouseholds(listOf(houseHold))
   }
 
+  fun setUpFilterTests() {
+    val foodFactsApple =
+        FoodFacts(
+            name = "Apple",
+            barcode = "123456789",
+            quantity = Quantity(5.0, FoodUnit.COUNT),
+            category = FoodCategory.FRUIT)
+    val foodItemApple =
+        FoodItem(
+            uid = "foodItem1",
+            foodFacts = foodFactsApple,
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)) // Expires in 1 day
+            )
+    val foodFactsSteak =
+        FoodFacts(
+            name = "Steak",
+            barcode = "123456789",
+            quantity = Quantity(250.0, FoodUnit.GRAM),
+            category = FoodCategory.MEAT)
+    val foodItemSteak =
+        FoodItem(
+            uid = "foodItem1",
+            foodFacts = foodFactsSteak,
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)) // Expires in 1 day
+            )
+    val foodFactsMilk =
+        FoodFacts(
+            name = "Steak",
+            barcode = "123456789",
+            quantity = Quantity(1000.0, FoodUnit.ML),
+            category = FoodCategory.DAIRY)
+    val foodItemMilk =
+        FoodItem(
+            uid = "foodItem1",
+            foodFacts = foodFactsMilk,
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)) // Expires in 1 day
+            )
+
+    val household =
+        houseHold.copy(
+            members = listOf("Jane", "Doe"),
+            foodItems = listOf(foodItemApple, foodItemSteak, foodItemMilk))
+
+    mockHouseHoldRepositoryGetHouseholds(listOf(household))
+
+    selectHousehold(household)
+    composeTestRule.setContent {
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
+    }
+  }
+
   private fun mockHouseHoldRepositoryGetHouseholds(households: List<HouseHold>) {
     doAnswer { invocation ->
           val onSuccess = invocation.arguments[0] as (List<HouseHold>) -> Unit
@@ -462,5 +516,78 @@ class OverviewTest {
 
     // Verify that navigateTo(Screen.ADD_FOOD) was called
     verify(navigationActions).navigateTo(com.android.shelfLife.ui.navigation.Screen.ADD_FOOD)
+  }
+
+  @Test
+  fun filtersFoodItemBasedOnSelectedFilter() {
+    setUpFilterTests()
+
+    composeTestRule.onNodeWithTag("filterIcon").performClick()
+
+    composeTestRule.onNodeWithText("Fruit").performClick()
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
+  }
+
+  @Test
+  fun filtersFoodItemsBasedOnMultipleSelectedFilters() {
+    setUpFilterTests()
+
+    composeTestRule.onNodeWithTag("filterIcon").performClick()
+
+    composeTestRule.onNodeWithText("Fruit").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("Meat").performClick()
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
+  }
+
+  @Test
+  fun filtersFoodItemsBasedOnAFilterAndThenAnother() {
+    setUpFilterTests()
+
+    composeTestRule.onNodeWithTag("filterIcon").performClick()
+
+    composeTestRule.onNodeWithText("Fruit").performClick()
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
+
+    composeTestRule.onNodeWithText("Fruit").performClick()
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithText("Meat").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Apple").assertDoesNotExist()
+  }
+
+  @Test
+  fun filtersFoodItemsBasedOnFiltersAndQuery() {
+    setUpFilterTests()
+
+    composeTestRule.onNodeWithTag("filterIcon").performClick()
+
+    composeTestRule.onNodeWithText("Fruit").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("Meat").performClick()
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
+
+    // Activate the SearchBar
+    composeTestRule.onNodeWithTag("foodSearchBar").performClick()
+    composeTestRule.waitForIdle()
+
+    composeTestRule
+        .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("foodSearchBar")))
+        .performTextInput("Ste")
+
+    composeTestRule.onNodeWithText("Apple").assertDoesNotExist()
+    composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
   }
 }
