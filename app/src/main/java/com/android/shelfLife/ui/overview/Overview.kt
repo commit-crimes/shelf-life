@@ -153,6 +153,20 @@ fun OverviewScreen(
       }
 }
 
+/**
+ * Converts a given string into a corresponding FoodCategory enum value.
+ *
+ * @param string the name of the food category as a string (e.g., "Dairy", "Meat", "Fish").
+ * @return the matching FoodCategory enum value.
+ * @throws IllegalArgumentException if the string does not match any known food category.
+ *
+ * Example:
+ * ```
+ * stringToCategory("Dairy") // Returns FoodCategory.DAIRY
+ * stringToCategory("Meat")  // Returns FoodCategory.MEAT
+ * stringToCategory("Invalid") // Throws IllegalArgumentException
+ * ```
+ */
 fun stringToCategory(string: String): FoodCategory {
   return when (string) {
     "Dairy" -> FoodCategory.DAIRY
