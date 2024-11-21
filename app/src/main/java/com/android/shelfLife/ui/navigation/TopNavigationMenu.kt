@@ -84,28 +84,25 @@ fun TopNavigationBar(
           }
         },
         actions = {
-            if (filters.isNotEmpty()) {
-                IconButton(
-                    modifier = Modifier.testTag("filterIcon"),
-                    onClick = { showFilterBar = !showFilterBar }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.FilterList,
-                        contentDescription = "Filter Icon",
-                    )
+          if (filters.isNotEmpty()) {
+            IconButton(
+                modifier = Modifier.testTag("filterIcon"),
+                onClick = { showFilterBar = !showFilterBar }) {
+                  Icon(
+                      imageVector = Icons.Default.FilterList,
+                      contentDescription = "Filter Icon",
+                  )
                 }
-            }
-            if (showDeleteOption) {
-                IconButton(
-                    modifier = Modifier.testTag("deleteIcon"),
-                    onClick = { onDeleteClick() }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete Icon",
-                    )
+          }
+          if (showDeleteOption) {
+            IconButton(
+                modifier = Modifier.testTag("deleteFoodItems"), onClick = { onDeleteClick() }) {
+                  Icon(
+                      imageVector = Icons.Default.Delete,
+                      contentDescription = "Delete Icon",
+                  )
                 }
-            }
+          }
         })
 
     if (filters.isNotEmpty()) {

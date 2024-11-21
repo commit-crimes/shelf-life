@@ -20,9 +20,10 @@ open class ListFoodItemsViewModel(private val repository: FoodItemRepository) : 
   private val _selectedFoodItem = MutableStateFlow<FoodItem?>(null)
   val selectedFoodItem: StateFlow<FoodItem?> = _selectedFoodItem.asStateFlow()
 
-  //Multiple selected food item model
+  // Multiple selected food item model
   private val _multipleSelectedFoodItems = MutableStateFlow<List<FoodItem>>(emptyList())
-  val multipleSelectedFoodItems: StateFlow<List<FoodItem>> = _multipleSelectedFoodItems.asStateFlow()
+  val multipleSelectedFoodItems: StateFlow<List<FoodItem>> =
+      _multipleSelectedFoodItems.asStateFlow()
 
   /**
    * Initializes the ListFoodItemsViewModel by loading the list of FoodItems from the repository.

@@ -197,7 +197,6 @@ class HouseholdViewModel(
     }
   }
 
-
   /**
    * Factory for creating a [HouseholdViewModel] with a constructor that takes a
    * [HouseHoldRepository] and a [ListFoodItemsViewModel].

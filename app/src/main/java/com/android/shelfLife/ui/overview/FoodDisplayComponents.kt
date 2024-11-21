@@ -1,11 +1,8 @@
 package com.android.shelfLife.ui.overview
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -35,15 +32,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.LightGray
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -65,8 +58,13 @@ import java.util.Locale
  * @param foodItems The list of food items to display
  */
 @Composable
-fun ListFoodItems(foodItems: List<FoodItem>, listFoodItemsViewModel: ListFoodItemsViewModel, onFoodItemClick: (FoodItem) -> Unit, onFoodItemLongHold: (FoodItem) -> Unit) {
-    if (foodItems.isEmpty()) {
+fun ListFoodItems(
+    foodItems: List<FoodItem>,
+    listFoodItemsViewModel: ListFoodItemsViewModel,
+    onFoodItemClick: (FoodItem) -> Unit,
+    onFoodItemLongHold: (FoodItem) -> Unit
+) {
+  if (foodItems.isEmpty()) {
     Box(
         modifier = Modifier.fillMaxSize().testTag("NoFoodItems"),
         contentAlignment = Alignment.Center) {
@@ -77,7 +75,11 @@ fun ListFoodItems(foodItems: List<FoodItem>, listFoodItemsViewModel: ListFoodIte
     LazyColumn(modifier = Modifier.fillMaxSize().testTag("foodItemList")) {
       items(foodItems) { item ->
         // Call a composable that renders each individual to-do item
-        FoodItemCard(foodItem = item, listFoodItemsViewModel = listFoodItemsViewModel, onClick = { onFoodItemClick(item) }, onLongPress = { onFoodItemLongHold(item) })
+        FoodItemCard(
+            foodItem = item,
+            listFoodItemsViewModel = listFoodItemsViewModel,
+            onClick = { onFoodItemClick(item) },
+            onLongPress = { onFoodItemLongHold(item) })
       }
     }
   }
@@ -85,12 +87,19 @@ fun ListFoodItems(foodItems: List<FoodItem>, listFoodItemsViewModel: ListFoodIte
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FoodItemCard(foodItem: FoodItem, listFoodItemsViewModel: ListFoodItemsViewModel, onClick: () -> Unit = {} ,onLongPress: () -> Unit = {}) {
-    val selectedItems by listFoodItemsViewModel.multipleSelectedFoodItems.collectAsState()
-    val isSelected = selectedItems.contains(foodItem)
-    val cardColor = if (isSelected) Color.Gray else MaterialTheme.colorScheme.background
-    val elevation = if (isSelected) 16.dp else 8.dp
-    val expiryDate = foodItem.expiryDate
+fun FoodItemCard(
+    foodItem: FoodItem,
+    listFoodItemsViewModel: ListFoodItemsViewModel,
+    onClick: () -> Unit = {},
+    onLongPress: () -> Unit = {}
+) {
+  val selectedItems by listFoodItemsViewModel.multipleSelectedFoodItems.collectAsState()
+  val isSelected = selectedItems.contains(foodItem)
+  val cardColor =
+      if (isSelected) MaterialTheme.colorScheme.primaryContainer
+      else MaterialTheme.colorScheme.background
+  val elevation = if (isSelected) 16.dp else 8.dp
+  val expiryDate = foodItem.expiryDate
   val currentDate = Timestamp.now()
 
   // Calculate time remaining in days
@@ -114,14 +123,7 @@ fun FoodItemCard(foodItem: FoodItem, listFoodItemsViewModel: ListFoodItemsViewMo
           Modifier.fillMaxWidth()
               .padding(horizontal = 16.dp, vertical = 8.dp)
               .background(MaterialTheme.colorScheme.background)
-              .combinedClickable(
-                  onClick = {
-                      onClick()
-                  },
-                  onLongClick = {
-                      onLongPress()
-                  }
-              )
+              .combinedClickable(onClick = { onClick() }, onLongClick = { onLongPress() })
               .testTag("foodItemCard")) {
         Column(modifier = Modifier.padding(16.dp)) {
           // Row for details
