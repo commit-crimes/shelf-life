@@ -4,6 +4,8 @@ import android.util.Log
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
+import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
+import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore.Companion
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -27,6 +29,23 @@ class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepos
   override fun getUid(): String {
     Log.d("RecipeRepository", "getUid called")
     return db.collection(COLLECTION_PATH).document().id
+  }
+
+  override fun init(onSuccess: () -> Unit) {
+    auth.addAuthStateListener { authVal ->
+      val currentUser = authVal.currentUser
+      if (currentUser != null) {
+        db.collection(COLLECTION_PATH).get().addOnCompleteListener { task ->
+          if (task.isSuccessful) {
+            onSuccess()
+          } else {
+            Log.e("RecipeRepositoryFirestore", "init failed: could not get collection : ${task.exception}")
+          }
+        }
+      } else {
+        Log.e("RecipeRepositoryFirestore", "init failed: user not logged in")
+      }
+    }
   }
 
   /**
