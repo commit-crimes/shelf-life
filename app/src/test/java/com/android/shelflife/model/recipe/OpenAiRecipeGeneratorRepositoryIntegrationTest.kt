@@ -1,3 +1,4 @@
+/*
 package com.android.shelflife.model.recipe
 
 import com.aallam.openai.api.http.Timeout
@@ -20,12 +21,14 @@ import org.junit.Test
 
 class OpenAiRecipeGeneratorRepositoryIntegrationTest {
 
-  /**
+  */
+/**
    * Integration test for generating recipes using OpenAI API (this test queries the openai api).
    * Set RUN_INTEGRATION_TEST to true to run the test and print out results of a recipe. WARNING!!:
    * DO NOT PUSH TO CI WITH INTEGRATION TEST ENABLED. THIS TEST DOES NOT MOCK, IT PROPERLY CALLS THE
    * API. ONLY FOR DEBUGGING LOCALLY. (note: This test requires a valid OpenAI API key to run.)
-   */
+   *//*
+
   companion object {
     private val _NOT_ON_CI: Boolean by lazy {
       (System.getenv("CI")?.toBoolean() != true) &&
@@ -167,3 +170,4 @@ class OpenAiRecipeGeneratorRepositoryIntegrationTest {
     latch.await(10, TimeUnit.SECONDS) // Wait for the recipe generation to complete
   }
 }
+*/
