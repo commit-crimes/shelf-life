@@ -33,6 +33,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.ui.utils.getExpiryMessageBasedOnDays
 import com.android.shelfLife.ui.utils.getProgressBarState
 import com.google.firebase.Timestamp
@@ -63,7 +65,7 @@ import java.util.Locale
  * @param foodItems The list of food items to display
  */
 @Composable
-fun ListFoodItems(foodItems: List<FoodItem>, onFoodItemClick: (FoodItem) -> Unit, onFoodItemLongHold: (FoodItem) -> Unit) {
+fun ListFoodItems(foodItems: List<FoodItem>, listFoodItemsViewModel: ListFoodItemsViewModel, onFoodItemClick: (FoodItem) -> Unit, onFoodItemLongHold: (FoodItem) -> Unit) {
     if (foodItems.isEmpty()) {
     Box(
         modifier = Modifier.fillMaxSize().testTag("NoFoodItems"),
@@ -75,7 +77,7 @@ fun ListFoodItems(foodItems: List<FoodItem>, onFoodItemClick: (FoodItem) -> Unit
     LazyColumn(modifier = Modifier.fillMaxSize().testTag("foodItemList")) {
       items(foodItems) { item ->
         // Call a composable that renders each individual to-do item
-        FoodItemCard(foodItem = item, onClick = { onFoodItemClick(item) }, onLongPress = { onFoodItemLongHold(item) })
+        FoodItemCard(foodItem = item, listFoodItemsViewModel = listFoodItemsViewModel, onClick = { onFoodItemClick(item) }, onLongPress = { onFoodItemLongHold(item) })
       }
     }
   }
@@ -83,9 +85,9 @@ fun ListFoodItems(foodItems: List<FoodItem>, onFoodItemClick: (FoodItem) -> Unit
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FoodItemCard(foodItem: FoodItem, onClick: () -> Unit, onLongPress: () -> Unit = {}) {
-
-    var isSelected by remember { mutableStateOf(false) }
+fun FoodItemCard(foodItem: FoodItem, listFoodItemsViewModel: ListFoodItemsViewModel, onClick: () -> Unit = {} ,onLongPress: () -> Unit = {}) {
+    val selectedItems by listFoodItemsViewModel.multipleSelectedFoodItems.collectAsState()
+    val isSelected = selectedItems.contains(foodItem)
     val cardColor = if (isSelected) Color.Gray else MaterialTheme.colorScheme.background
     val elevation = if (isSelected) 16.dp else 8.dp
     val expiryDate = foodItem.expiryDate
@@ -114,13 +116,9 @@ fun FoodItemCard(foodItem: FoodItem, onClick: () -> Unit, onLongPress: () -> Uni
               .background(MaterialTheme.colorScheme.background)
               .combinedClickable(
                   onClick = {
-                      isSelected = false
-                      Log.d("FoodItemCard", "Short tap detected")
                       onClick()
                   },
                   onLongClick = {
-                      isSelected = true
-                      Log.d("FoodItemCard", "Long press detected")
                       onLongPress()
                   }
               )

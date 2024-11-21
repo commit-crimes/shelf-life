@@ -75,18 +75,18 @@ open class ListFoodItemsViewModel(private val repository: FoodItemRepository) : 
     repository.deleteFoodItemById(id = id, onSuccess = { getAllFoodItems() }, onFailure = ::_onFail)
   }
 
-  /** Selects a FoodItem document */
+  /** Selects a FoodItem document for individual view */
   fun selectFoodItem(foodItem: FoodItem?) {
     _selectedFoodItem.value = foodItem
   }
 
+  /** Selects multiple FoodItem documents for bulk actions */
   fun selectMultipleFoodItems(foodItem: FoodItem) {
     if (_multipleSelectedFoodItems.value.contains(foodItem)) {
       _multipleSelectedFoodItems.value = _multipleSelectedFoodItems.value.minus(foodItem)
     } else {
       _multipleSelectedFoodItems.value = _multipleSelectedFoodItems.value.plus(foodItem)
     }
-    Log.e("ListFoodItemModel", "Selected items: ${_multipleSelectedFoodItems.value.map { it.uid }}")
   }
 
   fun clearMultipleSelectedFoodItems() {
