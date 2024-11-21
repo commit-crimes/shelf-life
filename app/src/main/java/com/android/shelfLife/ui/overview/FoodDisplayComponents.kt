@@ -1,7 +1,11 @@
 package com.android.shelfLife.ui.overview
 
+import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,10 +33,16 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.LightGray
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -53,8 +63,8 @@ import java.util.Locale
  * @param foodItems The list of food items to display
  */
 @Composable
-fun ListFoodItems(foodItems: List<FoodItem>, onFoodItemClick: (FoodItem) -> Unit) {
-  if (foodItems.isEmpty()) {
+fun ListFoodItems(foodItems: List<FoodItem>, onFoodItemClick: (FoodItem) -> Unit, onFoodItemLongHold: (FoodItem) -> Unit) {
+    if (foodItems.isEmpty()) {
     Box(
         modifier = Modifier.fillMaxSize().testTag("NoFoodItems"),
         contentAlignment = Alignment.Center) {
@@ -65,15 +75,20 @@ fun ListFoodItems(foodItems: List<FoodItem>, onFoodItemClick: (FoodItem) -> Unit
     LazyColumn(modifier = Modifier.fillMaxSize().testTag("foodItemList")) {
       items(foodItems) { item ->
         // Call a composable that renders each individual to-do item
-        FoodItemCard(foodItem = item, onClick = { onFoodItemClick(item) })
+        FoodItemCard(foodItem = item, onClick = { onFoodItemClick(item) }, onLongPress = { onFoodItemLongHold(item) })
       }
     }
   }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FoodItemCard(foodItem: FoodItem, onClick: () -> Unit) {
-  val expiryDate = foodItem.expiryDate
+fun FoodItemCard(foodItem: FoodItem, onClick: () -> Unit, onLongPress: () -> Unit = {}) {
+
+    var isSelected by remember { mutableStateOf(false) }
+    val cardColor = if (isSelected) Color.Gray else MaterialTheme.colorScheme.background
+    val elevation = if (isSelected) 16.dp else 8.dp
+    val expiryDate = foodItem.expiryDate
   val currentDate = Timestamp.now()
 
   // Calculate time remaining in days
@@ -91,12 +106,24 @@ fun FoodItemCard(foodItem: FoodItem, onClick: () -> Unit) {
 
   // Composable UI
   ElevatedCard(
-      elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
+      colors = CardDefaults.elevatedCardColors(containerColor = cardColor),
+      elevation = CardDefaults.elevatedCardElevation(defaultElevation = elevation),
       modifier =
           Modifier.fillMaxWidth()
               .padding(horizontal = 16.dp, vertical = 8.dp)
               .background(MaterialTheme.colorScheme.background)
-              .clickable { onClick() }
+              .combinedClickable(
+                  onClick = {
+                      isSelected = false
+                      Log.d("FoodItemCard", "Short tap detected")
+                      onClick()
+                  },
+                  onLongClick = {
+                      isSelected = true
+                      Log.d("FoodItemCard", "Long press detected")
+                      onLongPress()
+                  }
+              )
               .testTag("foodItemCard")) {
         Column(modifier = Modifier.padding(16.dp)) {
           // Row for details

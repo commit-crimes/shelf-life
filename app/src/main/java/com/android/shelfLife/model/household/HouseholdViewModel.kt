@@ -189,6 +189,15 @@ class HouseholdViewModel(
     }
   }
 
+  fun deleteMultipleFoodItems(foodItems: List<FoodItem>) {
+    val selectedHousehold = selectedHousehold.value
+    if (selectedHousehold != null) {
+      val updatedFoodItems = selectedHousehold.foodItems.minus(foodItems)
+      updateHousehold(selectedHousehold.copy(foodItems = updatedFoodItems))
+    }
+  }
+
+
   /**
    * Factory for creating a [HouseholdViewModel] with a constructor that takes a
    * [HouseHoldRepository] and a [ListFoodItemsViewModel].
