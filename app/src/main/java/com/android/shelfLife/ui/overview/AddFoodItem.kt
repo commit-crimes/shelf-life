@@ -99,8 +99,7 @@ fun AddFoodItemScreen(
 
               item(key = "amountAndUnit") {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    modifier = Modifier.fillMaxWidth()) {
                       AmountField(
                           amount = amount,
                           onAmountChange = { newValue ->
@@ -119,7 +118,7 @@ fun AddFoodItemScreen(
                           modifier = Modifier.weight(1f),
                           testTag = "inputFoodUnit")
                     }
-                Spacer(modifier = Modifier.height(16.dp))
+                  Spacer(modifier = Modifier.height(16.dp))
               }
 
               item(key = "category") {

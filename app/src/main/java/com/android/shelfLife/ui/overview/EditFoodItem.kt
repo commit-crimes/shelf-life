@@ -85,7 +85,6 @@ fun EditFoodItemScreen(
               item(key = "amountAndUnit") {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically) {
                       AmountField(
                           amount = amount,
