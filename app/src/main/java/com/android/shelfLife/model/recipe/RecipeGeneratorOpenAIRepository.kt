@@ -1,5 +1,6 @@
 package com.android.shelfLife.model.recipe
 
+import android.util.Log
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
 import com.aallam.openai.api.chat.ToolCall
@@ -21,12 +22,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.add
+import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
+import kotlin.time.Duration
 
 class RecipeGeneratorOpenAIRepository(
     private val openai: OpenAI =
@@ -35,6 +39,7 @@ class RecipeGeneratorOpenAIRepository(
 ) : RecipeGeneratorRepository {
 
   companion object {
+    const val USER_PROMPT_USE_TOOL_CALL = "To ensure a great tastin recipe, you can add other ingredients you deem relevant and necessary. Call _createRecipeFunction with a list of ingredients (name + quantity), step by step instructions, servings, and cooking time in seconds"
     const val USE_SOON_TO_EXPIRE_SYSTEM_PROMPT =
         "You are an assistant who generates recipes using ingredients that are about to expire."
     const val USE_SOON_TO_EXPIRE_USER_PROMPT =
@@ -90,41 +95,69 @@ class RecipeGeneratorOpenAIRepository(
 
     // Get the custom system and user prompts based on the mode
     val (systemPrompt, userPrompt) = getPromptsForMode(recipePrompt.ingredients, recipePrompt.recipeType)
-
     // Launch a coroutine
     CoroutineScope(dispatcher).launch {
       try {
         // Define the parameters for the recipe generation tool
-        val params =
-            Parameters.buildJsonObject {
-              put("type", "object")
-              putJsonObject("properties") {
-                putJsonObject("ingredients") {
-                  put("type", "array")
-                  putJsonObject("items") { put("type", "string") }
-                  put("description", "List of ingredients for the recipe")
+        val params = Parameters.buildJsonObject {
+          put("type", "object")
+          putJsonObject("properties") {
+            putJsonObject("ingredients") {
+              put("type", "array")
+              putJsonObject("items") {
+                put("type", "object")
+                putJsonObject("properties") {
+                  putJsonObject("name") {
+                    put("type", "string")
+                    put("description", "Name of the ingredient")
+                  }
+                  putJsonObject("quantity") {
+                    put("type", "number")
+                    put("description", "Quantity value of the ingredient")
+                  }
+                  putJsonObject("unit") {
+                    put("type", "string")
+                    putJsonArray("enum") {
+                      add("ML")
+                      add("GRAM")
+                    }
+                    put("description", "Unit of measurement (ml or gram)")
+                  }
                 }
-                putJsonObject("servings") {
-                  put("type", "integer")
-                  put("description", "Number of servings")
+                putJsonArray("required") {
+                  add("name")
+                  add("quantity")
+                  add("unit")
                 }
-                putJsonObject("time") {
-                  put("type", "string")
-                  put("description", "Estimated cooking time in minutes")
-                }
-                putJsonObject("instructions") {
-                  put("type", "array")
-                  putJsonObject("items") { put("type", "string") }
-                  put("description", "Step-by-step instructions for the recipe")
-                }
+                put("description", "Ingredient with name, quantity, and unit")
               }
-              putJsonArray("required") {
-                add("ingredients")
-                add("servings")
-                add("time")
-                add("instructions")
-              }
+              put("description", "List of ingredients for the recipe")
             }
+            putJsonObject("servings") {
+              put("type", "integer")
+              put("description", "Number of servings")
+            }
+            putJsonObject("time") {
+              put("type", "integer")
+              put("description", "Estimated cooking time in seconds")
+            }
+            putJsonObject("instructions") {
+              put("type", "array")
+              putJsonObject("items") {
+                put("type", "string")
+              }
+              put("description", "Step-by-step instructions for the recipe")
+            }
+          }
+          putJsonArray("required") {
+            add("ingredients")
+            add("servings")
+            add("time")
+            add("instructions")
+          }
+        }
+
+
 
         // Create the chat completion request with the system and user prompts
         val request = chatCompletionRequest {
@@ -135,13 +168,13 @@ class RecipeGeneratorOpenAIRepository(
                       role = ChatRole.System, content = systemPrompt // System prompt
                       ),
                   ChatMessage(
-                      role = ChatRole.User, content = userPrompt // User prompt with food items
+                      role = ChatRole.User, content = (userPrompt + USER_PROMPT_USE_TOOL_CALL)// User prompt with food items
                       ))
           tools {
             function(
                 name = "_createRecipeFunction",
                 description =
-                    "Generate a recipe with ingredients, step by step instructions, servings, and cooking time",
+                    "Generate a recipe with a list of ingredients, step by step instructions, servings, and cooking time in seconds",
                 parameters = params)
           }
           toolChoice = ToolChoice.Auto // Automatically selects the tool
@@ -153,7 +186,6 @@ class RecipeGeneratorOpenAIRepository(
         message?.toolCalls?.firstOrNull()?.let { toolCall ->
           require(toolCall is ToolCall.Function) { "Tool call is not a function" }
           val toolResponse = toolCall.execute() as Map<String, Any>
-
           // Construct the final Recipe object from the tool response
           val generatedRecipe = Recipe(
             uid = "0", // Placeholder UID
@@ -161,20 +193,25 @@ class RecipeGeneratorOpenAIRepository(
             instructions = toolResponse["instructions"] as List<String>,
             servings = (toolResponse["servings"] as Int).toFloat(),
             time = (toolResponse["time"] as Long).minutes,
-            ingredients = (toolResponse["ingredients"] as List<String>).map { ingredientName ->
+            ingredients = (toolResponse["ingredients"] as List<Map<String, Any>>).map { ingredient ->
               Ingredient(
-                name = ingredientName,
-                quantity = Quantity(0.0, FoodUnit.GRAM), // Default quantity
+                name = ingredient["name"] as String, // Access the map value for "name"
+                quantity = Quantity(
+                  amount = ingredient["quantity"] as Double, // Access the map value for "quantity"
+                  unit = ingredient["unit"] as FoodUnit // Access the map value for "unit"
+                ),
                 macros = NutritionFacts() // Default macros
               )
             }
           )
-
-          onSuccess(generatedRecipe) // Return the generated recipe
+          val recipe = generatedRecipe.copy(name = recipePrompt.name)
+          onSuccess(recipe) // Return the generated recipe
         } ?: onFailure(Exception("No tool call generated"))
       } catch (e: Exception) {
+        Log.e("RecipeGeneratorOpenAIRepository", "Error generating recipe: $e")
         onFailure(e)
       }
+
     }
   }
 
@@ -185,32 +222,58 @@ class RecipeGeneratorOpenAIRepository(
       availableFunctions[function.name] ?: error("Function ${function.name} not found")
     val functionArgs = function.argumentsAsJson()
 
-    // Extract arguments from tool call
-    val ingredients =
-      functionArgs["ingredients"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
-    val instructions =
-      functionArgs["instructions"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
-    val servings = functionArgs["servings"]?.jsonPrimitive?.int ?: 2
-    val time = functionArgs["time"]?.jsonPrimitive?.content?.toIntOrNull()?.minutes ?: 30.minutes
+    // Safely extract arguments with defaults
+    val ingredients = try {
+      functionArgs["ingredients"]?.jsonArray?.map { ingredient ->
+        ingredient.jsonObject.let {
+          mapOf(
+            "name" to it["name"]?.jsonPrimitive?.content.orEmpty(),
+            "quantity" to (it["quantity"]?.jsonPrimitive?.doubleOrNull ?: 0.0),
+            "unit" to (it["unit"]?.jsonPrimitive?.content?.let { unit ->
+              when (unit) {
+                "ML" -> FoodUnit.ML
+                "GRAM" -> FoodUnit.GRAM
+                else -> null
+              }
+            } ?: FoodUnit.GRAM)
+          )
+        }
+      } ?: emptyList()
+    } catch (e: Exception) {
+      Log.e("ToolCall", "Error extracting ingredients: $e")
+      emptyList()
+    }
 
-    // Call the simplified function and return the resulting map
+    val instructions = try {
+      functionArgs["instructions"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
+    } catch (e: Exception) {
+      Log.e("ToolCall", "Error extracting instructions: $e")
+      emptyList()
+    }
+
+    val servings = functionArgs["servings"]?.jsonPrimitive?.int ?: 2
+    val time = functionArgs["time"]?.jsonPrimitive?.content?.toIntOrNull()?.seconds ?: 30.seconds
+
     return functionToCall(ingredients, instructions, servings, time)
   }
 
+
+
   @JvmName("_createRecipeFunction") // allowing tests to access this function using reflection
   private fun _createRecipeFunction(
-    ingredients: List<String>,
+    ingredients: List<Map<String, Any>>, // List of ingredient maps
     instructions: List<String>,
     servings: Int,
-    time: kotlin.time.Duration
+    time: Duration
   ): Map<String, Any> {
     return mapOf(
       "name" to "Generated Recipe",
-      "ingredients" to ingredients,
+      "ingredients" to ingredients, // Return the updated ingredients structure
       "instructions" to instructions,
       "servings" to servings,
-      "time" to time.inWholeSeconds // Return time in minutes for consistency
+      "time" to time.inWholeSeconds // Return time in seconds for consistency
     )
   }
+
 
 }
