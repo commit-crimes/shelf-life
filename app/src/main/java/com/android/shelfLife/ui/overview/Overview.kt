@@ -97,7 +97,8 @@ fun OverviewScreen(
                         } else {
                           selectedFilters.remove(filter)
                         }
-                      })
+                      },
+                  )
                 }
               },
               bottomBar = {
