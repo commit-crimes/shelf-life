@@ -10,6 +10,9 @@ import com.aallam.openai.api.http.Timeout
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
 import com.android.shelfLife.BuildConfig
+import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodFacts.NutritionFacts
+import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodItem.FoodItem
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -25,11 +28,11 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 
-class OpenAiRecipesRepository(
+class RecipeGeneratorOpenAIRepository(
     private val openai: OpenAI =
         OpenAI(token = BuildConfig.OPENAI_API_KEY, timeout = Timeout(socket = 60.seconds)),
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
-) : RecipesRepository {
+) : RecipeGeneratorRepository {
 
   companion object {
     const val USE_SOON_TO_EXPIRE_SYSTEM_PROMPT =
@@ -55,34 +58,34 @@ class OpenAiRecipesRepository(
   // Define custom prompts for different recipe types
   private fun getPromptsForMode(
       listFoodItems: List<FoodItem>,
-      searchRecipeType: RecipesRepository.SearchRecipeType
+      searchRecipeType: RecipeGeneratorRepository.SearchRecipeType
   ): Pair<String, String> {
 
     val foodItemsNames = listFoodItems.joinToString(", ") { it.toString() }
 
     // System and user prompts based on the recipe search type
     return when (searchRecipeType) {
-      RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE -> {
+      RecipeGeneratorRepository.SearchRecipeType.USE_SOON_TO_EXPIRE -> {
         USE_SOON_TO_EXPIRE_SYSTEM_PROMPT to "$USE_SOON_TO_EXPIRE_USER_PROMPT$foodItemsNames."
       }
-      RecipesRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS -> {
+      RecipeGeneratorRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS -> {
         USE_ONLY_HOUSEHOLD_ITEMS_SYSTEM_PROMPT to
             "$USE_ONLY_HOUSEHOLD_ITEMS_USER_PROMPT$foodItemsNames."
       }
-      RecipesRepository.SearchRecipeType.HIGH_PROTEIN -> {
+      RecipeGeneratorRepository.SearchRecipeType.HIGH_PROTEIN -> {
         HIGH_PROTEIN_SYSTEM_PROMPT to "$HIGH_PROTEIN_USER_PROMPT$foodItemsNames."
       }
-      RecipesRepository.SearchRecipeType.LOW_CALORIE -> {
+      RecipeGeneratorRepository.SearchRecipeType.LOW_CALORIE -> {
         LOW_CALORIE_SYSTEM_PROMPT to "$LOW_CALORIE_USER_PROMPT$foodItemsNames."
       }
     }
   }
 
-  override fun generateRecipes(
-      listFoodItems: List<FoodItem>,
-      searchRecipeType: RecipesRepository.SearchRecipeType,
-      onSuccess: (List<Recipe>) -> Unit,
-      onFailure: (Exception) -> Unit
+  override fun generateRecipe(
+    listFoodItems: List<FoodItem>,
+    searchRecipeType: RecipeGeneratorRepository.SearchRecipeType,
+    onSuccess: (List<Recipe>) -> Unit,
+    onFailure: (Exception) -> Unit
   ) {
     // Get the custom system and user prompts based on the mode
     val (systemPrompt, userPrompt) = getPromptsForMode(listFoodItems, searchRecipeType)
@@ -148,16 +151,23 @@ class OpenAiRecipesRepository(
         val message = response.choices.firstOrNull()?.message
         message?.toolCalls?.firstOrNull()?.let { toolCall ->
           require(toolCall is ToolCall.Function) { "Tool call is not a function" }
-          val toolResponse = toolCall.execute()
+          val toolResponse = toolCall.execute() as Map<String, Any>
 
-          // Convert the tool response into a recipe object
-          val generatedRecipe =
-              Recipe(
-                  name = "Generated Recipe",
-                  instructions = toolResponse.instructions,
-                  servings = toolResponse.servings,
-                  time = toolResponse.time,
-                  ingredients = toolResponse.ingredients)
+          // Construct the final Recipe object from the tool response
+          val generatedRecipe = Recipe(
+            uid = "0", // Placeholder UID
+            name = toolResponse["name"] as String,
+            instructions = toolResponse["instructions"] as List<String>,
+            servings = (toolResponse["servings"] as Int).toFloat(),
+            time = (toolResponse["time"] as Long).minutes,
+            ingredients = (toolResponse["ingredients"] as List<String>).map { ingredientName ->
+              Ingredient(
+                name = ingredientName,
+                quantity = Quantity(0.0, FoodUnit.GRAM), // Default quantity
+                macros = NutritionFacts() // Default macros
+              )
+            }
+          )
 
           onSuccess(listOf(generatedRecipe)) // Return the generated recipe
         } ?: onFailure(Exception("No tool call generated"))
@@ -169,32 +179,37 @@ class OpenAiRecipesRepository(
 
   private val availableFunctions = mapOf("_createRecipeFunction" to ::_createRecipeFunction)
 
-  private fun ToolCall.Function.execute(): Recipe {
+  private fun ToolCall.Function.execute(): Map<String, Any> {
     val functionToCall =
-        availableFunctions[function.name] ?: error("Function ${function.name} not found")
+      availableFunctions[function.name] ?: error("Function ${function.name} not found")
     val functionArgs = function.argumentsAsJson()
 
-    // Extract ingredients, instructions, servings, and time from tool call arguments
+    // Extract arguments from tool call
     val ingredients =
-        functionArgs["ingredients"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
+      functionArgs["ingredients"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
     val instructions =
-        functionArgs["instructions"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
+      functionArgs["instructions"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
     val servings = functionArgs["servings"]?.jsonPrimitive?.int ?: 2
     val time = functionArgs["time"]?.jsonPrimitive?.content?.toIntOrNull()?.minutes ?: 30.minutes
 
-    return _createRecipeFunction(ingredients, instructions, servings, time)
+    // Call the simplified function and return the resulting map
+    return functionToCall(ingredients, instructions, servings, time)
   }
 
   @JvmName("_createRecipeFunction") // allowing tests to access this function using reflection
   private fun _createRecipeFunction(
-      ingredients: List<String>,
-      instructions: List<String>,
-      servings: Int,
-      time: kotlin.time.Duration
-  ): Recipe {
-
-    // TODO: logic to find and create a new list of Ingredients
-    return Recipe(
-        name = "Generated Recipe", instructions = instructions, servings = servings, time = time)
+    ingredients: List<String>,
+    instructions: List<String>,
+    servings: Int,
+    time: kotlin.time.Duration
+  ): Map<String, Any> {
+    return mapOf(
+      "name" to "Generated Recipe",
+      "ingredients" to ingredients,
+      "instructions" to instructions,
+      "servings" to servings,
+      "time" to time.inWholeSeconds // Return time in minutes for consistency
+    )
   }
+
 }

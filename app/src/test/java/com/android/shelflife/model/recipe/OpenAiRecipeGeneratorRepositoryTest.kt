@@ -38,10 +38,10 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.whenever
 
-class OpenAiRecipesRepositoryTest {
+class OpenAiRecipeGeneratorRepositoryTest {
 
   @Mock private lateinit var mockOpenAI: OpenAI
-  private lateinit var openAiRecipesRepository: OpenAiRecipesRepository
+  private lateinit var openAiRecipesRepository: RecipeGeneratorOpenAIRepository
 
   @OptIn(ExperimentalCoroutinesApi::class) private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -60,7 +60,7 @@ class OpenAiRecipesRepositoryTest {
   fun setUp() {
     MockitoAnnotations.openMocks(this)
     openAiRecipesRepository =
-        OpenAiRecipesRepository(openai = mockOpenAI, dispatcher = testDispatcher)
+        RecipeGeneratorOpenAIRepository(openai = mockOpenAI, dispatcher = testDispatcher)
   }
 
   /**
@@ -70,30 +70,30 @@ class OpenAiRecipesRepositoryTest {
   @Test
   fun `getPromptsForMode should return correct prompts for all recipe types`() {
     val method: Method =
-        OpenAiRecipesRepository::class
+        RecipeGeneratorOpenAIRepository::class
             .java
             .getDeclaredMethod(
                 "getPromptsForMode",
                 List::class.java,
-                RecipesRepository.SearchRecipeType::class.java)
+                RecipeGeneratorRepository.SearchRecipeType::class.java)
     method.isAccessible = true // Make the method accessible
 
     // Define expected system and user prompts for each search type
     val ingredientsString = testFoodItems.joinToString(", ") { it.toString() }
     val expectedPrompts =
         mapOf(
-            RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE to
-                (OpenAiRecipesRepository.USE_SOON_TO_EXPIRE_SYSTEM_PROMPT to
-                    "${OpenAiRecipesRepository.USE_SOON_TO_EXPIRE_USER_PROMPT}${ingredientsString}."),
-            RecipesRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS to
-                (OpenAiRecipesRepository.USE_ONLY_HOUSEHOLD_ITEMS_SYSTEM_PROMPT to
-                    "${OpenAiRecipesRepository.USE_ONLY_HOUSEHOLD_ITEMS_USER_PROMPT}${ingredientsString}."),
-            RecipesRepository.SearchRecipeType.HIGH_PROTEIN to
-                (OpenAiRecipesRepository.HIGH_PROTEIN_SYSTEM_PROMPT to
-                    "${OpenAiRecipesRepository.HIGH_PROTEIN_USER_PROMPT}${ingredientsString}."),
-            RecipesRepository.SearchRecipeType.LOW_CALORIE to
-                (OpenAiRecipesRepository.LOW_CALORIE_SYSTEM_PROMPT to
-                    "${OpenAiRecipesRepository.LOW_CALORIE_USER_PROMPT}${ingredientsString}."))
+            RecipeGeneratorRepository.SearchRecipeType.USE_SOON_TO_EXPIRE to
+                (RecipeGeneratorOpenAIRepository.USE_SOON_TO_EXPIRE_SYSTEM_PROMPT to
+                    "${RecipeGeneratorOpenAIRepository.USE_SOON_TO_EXPIRE_USER_PROMPT}${ingredientsString}."),
+            RecipeGeneratorRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS to
+                (RecipeGeneratorOpenAIRepository.USE_ONLY_HOUSEHOLD_ITEMS_SYSTEM_PROMPT to
+                    "${RecipeGeneratorOpenAIRepository.USE_ONLY_HOUSEHOLD_ITEMS_USER_PROMPT}${ingredientsString}."),
+            RecipeGeneratorRepository.SearchRecipeType.HIGH_PROTEIN to
+                (RecipeGeneratorOpenAIRepository.HIGH_PROTEIN_SYSTEM_PROMPT to
+                    "${RecipeGeneratorOpenAIRepository.HIGH_PROTEIN_USER_PROMPT}${ingredientsString}."),
+            RecipeGeneratorRepository.SearchRecipeType.LOW_CALORIE to
+                (RecipeGeneratorOpenAIRepository.LOW_CALORIE_SYSTEM_PROMPT to
+                    "${RecipeGeneratorOpenAIRepository.LOW_CALORIE_USER_PROMPT}${ingredientsString}."))
 
     // Iterate over each search type and test the generated prompts
     for ((searchType, expectedPromptPair) in expectedPrompts) {
@@ -117,7 +117,7 @@ class OpenAiRecipesRepositoryTest {
         var recipesResult: List<Recipe>? = null
         openAiRecipesRepository.generateRecipes(
             testFoodItems,
-            RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE,
+            RecipeGeneratorRepository.SearchRecipeType.USE_SOON_TO_EXPIRE,
             onSuccess = { recipes ->
               println("Success: Recipes generated successfully $recipes")
               recipesResult = recipes
@@ -143,7 +143,7 @@ class OpenAiRecipesRepositoryTest {
         var errorMessage: String? = null
         openAiRecipesRepository.generateRecipes(
             testFoodItems,
-            RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE,
+            RecipeGeneratorRepository.SearchRecipeType.USE_SOON_TO_EXPIRE,
             onSuccess = { fail("Expected failure callback") },
             onFailure = { error ->
               println("FAILURE: $error")
@@ -160,7 +160,7 @@ class OpenAiRecipesRepositoryTest {
   @Test
   fun `test _createRecipeFunction using reflection`() {
     val method =
-        OpenAiRecipesRepository::class.java.declaredMethods.firstOrNull {
+        RecipeGeneratorOpenAIRepository::class.java.declaredMethods.firstOrNull {
           it.name == "_createRecipeFunction"
         } ?: throw NoSuchMethodException("Method _createRecipeFunction not found")
 

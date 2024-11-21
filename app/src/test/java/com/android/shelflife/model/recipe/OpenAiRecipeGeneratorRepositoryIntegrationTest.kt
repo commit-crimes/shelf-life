@@ -5,8 +5,8 @@ import com.aallam.openai.client.OpenAI
 import com.android.shelfLife.BuildConfig
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.*
-import com.android.shelfLife.model.recipe.OpenAiRecipesRepository
-import com.android.shelfLife.model.recipe.RecipesRepository
+import com.android.shelfLife.model.recipe.RecipeGeneratorOpenAIRepository
+import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.google.firebase.Timestamp
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -18,7 +18,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
-class OpenAiRecipesRepositoryIntegrationTest {
+class OpenAiRecipeGeneratorRepositoryIntegrationTest {
 
   /**
    * Integration test for generating recipes using OpenAI API (this test queries the openai api).
@@ -37,7 +37,7 @@ class OpenAiRecipesRepositoryIntegrationTest {
   private val runIntegrationTest = RUN_INTEGRATION_TEST && _NOT_ON_CI
 
   private lateinit var mockWebServer: MockWebServer
-  private lateinit var openAiRecipesRepository: OpenAiRecipesRepository
+  private lateinit var openAiRecipesRepository: RecipeGeneratorOpenAIRepository
 
   val oneDaySeconds = 24 * 60 * 60 // 1 day in milliseconds
 
@@ -127,7 +127,7 @@ class OpenAiRecipesRepositoryIntegrationTest {
 
     // Initialize OpenAI repository with real API key (or mock URL if using MockWebServer)
     val openai = OpenAI(token = BuildConfig.OPENAI_API_KEY, timeout = Timeout(socket = 60.seconds))
-    openAiRecipesRepository = OpenAiRecipesRepository(openai, dispatcher = Dispatchers.IO)
+    openAiRecipesRepository = RecipeGeneratorOpenAIRepository(openai, dispatcher = Dispatchers.IO)
   }
 
   @After
@@ -146,7 +146,7 @@ class OpenAiRecipesRepositoryIntegrationTest {
     // Call the repository to generate a recipe using OpenAI
     openAiRecipesRepository.generateRecipes(
         listFoodItems = foodItems,
-        searchRecipeType = RecipesRepository.SearchRecipeType.LOW_CALORIE,
+        searchRecipeType = RecipeGeneratorRepository.SearchRecipeType.LOW_CALORIE,
         onSuccess = { recipes ->
           // Print the recipes to the console
           recipes.forEach { recipe ->
