@@ -50,6 +50,8 @@ import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
+import com.android.shelfLife.model.recipe.RecipePrompt
+import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.theme.errorContainerDark
 import com.android.shelfLife.ui.theme.onSecondaryDark
@@ -250,41 +252,66 @@ fun AddRecipeScreen(
 
                   // Add button
                   Button(
-                      // check that everything has been entered
-                      onClick = {
-                        validateInstructions()
-                        error =
-                            title.isEmpty() ||
+                    // check that everything has been entered
+                    onClick = {
+                      validateInstructions()
+                      error =
+                        title.isEmpty() ||
                                 time.isEmpty() ||
                                 servings.isEmpty() ||
                                 ingredients.isEmpty() ||
                                 instructions.isEmpty() ||
                                 instructionsError
-                        if (!error) {
-                          listRecipesViewModel.addRecipeToList(
-                              recipe =
-                                  Recipe(
-                                      name = title,
-                                      instructions = instructions.toList(),
-                                      servings = servings.toInt(),
-                                      time = (time.toDouble() * 60.0).seconds,
-                                      ingredients = ingredients.toList()))
-                          navigationActions.goBack()
-                        } else {
-                          // if not a Toast appears
-                          Toast.makeText(
-                                  context,
-                                  "Please correct the errors before submitting.",
-                                  Toast.LENGTH_SHORT)
-                              .show()
-                        }
-                      },
-                      modifier = Modifier.height(40.dp).testTag("addButton"),
-                      colors =
-                          ButtonDefaults.buttonColors(containerColor = primaryContainerLight)) {
-                        Text(text = "Add", fontSize = 18.sp, color = onSecondaryDark)
+                      if (!error) {
+                        listRecipesViewModel.saveRecipe(
+                          recipe =
+                          Recipe(
+                            uid =  listRecipesViewModel.getUID(),
+                            name = title,
+                            instructions = instructions.toList(),
+                            servings = servings.toFloat(),
+                            time = (time.toDouble() * 60.0).seconds,
+                            ingredients = ingredients.toList()))
+                        navigationActions.goBack()
+                      } else {
+                        // if not a Toast appears
+                        Toast.makeText(
+                          context,
+                          "Please correct the errors before submitting.",
+                          Toast.LENGTH_SHORT)
+                          .show()
                       }
+                    },
+                    modifier = Modifier.height(40.dp).testTag("addButton"),
+                    colors =
+                    ButtonDefaults.buttonColors(containerColor = primaryContainerLight)) {
+                    Text(text = "Add", fontSize = 18.sp, color = onSecondaryDark)
+                  }
+
+                Button(
+                  // check that everything has been entered
+                  onClick = {
+                    listRecipesViewModel.generateRecipe(
+                      recipePrompt = RecipePrompt(name = title, recipeType = RecipeType.HIGH_PROTEIN, specialInstruction = instructions.toList().toString()),
+                      onSuccess = { recipe ->
+                        listRecipesViewModel.saveRecipe(recipe)
+                        Toast.makeText(
+                          context,
+                          "Added recipe.",
+                          Toast.LENGTH_SHORT)
+                          .show()
+                        navigationActions.goBack()
+                      })
+                  },
+                  modifier = Modifier.height(40.dp).testTag("addButton"),
+                  colors = ButtonDefaults.buttonColors(containerColor = primaryContainerLight)) {
+                  Text(text = "Generate", fontSize = 18.sp, color = onSecondaryDark)
                 }
+
+
+            }
+
+
           }
         }
 
@@ -367,7 +394,7 @@ fun IngredientItem(index: Int, ingredient: Ingredient, onRemoveClick: () -> Unit
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
     // title of ingredient
     Text(
-        text = "Ingredient${index + 1} : ${ingredient.foodFacts.name}",
+        text = "Ingredient${index + 1} : ${ingredient.name}",
         modifier = Modifier.testTag("ingredientItem"))
     // delete button
     IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteIngredientButton")) {
@@ -473,11 +500,9 @@ fun IngredientDialog(
                 // create the new ingredient
                 val newIngredient =
                     Ingredient(
-                        foodFacts =
-                            FoodFacts(
-                                name = ingredientName,
-                                quantity = Quantity(quantity, ingredientUnit)),
-                        isOwned = false)
+                        name = ingredientName,
+                        quantity = Quantity(quantity, ingredientUnit)
+                      )
                 // adding it into our list of ingredients
                 ingredients.add(newIngredient)
                 onAddIngredient()

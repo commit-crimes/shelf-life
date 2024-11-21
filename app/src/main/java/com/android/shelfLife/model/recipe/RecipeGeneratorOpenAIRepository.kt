@@ -86,6 +86,8 @@ class RecipeGeneratorOpenAIRepository(
     onSuccess: (Recipe) -> Unit,
     onFailure: (Exception) -> Unit
   ) {
+
+
     // Get the custom system and user prompts based on the mode
     val (systemPrompt, userPrompt) = getPromptsForMode(recipePrompt.ingredients, recipePrompt.recipeType)
 
