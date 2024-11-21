@@ -135,12 +135,12 @@ class BarcodeScannerScreenTest {
 
     // test dropdown
     composeTestRule.onNodeWithTag("locationDropdown").performClick()
-    composeTestRule.onNodeWithTag("locationOption_PANTRY").performClick()
-    composeTestRule.onNodeWithTag("locationTextField").assertTextContains("pantry")
+    composeTestRule.onNodeWithTag("dropDownItem_Pantry").performClick()
+    composeTestRule.onNodeWithTag("dropdownMenu_Select location").assertTextContains("Pantry")
 
     composeTestRule.onNodeWithTag("locationDropdown").performClick()
-    composeTestRule.onNodeWithTag("locationOption_FRIDGE").performClick()
-    composeTestRule.onNodeWithTag("locationTextField").assertTextContains("fridge")
+    composeTestRule.onNodeWithTag("dropDownItem_Fridge").performClick()
+    composeTestRule.onNodeWithTag("dropdownMenu_Select location").assertTextContains("Fridge")
   }
 
   @Test
