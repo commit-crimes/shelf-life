@@ -47,13 +47,14 @@ open class ListRecipesViewModel(private val recipeRepository: RecipeRepository, 
   }
 
   /**
-   * Save a recipe to Firebase Firestore.
+   * Save a recipe to Firebase Firestore. This function will GIVE THE RECIPE A NEW UID
    *
    * @param recipe The Recipe to be saved.
    */
   fun saveRecipe(recipe: Recipe) {
+    val newRecipe = recipe.copy(uid = getUID())
     recipeRepository.addRecipe(
-      recipe = recipe,
+      recipe = newRecipe,
       onSuccess = {
         getRecipes()
       },
@@ -69,11 +70,11 @@ open class ListRecipesViewModel(private val recipeRepository: RecipeRepository, 
    * @param recipePrompt The RecipePrompt to generate the recipe from.
    * @param onSuccess The callback to be called when the recipe is successfully generated.
    */
-  fun generateRecipe(recipePrompt: RecipePrompt, onSuccess: (Recipe) -> Unit) {
+  fun generateRecipe(recipePrompt: RecipePrompt, onSuccess: (Recipe) -> Unit, onFailure: (Exception) -> Unit) {
     recipeGeneratorRepository.generateRecipe(
       recipePrompt = recipePrompt,
       onSuccess = onSuccess, //NOT SAVED DIRECTLY (maybe user wants to regenerate, or scrap the recipe)
-      onFailure = ::_onFail
+      onFailure = onFailure
     )
   }
 
