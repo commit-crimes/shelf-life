@@ -2,6 +2,7 @@ package com.android.shelfLife.ui.recipes
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -126,11 +128,26 @@ fun RecipesScreen(
               },
               // Floating Action Button to add a new food item
               floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigationActions.navigateTo(Screen.ADD_RECIPE) },
-                    content = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                    modifier = Modifier.testTag("addRecipeFab"),
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                  Column(
+                      modifier = Modifier.padding(end = 16.dp), // Adjust padding for better alignment
+                      verticalArrangement = Arrangement.spacedBy(8.dp), // Add spacing between FABs
+                      horizontalAlignment = Alignment.End // Align FABs to the end
+                  ) {
+                      FloatingActionButton(
+                          onClick = { navigationActions.navigateTo(Screen.ADD_RECIPE) },
+                          content = { Icon(Icons.Default.Add, contentDescription = "Add") },
+                          modifier = Modifier.testTag("addRecipeFab"),
+                          containerColor = MaterialTheme.colorScheme.secondaryContainer)
+
+                      Spacer(modifier = Modifier.width(5.dp))
+
+                      FloatingActionButton(
+                          onClick = { navigationActions.navigateTo(Screen.GENERATE_RECIPE) },
+                          content = { Icon(Icons.Default.AutoAwesome, contentDescription = "Generate") },
+                          modifier = Modifier.testTag("generateRecipeFab"),
+                          containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                  }
+
               },
               content = { paddingValues ->
                 Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
