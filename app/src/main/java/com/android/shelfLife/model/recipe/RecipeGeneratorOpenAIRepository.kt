@@ -58,37 +58,36 @@ class RecipeGeneratorOpenAIRepository(
   // Define custom prompts for different recipe types
   private fun getPromptsForMode(
       listFoodItems: List<FoodItem>,
-      searchRecipeType: RecipeGeneratorRepository.SearchRecipeType
+      recipeType: RecipeType
   ): Pair<String, String> {
 
     val foodItemsNames = listFoodItems.joinToString(", ") { it.toString() }
 
     // System and user prompts based on the recipe search type
-    return when (searchRecipeType) {
-      RecipeGeneratorRepository.SearchRecipeType.USE_SOON_TO_EXPIRE -> {
+    return when (recipeType) {
+      RecipeType.USE_SOON_TO_EXPIRE -> {
         USE_SOON_TO_EXPIRE_SYSTEM_PROMPT to "$USE_SOON_TO_EXPIRE_USER_PROMPT$foodItemsNames."
       }
-      RecipeGeneratorRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS -> {
+      RecipeType.USE_ONLY_HOUSEHOLD_ITEMS -> {
         USE_ONLY_HOUSEHOLD_ITEMS_SYSTEM_PROMPT to
             "$USE_ONLY_HOUSEHOLD_ITEMS_USER_PROMPT$foodItemsNames."
       }
-      RecipeGeneratorRepository.SearchRecipeType.HIGH_PROTEIN -> {
+      RecipeType.HIGH_PROTEIN -> {
         HIGH_PROTEIN_SYSTEM_PROMPT to "$HIGH_PROTEIN_USER_PROMPT$foodItemsNames."
       }
-      RecipeGeneratorRepository.SearchRecipeType.LOW_CALORIE -> {
+      RecipeType.LOW_CALORIE -> {
         LOW_CALORIE_SYSTEM_PROMPT to "$LOW_CALORIE_USER_PROMPT$foodItemsNames."
       }
     }
   }
 
   override fun generateRecipe(
-    listFoodItems: List<FoodItem>,
-    searchRecipeType: RecipeGeneratorRepository.SearchRecipeType,
-    onSuccess: (List<Recipe>) -> Unit,
+    recipePrompt: RecipePrompt,
+    onSuccess: (Recipe) -> Unit,
     onFailure: (Exception) -> Unit
   ) {
     // Get the custom system and user prompts based on the mode
-    val (systemPrompt, userPrompt) = getPromptsForMode(listFoodItems, searchRecipeType)
+    val (systemPrompt, userPrompt) = getPromptsForMode(recipePrompt.ingredients, recipePrompt.recipeType)
 
     // Launch a coroutine
     CoroutineScope(dispatcher).launch {
@@ -169,7 +168,7 @@ class RecipeGeneratorOpenAIRepository(
             }
           )
 
-          onSuccess(listOf(generatedRecipe)) // Return the generated recipe
+          onSuccess(generatedRecipe) // Return the generated recipe
         } ?: onFailure(Exception("No tool call generated"))
       } catch (e: Exception) {
         onFailure(e)

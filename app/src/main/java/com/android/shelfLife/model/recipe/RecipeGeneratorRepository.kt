@@ -7,12 +7,6 @@ import com.android.shelfLife.model.foodItem.FoodItem
  */
 interface RecipeGeneratorRepository {
 
-  enum class SearchRecipeType {
-    USE_SOON_TO_EXPIRE,
-    USE_ONLY_HOUSEHOLD_ITEMS,
-    HIGH_PROTEIN,
-    LOW_CALORIE,
-  }
 
   /**
    * Generates a recipe based on the provided search input.
@@ -23,9 +17,8 @@ interface RecipeGeneratorRepository {
    * @param onFailure Callback function to handle recipe generation failures.
    */
   fun generateRecipe(
-      listFoodItems: List<FoodItem>,
-      searchRecipeType: SearchRecipeType = SearchRecipeType.USE_SOON_TO_EXPIRE,
-      onSuccess: (List<Recipe>) -> Unit,
-      onFailure: (Exception) -> Unit
+    recipePrompt: RecipePrompt,
+    onSuccess: (Recipe) -> Unit,
+    onFailure: (Exception) -> Unit
   )
 }
