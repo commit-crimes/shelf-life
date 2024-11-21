@@ -266,8 +266,7 @@ fun AddRecipeScreen(
                                 instructionsError
                       if (!error) {
                         listRecipesViewModel.saveRecipe(
-                          recipe =
-                          Recipe(
+                          recipe = Recipe(
                             uid =  listRecipesViewModel.getUID(),
                             name = title,
                             instructions = instructions.toList(),
@@ -289,32 +288,6 @@ fun AddRecipeScreen(
                     ButtonDefaults.buttonColors(containerColor = primaryContainerLight)) {
                     Text(text = "Add", fontSize = 18.sp, color = onSecondaryDark)
                   }
-
-                Button(
-                  // check that everything has been entered
-                  onClick = {
-                    val testIngredients = listOf(
-                      FoodItem("1", FoodFacts("Chicken", quantity = Quantity(1.0))),
-                      FoodItem("12", FoodFacts("Milk", quantity = Quantity(50.0)))
-                    )
-
-                    listRecipesViewModel.generateRecipe(
-                      recipePrompt = RecipePrompt(name = title, ingredients = testIngredients, recipeType = RecipeType.HIGH_PROTEIN),
-                      onSuccess = { recipe ->
-                        Log.d("AddRecipeScreen", "Generated recipe: $recipe")
-                        listRecipesViewModel.saveRecipe(recipe)
-                      },
-                      onFailure = { error ->
-                        Log.e("AddRecipeScreen", "Error generating recipe: $error")
-
-                      })
-                    navigationActions.goBack()
-                  },
-                  modifier = Modifier.height(40.dp).testTag("addButton"),
-                  colors = ButtonDefaults.buttonColors(containerColor = primaryContainerLight)) {
-                  Text(text = "Generate", fontSize = 18.sp, color = onSecondaryDark)
-                }
-
 
             }
 
