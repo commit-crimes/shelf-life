@@ -1,6 +1,7 @@
 package com.android.shelfLife.ui.recipes
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -46,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
+import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
@@ -291,17 +293,22 @@ fun AddRecipeScreen(
                 Button(
                   // check that everything has been entered
                   onClick = {
+                    val testIngredients = listOf(
+                      FoodItem("1", FoodFacts("Chicken", quantity = Quantity(1.0))),
+                      FoodItem("12", FoodFacts("Milk", quantity = Quantity(50.0)))
+                    )
+
                     listRecipesViewModel.generateRecipe(
-                      recipePrompt = RecipePrompt(name = title, recipeType = RecipeType.HIGH_PROTEIN, specialInstruction = instructions.toList().toString()),
+                      recipePrompt = RecipePrompt(name = title, ingredients = testIngredients, recipeType = RecipeType.HIGH_PROTEIN),
                       onSuccess = { recipe ->
+                        Log.d("AddRecipeScreen", "Generated recipe: $recipe")
                         listRecipesViewModel.saveRecipe(recipe)
-                        Toast.makeText(
-                          context,
-                          "Added recipe.",
-                          Toast.LENGTH_SHORT)
-                          .show()
-                        navigationActions.goBack()
+                      },
+                      onFailure = { error ->
+                        Log.e("AddRecipeScreen", "Error generating recipe: $error")
+
                       })
+                    navigationActions.goBack()
                   },
                   modifier = Modifier.height(40.dp).testTag("addButton"),
                   colors = ButtonDefaults.buttonColors(containerColor = primaryContainerLight)) {
