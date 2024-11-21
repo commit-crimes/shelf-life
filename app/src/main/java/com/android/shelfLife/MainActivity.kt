@@ -21,6 +21,8 @@ import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
+import com.android.shelfLife.model.recipe.RecipeGeneratorOpenAIRepository
+import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
@@ -55,12 +57,15 @@ class MainActivity : ComponentActivity() {
 fun ShelfLifeApp() {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
-  val listRecipesViewModel: ListRecipesViewModel = viewModel()
   val firebaseFirestore = FirebaseFirestore.getInstance()
   val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
   val listFoodItemViewModel = viewModel { ListFoodItemsViewModel(foodItemRepository) }
   val foodFactsRepository = OpenFoodFactsRepository(OkHttpClient())
   val foodFactsViewModel = viewModel { FoodFactsViewModel(foodFactsRepository) }
+  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
+  val recipeGeneratorRepository = RecipeGeneratorOpenAIRepository()
+  val listRecipesViewModel =  viewModel { ListRecipesViewModel(recipeRepository, recipeGeneratorRepository) }
+
   val context = LocalContext.current
 
   val barcodeScannerViewModel: BarcodeScannerViewModel = viewModel()
