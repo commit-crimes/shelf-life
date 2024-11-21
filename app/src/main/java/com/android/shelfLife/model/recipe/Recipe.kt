@@ -23,19 +23,19 @@ data class Recipe(
  */
 data class RecipePrompt (
     val name: String,
-    val recipeType: RecipeType,
-    val specialInstruction: String,
-    val ingredients: List<FoodItem>,
-    val missingIngredients: List<String>,
-    val servings: Float,
-    val shortDuration: Boolean,
-    val macros : NutritionFacts
+    val recipeType: RecipeType = RecipeType.USE_SOON_TO_EXPIRE,
+    val specialInstruction: String = "",
+    val ingredients: List<FoodItem> = listOf(),
+    val missingIngredients: List<String> = listOf(),
+    val servings: Float = 1.0f,
+    val shortDuration: Boolean = false,
+    val macros : NutritionFacts = NutritionFacts()
 )
 
 data class Ingredient(
     val name: String,
     val quantity: Quantity,
-    val macros : NutritionFacts //need to save base macros to estimate correctly the macros of the recipe (and allow dynamic updates to macros when executing a recipe)
+    val macros : NutritionFacts = NutritionFacts() //need to save base macros to estimate correctly the macros of the recipe (and allow dynamic updates to macros when executing a recipe)
 )
 
 enum class RecipeType {
