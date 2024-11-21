@@ -2,6 +2,8 @@ package com.android.shelflife.ui.overview
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
@@ -45,7 +47,9 @@ class OverviewTest {
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
 
     houseHoldRepository = mock()
-    householdViewModel = HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel)
+    householdViewModel =
+        HouseholdViewModel(
+            houseHoldRepository, listFoodItemsViewModel, mock<DataStore<Preferences>>())
 
     whenever(navigationActions.currentRoute()).thenReturn(Route.OVERVIEW)
 
