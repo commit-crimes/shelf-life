@@ -6,6 +6,7 @@ import com.android.shelfLife.model.foodItem.FoodItem
 import kotlin.time.Duration
 
 data class Recipe(
+    val uid: String, // unique identifier for the recipe
     val name: String, // recipe name
     val instructions: List<String>, // instructions of recipes step by step (hence the list)
     val servings: Float, // total number of servings
