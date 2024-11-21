@@ -285,7 +285,9 @@ fun EditFoodItemScreen(
                                 quantity =
                                     Quantity(
                                         amount.toDouble(), selectedFood.foodFacts.quantity.unit),
-                                category = selectedFood.foodFacts.category)
+                                category = selectedFood.foodFacts.category,
+                                imageUrl = selectedFood.foodFacts.imageUrl,
+                            )
 
                         val newFoodItem =
                             FoodItem(
