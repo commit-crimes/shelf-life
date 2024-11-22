@@ -52,16 +52,10 @@ fun validateBuyDate(buyDate: String): Int? {
  */
 fun validateExpireDate(expireDate: String, buyDate: String, buyDateErrorResId: Int?): Int? {
   var errorResId = getDateErrorMessageResId(expireDate)
-  if (errorResId == null &&
-      expireDate.length == 8 &&
-      buyDateErrorResId == null &&
-      buyDate.length == 8) {
+  if (errorResId == null && buyDateErrorResId == null) {
     if (!isDateAfterOrEqual(expireDate, buyDate)) {
       errorResId = R.string.expire_date_before_buy_date_error
-    }
-  }
-  if (errorResId == null && expireDate.length == 8) {
-    if (!isValidDateNotPast(expireDate)) {
+    } else if (!isValidDateNotPast(expireDate)) {
       errorResId = R.string.expire_date_in_past_error
     }
   }
@@ -89,36 +83,12 @@ fun validateOpenDate(
   if (errorResId == null &&
       openDate.isNotEmpty() &&
       buyDateErrorResId == null &&
-      openDate.length == 8 &&
-      buyDate.length == 8) {
+      expireDateErrorResId == null) {
     if (!isDateAfterOrEqual(openDate, buyDate)) {
       errorResId = R.string.open_date_before_buy_date_error
-    }
-  }
-  if (errorResId == null &&
-      openDate.isNotEmpty() &&
-      expireDateErrorResId == null &&
-      openDate.length == 8 &&
-      expireDate.length == 8) {
-    if (!isDateAfterOrEqual(expireDate, openDate)) {
+    } else if (!isDateAfterOrEqual(expireDate, openDate)) {
       errorResId = R.string.open_date_after_expire_date_error
     }
   }
   return errorResId
-}
-
-/**
- * Gets the resource ID of the error message for a date field.
- *
- * @param date The date string to validate.
- * @param isRequired Whether the date field is required.
- * @return The resource ID of the error message if the date is invalid, null otherwise.
- */
-fun getDateErrorMessageResId(date: String, isRequired: Boolean = true): Int? {
-  return when {
-    date.isEmpty() && isRequired -> R.string.date_empty_error
-    date.length != 8 && date.isNotEmpty() -> R.string.date_invalid_format_error
-    !isValidDate(date) && date.isNotEmpty() -> R.string.date_invalid_error
-    else -> null
-  }
 }

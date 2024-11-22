@@ -41,6 +41,7 @@
     <string name="date_empty_error">Date cannot be empty.</string>
     <string name="date_invalid_format_error">Date must be in ddMMyyyy format.</string>
     <string name="date_invalid_error">Invalid date.</string>
+    <string name="date_incomplete_error">Incomplete date.</string>
 
     <!-- Toast Messages -->
     <string name="food_added_message">Food item added.</string>
