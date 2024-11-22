@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Screen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -198,7 +199,7 @@ fun HouseHoldCreationScreen(
                                 } else {
                                   householdViewModel.addNewHousehold(houseHoldName, memberEmailList)
                                 }
-                                navigationActions.goBack()
+                                navigationActions.navigateTo(Screen.OVERVIEW)
                               }
                             }
                           }

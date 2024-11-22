@@ -25,6 +25,7 @@ import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
+import com.android.shelfLife.ui.invitations.InvitationScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
@@ -147,11 +148,12 @@ fun ShelfLifeApp() {
         ProfileScreen(
             navigationActions,
             signOutUser = {
-              signOutUser(context) {
-                // Navigate to the authentication screen
-                navigationActions.navigateToAndClearBackStack(Route.AUTH)
-              }
-            })
+              signOutUser(context) { navigationActions.navigateToAndClearBackStack(Route.AUTH) }
+            },
+            householdViewModel = householdViewModel)
+      }
+      composable(Route.INVITATIONS) {
+        InvitationScreen(viewModel = householdViewModel, navigationActions = navigationActions)
       }
     }
   }

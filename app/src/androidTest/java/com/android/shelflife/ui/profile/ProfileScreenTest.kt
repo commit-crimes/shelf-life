@@ -6,13 +6,18 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.NavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
+import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
+import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.profile.ProfileScreen
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,12 +26,24 @@ import org.junit.runner.RunWith
 class ProfileScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
+  private lateinit var householdViewModel: HouseholdViewModel
+
+  @Before
+  fun setUp() {
+    MockKAnnotations.init(this, relaxUnitFun = true)
+    val mockRepository: HouseholdRepositoryFirestore = mockk(relaxed = true)
+    val mockListFoodItemsViewModel: ListFoodItemsViewModel = mockk(relaxed = true)
+    householdViewModel = HouseholdViewModel(mockRepository, mockListFoodItemsViewModel)
+  }
 
   @Test
   fun testNameText_whenAccountIsNull_displaysGuest() {
     val navigationActions = NavigationActions(mockk<NavHostController>(relaxed = true))
     composeTestRule.setContent {
-      ProfileScreen(navigationActions = navigationActions, account = null)
+      ProfileScreen(
+          navigationActions = navigationActions,
+          account = null,
+          householdViewModel = householdViewModel)
     }
 
     composeTestRule.onNodeWithTag("profileNameText").assertIsDisplayed().assertTextEquals("Guest")
@@ -44,7 +61,10 @@ class ProfileScreenTest {
             })
 
     composeTestRule.setContent {
-      ProfileScreen(navigationActions = navigationActions, account = account)
+      ProfileScreen(
+          navigationActions = navigationActions,
+          account = account,
+          householdViewModel = householdViewModel)
     }
 
     composeTestRule.onNodeWithTag("profileNameText").assertTextEquals("John Smith")
@@ -64,7 +84,10 @@ class ProfileScreenTest {
                       "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg")
             })
     composeTestRule.setContent {
-      ProfileScreen(navigationActions = navigationActions, account = account)
+      ProfileScreen(
+          navigationActions = navigationActions,
+          account = account,
+          householdViewModel = householdViewModel)
     }
 
     composeTestRule
@@ -77,7 +100,10 @@ class ProfileScreenTest {
   fun profileScreen_hidesEmailWhenNotAvailable() {
     val navigationActions = NavigationActions(mockk<NavHostController>(relaxed = true))
     composeTestRule.setContent {
-      ProfileScreen(navigationActions = navigationActions, account = null)
+      ProfileScreen(
+          navigationActions = navigationActions,
+          account = null,
+          householdViewModel = householdViewModel)
     }
 
     composeTestRule.onNodeWithTag("profileEmailText").assertDoesNotExist()
@@ -93,7 +119,10 @@ class ProfileScreenTest {
 
     composeTestRule.setContent {
       ProfileScreen(
-          navigationActions = navigationActions, account = null, signOutUser = signOutUser)
+          navigationActions = navigationActions,
+          account = null,
+          signOutUser = signOutUser,
+          householdViewModel = householdViewModel)
     }
 
     composeTestRule.onNodeWithTag("logoutButton").assertIsDisplayed().performClick()
@@ -109,7 +138,10 @@ class ProfileScreenTest {
   fun testProfilePictureIsDisplayed() {
     val navigationActions = NavigationActions(mockk<NavHostController>(relaxed = true))
     composeTestRule.setContent {
-      ProfileScreen(navigationActions = navigationActions, account = null)
+      ProfileScreen(
+          navigationActions = navigationActions,
+          account = null,
+          householdViewModel = householdViewModel)
     }
 
     composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
@@ -119,7 +151,10 @@ class ProfileScreenTest {
   fun testBottomNavigationIsDisplayed() {
     val navigationActions = NavigationActions(mockk<NavHostController>(relaxed = true))
     composeTestRule.setContent {
-      ProfileScreen(navigationActions = navigationActions, account = null)
+      ProfileScreen(
+          navigationActions = navigationActions,
+          account = null,
+          householdViewModel = householdViewModel)
     }
 
     composeTestRule.onNodeWithText("Profile").assertIsDisplayed().assertIsSelected()
@@ -131,7 +166,10 @@ class ProfileScreenTest {
         mockk<NavigationActions>(
             relaxed = true, block = { every { currentRoute() } returns Route.RECIPES })
     composeTestRule.setContent {
-      ProfileScreen(navigationActions = navigationActions, account = null)
+      ProfileScreen(
+          navigationActions = navigationActions,
+          account = null,
+          householdViewModel = householdViewModel)
     }
 
     composeTestRule.onNodeWithText("Recipes").performClick()
@@ -146,7 +184,10 @@ class ProfileScreenTest {
             relaxed = true, block = { every { currentRoute() } returns Route.PROFILE })
 
     composeTestRule.setContent {
-      ProfileScreen(navigationActions = navigationActions, account = null)
+      ProfileScreen(
+          navigationActions = navigationActions,
+          account = null,
+          householdViewModel = householdViewModel)
     }
 
     composeTestRule.onNodeWithTag("dropdownMenu_App Theme").performClick()

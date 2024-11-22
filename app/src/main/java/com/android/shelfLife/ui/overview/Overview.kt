@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.overview
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,7 +51,7 @@ fun OverviewScreen(
   val selectedHousehold = householdViewModel.selectedHousehold.collectAsState()
   var searchQuery by remember { mutableStateOf("") }
   val foodItems = listFoodItemsViewModel.foodItems.collectAsState()
-  val userHouseholds = householdViewModel.households.collectAsState().value
+  val userHouseholds = householdViewModel.households.collectAsState()
   val householdViewModelIsLoaded = householdViewModel.finishedLoading.collectAsState().value
   val selectedFilters = remember { mutableStateListOf<String>() }
 
@@ -79,7 +80,8 @@ fun OverviewScreen(
           ) {
             CircularProgressIndicator()
           }
-        } else if (selectedHousehold.value == null && userHouseholds.isEmpty()) {
+        } else if (selectedHousehold.value == null && userHouseholds.value.isEmpty()) {
+            Log.d("OverviewScreen", userHouseholds.value.toString())
           FirstTimeWelcomeScreen(navigationActions, householdViewModel)
         } else {
           Scaffold(

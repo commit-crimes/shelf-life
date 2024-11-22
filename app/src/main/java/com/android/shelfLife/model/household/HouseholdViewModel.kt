@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
+import com.android.shelfLife.model.invitations.Invitation
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +29,9 @@ class HouseholdViewModel(
   private val _memberEmails = MutableStateFlow<Map<String, String>>(emptyMap())
   val memberEmails: StateFlow<Map<String, String>> = _memberEmails.asStateFlow()
 
+  private val _invitations = MutableStateFlow<List<Invitation>>(emptyList())
+  val invitations: StateFlow<List<Invitation>> = _invitations.asStateFlow()
+
   var finishedLoading = MutableStateFlow(false)
 
   /** Initializes the HouseholdViewModel by loading the list of households from the repository. */
@@ -35,6 +39,7 @@ class HouseholdViewModel(
     FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
       if (firebaseAuth.currentUser != null) {
         loadHouseholds()
+        loadInvitations()
       }
     }
   }
@@ -61,6 +66,7 @@ class HouseholdViewModel(
           finishedLoading.value = true
         })
   }
+
   /**
    * Updates the selected household with the latest data from the list of households using the uid,
    * we may need to add another uid than the name.
@@ -121,7 +127,14 @@ class HouseholdViewModel(
 
         repository.addHousehold(
             householdWithMembers,
-            onSuccess = { Log.d("HouseholdViewModel", "Household added successfully") },
+            onSuccess = {
+              Log.d("HouseholdViewModel", "Household added successfully")
+
+              // Send invitations to friends
+              for (email in friendEmails) {
+                sendInvitation(household, email)
+              }
+            },
             onFailure = { exception ->
               Log.e("HouseholdViewModel", "Error adding household: $exception")
             })
@@ -197,5 +210,52 @@ class HouseholdViewModel(
             return HouseholdViewModel(repository, listFoodItemsViewModel) as T
           }
         }
+  }
+
+  // Load invitations for the current user
+  private fun loadInvitations() {
+    repository.getInvitations(
+        onSuccess = { invitationList -> _invitations.value = invitationList },
+        onFailure = { exception ->
+          Log.e("HouseholdViewModel", "Error loading invitations: $exception")
+        })
+  }
+
+  private fun sendInvitation(household: HouseHold, invitedUserEmail: String) {
+    repository.sendInvitation(
+        household = household,
+        invitedUserEmail = invitedUserEmail,
+        onSuccess = { Log.d("HouseholdViewModel", "Invitation sent successfully") },
+        onFailure = { exception ->
+          Log.e("HouseholdViewModel", "Error sending invitation: $exception")
+        })
+  }
+
+  fun acceptInvitation(invitation: Invitation) {
+    repository.acceptInvitation(
+        invitation,
+        onSuccess = {
+          Log.d("HouseholdViewModel", "Invitation accepted")
+            invitations.value.minus(invitation)
+            loadInvitations()
+            loadHouseholds()
+        },
+        onFailure = { exception ->
+          Log.e("HouseholdViewModel", "Error accepting invitation: $exception")
+        })
+  }
+
+  fun declineInvitation(invitation: Invitation) {
+    repository.declineInvitation(
+        invitation,
+        onSuccess = {
+          Log.d("HouseholdViewModel", "Invitation declined")
+          // Refresh invitations
+            invitations.value.minus(invitation)
+          loadInvitations()
+        },
+        onFailure = { exception ->
+          Log.e("HouseholdViewModel", "Error declining invitation: $exception")
+        })
   }
 }
