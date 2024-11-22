@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,7 +52,9 @@ fun TopNavigationBar(
     onHamburgerClick: () -> Unit = {},
     filters: List<String>,
     selectedFilters: List<String>,
-    onFilterChange: (String, Boolean) -> Unit
+    onFilterChange: (String, Boolean) -> Unit,
+    showDeleteOption: Boolean = false,
+    onDeleteClick: () -> Unit = {}
 ) {
   var showFilterBar by remember { mutableStateOf(false) }
   Column {
@@ -84,10 +87,19 @@ fun TopNavigationBar(
           if (filters.isNotEmpty()) {
             IconButton(
                 modifier = Modifier.testTag("filterIcon"),
-                onClick = { showFilterBar = !showFilterBar }) { // Toggle filter bar visibility
+                onClick = { showFilterBar = !showFilterBar }) {
                   Icon(
                       imageVector = Icons.Default.FilterList,
                       contentDescription = "Filter Icon",
+                  )
+                }
+          }
+          if (showDeleteOption) {
+            IconButton(
+                modifier = Modifier.testTag("deleteFoodItems"), onClick = { onDeleteClick() }) {
+                  Icon(
+                      imageVector = Icons.Default.Delete,
+                      contentDescription = "Delete Icon",
                   )
                 }
           }
