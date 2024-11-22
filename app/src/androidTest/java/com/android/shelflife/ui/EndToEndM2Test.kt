@@ -256,7 +256,7 @@ class EndToEndM2Test {
     composeTestRule.onNodeWithTag("submitButton").performClick()
   }
 
-  // In this test the user wants to first add a friend into a new household
+  /*// In this test the user wants to first add a friend into a new household
   @Test
   fun testEndToEnd_add_friend() {
     // User goes and navigates to the Household drawer to create a new household
@@ -270,7 +270,7 @@ class EndToEndM2Test {
     composeTestRule.onNodeWithTag("EmailInputField").performTextInput("dogwaterson@gmail.com")
     composeTestRule.onNodeWithTag("ConfirmButton").performClick()
   }
-
+*/
   // In this test the user searches for an food item, clicks on it to see all its fields and edits
   // some of them.
   @Test

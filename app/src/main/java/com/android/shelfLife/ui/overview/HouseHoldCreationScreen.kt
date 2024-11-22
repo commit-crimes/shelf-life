@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.overview
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,7 +27,6 @@ import androidx.compose.ui.unit.sp
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -180,15 +178,21 @@ fun HouseHoldCreationScreen(
                                   houseHoldName != householdToEdit!!.name)) {
                             isError = true
                           } else {
-                                if (householdToEdit != null) {
-                                  val updatedHouseHold =
-                                      householdToEdit!!.copy(
-                                          name = houseHoldName, members = memberEmailList)
-                                  householdViewModel.updateHousehold(updatedHouseHold)
-                                } else {
-                                  householdViewModel.addNewHousehold(houseHoldName, memberEmailList)
-                                }
-                                navigationActions.navigateTo(Screen.OVERVIEW)
+                            if (householdToEdit != null) {
+                              var updatedHouseHold = householdToEdit!!.copy(name = houseHoldName)
+                              householdViewModel.getUserIdsByEmails(
+                                  memberEmailList,
+                                  callback = { emailToUserIds ->
+                                    updatedHouseHold =
+                                        updatedHouseHold.copy(
+                                            members = emailToUserIds.values.toList())
+                                    householdViewModel.updateHousehold(updatedHouseHold)
+                                  })
+                              householdViewModel.updateHousehold(updatedHouseHold)
+                            } else {
+                              householdViewModel.addNewHousehold(houseHoldName, memberEmailList)
+                            }
+                            navigationActions.navigateTo(Screen.OVERVIEW)
                           }
                         },
                     ) {

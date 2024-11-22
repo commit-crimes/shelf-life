@@ -36,49 +36,51 @@ fun FirstTimeWelcomeScreen(
     navigationActions: NavigationActions,
     householdViewModel: HouseholdViewModel
 ) {
-   val currentContext =  LocalContext.current
+  val currentContext = LocalContext.current
   Column(
       modifier = Modifier.fillMaxSize().padding(16.dp).testTag("firstTimeWelcomeScreen"),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally) {
-      // Welcome Text
-      Text(
-          text = "Welcome to ShelfLife!",
-          style = MaterialTheme.typography.headlineLarge,
-          color = MaterialTheme.colorScheme.primary,
-      )
+        // Welcome Text
+        Text(
+            text = "Welcome to ShelfLife!",
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.primary,
+        )
 
-      Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-      // Subtitle Text
-      Text(
-          text = "Get started by creating your Household",
-          style = MaterialTheme.typography.bodyMedium,
-          color = MaterialTheme.colorScheme.onBackground,
-          modifier = Modifier.padding(horizontal = 16.dp),
-          textAlign = TextAlign.Center
-      )
+        // Subtitle Text
+        Text(
+            text = "Get started by creating your Household",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground,
+            modifier = Modifier.padding(horizontal = 16.dp),
+            textAlign = TextAlign.Center)
 
-      Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-      // Create Household Button
-      Button(
-          onClick = {
+        // Create Household Button
+        Button(
+            onClick = {
               householdViewModel.selectHouseholdToEdit(null)
               navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
-          },
-          modifier = Modifier.fillMaxWidth(0.6f).height(48.dp).testTag("householdNameSaveButton"),
-          shape = MaterialTheme.shapes.medium
-      ) {
-          Text(text = "Create Household", style = MaterialTheme.typography.labelLarge)
-      }
+            },
+            modifier = Modifier.fillMaxWidth(0.6f).height(48.dp).testTag("householdNameSaveButton"),
+            shape = MaterialTheme.shapes.medium) {
+              Text(text = "Create Household", style = MaterialTheme.typography.labelLarge)
+            }
 
-      OutlinedButton(
-          onClick = { signOutUser(currentContext) { navigationActions.navigateToAndClearBackStack(Route.AUTH) }},
-          modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
-          border = BorderStroke(1.dp, Color.Red) // Outline color matches the current status
-      ) {
-          Text(text = "Log out", color = Color.Red)
+        OutlinedButton(
+            onClick = {
+              signOutUser(currentContext) {
+                navigationActions.navigateToAndClearBackStack(Route.AUTH)
+              }
+            },
+            modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
+            border = BorderStroke(1.dp, Color.Red) // Outline color matches the current status
+            ) {
+              Text(text = "Log out", color = Color.Red)
+            }
       }
-  }
 }

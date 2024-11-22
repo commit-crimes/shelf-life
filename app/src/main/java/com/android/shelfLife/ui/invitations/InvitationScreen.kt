@@ -36,7 +36,11 @@ fun InvitationScreen(viewModel: HouseholdViewModel, navigationActions: Navigatio
 }
 
 @Composable
-fun InvitationCard(invitation: Invitation, viewModel: HouseholdViewModel, navigationActions: NavigationActions) {
+fun InvitationCard(
+    invitation: Invitation,
+    viewModel: HouseholdViewModel,
+    navigationActions: NavigationActions
+) {
   Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation()) {
     Column(modifier = Modifier.padding(16.dp)) {
       Text(
@@ -46,9 +50,9 @@ fun InvitationCard(invitation: Invitation, viewModel: HouseholdViewModel, naviga
       Row {
         Button(
             onClick = {
-                viewModel.acceptInvitation(invitation)
-                navigationActions.navigateTo(Screen.PROFILE)
-                      },
+              viewModel.acceptInvitation(invitation)
+              navigationActions.navigateTo(Screen.PROFILE)
+            },
             modifier = Modifier.weight(1f)) {
               Text("Accept")
             }

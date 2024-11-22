@@ -82,7 +82,7 @@ fun OverviewScreen(
             CircularProgressIndicator()
           }
         } else if (selectedHousehold.value == null && userHouseholds.value.isEmpty()) {
-            Log.d("OverviewScreen", userHouseholds.value.toString())
+          Log.d("OverviewScreen", userHouseholds.value.toString())
           FirstTimeWelcomeScreen(navigationActions, householdViewModel)
         } else {
           Scaffold(

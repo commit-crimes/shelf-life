@@ -157,12 +157,11 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
     }
   }
 
-  override fun getUserIds(users: List<String>, callback: (Map<String, String>) -> Unit) {
+  override fun getUserIds(users: List<String?>, callback: (Map<String, String>) -> Unit) {
     if (users.isEmpty()) {
       callback(emptyMap())
       return
     }
-
     val emailBatches = users.chunked(10) // Firestore allows up to 10 values in 'whereIn'
     val emailToUserId = mutableMapOf<String, String>()
     var batchesProcessed = 0
@@ -287,9 +286,7 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
                     "householdName" to household.name,
                     "invitedUserId" to invitedUserId,
                     "inviterUserId" to FirebaseAuth.getInstance().currentUser?.uid,
-                    "status" to "pending",
                     "timestamp" to Timestamp.now())
-
             db.collection("invitations")
                 .document(invitationId)
                 .set(invitationData)
@@ -324,7 +321,6 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
     if (currentUser != null) {
       db.collection("invitations")
           .whereEqualTo("invitedUserId", currentUser.uid)
-          .whereEqualTo("status", "pending")
           .get()
           .addOnSuccessListener { querySnapshot ->
             val invitations = querySnapshot.documents.mapNotNull { doc -> convertToInvitation(doc) }
@@ -355,26 +351,23 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
     val currentUser = FirebaseAuth.getInstance().currentUser
 
     if (currentUser != null) {
-        db.collection("invitations")
-            .whereEqualTo("invitedUserId", currentUser.uid)
-            .whereEqualTo("status", "pending")
-            .get()
-            .addOnSuccessListener {
-                // delete the invitation
-                db.collection("invitations").
-                document(invitation.invitationId).
-                delete()
-                // add the user to the household
-                db.collection("households").
-                document(invitation.householdId).
-                update("members", FieldValue.arrayUnion(currentUser.uid))
-                Log.d("HouseholdRepository", "Invitation accepted")
-              onSuccess()
-            }
-            .addOnFailureListener { exception ->
-              Log.e("HouseholdRepository", "Error fetching invitations", exception)
-              onFailure(exception)
-            }
+      db.collection("invitations")
+          .whereEqualTo("invitedUserId", currentUser.uid)
+          .get()
+          .addOnSuccessListener {
+            // delete the invitation
+            db.collection("invitations").document(invitation.invitationId).delete()
+            // add the user to the household
+            db.collection("households")
+                .document(invitation.householdId)
+                .update("members", FieldValue.arrayUnion(currentUser.uid))
+            Log.d("HouseholdRepository", "Invitation accepted")
+            onSuccess()
+          }
+          .addOnFailureListener { exception ->
+            Log.e("HouseholdRepository", "Error fetching invitations", exception)
+            onFailure(exception)
+          }
     } else {
       Log.e("HouseholdRepository", "User not logged in")
       onFailure(Exception("User not logged in"))
@@ -393,8 +386,8 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
       onSuccess: () -> Unit,
       onFailure: (Exception) -> Unit
   ) {
-      // delete the invitation
-      db.collection("invitations")
+    // delete the invitation
+    db.collection("invitations")
         .document(invitation.invitationId)
         .delete()
         .addOnSuccessListener { onSuccess() }
