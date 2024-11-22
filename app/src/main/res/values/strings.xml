@@ -2,6 +2,7 @@
     <string name="app_name">Shelf Life</string>
     <string name="default_web_client_id">1096875383271-iltoi30htgc5bhsh7jfafq0213f65cd4.apps.googleusercontent.com</string>
     <string name="add_food_item_title">Add Food Item</string>
+    <string name="edit_food_item_title">Edit Food Item</string>
     <string name="food_name_hint">Enter food name</string>
     <string name="amount_hint">Enter amount</string>
     <string name="unit_label">Select unit</string>

@@ -1,7 +1,8 @@
 package com.android.shelfLife.ui.overview
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,6 +30,9 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,8 +45,9 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
+import com.android.shelfLife.ui.utils.getExpiryMessageBasedOnDays
 import com.android.shelfLife.ui.utils.getProgressBarState
-import com.android.shelfLife.ui.utils.getThresholdsForCategory
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -53,7 +58,12 @@ import java.util.Locale
  * @param foodItems The list of food items to display
  */
 @Composable
-fun ListFoodItems(foodItems: List<FoodItem>, onFoodItemClick: (FoodItem) -> Unit) {
+fun ListFoodItems(
+    foodItems: List<FoodItem>,
+    listFoodItemsViewModel: ListFoodItemsViewModel,
+    onFoodItemClick: (FoodItem) -> Unit,
+    onFoodItemLongHold: (FoodItem) -> Unit
+) {
   if (foodItems.isEmpty()) {
     Box(
         modifier = Modifier.fillMaxSize().testTag("NoFoodItems"),
@@ -65,74 +75,96 @@ fun ListFoodItems(foodItems: List<FoodItem>, onFoodItemClick: (FoodItem) -> Unit
     LazyColumn(modifier = Modifier.fillMaxSize().testTag("foodItemList")) {
       items(foodItems) { item ->
         // Call a composable that renders each individual to-do item
-        FoodItemCard(foodItem = item, onClick = { onFoodItemClick(item) })
+        FoodItemCard(
+            foodItem = item,
+            listFoodItemsViewModel = listFoodItemsViewModel,
+            onClick = { onFoodItemClick(item) },
+            onLongPress = { onFoodItemLongHold(item) })
       }
     }
   }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun FoodItemCard(foodItem: FoodItem, onClick: () -> Unit) {
+fun FoodItemCard(
+    foodItem: FoodItem,
+    listFoodItemsViewModel: ListFoodItemsViewModel,
+    onClick: () -> Unit = {},
+    onLongPress: () -> Unit = {}
+) {
+  val selectedItems by listFoodItemsViewModel.multipleSelectedFoodItems.collectAsState()
+  val isSelected = selectedItems.contains(foodItem)
+  val cardColor =
+      if (isSelected) MaterialTheme.colorScheme.primaryContainer
+      else MaterialTheme.colorScheme.background
+  val elevation = if (isSelected) 16.dp else 8.dp
   val expiryDate = foodItem.expiryDate
   val currentDate = Timestamp.now()
 
-  val timeRemaining = expiryDate?.seconds?.minus(currentDate.seconds) ?: 0L
-  val thresholds = getThresholdsForCategory(foodItem.foodFacts.category)
+  // Calculate time remaining in days
+  val timeRemainingInDays =
+      expiryDate?.let { ((it.seconds - currentDate.seconds) / (60 * 60 * 24)).toInt() } ?: -1
 
-  val (progress, progressBarColor) = getProgressBarState(timeRemaining, thresholds)
+  // Get progress bar state
+  val (progress, progressBarColor) = getProgressBarState(timeRemainingInDays)
 
+  // Get formatted expiry date and message
   val formattedExpiryDate =
       expiryDate?.toDate()?.let { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it) }
           ?: "No Expiry Date"
+  val expiryDateMessage = getExpiryMessageBasedOnDays(timeRemainingInDays, formattedExpiryDate)
 
+  // Composable UI
   ElevatedCard(
-      elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
+      colors = CardDefaults.elevatedCardColors(containerColor = cardColor),
+      elevation = CardDefaults.elevatedCardElevation(defaultElevation = elevation),
       modifier =
           Modifier.fillMaxWidth()
               .padding(horizontal = 16.dp, vertical = 8.dp)
               .background(MaterialTheme.colorScheme.background)
-              .clickable { onClick() }
+              .combinedClickable(onClick = { onClick() }, onLongClick = { onLongPress() })
               .testTag("foodItemCard")) {
-        Row(modifier = Modifier.padding(16.dp)) {
-          Column(modifier = Modifier.weight(1f)) {
-            Text(text = foodItem.foodFacts.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Column(modifier = Modifier.padding(16.dp)) {
+          // Row for details
+          Row {
+            Column(modifier = Modifier.weight(1f)) {
+              Text(text = foodItem.foodFacts.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
-            when (foodItem.foodFacts.quantity.unit) {
-              FoodUnit.GRAM ->
-                  Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}g", fontSize = 12.sp)
-              FoodUnit.ML ->
-                  Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}ml", fontSize = 12.sp)
-              FoodUnit.COUNT ->
-                  Text(
-                      text = "${foodItem.foodFacts.quantity.amount.toInt()} in stock",
-                      fontSize = 12.sp)
+              when (foodItem.foodFacts.quantity.unit) {
+                FoodUnit.GRAM ->
+                    Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}g", fontSize = 12.sp)
+                FoodUnit.ML ->
+                    Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}ml", fontSize = 12.sp)
+                FoodUnit.COUNT ->
+                    Text(
+                        text = "${foodItem.foodFacts.quantity.amount.toInt()} in stock",
+                        fontSize = 12.sp)
+              }
+
+              Text(text = expiryDateMessage, fontSize = 12.sp)
             }
 
-            Text(text = "Expires on $formattedExpiryDate", fontSize = 12.sp)
+            Spacer(modifier = Modifier.width(8.dp))
+
+            AsyncImage(
+                model = foodItem.foodFacts.imageUrl,
+                contentDescription = "Food Image",
+                modifier =
+                    Modifier.size(80.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .align(Alignment.CenterVertically),
+                contentScale = ContentScale.Crop)
           }
 
-          Spacer(modifier = Modifier.width(8.dp))
-
-          AsyncImage(
-              model = foodItem.foodFacts.imageUrl,
-              contentDescription = "Food Image",
-              modifier =
-                  Modifier.size(80.dp)
-                      .clip(RoundedCornerShape(8.dp))
-                      .align(Alignment.CenterVertically),
-              contentScale = ContentScale.Crop)
-        }
-        Row {
+          // Progress bar
+          Spacer(modifier = Modifier.height(8.dp))
           LinearProgressIndicator(
-              progress = { progress },
+              progress = progress,
               modifier = Modifier.fillMaxWidth().height(8.dp),
               color = progressBarColor,
-              gapSize = 4.dp,
-              drawStopIndicator = {},
-              trackColor = LightGray,
-          )
+              trackColor = LightGray)
         }
-        Spacer(modifier = Modifier.width(8.dp))
       }
 }
 
