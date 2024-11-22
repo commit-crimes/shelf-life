@@ -39,10 +39,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
@@ -112,7 +114,7 @@ fun AddRecipeScreen(
             // Title of the screen: Recipe name
             title = {
               Text(
-                  text = "Add your own recipe",
+                  text = stringResource(R.string.title_of_AddRecipeScreen),
                   style =
                       MaterialTheme.typography.bodyLarge.copy(
                           fontSize = 24.sp, fontWeight = FontWeight.Bold))
@@ -127,9 +129,11 @@ fun AddRecipeScreen(
                 value = title,
                 onValueChange = {
                   title = it
-                  titleError = if (title.isEmpty()) "Incomplete title" else null
+                  titleError =
+                      if (title.isEmpty()) context.getString(R.string.error_message_title_of_recipe)
+                      else null
                 },
-                label = { Text("Recipe title") },
+                label = { Text(stringResource(R.string.title_of_recipe)) },
                 modifier =
                     Modifier.fillMaxWidth().padding(vertical = 10.dp).testTag("inputRecipeTitle"))
           }
@@ -143,9 +147,11 @@ fun AddRecipeScreen(
                 value = servings,
                 onValueChange = {
                   servings = it
-                  servingsError = if (servings.isEmpty()) "Incomplete serving number" else null
+                  servingsError =
+                      if (servings.isEmpty()) context.getString(R.string.error_message_servings)
+                      else null
                 },
-                label = { Text("Servings") },
+                label = { Text(stringResource(R.string.servings)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier =
                     Modifier.fillMaxWidth()
@@ -162,9 +168,10 @@ fun AddRecipeScreen(
                 value = time,
                 onValueChange = {
                   time = it
-                  timeError = if (time.isEmpty()) "Incomplete time" else null
+                  timeError =
+                      if (time.isEmpty()) context.getString(R.string.error_message_time) else null
                 },
-                label = { Text("Time in minutes") },
+                label = { Text(stringResource(R.string.time)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier =
                     Modifier.fillMaxWidth().padding(vertical = 10.dp).testTag("inputRecipeTime"))
@@ -176,7 +183,9 @@ fun AddRecipeScreen(
           // recipe Ingredients
           item {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-              Text(text = "Ingredients", modifier = Modifier.testTag("ingredientSection"))
+              Text(
+                  text = stringResource(R.string.ingredients),
+                  modifier = Modifier.testTag("ingredientSection"))
             }
           }
 
@@ -206,7 +215,9 @@ fun AddRecipeScreen(
           // recipe instructions
           item {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-              Text(text = "Instructions", modifier = Modifier.testTag("instructionSection"))
+              Text(
+                  text = stringResource(R.string.instructions),
+                  modifier = Modifier.testTag("instructionSection"))
             }
           }
 
@@ -243,7 +254,7 @@ fun AddRecipeScreen(
                       onClick = { navigationActions.goBack() },
                       modifier = Modifier.height(40.dp).testTag("cancelButton"),
                       colors = ButtonDefaults.buttonColors(containerColor = errorContainerDark)) {
-                        Text(text = "Cancel", fontSize = 18.sp)
+                        Text(text = stringResource(R.string.cancel_button), fontSize = 18.sp)
                       }
 
                   Spacer(Modifier.width(24.dp))
@@ -282,7 +293,10 @@ fun AddRecipeScreen(
                       modifier = Modifier.height(40.dp).testTag("addButton"),
                       colors =
                           ButtonDefaults.buttonColors(containerColor = primaryContainerLight)) {
-                        Text(text = "Add", fontSize = 18.sp, color = onSecondaryDark)
+                        Text(
+                            text = stringResource(R.string.add_button),
+                            fontSize = 18.sp,
+                            color = onSecondaryDark)
                       }
                 }
           }
@@ -325,15 +339,19 @@ fun InstructionItem(
     onInstructionChange: (String) -> Unit,
     onRemoveClick: () -> Unit
 ) {
+  val context = LocalContext.current
+
   var instructionError by remember { mutableStateOf<String?>(null) }
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
     OutlinedTextField(
         value = instruction,
         onValueChange = { newInstruction ->
           onInstructionChange(newInstruction)
-          instructionError = if (newInstruction.isEmpty()) "Incomplete instruction" else null
+          instructionError =
+              if (newInstruction.isEmpty()) context.getString(R.string.error_message_instructions)
+              else null
         },
-        label = { Text("Step ${index + 1}") },
+        label = { Text(stringResource(R.string.instruction_step, index + 1)) },
         modifier = Modifier.weight(1f).testTag("inputRecipeInstruction"))
     IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteInstructionButton")) {
       Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Step")
@@ -367,7 +385,7 @@ fun IngredientItem(index: Int, ingredient: Ingredient, onRemoveClick: () -> Unit
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
     // title of ingredient
     Text(
-        text = "Ingredient${index + 1} : ${ingredient.foodFacts.name}",
+        text = stringResource(R.string.ingredient_item, index + 1, ingredient.foodFacts.name),
         modifier = Modifier.testTag("ingredientItem"))
     // delete button
     IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteIngredientButton")) {
@@ -407,7 +425,7 @@ fun IngredientDialog(
 
   androidx.compose.material3.AlertDialog(
       onDismissRequest = onDismiss,
-      title = { Text("Add Ingredient") },
+      title = { Text(stringResource(R.string.add_ingredient)) },
       text = {
         Column(modifier = Modifier.testTag("addIngredientPopUp")) {
           // ingredient name
@@ -415,9 +433,12 @@ fun IngredientDialog(
               value = ingredientName,
               onValueChange = {
                 ingredientName = it
-                ingredientNameError = if (ingredientName.isEmpty()) "Incomplete name" else null
+                ingredientNameError =
+                    if (ingredientName.isEmpty())
+                        context.getString(R.string.error_message_ingredient_name)
+                    else null
               },
-              label = { Text("Ingredient Name") },
+              label = { Text(stringResource(R.string.ingredient_name)) },
               modifier = Modifier.fillMaxWidth().testTag("inputIngredientName"))
           // error message if ingredient name is empty
           ErrorTextBox(ingredientNameError, "ingredientNameErrorMessage")
@@ -427,9 +448,12 @@ fun IngredientDialog(
               value = ingredientQuantity,
               onValueChange = {
                 ingredientQuantity = it
-                quantityError = if (ingredientQuantity.isEmpty()) "Incomplete quantity" else null
+                quantityError =
+                    if (ingredientQuantity.isEmpty())
+                        context.getString(R.string.error_message_ingredient_quantity)
+                    else null
               },
-              label = { Text("Quantity") },
+              label = { Text(stringResource(R.string.ingredient_quantity)) },
               keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
               modifier = Modifier.fillMaxWidth().testTag("inputIngredientQuantity"))
 
@@ -492,7 +516,7 @@ fun IngredientDialog(
                 ButtonDefaults.buttonColors(
                     containerColor = primaryContainerLight,
                     contentColor = secondaryContainerDark)) {
-              Text("Add Ingredient")
+              Text(stringResource(R.string.add_ingredient))
             }
       },
       // Cancel button
@@ -501,7 +525,7 @@ fun IngredientDialog(
             onClick = onDismiss,
             modifier = Modifier.testTag("cancelIngredientButton"),
             colors = ButtonDefaults.buttonColors(containerColor = errorContainerDark)) {
-              Text("Cancel")
+              Text(stringResource(R.string.cancel_button))
             }
       })
 }
