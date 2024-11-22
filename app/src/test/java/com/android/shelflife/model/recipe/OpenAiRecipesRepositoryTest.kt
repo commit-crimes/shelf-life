@@ -176,8 +176,13 @@ class OpenAiRecipesRepositoryTest {
 
     // Invoke the private method
     val recipe =
-        method.invoke(openAiRecipesRepository, ingredients, instructions, servings, timeInMillis)
-            as Recipe
+        method.invoke(
+            openAiRecipesRepository,
+            ingredients,
+            instructions,
+            servings,
+            timeInMillis,
+            RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE) as Recipe
 
     // Assertions for the returned Recipe
     assertNotNull(recipe)

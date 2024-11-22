@@ -52,6 +52,7 @@ import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
+import com.android.shelfLife.model.recipe.RecipesRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.theme.errorContainerDark
 import com.android.shelfLife.ui.theme.onSecondaryDark
@@ -279,7 +280,9 @@ fun AddRecipeScreen(
                                       instructions = instructions.toList(),
                                       servings = servings.toInt(),
                                       time = (time.toDouble() * 60.0).seconds,
-                                      ingredients = ingredients.toList()))
+                                      ingredients = ingredients.toList(),
+                                      recipeTypes =
+                                          listOf(RecipesRepository.SearchRecipeType.PERSONAL)))
                           navigationActions.goBack()
                         } else {
                           // if not a Toast appears
