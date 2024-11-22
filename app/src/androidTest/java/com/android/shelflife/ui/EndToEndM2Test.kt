@@ -257,20 +257,20 @@ class EndToEndM2Test {
   }
 
   /*// In this test the user wants to first add a friend into a new household
-  @Test
-  fun testEndToEnd_add_friend() {
-    // User goes and navigates to the Household drawer to create a new household
-    composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("hamburgerIcon").assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithTag("addHouseholdIcon").assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithTag("HouseHoldCreationScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextClearance()
-    composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextInput("My House Rocks")
-    composeTestRule.onNodeWithTag("EmailInputField").performTextClearance()
-    composeTestRule.onNodeWithTag("EmailInputField").performTextInput("dogwaterson@gmail.com")
-    composeTestRule.onNodeWithTag("ConfirmButton").performClick()
-  }
-*/
+    @Test
+    fun testEndToEnd_add_friend() {
+      // User goes and navigates to the Household drawer to create a new household
+      composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("hamburgerIcon").assertIsDisplayed().performClick()
+      composeTestRule.onNodeWithTag("addHouseholdIcon").assertIsDisplayed().performClick()
+      composeTestRule.onNodeWithTag("HouseHoldCreationScreen").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextClearance()
+      composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextInput("My House Rocks")
+      composeTestRule.onNodeWithTag("EmailInputField").performTextClearance()
+      composeTestRule.onNodeWithTag("EmailInputField").performTextInput("dogwaterson@gmail.com")
+      composeTestRule.onNodeWithTag("ConfirmButton").performClick()
+    }
+  */
   // In this test the user searches for an food item, clicks on it to see all its fields and edits
   // some of them.
   @Test

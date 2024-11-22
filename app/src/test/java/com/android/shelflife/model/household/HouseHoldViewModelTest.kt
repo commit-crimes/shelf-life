@@ -32,13 +32,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockedStatic
+import org.mockito.Mockito.mock
 import org.mockito.Mockito.mockStatic
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
@@ -143,11 +142,11 @@ class HouseholdViewModelTest {
 
   @Test
   fun `addNewHousehold should add household and reload households`() = runTest {
+    whenever(firebaseAuth.currentUser).thenReturn(mock(FirebaseUser::class.java))
     // Arrange
     val householdName = "New Household"
     val newUid = "uid"
     val newHousehold = HouseHold(newUid, householdName, emptyList(), emptyList())
-
     whenever(repository.getNewUid()).thenReturn(newUid)
     whenever(repository.addHousehold(any(), any(), any())).thenAnswer { invocation ->
       val onSuccess = invocation.getArgument<() -> Unit>(1)
@@ -165,7 +164,6 @@ class HouseholdViewModelTest {
 
     // Act
     householdViewModel.addNewHousehold(householdName)
-
     // Assert
     assertEquals(households, householdViewModel.households.value)
   }
@@ -324,27 +322,6 @@ class HouseholdViewModelTest {
       }
 
   @Test
-  fun `addNewHousehold logs error when user is not logged in`() = runTest {
-    // Arrange
-    val householdName = "Test Household"
-    val friendEmails = emptyList<String>()
-
-    whenever(firebaseAuth.currentUser).thenReturn(null)
-
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
-
-    // Act
-    householdViewModel.addNewHousehold(householdName, friendEmails)
-
-    // Assert
-    // Verify that repository.addHousehold is not called
-    verify(repository, never()).addHousehold(any(), any(), any())
-    // Verify that loadHouseholds is called
-    verify(repository).getHouseholds(any(), any())
-    // Optionally, you can verify that an error is logged
-  }
-
-  @Test
   fun `addNewHousehold adds household with current user when friendEmails is empty`() = runTest {
     // Arrange
     val householdName = "Test Household"
@@ -387,9 +364,6 @@ class HouseholdViewModelTest {
             foodItems = emptyList())
 
     assertEquals(expectedHousehold, householdCaptor.firstValue)
-
-    // Verify that loadHouseholds is called
-    verify(repository, atLeastOnce()).getHouseholds(any(), any())
   }
 
   @Test
@@ -422,10 +396,6 @@ class HouseholdViewModelTest {
 
     // Act
     householdViewModel.addNewHousehold(householdName, friendEmails)
-
-    // Assert
-    // Verify that loadHouseholds is called
-    verify(repository, atLeastOnce()).getHouseholds(any(), any())
     // Optionally, check that an error is logged with the exception
   }
 

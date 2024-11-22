@@ -113,52 +113,52 @@ class HouseholdViewModel(
    * @param householdName - The name of the household to be added.
    */
   fun addNewHousehold(householdName: String, friendEmails: List<String?> = emptyList()) {
-      val currentUser = FirebaseAuth.getInstance().currentUser
-      if (currentUser != null) {
-          val householdUid = repository.getNewUid()
-          var household = HouseHold(householdUid, householdName, emptyList(), emptyList())
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    if (currentUser != null) {
+      val householdUid = repository.getNewUid()
+      var household = HouseHold(householdUid, householdName, emptyList(), emptyList())
 
-          if (friendEmails.isNotEmpty()) {  // Corrected condition
-              repository.getUserIds(friendEmails) { emailToUserId ->
-                  val emailsNotFound = friendEmails.filter { it !in emailToUserId.keys }
-                  if (emailsNotFound.isNotEmpty()) {
-                      Log.w("HouseholdViewModel", "Emails not found: $emailsNotFound")
-                  }
-                  val friendUserIds = emailToUserId.values.toList()
-                  household = household.copy(members = friendUserIds.plus(currentUser.uid))
-
-                  repository.addHousehold(
-                      household,
-                      onSuccess = {
-                          Log.d("HouseholdViewModel", "Household added successfully")
-                          // Send invitations to friends
-                          for (email in friendEmails.filter { it != currentUser.email }) {
-                              sendInvitation(household, email!!)
-                          }
-                          loadHouseholds()  // Ensure this is called after household is added
-                      },
-                      onFailure = { exception ->
-                          Log.e("HouseholdViewModel", "Error adding household: $exception")
-                      }
-                  )
-              }
-          } else {
-              // No friend emails, add household with current user only
-              household = household.copy(members = listOf(currentUser.uid))
-              repository.addHousehold(
-                  household,
-                  onSuccess = {
-                      Log.d("HouseholdViewModel", "Household added successfully")
-                      loadHouseholds()
-                  },
-                  onFailure = { exception ->
-                      Log.e("HouseholdViewModel", "Error adding household: $exception")
-                  }
-              )
+      if (friendEmails.isNotEmpty()) { // Corrected condition
+        repository.getUserIds(friendEmails) { emailToUserId ->
+          val emailsNotFound = friendEmails.filter { it !in emailToUserId.keys }
+          if (emailsNotFound.isNotEmpty()) {
+            Log.w("HouseholdViewModel", "Emails not found: $emailsNotFound")
           }
+          val friendUserIds = emailToUserId.values.toList()
+          household = household.copy(members = friendUserIds.plus(currentUser.uid))
+
+          repository.addHousehold(
+              household,
+              onSuccess = {
+                Log.d("HouseholdViewModel", "Household added successfully")
+                // Send invitations to friends
+                for (email in friendEmails.filter { it != currentUser.email }) {
+                  sendInvitation(household, email!!)
+                }
+                households.value.plus(household)
+                loadHouseholds()
+              },
+              onFailure = { exception ->
+                Log.e("HouseholdViewModel", "Error adding household: $exception")
+              })
+        }
       } else {
-          Log.e("HouseholdViewModel", "User not logged in")
+        // No friend emails, add household with current user only
+        household = household.copy(members = listOf(currentUser.uid))
+        repository.addHousehold(
+            household,
+            onSuccess = {
+              Log.d("HouseholdViewModel", "Household added successfully")
+              households.value.plus(household)
+              loadHouseholds()
+            },
+            onFailure = { exception ->
+              Log.e("HouseholdViewModel", "Error adding household: $exception")
+            })
       }
+    } else {
+      Log.e("HouseholdViewModel", "User not logged in")
+    }
   }
 
   /**
