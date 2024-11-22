@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,7 +38,6 @@ import com.android.shelfLife.ui.recipes.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.utils.signOutUser
-import com.example.compose.LocalThemeMode
 import com.example.compose.ShelfLifeTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -82,14 +80,6 @@ fun ShelfLifeApp() {
     HouseholdViewModel(HouseholdRepositoryFirestore(firebaseFirestore), listFoodItemViewModel)
   }
 
-  DisposableEffect(LocalThemeMode.current) {
-    navController.navigate(startingRoute) {
-      // Clear the back stack to ensure navigation resets to the starting route
-      popUpTo(0) { inclusive = true }
-    }
-    onDispose {} // No cleanup necessary
-  }
-
   NavHost(navController = navController, startDestination = startingRoute) {
     // Authentication route
     navigation(
@@ -113,7 +103,7 @@ fun ShelfLifeApp() {
       }
       composable(Screen.INDIVIDUAL_FOOD_ITEM) {
         IndividualFoodItemScreen(
-            navigationActions = navigationActions, foodItemViewModel = listFoodItemViewModel)
+            navigationActions = navigationActions, householdViewModel, listFoodItemViewModel)
       }
     }
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {

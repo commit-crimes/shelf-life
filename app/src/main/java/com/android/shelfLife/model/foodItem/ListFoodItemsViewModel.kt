@@ -20,6 +20,11 @@ open class ListFoodItemsViewModel(private val repository: FoodItemRepository) : 
   private val _selectedFoodItem = MutableStateFlow<FoodItem?>(null)
   val selectedFoodItem: StateFlow<FoodItem?> = _selectedFoodItem.asStateFlow()
 
+  // Multiple selected food item model
+  private val _multipleSelectedFoodItems = MutableStateFlow<List<FoodItem>>(emptyList())
+  val multipleSelectedFoodItems: StateFlow<List<FoodItem>> =
+      _multipleSelectedFoodItems.asStateFlow()
+
   /**
    * Initializes the ListFoodItemsViewModel by loading the list of FoodItems from the repository.
    */
@@ -71,11 +76,23 @@ open class ListFoodItemsViewModel(private val repository: FoodItemRepository) : 
     repository.deleteFoodItemById(id = id, onSuccess = { getAllFoodItems() }, onFailure = ::_onFail)
   }
 
-  /** Selects a FoodItem document */
+  /** Selects a FoodItem document for individual view */
   fun selectFoodItem(foodItem: FoodItem?) {
     _selectedFoodItem.value = foodItem
   }
 
+  /** Selects multiple FoodItem documents for bulk actions */
+  fun selectMultipleFoodItems(foodItem: FoodItem) {
+    if (_multipleSelectedFoodItems.value.contains(foodItem)) {
+      _multipleSelectedFoodItems.value = _multipleSelectedFoodItems.value.minus(foodItem)
+    } else {
+      _multipleSelectedFoodItems.value = _multipleSelectedFoodItems.value.plus(foodItem)
+    }
+  }
+
+  fun clearMultipleSelectedFoodItems() {
+    _multipleSelectedFoodItems.value = emptyList()
+  }
   // create factory
   companion object {
     fun Factory(repository: FoodItemRepository): ViewModelProvider.Factory =

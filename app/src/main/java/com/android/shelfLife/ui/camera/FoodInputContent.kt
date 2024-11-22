@@ -1,25 +1,13 @@
 // FoodInputContent.kt
+
 package com.android.shelfLife.ui.camera
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,7 +15,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
@@ -35,14 +22,9 @@ import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodStorageLocation
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.android.shelfLife.ui.utils.DateVisualTransformation
-import com.android.shelfLife.ui.utils.formatDateToTimestamp
-import com.android.shelfLife.ui.utils.formatTimestampToDate
-import com.android.shelfLife.ui.utils.getDateErrorMessage
-import com.android.shelfLife.ui.utils.isDateAfterOrEqual
+import com.android.shelfLife.ui.utils.*
 import com.google.firebase.Timestamp
 
-/** Composable function for the bottom sheet content with date input fields and error handling. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FoodInputContent(
@@ -62,6 +44,13 @@ fun FoodInputContent(
   var buyDateError by remember { mutableStateOf<String?>(null) }
 
   var locationExpanded by remember { mutableStateOf(false) }
+
+  /** Validates all fields when the submit button is clicked. */
+  fun validateAllFieldsWhenSubmitButton() {
+    buyDateError = validateBuyDate(buyDate)
+    expireDateError = validateExpireDate(expireDate, buyDate, buyDateError)
+    openDateError = validateOpenDate(openDate, buyDate, buyDateError, expireDate, expireDateError)
+  }
 
   Column(
       modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -96,128 +85,60 @@ fun FoodInputContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         // Location Dropdown
-        ExposedDropdownMenuBox(
-            expanded = locationExpanded,
-            onExpandedChange = { locationExpanded = !locationExpanded },
-            modifier = Modifier.testTag("locationDropdown")) {
-              OutlinedTextField(
-                  value = location.name.lowercase(),
-                  onValueChange = {},
-                  label = { Text("Location") },
-                  readOnly = true,
-                  trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = locationExpanded)
-                  },
-                  modifier = Modifier.fillMaxWidth().menuAnchor().testTag("locationTextField"))
-              ExposedDropdownMenu(
-                  expanded = locationExpanded,
-                  onDismissRequest = { locationExpanded = false },
-                  modifier = Modifier.testTag("locationMenu")) {
-                    FoodStorageLocation.entries.forEach { selectionOption ->
-                      DropdownMenuItem(
-                          text = { Text(selectionOption.name) },
-                          onClick = {
-                            location = selectionOption
-                            locationExpanded = false
-                          },
-                          modifier = Modifier.testTag("locationOption_${selectionOption.name}"))
-                    }
-                  }
-            }
+        LocationDropdownField(
+            location = location,
+            onLocationChange = { location = it },
+            locationExpanded = locationExpanded,
+            onExpandedChange = { locationExpanded = it },
+            modifier = Modifier,
+            testTag = "locationDropdown")
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Expire Date Field with Error Handling and Input Masking
-        OutlinedTextField(
-            value = expireDate,
-            onValueChange = { newValue ->
+        // Expire Date Field with Error Handling
+        DateField(
+            date = expireDate,
+            onDateChange = { newValue ->
               expireDate = newValue.filter { it.isDigit() }
-              expireDateError = getDateErrorMessage(expireDate)
+              expireDateError = validateExpireDate(expireDate, buyDate, buyDateError)
+              // Re-validate Open Date since it depends on Expire Date
+              openDateError =
+                  validateOpenDate(openDate, buyDate, buyDateError, expireDate, expireDateError)
             },
-            label = { Text("Expire Date") },
-            placeholder = { Text("dd/MM/yyyy") },
-            isError = expireDateError != null,
-            visualTransformation = DateVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-            modifier = Modifier.fillMaxWidth().testTag("expireDateTextField"))
-        if (expireDateError != null) {
-          Text(
-              text = expireDateError!!,
-              color = MaterialTheme.colorScheme.error,
-              style = MaterialTheme.typography.bodySmall,
-              modifier = Modifier.align(Alignment.Start))
-        }
+            dateError = expireDateError,
+            labelResId = R.string.expire_date_hint,
+            testTag = "expireDateTextField")
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Open Date Field with Error Handling and Input Masking
-        OutlinedTextField(
-            value = openDate,
-            onValueChange = { newValue ->
+        // Open Date Field with Error Handling
+        DateField(
+            date = openDate,
+            onDateChange = { newValue ->
               openDate = newValue.filter { it.isDigit() }
-              openDateError = getDateErrorMessage(openDate, isRequired = false)
-
-              // Additional validation only if openDate is not empty
-              if (openDateError == null &&
-                  openDate.isNotEmpty() &&
-                  buyDateError == null &&
-                  openDate.length == 8 &&
-                  buyDate.length == 8) {
-                if (!isDateAfterOrEqual(openDate, buyDate)) {
-                  openDateError = "Open Date cannot be before Buy Date"
-                } else {
-                  openDateError = null
-                }
-              }
+              openDateError =
+                  validateOpenDate(openDate, buyDate, buyDateError, expireDate, expireDateError)
             },
-            label = { Text("Open Date") },
-            placeholder = { Text("dd/MM/yyyy") },
-            isError = openDateError != null,
-            visualTransformation = DateVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-            modifier = Modifier.fillMaxWidth().testTag("openDateTextField"))
-        if (openDateError != null) {
-          Text(
-              text = openDateError!!,
-              color = MaterialTheme.colorScheme.error,
-              style = MaterialTheme.typography.bodySmall,
-              modifier = Modifier.align(Alignment.Start))
-        }
+            dateError = openDateError,
+            labelResId = R.string.open_date_hint,
+            testTag = "openDateTextField")
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Buy Date Field with Error Handling and Input Masking
-        OutlinedTextField(
-            value = buyDate,
-            onValueChange = { newValue ->
+        // Buy Date Field with Error Handling
+        DateField(
+            date = buyDate,
+            onDateChange = { newValue ->
               buyDate = newValue.filter { it.isDigit() }
-              buyDateError = getDateErrorMessage(buyDate)
-
-              // Re-validate openDate against buyDate
-              if (openDateError == null &&
-                  buyDateError == null &&
-                  openDate.length == 8 &&
-                  buyDate.length == 8) {
-                if (!isDateAfterOrEqual(openDate, buyDate)) {
-                  openDateError = "Open Date cannot be before Buy Date"
-                } else {
-                  openDateError = null
-                }
-              }
+              buyDateError = validateBuyDate(buyDate)
+              // Re-validate Expire Date and Open Date since they depend on Buy Date
+              expireDateError = validateExpireDate(expireDate, buyDate, buyDateError)
+              openDateError =
+                  validateOpenDate(openDate, buyDate, buyDateError, expireDate, expireDateError)
             },
-            label = { Text("Buy Date") },
-            placeholder = { Text("dd/MM/yyyy") },
-            isError = buyDateError != null,
-            visualTransformation = DateVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-            modifier = Modifier.fillMaxWidth().testTag("buyDateTextField"))
-        if (buyDateError != null) {
-          Text(
-              text = buyDateError!!,
-              color = MaterialTheme.colorScheme.error,
-              style = MaterialTheme.typography.bodySmall,
-              modifier = Modifier.align(Alignment.Start))
-        }
+            dateError = buyDateError,
+            labelResId = R.string.buy_date_hint,
+            testTag = "buyDateTextField")
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -225,7 +146,16 @@ fun FoodInputContent(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)) {
               Button(
+                  onClick = { onCancel() },
+                  colors =
+                      ButtonDefaults.buttonColors(
+                          containerColor = MaterialTheme.colorScheme.secondary),
+                  modifier = Modifier.weight(1f).height(50.dp).testTag("cancelButton")) {
+                    Text(text = "Cancel", fontSize = 18.sp)
+                  }
+              Button(
                   onClick = {
+                    validateAllFieldsWhenSubmitButton()
                     val isExpireDateValid = expireDateError == null && expireDate.isNotEmpty()
                     val isOpenDateValid = openDateError == null
                     val isBuyDateValid = buyDateError == null && buyDate.isNotEmpty()
@@ -248,6 +178,8 @@ fun FoodInputContent(
                               expiryDate = expiryTimestamp,
                               openDate = openTimestamp,
                               buyDate = buyTimestamp)
+
+                      Toast.makeText(context, "Food item added", Toast.LENGTH_SHORT).show()
                       onSubmit(newFoodItem)
                     } else {
                       Toast.makeText(
@@ -259,15 +191,6 @@ fun FoodInputContent(
                   },
                   modifier = Modifier.weight(1f).height(50.dp).testTag("submitButton")) {
                     Text(text = "Submit", fontSize = 18.sp)
-                  }
-
-              Button(
-                  onClick = { onCancel() },
-                  colors =
-                      ButtonDefaults.buttonColors(
-                          containerColor = MaterialTheme.colorScheme.secondary),
-                  modifier = Modifier.weight(1f).height(50.dp).testTag("cancelButton")) {
-                    Text(text = "Cancel", fontSize = 18.sp)
                   }
             }
       }

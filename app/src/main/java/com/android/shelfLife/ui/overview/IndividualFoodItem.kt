@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
+import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -41,6 +43,7 @@ import com.android.shelfLife.ui.utils.FoodItemDetails
 @Composable
 fun IndividualFoodItemScreen(
     navigationActions: NavigationActions,
+    houseHoldViewModel: HouseholdViewModel,
     foodItemViewModel: ListFoodItemsViewModel
 ) {
   val foodItem by foodItemViewModel.selectedFoodItem.collectAsState()
@@ -61,6 +64,18 @@ fun IndividualFoodItemScreen(
                   onClick = { navigationActions.goBack() },
                   modifier = Modifier.testTag("IndividualTestScreenGoBack")) {
                     Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Go back Icon")
+                  }
+            },
+            actions = {
+              IconButton(
+                  onClick = {
+                    foodItem?.let {
+                      houseHoldViewModel.deleteFoodItem(it)
+                      navigationActions.goBack()
+                    }
+                  },
+                  modifier = Modifier.testTag("deleteFoodItem")) {
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
                   }
             })
       },

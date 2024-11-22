@@ -131,6 +131,7 @@ fun ProfileScreen(
                         selectedOption = currentThemeMode,
                         onOptionSelected = { selectedOption ->
                           themeToggler.toggleTheme(selectedOption)
+                          navigationActions.navigateToAndClearBackStack(Route.PROFILE)
                         },
                         expanded = expanded,
                         onExpandedChange = { expanded = it },

@@ -19,6 +19,7 @@ import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.overview.OverviewScreen
 import com.google.firebase.Timestamp
 import java.util.*
+import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -462,5 +463,122 @@ class OverviewTest {
 
     // Verify that navigateTo(Screen.ADD_FOOD) was called
     verify(navigationActions).navigateTo(com.android.shelfLife.ui.navigation.Screen.ADD_FOOD)
+  }
+
+  @Test
+  fun selectAndDeleteFoodItems() {
+
+    // Create multiple food items
+    val appleFoodFacts =
+        FoodFacts(
+            name = "Apple",
+            barcode = "123456789",
+            quantity = Quantity(5.0, FoodUnit.COUNT),
+            category = FoodCategory.FRUIT)
+    val appleFoodItem =
+        FoodItem(
+            uid = "foodItem1",
+            foodFacts = appleFoodFacts,
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)))
+
+    val bananaFoodFacts =
+        FoodFacts(
+            name = "Banana",
+            barcode = "987654321",
+            quantity = Quantity(3.0, FoodUnit.COUNT),
+            category = FoodCategory.FRUIT)
+    val bananaFoodItem =
+        FoodItem(
+            uid = "foodItem2",
+            foodFacts = bananaFoodFacts,
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)))
+
+    val householdWithMultipleItems =
+        houseHold.copy(foodItems = listOf(appleFoodItem, bananaFoodItem))
+
+    // Mock the repository to return the household with multiple food items
+    mockHouseHoldRepositoryGetHouseholds(listOf(householdWithMultipleItems))
+
+    selectHousehold(householdWithMultipleItems)
+    composeTestRule.setContent {
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel = listFoodItemsViewModel)
+    }
+
+    // Initially, both items should be displayed
+    composeTestRule.onAllNodesWithTag("foodItemCard").assertCountEquals(2)
+
+    // Long press to select the first item
+    composeTestRule.onAllNodesWithTag("foodItemCard")[0].performTouchInput { longClick() }
+    composeTestRule.onNodeWithTag("deleteFoodItems").assertIsDisplayed()
+    assertEquals(1, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+    // Long press to select the second item
+    composeTestRule.onAllNodesWithTag("foodItemCard")[1].performTouchInput { longClick() }
+    assertEquals(2, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+    composeTestRule.onNodeWithTag("deleteFoodItems").assertIsEnabled().performClick()
+    assertEquals(0, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+  }
+
+  @Test
+  fun selectAndDeselectFoodItems() {
+    // Create multiple food items
+    val appleFoodFacts =
+        FoodFacts(
+            name = "Apple",
+            barcode = "123456789",
+            quantity = Quantity(5.0, FoodUnit.COUNT),
+            category = FoodCategory.FRUIT)
+    val appleFoodItem =
+        FoodItem(
+            uid = "foodItem1",
+            foodFacts = appleFoodFacts,
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)))
+
+    val bananaFoodFacts =
+        FoodFacts(
+            name = "Banana",
+            barcode = "987654321",
+            quantity = Quantity(3.0, FoodUnit.COUNT),
+            category = FoodCategory.FRUIT)
+    val bananaFoodItem =
+        FoodItem(
+            uid = "foodItem2",
+            foodFacts = bananaFoodFacts,
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)))
+
+    val householdWithMultipleItems =
+        houseHold.copy(foodItems = listOf(appleFoodItem, bananaFoodItem))
+
+    // Mock the repository to return the household with multiple food items
+    mockHouseHoldRepositoryGetHouseholds(listOf(householdWithMultipleItems))
+
+    selectHousehold(householdWithMultipleItems)
+    composeTestRule.setContent {
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel = listFoodItemsViewModel)
+    }
+
+    // Initially, both items should be displayed
+    composeTestRule.onAllNodesWithTag("foodItemCard").assertCountEquals(2)
+
+    // Long press to select the first item
+    composeTestRule.onAllNodesWithTag("foodItemCard")[0].performTouchInput { longClick() }
+    assertEquals(1, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+
+    // Long press to select the second item
+    composeTestRule.onAllNodesWithTag("foodItemCard")[1].performTouchInput { longClick() }
+    assertEquals(2, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+
+    // Long press again to deselect the first item
+    composeTestRule.onAllNodesWithTag("foodItemCard")[0].performTouchInput { longClick() }
+    assertEquals(1, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+
+    // Long press again to deselect the second item
+    composeTestRule.onAllNodesWithTag("foodItemCard")[1].performTouchInput { longClick() }
+    assertEquals(0, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
   }
 }
