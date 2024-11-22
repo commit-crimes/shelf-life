@@ -82,7 +82,6 @@ fun HouseHoldCreationScreen(
   // Function to add email card to the list and scroll to the bottom
   fun addEmailCard() {
     if (emailInput.isNotBlank() && emailInput.trim() !in memberEmailList.value) {
-      // TODO check if email is valid
       creationScreenViewModel.addEmail(emailInput.trim())
       emailInput = ""
     }
