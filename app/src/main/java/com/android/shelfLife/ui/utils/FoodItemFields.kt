@@ -18,18 +18,18 @@ import com.android.shelfLife.model.foodItem.FoodStorageLocation
 fun FoodNameField(
     foodName: String,
     onFoodNameChange: (String) -> Unit,
-    foodNameError: String?,
+    foodNameErrorResId: Int?,
     modifier: Modifier = Modifier
 ) {
   OutlinedTextField(
       value = foodName,
       onValueChange = onFoodNameChange,
       label = { Text(stringResource(id = R.string.food_name_hint)) },
-      isError = foodNameError != null,
+      isError = foodNameErrorResId != null,
       modifier = modifier.fillMaxWidth().testTag("inputFoodName"))
-  if (foodNameError != null) {
+  if (foodNameErrorResId != null) {
     Text(
-        text = foodNameError,
+        text = stringResource(id = foodNameErrorResId),
         color = MaterialTheme.colorScheme.error,
         style = MaterialTheme.typography.bodySmall,
         modifier = Modifier.fillMaxWidth(),
@@ -41,31 +41,27 @@ fun FoodNameField(
 fun AmountField(
     amount: String,
     onAmountChange: (String) -> Unit,
-    amountError: String?,
+    amountErrorResId: Int?,
     modifier: Modifier = Modifier,
     testTag: String = ""
 ) {
-    Column(modifier = modifier) {
-        OutlinedTextField(
-            value = amount,
-            onValueChange = onAmountChange,
-            label = { Text(stringResource(id = R.string.amount_hint)) },
-            isError = amountError != null,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag(testTag)
-        )
-        if (amountError != null) {
-            Text(
-                text = amountError,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Start
-            )
-        }
+  Column(modifier = modifier) {
+    OutlinedTextField(
+        value = amount,
+        onValueChange = onAmountChange,
+        label = { Text(stringResource(id = R.string.amount_hint)) },
+        isError = amountErrorResId != null,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        modifier = Modifier.fillMaxWidth().testTag(testTag))
+    if (amountErrorResId != null) {
+      Text(
+          text = stringResource(id = amountErrorResId),
+          color = MaterialTheme.colorScheme.error,
+          style = MaterialTheme.typography.bodySmall,
+          modifier = Modifier.fillMaxWidth(),
+          textAlign = TextAlign.Start)
     }
+  }
 }
 
 @Composable
@@ -131,7 +127,7 @@ fun LocationDropdownField(
 fun DateField(
     date: String,
     onDateChange: (String) -> Unit,
-    dateError: String?,
+    dateErrorResId: Int?,
     labelResId: Int,
     modifier: Modifier = Modifier,
     testTag: String = ""
@@ -140,14 +136,14 @@ fun DateField(
       value = date,
       onValueChange = onDateChange,
       label = { Text(stringResource(id = labelResId)) },
-      placeholder = { Text("dd/mm/yyyy") },
-      isError = dateError != null,
+      placeholder = { Text(stringResource(id = R.string.date_placeholder)) },
+      isError = dateErrorResId != null,
       visualTransformation = DateVisualTransformation(),
       keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
       modifier = modifier.fillMaxWidth().testTag(testTag))
-  if (dateError != null) {
+  if (dateErrorResId != null) {
     Text(
-        text = dateError,
+        text = stringResource(id = dateErrorResId),
         color = MaterialTheme.colorScheme.error,
         style = MaterialTheme.typography.bodySmall,
         modifier = Modifier.fillMaxWidth(),

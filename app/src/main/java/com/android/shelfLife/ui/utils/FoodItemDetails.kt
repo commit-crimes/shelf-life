@@ -7,7 +7,6 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -18,7 +17,6 @@ import com.android.shelfLife.model.foodItem.FoodItem
 
 @Composable
 fun FoodItemDetails(foodItem: FoodItem) {
-  val context = LocalContext.current
   val textStyle = TextStyle(fontSize = 14.sp)
 
   val formattedExpiryDate =
@@ -80,7 +78,7 @@ fun FoodItemDetails(foodItem: FoodItem) {
                   stringResource(
                       R.string.food_item_quantity_label,
                       foodItem.foodFacts.quantity.amount,
-                      foodItem.foodFacts.quantity.unit),
+                      foodItem.foodFacts.quantity.unit.name),
               tag = "quantityText",
               style = textStyle)
         }

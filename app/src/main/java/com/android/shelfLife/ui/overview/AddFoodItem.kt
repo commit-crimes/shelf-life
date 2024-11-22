@@ -30,7 +30,6 @@ fun AddFoodItemScreen(
     foodItemViewModel: ListFoodItemsViewModel,
     paddingValues: PaddingValues = PaddingValues(16.dp)
 ) {
-
   var foodName by remember { mutableStateOf("") }
   var amount by remember { mutableStateOf("") }
   var unit by remember { mutableStateOf(FoodUnit.GRAM) }
@@ -40,11 +39,11 @@ fun AddFoodItemScreen(
   var openDate by remember { mutableStateOf("") }
   var buyDate by remember { mutableStateOf(formatTimestampToDate(Timestamp.now())) }
 
-  var foodNameError by remember { mutableStateOf<String?>(null) }
-  var amountError by remember { mutableStateOf<String?>(null) }
-  var expireDateError by remember { mutableStateOf<String?>(null) }
-  var openDateError by remember { mutableStateOf<String?>(null) }
-  var buyDateError by remember { mutableStateOf<String?>(null) }
+  var foodNameErrorResId by remember { mutableStateOf<Int?>(null) }
+  var amountErrorResId by remember { mutableStateOf<Int?>(null) }
+  var expireDateErrorResId by remember { mutableStateOf<Int?>(null) }
+  var openDateErrorResId by remember { mutableStateOf<Int?>(null) }
+  var buyDateErrorResId by remember { mutableStateOf<Int?>(null) }
 
   var unitExpanded by remember { mutableStateOf(false) }
   var categoryExpanded by remember { mutableStateOf(false) }
@@ -54,11 +53,12 @@ fun AddFoodItemScreen(
 
   /** Validates all fields when the submit button is clicked. */
   fun validateAllFieldsWhenSubmitButton() {
-    foodNameError = validateFoodName(foodName)
-    amountError = validateAmount(amount)
-    buyDateError = validateBuyDate(buyDate)
-    expireDateError = validateExpireDate(expireDate, buyDate, buyDateError)
-    openDateError = validateOpenDate(openDate, buyDate, buyDateError, expireDate, expireDateError)
+    foodNameErrorResId = validateFoodName(foodName)
+    amountErrorResId = validateAmount(amount)
+    buyDateErrorResId = validateBuyDate(buyDate)
+    expireDateErrorResId = validateExpireDate(expireDate, buyDate, buyDateErrorResId)
+    openDateErrorResId =
+        validateOpenDate(openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
   }
 
   Scaffold(
@@ -74,7 +74,10 @@ fun AddFoodItemScreen(
               IconButton(
                   onClick = { navigationActions.goBack() },
                   modifier = Modifier.testTag("goBackButton")) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go Back")
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription =
+                            stringResource(id = R.string.go_back_button_description))
                   }
             })
       }) { innerPadding ->
@@ -91,22 +94,23 @@ fun AddFoodItemScreen(
                     foodName = foodName,
                     onFoodNameChange = { newValue ->
                       foodName = newValue
-                      foodNameError = validateFoodName(foodName)
+                      foodNameErrorResId = validateFoodName(foodName)
                     },
-                    foodNameError = foodNameError)
+                    foodNameErrorResId = foodNameErrorResId)
                 Spacer(modifier = Modifier.height(16.dp))
               }
 
               item(key = "amountAndUnit") {
                 Row(
-                    modifier = Modifier.fillMaxWidth()) {
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically) {
                       AmountField(
                           amount = amount,
                           onAmountChange = { newValue ->
                             amount = newValue
-                            amountError = validateAmount(amount)
+                            amountErrorResId = validateAmount(amount)
                           },
-                          amountError = amountError,
+                          amountErrorResId = amountErrorResId,
                           modifier = Modifier.weight(1f),
                           testTag = "inputFoodAmount")
                       Spacer(modifier = Modifier.width(8.dp))
@@ -118,7 +122,7 @@ fun AddFoodItemScreen(
                           modifier = Modifier.weight(1f),
                           testTag = "inputFoodUnit")
                     }
-                  Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
               }
 
               item(key = "category") {
@@ -145,13 +149,18 @@ fun AddFoodItemScreen(
                     date = expireDate,
                     onDateChange = { newValue ->
                       expireDate = newValue.filter { it.isDigit() }
-                      expireDateError = validateExpireDate(expireDate, buyDate, buyDateError)
+                      expireDateErrorResId =
+                          validateExpireDate(expireDate, buyDate, buyDateErrorResId)
                       // Re-validate Open Date since it depends on Expire Date
-                      openDateError =
+                      openDateErrorResId =
                           validateOpenDate(
-                              openDate, buyDate, buyDateError, expireDate, expireDateError)
+                              openDate,
+                              buyDate,
+                              buyDateErrorResId,
+                              expireDate,
+                              expireDateErrorResId)
                     },
-                    dateError = expireDateError,
+                    dateErrorResId = expireDateErrorResId,
                     labelResId = R.string.expire_date_hint,
                     testTag = "inputFoodExpireDate")
                 Spacer(modifier = Modifier.height(16.dp))
@@ -162,11 +171,15 @@ fun AddFoodItemScreen(
                     date = openDate,
                     onDateChange = { newValue ->
                       openDate = newValue.filter { it.isDigit() }
-                      openDateError =
+                      openDateErrorResId =
                           validateOpenDate(
-                              openDate, buyDate, buyDateError, expireDate, expireDateError)
+                              openDate,
+                              buyDate,
+                              buyDateErrorResId,
+                              expireDate,
+                              expireDateErrorResId)
                     },
-                    dateError = openDateError,
+                    dateErrorResId = openDateErrorResId,
                     labelResId = R.string.open_date_hint,
                     testTag = "inputFoodOpenDate")
                 Spacer(modifier = Modifier.height(16.dp))
@@ -177,28 +190,35 @@ fun AddFoodItemScreen(
                     date = buyDate,
                     onDateChange = { newValue ->
                       buyDate = newValue.filter { it.isDigit() }
-                      buyDateError = validateBuyDate(buyDate)
+                      buyDateErrorResId = validateBuyDate(buyDate)
                       // Re-validate Expire Date and Open Date since they depend on Buy Date
-                      expireDateError = validateExpireDate(expireDate, buyDate, buyDateError)
-                      openDateError =
+                      expireDateErrorResId =
+                          validateExpireDate(expireDate, buyDate, buyDateErrorResId)
+                      openDateErrorResId =
                           validateOpenDate(
-                              openDate, buyDate, buyDateError, expireDate, expireDateError)
+                              openDate,
+                              buyDate,
+                              buyDateErrorResId,
+                              expireDate,
+                              expireDateErrorResId)
                     },
-                    dateError = buyDateError,
+                    dateErrorResId = buyDateErrorResId,
                     labelResId = R.string.buy_date_hint,
                     testTag = "inputFoodBuyDate")
                 Spacer(modifier = Modifier.height(32.dp))
               }
 
               item(key = "submitButton") {
+                // Submit Button
                 Button(
                     onClick = {
                       validateAllFieldsWhenSubmitButton()
-                      val isExpireDateValid = expireDateError == null && expireDate.isNotEmpty()
-                      val isOpenDateValid = openDateError == null
-                      val isBuyDateValid = buyDateError == null && buyDate.isNotEmpty()
-                      val isFoodNameValid = foodNameError == null
-                      val isAmountValid = amountError == null
+                      val isExpireDateValid =
+                          expireDateErrorResId == null && expireDate.isNotEmpty()
+                      val isOpenDateValid = openDateErrorResId == null
+                      val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
+                      val isFoodNameValid = foodNameErrorResId == null
+                      val isAmountValid = amountErrorResId == null
 
                       val expiryTimestamp = formatDateToTimestamp(expireDate)
                       val openTimestamp =
@@ -231,14 +251,13 @@ fun AddFoodItemScreen(
                         navigationActions.goBack()
                       } else {
                         Toast.makeText(
-                                context,
-                                "Please correct the errors before submitting.",
-                                Toast.LENGTH_SHORT)
+                                context, R.string.submission_error_message, Toast.LENGTH_SHORT)
                             .show()
                       }
                     },
                     modifier = Modifier.testTag("foodSave").fillMaxWidth().height(50.dp)) {
-                      Text(text = "Submit", fontSize = 18.sp)
+                      Text(
+                          text = stringResource(id = R.string.submit_button_text), fontSize = 18.sp)
                     }
               }
             }
