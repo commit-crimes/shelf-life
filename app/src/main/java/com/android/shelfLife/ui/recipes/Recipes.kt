@@ -90,30 +90,16 @@ fun RecipesScreen(
       householdViewModel = householdViewModel,
       navigationActions = navigationActions) {
 
-        // filtered based on selected filters
-        val filteredRecipesSelectedFilters =
-            if (selectedFilters.isEmpty()) {
-              recipeList
-            } else {
-              recipeList.filter { recipe ->
-                selectedFilters.any { filter ->
-                  recipe.recipeTypes.any { recipeType ->
-                    recipeType == stringToSearchRecipeType(filter)
-                  }
-                }
-              }
-            }
-        // Filtered based on searched query
-        val filteredRecipesQuery = {
-          if (query.isEmpty()) {
-            recipeList
-          } else {
-            recipeList.filter { recipe -> recipe.name.contains(query, ignoreCase = true) }
-          }
-        }
 
-        // gets the intersection between the the filtered recipes based on the filters and the query
-        val filteredRecipes = filteredRecipesSelectedFilters.filter { it in filteredRecipesQuery() }
+          // Combined filtering based on selected filters and search query
+          val filteredRecipes = recipeList.filter { recipe ->
+              // Check if recipe matches selected filters
+              (selectedFilters.isEmpty() || recipe.recipeTypes.any { recipeType ->
+                  selectedFilters.any { filter -> recipeType == stringToSearchRecipeType(filter) }
+              }) &&
+                      // Check if recipe matches the search query
+                      (query.isEmpty() || recipe.name.contains(query, ignoreCase = true))
+          }
 
         if (selectedHousehold == null) {
           FirstTimeWelcomeScreen(navigationActions, householdViewModel)
@@ -360,6 +346,6 @@ fun stringToSearchRecipeType(string: String): RecipesRepository.SearchRecipeType
     "High protein" -> RecipesRepository.SearchRecipeType.HIGH_PROTEIN
     "Low calories" -> RecipesRepository.SearchRecipeType.LOW_CALORIE
     "Personal" -> RecipesRepository.SearchRecipeType.PERSONAL
-    else -> throw IllegalArgumentException("Unknown recipe type: $string")
+    else -> throw IllegalArgumentException("Unknown filter: $string")
   }
 }

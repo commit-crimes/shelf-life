@@ -77,7 +77,7 @@ class OpenAiRecipesRepository(
       }
       RecipesRepository.SearchRecipeType.PERSONAL -> {
         throw IllegalArgumentException(
-            "SearchRecipeType.PERSONAL is not supported in getPromptsForMode.")
+            "SearchRecipeType.PERSONAL is not supported for recipe generation as it is reserved for user-created recipes.")
       }
     }
   }
