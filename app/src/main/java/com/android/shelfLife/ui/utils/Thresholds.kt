@@ -1,7 +1,6 @@
 package com.android.shelfLife.ui.utils
 
 import androidx.compose.ui.graphics.Color
-import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.ui.theme.expired
 import com.android.shelfLife.ui.theme.expiresInALongTime
 import com.android.shelfLife.ui.theme.expiresLater
@@ -44,30 +43,6 @@ fun getExpiryInfo(
   val progressBarState = getProgressBarState(daysDifference)
 
   return Pair(expiryMessage, progressBarState)
-}
-
-// Function to get thresholds based on food category
-fun getThresholdsForCategory(category: FoodCategory): Thresholds {
-    return when (category) {
-        FoodCategory.MEAT ->
-            Thresholds(redThreshold = daysToSeconds(3), orangeThreshold = daysToSeconds(7))
-        FoodCategory.FISH ->
-            Thresholds(redThreshold = daysToSeconds(3), orangeThreshold = daysToSeconds(7))
-        FoodCategory.FRUIT ->
-            Thresholds(redThreshold = daysToSeconds(2), orangeThreshold = daysToSeconds(5))
-        FoodCategory.VEGETABLE ->
-            Thresholds(redThreshold = daysToSeconds(3), orangeThreshold = daysToSeconds(7))
-        FoodCategory.DAIRY ->
-            Thresholds(redThreshold = daysToSeconds(5), orangeThreshold = daysToSeconds(10))
-        FoodCategory.GRAIN ->
-            Thresholds(redThreshold = daysToSeconds(30), orangeThreshold = daysToSeconds(90))
-        FoodCategory.BEVERAGE ->
-            Thresholds(redThreshold = daysToSeconds(30), orangeThreshold = daysToSeconds(90))
-        FoodCategory.SNACK ->
-            Thresholds(redThreshold = daysToSeconds(15), orangeThreshold = daysToSeconds(30))
-        FoodCategory.OTHER ->
-            Thresholds(redThreshold = daysToSeconds(7), orangeThreshold = daysToSeconds(14))
-    }
 }
 
 /**

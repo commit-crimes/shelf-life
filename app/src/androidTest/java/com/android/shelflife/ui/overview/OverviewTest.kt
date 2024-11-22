@@ -635,76 +635,77 @@ class OverviewTest {
     composeTestRule.onAllNodesWithTag("foodItemCard")[1].performTouchInput { longClick() }
     assertEquals(0, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
   }
-    @Test
-    fun filtersFoodItemBasedOnSelectedFilter() {
-        setUpFilterTests()
 
-        composeTestRule.onNodeWithTag("filterIcon").performClick()
+  @Test
+  fun filtersFoodItemBasedOnSelectedFilter() {
+    setUpFilterTests()
 
-        composeTestRule.onNodeWithText("Fruit").performClick()
-        composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("filterIcon").performClick()
 
-        composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
-    }
+    composeTestRule.onNodeWithText("Fruit").performClick()
+    composeTestRule.waitForIdle()
 
-    @Test
-    fun filtersFoodItemsBasedOnMultipleSelectedFilters() {
-        setUpFilterTests()
+    composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
+  }
 
-        composeTestRule.onNodeWithTag("filterIcon").performClick()
+  @Test
+  fun filtersFoodItemsBasedOnMultipleSelectedFilters() {
+    setUpFilterTests()
 
-        composeTestRule.onNodeWithText("Fruit").performClick()
-        composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Meat").performClick()
-        composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("filterIcon").performClick()
 
-        composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
-    }
+    composeTestRule.onNodeWithText("Fruit").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("Meat").performClick()
+    composeTestRule.waitForIdle()
 
-    @Test
-    fun filtersFoodItemsBasedOnAFilterAndThenAnother() {
-        setUpFilterTests()
+    composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
+  }
 
-        composeTestRule.onNodeWithTag("filterIcon").performClick()
+  @Test
+  fun filtersFoodItemsBasedOnAFilterAndThenAnother() {
+    setUpFilterTests()
 
-        composeTestRule.onNodeWithText("Fruit").performClick()
-        composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("filterIcon").performClick()
 
-        composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Fruit").performClick()
+    composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("Fruit").performClick()
-        composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
 
-        composeTestRule.onNodeWithText("Meat").performClick()
-        composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Apple").assertDoesNotExist()
-    }
+    composeTestRule.onNodeWithText("Fruit").performClick()
+    composeTestRule.waitForIdle()
 
-    @Test
-    fun filtersFoodItemsBasedOnFiltersAndQuery() {
-        setUpFilterTests()
+    composeTestRule.onNodeWithText("Meat").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Apple").assertDoesNotExist()
+  }
 
-        composeTestRule.onNodeWithTag("filterIcon").performClick()
+  @Test
+  fun filtersFoodItemsBasedOnFiltersAndQuery() {
+    setUpFilterTests()
 
-        composeTestRule.onNodeWithText("Fruit").performClick()
-        composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Meat").performClick()
-        composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("filterIcon").performClick()
 
-        composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Fruit").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("Meat").performClick()
+    composeTestRule.waitForIdle()
 
-        // Activate the SearchBar
-        composeTestRule.onNodeWithTag("foodSearchBar").performClick()
-        composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
 
-        composeTestRule
-            .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("foodSearchBar")))
-            .performTextInput("Ste")
+    // Activate the SearchBar
+    composeTestRule.onNodeWithTag("foodSearchBar").performClick()
+    composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithText("Apple").assertDoesNotExist()
-        composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
-    }
+    composeTestRule
+        .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("foodSearchBar")))
+        .performTextInput("Ste")
+
+    composeTestRule.onNodeWithText("Apple").assertDoesNotExist()
+    composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
+  }
 }
