@@ -167,7 +167,9 @@ class EndToEndM2Test {
         }
         composable(Screen.INDIVIDUAL_FOOD_ITEM) {
           IndividualFoodItemScreen(
-              navigationActions = navigationActions, foodItemViewModel = listFoodItemsViewModel)
+              navigationActions = navigationActions,
+              houseHoldViewModel = householdViewModel,
+              foodItemViewModel = listFoodItemsViewModel)
         }
         composable(Route.RECIPES) {
           RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
@@ -245,8 +247,8 @@ class EndToEndM2Test {
     composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
     composeTestRule.runOnUiThread { foodFactsViewModel.searchByBarcode(1234567890L) }
     composeTestRule.onNodeWithTag("locationDropdown").performClick()
-    composeTestRule.onNodeWithTag("locationOption_PANTRY").performClick()
-    composeTestRule.onNodeWithTag("locationTextField").assertTextContains("pantry")
+    composeTestRule.onNodeWithTag("dropDownItem_Pantry").performClick()
+    composeTestRule.onNodeWithTag("dropdownMenu_Select location").assertTextContains("Pantry")
     composeTestRule.onNodeWithTag("expireDateTextField").performTextInput("29122024")
     composeTestRule.onNodeWithTag("submitButton").performClick()
   }

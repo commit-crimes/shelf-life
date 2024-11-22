@@ -54,6 +54,7 @@ fun OverviewScreen(
   val userHouseholds = householdViewModel.households.collectAsState().value
   val householdViewModelIsLoaded = householdViewModel.finishedLoading.collectAsState().value
   val selectedFilters = remember { mutableStateListOf<String>() }
+  val multipleSelectedFoodItems = listFoodItemsViewModel.multipleSelectedFoodItems.collectAsState()
 
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
@@ -116,6 +117,11 @@ fun OverviewScreen(
                         } else {
                           selectedFilters.remove(filter)
                         }
+                      },
+                      showDeleteOption = multipleSelectedFoodItems.value.isNotEmpty(),
+                      onDeleteClick = {
+                        householdViewModel.deleteMultipleFoodItems(multipleSelectedFoodItems.value)
+                        listFoodItemsViewModel.clearMultipleSelectedFoodItems()
                       })
                 }
               },
@@ -143,9 +149,13 @@ fun OverviewScreen(
                   )
               ListFoodItems(
                   foodItems = filteredFoodItems,
+                  listFoodItemsViewModel = listFoodItemsViewModel,
                   onFoodItemClick = { selectedFoodItem ->
                     listFoodItemsViewModel.selectFoodItem(selectedFoodItem)
                     navigationActions.navigateTo(Screen.INDIVIDUAL_FOOD_ITEM)
+                  },
+                  onFoodItemLongHold = { selectedFoodItem ->
+                    listFoodItemsViewModel.selectMultipleFoodItems(selectedFoodItem)
                   })
             }
           }

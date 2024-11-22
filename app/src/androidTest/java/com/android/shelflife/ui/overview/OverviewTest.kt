@@ -19,6 +19,7 @@ import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.overview.OverviewScreen
 import com.google.firebase.Timestamp
 import java.util.*
+import junit.framework.TestCase.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -519,75 +520,191 @@ class OverviewTest {
   }
 
   @Test
-  fun filtersFoodItemBasedOnSelectedFilter() {
-    setUpFilterTests()
+  fun selectAndDeleteFoodItems() {
 
-    composeTestRule.onNodeWithTag("filterIcon").performClick()
+    // Create multiple food items
+    val appleFoodFacts =
+        FoodFacts(
+            name = "Apple",
+            barcode = "123456789",
+            quantity = Quantity(5.0, FoodUnit.COUNT),
+            category = FoodCategory.FRUIT)
+    val appleFoodItem =
+        FoodItem(
+            uid = "foodItem1",
+            foodFacts = appleFoodFacts,
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)))
 
-    composeTestRule.onNodeWithText("Fruit").performClick()
-    composeTestRule.waitForIdle()
+    val bananaFoodFacts =
+        FoodFacts(
+            name = "Banana",
+            barcode = "987654321",
+            quantity = Quantity(3.0, FoodUnit.COUNT),
+            category = FoodCategory.FRUIT)
+    val bananaFoodItem =
+        FoodItem(
+            uid = "foodItem2",
+            foodFacts = bananaFoodFacts,
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)))
 
-    composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
+    val householdWithMultipleItems =
+        houseHold.copy(foodItems = listOf(appleFoodItem, bananaFoodItem))
+
+    // Mock the repository to return the household with multiple food items
+    mockHouseHoldRepositoryGetHouseholds(listOf(householdWithMultipleItems))
+
+    selectHousehold(householdWithMultipleItems)
+    composeTestRule.setContent {
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel = listFoodItemsViewModel)
+    }
+
+    // Initially, both items should be displayed
+    composeTestRule.onAllNodesWithTag("foodItemCard").assertCountEquals(2)
+
+    // Long press to select the first item
+    composeTestRule.onAllNodesWithTag("foodItemCard")[0].performTouchInput { longClick() }
+    composeTestRule.onNodeWithTag("deleteFoodItems").assertIsDisplayed()
+    assertEquals(1, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+    // Long press to select the second item
+    composeTestRule.onAllNodesWithTag("foodItemCard")[1].performTouchInput { longClick() }
+    assertEquals(2, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+    composeTestRule.onNodeWithTag("deleteFoodItems").assertIsEnabled().performClick()
+    assertEquals(0, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
   }
 
   @Test
-  fun filtersFoodItemsBasedOnMultipleSelectedFilters() {
-    setUpFilterTests()
+  fun selectAndDeselectFoodItems() {
+    // Create multiple food items
+    val appleFoodFacts =
+        FoodFacts(
+            name = "Apple",
+            barcode = "123456789",
+            quantity = Quantity(5.0, FoodUnit.COUNT),
+            category = FoodCategory.FRUIT)
+    val appleFoodItem =
+        FoodItem(
+            uid = "foodItem1",
+            foodFacts = appleFoodFacts,
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)))
 
-    composeTestRule.onNodeWithTag("filterIcon").performClick()
+    val bananaFoodFacts =
+        FoodFacts(
+            name = "Banana",
+            barcode = "987654321",
+            quantity = Quantity(3.0, FoodUnit.COUNT),
+            category = FoodCategory.FRUIT)
+    val bananaFoodItem =
+        FoodItem(
+            uid = "foodItem2",
+            foodFacts = bananaFoodFacts,
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)))
 
-    composeTestRule.onNodeWithText("Fruit").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithText("Meat").performClick()
-    composeTestRule.waitForIdle()
+    val householdWithMultipleItems =
+        houseHold.copy(foodItems = listOf(appleFoodItem, bananaFoodItem))
 
-    composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
+    // Mock the repository to return the household with multiple food items
+    mockHouseHoldRepositoryGetHouseholds(listOf(householdWithMultipleItems))
+
+    selectHousehold(householdWithMultipleItems)
+    composeTestRule.setContent {
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel = listFoodItemsViewModel)
+    }
+
+    // Initially, both items should be displayed
+    composeTestRule.onAllNodesWithTag("foodItemCard").assertCountEquals(2)
+
+    // Long press to select the first item
+    composeTestRule.onAllNodesWithTag("foodItemCard")[0].performTouchInput { longClick() }
+    assertEquals(1, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+
+    // Long press to select the second item
+    composeTestRule.onAllNodesWithTag("foodItemCard")[1].performTouchInput { longClick() }
+    assertEquals(2, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+
+    // Long press again to deselect the first item
+    composeTestRule.onAllNodesWithTag("foodItemCard")[0].performTouchInput { longClick() }
+    assertEquals(1, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+
+    // Long press again to deselect the second item
+    composeTestRule.onAllNodesWithTag("foodItemCard")[1].performTouchInput { longClick() }
+    assertEquals(0, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
   }
+    @Test
+    fun filtersFoodItemBasedOnSelectedFilter() {
+        setUpFilterTests()
 
-  @Test
-  fun filtersFoodItemsBasedOnAFilterAndThenAnother() {
-    setUpFilterTests()
+        composeTestRule.onNodeWithTag("filterIcon").performClick()
 
-    composeTestRule.onNodeWithTag("filterIcon").performClick()
+        composeTestRule.onNodeWithText("Fruit").performClick()
+        composeTestRule.waitForIdle()
 
-    composeTestRule.onNodeWithText("Fruit").performClick()
-    composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
+    }
 
-    composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
+    @Test
+    fun filtersFoodItemsBasedOnMultipleSelectedFilters() {
+        setUpFilterTests()
 
-    composeTestRule.onNodeWithText("Fruit").performClick()
-    composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("filterIcon").performClick()
 
-    composeTestRule.onNodeWithText("Meat").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Apple").assertDoesNotExist()
-  }
+        composeTestRule.onNodeWithText("Fruit").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Meat").performClick()
+        composeTestRule.waitForIdle()
 
-  @Test
-  fun filtersFoodItemsBasedOnFiltersAndQuery() {
-    setUpFilterTests()
+        composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
+    }
 
-    composeTestRule.onNodeWithTag("filterIcon").performClick()
+    @Test
+    fun filtersFoodItemsBasedOnAFilterAndThenAnother() {
+        setUpFilterTests()
 
-    composeTestRule.onNodeWithText("Fruit").performClick()
-    composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithText("Meat").performClick()
-    composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("filterIcon").performClick()
 
-    composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
-    composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Fruit").performClick()
+        composeTestRule.waitForIdle()
 
-    // Activate the SearchBar
-    composeTestRule.onNodeWithTag("foodSearchBar").performClick()
-    composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
 
-    composeTestRule
-        .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("foodSearchBar")))
-        .performTextInput("Ste")
+        composeTestRule.onNodeWithText("Fruit").performClick()
+        composeTestRule.waitForIdle()
 
-    composeTestRule.onNodeWithText("Apple").assertDoesNotExist()
-    composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
-  }
+        composeTestRule.onNodeWithText("Meat").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Apple").assertDoesNotExist()
+    }
+
+    @Test
+    fun filtersFoodItemsBasedOnFiltersAndQuery() {
+        setUpFilterTests()
+
+        composeTestRule.onNodeWithTag("filterIcon").performClick()
+
+        composeTestRule.onNodeWithText("Fruit").performClick()
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithText("Meat").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
+
+        // Activate the SearchBar
+        composeTestRule.onNodeWithTag("foodSearchBar").performClick()
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("foodSearchBar")))
+            .performTextInput("Ste")
+
+        composeTestRule.onNodeWithText("Apple").assertDoesNotExist()
+        composeTestRule.onNodeWithText("Steak").assertIsDisplayed()
+    }
 }

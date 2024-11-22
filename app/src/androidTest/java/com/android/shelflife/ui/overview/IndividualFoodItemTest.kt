@@ -80,7 +80,9 @@ class IndividualFoodItemScreenTest {
   fun individualFoodItemScreenDisplaysCorrectly() = runTest {
     composeTestRule.setContent {
       IndividualFoodItemScreen(
-          navigationActions = navigationActions, foodItemViewModel = foodItemViewModel)
+          navigationActions = navigationActions,
+          houseHoldViewModel = houseHoldViewModel,
+          foodItemViewModel = foodItemViewModel)
     }
 
     // Check if the screen displays the correct food item details
@@ -96,7 +98,9 @@ class IndividualFoodItemScreenTest {
 
     composeTestRule.setContent {
       IndividualFoodItemScreen(
-          navigationActions = navigationActions, foodItemViewModel = foodItemViewModel)
+          navigationActions = navigationActions,
+          houseHoldViewModel = houseHoldViewModel,
+          foodItemViewModel = foodItemViewModel)
     }
 
     // Verify that the loading indicator is displayed
@@ -107,11 +111,32 @@ class IndividualFoodItemScreenTest {
   fun testBackButtonNavigatesBack() = runTest {
     composeTestRule.setContent {
       IndividualFoodItemScreen(
-          navigationActions = navigationActions, foodItemViewModel = foodItemViewModel)
+          navigationActions = navigationActions,
+          houseHoldViewModel = houseHoldViewModel,
+          foodItemViewModel = foodItemViewModel)
     }
 
     // Perform click on the back button
     composeTestRule.onNodeWithTag("IndividualTestScreenGoBack").performClick()
+
+    // Verify that the navigation action was triggered
+    io.mockk.verify { navigationActions.goBack() }
+  }
+
+  @Test
+  fun testDeleteFoodItem() = runTest {
+    composeTestRule.setContent {
+      IndividualFoodItemScreen(
+          navigationActions = navigationActions,
+          houseHoldViewModel = houseHoldViewModel,
+          foodItemViewModel = foodItemViewModel)
+    }
+
+    // Perform click on the delete icon
+    composeTestRule.onNodeWithTag("deleteFoodItem").performClick()
+
+    // Verify that the deleteFoodItem function was called
+    io.mockk.verify { houseHoldViewModel.deleteFoodItem(foodItem) }
 
     // Verify that the navigation action was triggered
     io.mockk.verify { navigationActions.goBack() }
