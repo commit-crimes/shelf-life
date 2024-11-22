@@ -10,9 +10,3 @@ data class Invitation(
     val inviterUserId: String,
     val timestamp: Timestamp? = null
 )
-
-enum class InvitationStatus {
-  PENDING,
-  ACCEPTED,
-  DECLINED
-}

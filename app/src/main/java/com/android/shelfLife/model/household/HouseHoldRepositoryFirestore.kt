@@ -3,7 +3,6 @@ package com.android.shelfLife.model.household
 import android.util.Log
 import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.invitations.Invitation
-import com.android.shelfLife.model.invitations.InvitationStatus
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot

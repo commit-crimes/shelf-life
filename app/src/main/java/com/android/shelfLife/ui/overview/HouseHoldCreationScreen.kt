@@ -36,7 +36,6 @@ fun HouseHoldCreationScreen(
     navigationActions: NavigationActions,
     householdViewModel: HouseholdViewModel,
 ) {
-  val coroutineScope = rememberCoroutineScope()
   val householdToEdit by householdViewModel.householdToEdit.collectAsState()
   val memberEmails by householdViewModel.memberEmails.collectAsState()
 
@@ -181,27 +180,15 @@ fun HouseHoldCreationScreen(
                                   houseHoldName != householdToEdit!!.name)) {
                             isError = true
                           } else {
-                            coroutineScope.launch {
-                              householdViewModel.getUserIdsByEmails(memberEmailList) { emailToUid ->
-                                val missingEmails =
-                                    memberEmailList.filter { it !in emailToUid.keys }
-                                if (missingEmails.isNotEmpty()) {
-                                  Log.w(
-                                      "HouseHoldCreationScreen", "Emails not found: $missingEmails")
-                                }
-                                val memberUids = emailToUid.values.toMutableList()
-
                                 if (householdToEdit != null) {
                                   val updatedHouseHold =
                                       householdToEdit!!.copy(
-                                          name = houseHoldName, members = memberUids)
+                                          name = houseHoldName, members = memberEmailList)
                                   householdViewModel.updateHousehold(updatedHouseHold)
                                 } else {
                                   householdViewModel.addNewHousehold(houseHoldName, memberEmailList)
                                 }
                                 navigationActions.navigateTo(Screen.OVERVIEW)
-                              }
-                            }
                           }
                         },
                     ) {

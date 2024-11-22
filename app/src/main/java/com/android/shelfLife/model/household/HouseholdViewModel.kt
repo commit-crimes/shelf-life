@@ -175,7 +175,6 @@ class HouseholdViewModel(
     loadHouseholds()
   }
 
-  // TODO this is a bad way to update the food items, we need a plan to separate the food items from
   // the household
   fun addFoodItem(foodItem: FoodItem) {
     val selectedHousehold = selectedHousehold.value
@@ -212,8 +211,11 @@ class HouseholdViewModel(
         }
   }
 
-  // Load invitations for the current user
-  private fun loadInvitations() {
+
+    /**
+     * Loads the list of invitations from the repository and updates the [_invitations] flow.
+     */
+    private fun loadInvitations() {
     repository.getInvitations(
         onSuccess = { invitationList -> _invitations.value = invitationList },
         onFailure = { exception ->
@@ -237,7 +239,9 @@ class HouseholdViewModel(
         onSuccess = {
           Log.d("HouseholdViewModel", "Invitation accepted")
             invitations.value.minus(invitation)
+            // refresh invitations
             loadInvitations()
+            // refresh households
             loadHouseholds()
         },
         onFailure = { exception ->
