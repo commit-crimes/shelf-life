@@ -90,16 +90,8 @@ fun RecipesScreen(
       householdViewModel = householdViewModel,
       navigationActions = navigationActions) {
 
-
-          // Combined filtering based on selected filters and search query
-          val filteredRecipes = recipeList.filter { recipe ->
-              // Check if recipe matches selected filters
-              (selectedFilters.isEmpty() || recipe.recipeTypes.any { recipeType ->
-                  selectedFilters.any { filter -> recipeType == stringToSearchRecipeType(filter) }
-              }) &&
-                      // Check if recipe matches the search query
-                      (query.isEmpty() || recipe.name.contains(query, ignoreCase = true))
-          }
+        // filtering recipeList using the filter and the query from the searchBar
+        val filteredRecipes = filterRecipes(recipeList, selectedFilters, query)
 
         if (selectedHousehold == null) {
           FirstTimeWelcomeScreen(navigationActions, householdViewModel)
@@ -348,4 +340,33 @@ fun stringToSearchRecipeType(string: String): RecipesRepository.SearchRecipeType
     "Personal" -> RecipesRepository.SearchRecipeType.PERSONAL
     else -> throw IllegalArgumentException("Unknown filter: $string")
   }
+}
+
+/**
+ * Filters a list of recipes based on selected filters and a search query.
+ *
+ * @param listRecipes The complete list of recipes to be filtered.
+ * @param selectedFilters A list of filter criteria. Each filter is matched against the recipe's types.
+ *                        If the list is empty, no filter is applied based on this parameter.
+ * @param query A search string used to filter recipes by their names.
+ *              If the string is empty, no filtering is applied based on this parameter.
+ * @return A list of recipes that match both the selected filters and the search query.
+ *         - Recipes are included if they match at least one filter from `selectedFilters` (if provided).
+ *         - Recipes are included if their names contain the `query` string (case-insensitive, if provided).
+ *         - If both `selectedFilters` and `query` are empty, the original list is returned without any filtering.
+ */
+fun filterRecipes(listRecipes: List<Recipe>,
+                  selectedFilters : List<String>,
+                  query : String) : List<Recipe>{
+    // Combined filtering based on selected filters and search query
+    val filteredRecipes = listRecipes.filter { recipe ->
+        // Check if recipe matches selected filters
+        (selectedFilters.isEmpty() || recipe.recipeTypes.any { recipeType ->
+            selectedFilters.any { filter -> recipeType == stringToSearchRecipeType(filter) }
+        }) &&
+                // Check if recipe matches the search query
+                (query.isEmpty() || recipe.name.contains(query, ignoreCase = true))
+    }
+
+    return filteredRecipes
 }
