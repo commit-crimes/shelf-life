@@ -51,6 +51,7 @@ import com.android.shelfLife.R
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
+import com.android.shelfLife.model.recipe.RecipesRepository
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -80,22 +81,17 @@ fun RecipesScreen(
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
 
-  val filters = listOf("Soon to expire", "Only household items", "High protein", "Low calories")
+  val filters =
+      listOf("Soon to expire", "Only household items", "High protein", "Low calories", "Personal")
 
   HouseHoldSelectionDrawer(
       scope = scope,
       drawerState = drawerState,
       householdViewModel = householdViewModel,
       navigationActions = navigationActions) {
-        // Filter the recipes based on the search query
-        val filteredRecipes =
-            if (query.isEmpty()) {
-              recipeList // Use the collected recipe list
-            } else {
-              recipeList.filter { recipe ->
-                recipe.name.contains(query, ignoreCase = true) // Filter by recipe name
-              }
-            }
+
+        // filtering recipeList using the filter and the query from the searchBar
+        val filteredRecipes = filterRecipes(recipeList, selectedFilters, query)
 
         if (selectedHousehold == null) {
           FirstTimeWelcomeScreen(navigationActions, householdViewModel)
@@ -141,7 +137,11 @@ fun RecipesScreen(
                   if (filteredRecipes.isEmpty()) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        content = { Text(text = "No recipes available", modifier = Modifier) },
+                        content = {
+                          Text(
+                              text = "No recipes available",
+                              modifier = Modifier.testTag("noRecipesAvailableText"))
+                        },
                         contentAlignment = Alignment.Center)
                   } else {
                     // LazyColumn for displaying the list of filtered recipes
@@ -194,9 +194,7 @@ fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
             placeholder = {
               Text("Search recipes") // Placeholder text shown when the query is empty
             },
-            onSearch = {
-              // Logic to handle the search action can be added here if necessary
-            },
+            onSearch = {},
             active = isActive, // Determines whether the search bar is in an active state
             onActiveChange = { active -> isActive = active }, // Callback to update the active state
             modifier =
@@ -318,4 +316,64 @@ fun RecipeItem(
     navigationActions.navigateTo(
         Screen.INDIVIDUAL_RECIPE) // Navigate to the individual recipe screen
   }
+}
+
+/**
+ * Converts a string representation of a recipe type into a corresponding
+ * `RecipesRepository.SearchRecipeType` enumeration value.
+ *
+ * @param string A string describing the type of recipe to search for. Possible values include:
+ *     - "Soon to expire": Recipes with ingredients that are nearing expiration.
+ *     - "Only household items": Recipes using only ingredients available in the household.
+ *     - "High protein": Recipes with a high protein content.
+ *     - "Low calories": Recipes with low caloric content.
+ *
+ * @return The corresponding `RecipesRepository.SearchRecipeType` enum value.
+ * @throws IllegalArgumentException If the input string does not match any known recipe type.
+ */
+fun stringToSearchRecipeType(string: String): RecipesRepository.SearchRecipeType {
+  return when (string) {
+    "Soon to expire" -> RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE
+    "Only household items" -> RecipesRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS
+    "High protein" -> RecipesRepository.SearchRecipeType.HIGH_PROTEIN
+    "Low calories" -> RecipesRepository.SearchRecipeType.LOW_CALORIE
+    "Personal" -> RecipesRepository.SearchRecipeType.PERSONAL
+    else -> throw IllegalArgumentException("Unknown filter: $string")
+  }
+}
+
+/**
+ * Filters a list of recipes based on selected filters and a search query.
+ *
+ * @param listRecipes The complete list of recipes to be filtered.
+ * @param selectedFilters A list of filter criteria. Each filter is matched against the recipe's
+ *   types. If the list is empty, no filter is applied based on this parameter.
+ * @param query A search string used to filter recipes by their names. If the string is empty, no
+ *   filtering is applied based on this parameter.
+ * @return A list of recipes that match both the selected filters and the search query.
+ *     - Recipes are included if they match at least one filter from `selectedFilters` (if
+ *       provided).
+ *     - Recipes are included if their names contain the `query` string (case-insensitive, if
+ *       provided).
+ *     - If both `selectedFilters` and `query` are empty, the original list is returned without any
+ *       filtering.
+ */
+fun filterRecipes(
+    listRecipes: List<Recipe>,
+    selectedFilters: List<String>,
+    query: String
+): List<Recipe> {
+  // Combined filtering based on selected filters and search query
+  val filteredRecipes =
+      listRecipes.filter { recipe ->
+        // Check if recipe matches selected filters
+        (selectedFilters.isEmpty() ||
+            recipe.recipeTypes.any { recipeType ->
+              selectedFilters.any { filter -> recipeType == stringToSearchRecipeType(filter) }
+            }) &&
+            // Check if recipe matches the search query
+            (query.isEmpty() || recipe.name.contains(query, ignoreCase = true))
+      }
+
+  return filteredRecipes
 }

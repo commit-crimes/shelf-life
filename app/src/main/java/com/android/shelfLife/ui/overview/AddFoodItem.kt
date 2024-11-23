@@ -3,7 +3,6 @@ package com.android.shelfLife.ui.overview
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -13,8 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
@@ -25,14 +22,6 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.utils.*
 import com.google.firebase.Timestamp
 
-/**
- * Composable function to display the Add Food Item screen.
- *
- * @param navigationActions The navigation actions to be used in the screen.
- * @param houseHoldViewModel The ViewModel for the household.
- * @param foodItemViewModel The ViewModel for the food items.
- * @param paddingValues The padding values to be applied to the screen.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddFoodItemScreen(
@@ -98,100 +87,62 @@ fun AddFoodItemScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top) {
               item(key = "foodName") {
-                // Food Name Field with Error Handling
-                OutlinedTextField(
-                    value = foodName,
-                    onValueChange = { newValue ->
+                FoodNameField(
+                    foodName = foodName,
+                    onFoodNameChange = { newValue ->
                       foodName = newValue
                       foodNameError = validateFoodName(foodName)
                     },
-                    label = { Text(stringResource(id = R.string.food_name_hint)) },
-                    isError = foodNameError != null,
-                    modifier = Modifier.testTag("inputFoodName").fillMaxWidth())
-                if (foodNameError != null) {
-                  Text(
-                      text = foodNameError!!,
-                      color = MaterialTheme.colorScheme.error,
-                      style = MaterialTheme.typography.bodySmall,
-                      modifier = Modifier.fillMaxWidth(),
-                      textAlign = TextAlign.Start)
+                    foodNameError = foodNameError)
+                Spacer(modifier = Modifier.height(16.dp))
+              }
+
+              item(key = "amountAndUnit") {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                  AmountField(
+                      amount = amount,
+                      onAmountChange = { newValue ->
+                        amount = newValue
+                        amountError = validateAmount(amount)
+                      },
+                      amountError = amountError,
+                      modifier = Modifier.weight(1f),
+                      testTag = "inputFoodAmount")
+                  Spacer(modifier = Modifier.width(8.dp))
+                  UnitDropdownField(
+                      unit = unit,
+                      onUnitChange = { unit = it },
+                      unitExpanded = unitExpanded,
+                      onUnitExpandedChange = { unitExpanded = it },
+                      modifier = Modifier.weight(1f),
+                      testTag = "inputFoodUnit")
                 }
                 Spacer(modifier = Modifier.height(16.dp))
               }
 
-              item(key = "amount") {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween) {
-                      Column(modifier = Modifier.weight(1f)) {
-                        // Amount Field with Error Handling
-                        OutlinedTextField(
-                            value = amount,
-                            onValueChange = { newValue ->
-                              amount = newValue
-                              amountError = validateAmount(amount)
-                            },
-                            label = { Text(stringResource(id = R.string.amount_hint)) },
-                            isError = amountError != null,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.testTag("inputFoodAmount").fillMaxWidth())
-                        if (amountError != null) {
-                          Text(
-                              text = amountError!!,
-                              color = MaterialTheme.colorScheme.error,
-                              style = MaterialTheme.typography.bodySmall,
-                              modifier = Modifier.fillMaxWidth(),
-                              textAlign = TextAlign.Start)
-                        }
-                      }
-                      Spacer(modifier = Modifier.width(8.dp))
-                      // Unit Dropdown
-                      DropdownFields(
-                          label = stringResource(id = R.string.unit_label),
-                          options = FoodUnit.entries.toTypedArray(),
-                          selectedOption = unit,
-                          onOptionSelected = { unit = it },
-                          expanded = unitExpanded,
-                          onExpandedChange = { unitExpanded = it },
-                          optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-                          modifier = Modifier.weight(1f).testTag("inputFoodUnit"))
-                    }
-                Spacer(modifier = Modifier.height(16.dp))
-              }
-
               item(key = "category") {
-                // Category Dropdown
-                DropdownFields(
-                    label = stringResource(id = R.string.category_label),
-                    options = FoodCategory.entries.toTypedArray(),
-                    selectedOption = category,
-                    onOptionSelected = { category = it },
-                    expanded = categoryExpanded,
-                    onExpandedChange = { categoryExpanded = it },
-                    optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-                    modifier = Modifier.testTag("inputFoodCategory").fillMaxWidth())
+                CategoryDropdownField(
+                    category = category,
+                    onCategoryChange = { category = it },
+                    categoryExpanded = categoryExpanded,
+                    onCategoryExpandedChange = { categoryExpanded = it })
                 Spacer(modifier = Modifier.height(16.dp))
               }
 
               item(key = "location") {
-                // Location Dropdown
-                DropdownFields(
-                    label = stringResource(id = R.string.location_label),
-                    options = FoodStorageLocation.entries.toTypedArray(),
-                    selectedOption = location,
-                    onOptionSelected = { location = it },
-                    expanded = locationExpanded,
+                LocationDropdownField(
+                    location = location,
+                    onLocationChange = { location = it },
+                    locationExpanded = locationExpanded,
                     onExpandedChange = { locationExpanded = it },
-                    optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-                    modifier = Modifier.testTag("inputFoodLocation").fillMaxWidth())
+                    testTag = "inputFoodLocation")
                 Spacer(modifier = Modifier.height(16.dp))
               }
 
               item(key = "expireDate") {
-                // Expire Date Field with Error Handling
-                OutlinedTextField(
-                    value = expireDate,
-                    onValueChange = { newValue ->
+                DateField(
+                    date = expireDate,
+                    onDateChange = { newValue ->
                       expireDate = newValue.filter { it.isDigit() }
                       expireDateError = validateExpireDate(expireDate, buyDate, buyDateError)
                       // Re-validate Open Date since it depends on Expire Date
@@ -199,55 +150,31 @@ fun AddFoodItemScreen(
                           validateOpenDate(
                               openDate, buyDate, buyDateError, expireDate, expireDateError)
                     },
-                    label = { Text(stringResource(id = R.string.expire_date_hint)) },
-                    placeholder = { Text("dd/mm/yyyy") },
-                    isError = expireDateError != null,
-                    visualTransformation = DateVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    modifier = Modifier.testTag("inputFoodExpireDate").fillMaxWidth())
-                if (expireDateError != null) {
-                  Text(
-                      text = expireDateError!!,
-                      color = MaterialTheme.colorScheme.error,
-                      style = MaterialTheme.typography.bodySmall,
-                      modifier = Modifier.fillMaxWidth(),
-                      textAlign = TextAlign.Start)
-                }
+                    dateError = expireDateError,
+                    labelResId = R.string.expire_date_hint,
+                    testTag = "inputFoodExpireDate")
                 Spacer(modifier = Modifier.height(16.dp))
               }
 
               item(key = "openDate") {
-                // Open Date Field with Error Handling
-                OutlinedTextField(
-                    value = openDate,
-                    onValueChange = { newValue ->
+                DateField(
+                    date = openDate,
+                    onDateChange = { newValue ->
                       openDate = newValue.filter { it.isDigit() }
                       openDateError =
                           validateOpenDate(
                               openDate, buyDate, buyDateError, expireDate, expireDateError)
                     },
-                    label = { Text(stringResource(id = R.string.open_date_hint)) },
-                    placeholder = { Text("dd/mm/yyyy") },
-                    isError = openDateError != null,
-                    visualTransformation = DateVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    modifier = Modifier.testTag("inputFoodOpenDate").fillMaxWidth())
-                if (openDateError != null) {
-                  Text(
-                      text = openDateError!!,
-                      color = MaterialTheme.colorScheme.error,
-                      style = MaterialTheme.typography.bodySmall,
-                      modifier = Modifier.fillMaxWidth(),
-                      textAlign = TextAlign.Start)
-                }
+                    dateError = openDateError,
+                    labelResId = R.string.open_date_hint,
+                    testTag = "inputFoodOpenDate")
                 Spacer(modifier = Modifier.height(16.dp))
               }
 
               item(key = "buyDate") {
-                // Buy Date Field with Error Handling
-                OutlinedTextField(
-                    value = buyDate,
-                    onValueChange = { newValue ->
+                DateField(
+                    date = buyDate,
+                    onDateChange = { newValue ->
                       buyDate = newValue.filter { it.isDigit() }
                       buyDateError = validateBuyDate(buyDate)
                       // Re-validate Expire Date and Open Date since they depend on Buy Date
@@ -256,25 +183,13 @@ fun AddFoodItemScreen(
                           validateOpenDate(
                               openDate, buyDate, buyDateError, expireDate, expireDateError)
                     },
-                    label = { Text(stringResource(id = R.string.buy_date_hint)) },
-                    placeholder = { Text("dd/mm/yyyy") },
-                    isError = buyDateError != null,
-                    visualTransformation = DateVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                    modifier = Modifier.testTag("inputFoodBuyDate").fillMaxWidth())
-                if (buyDateError != null) {
-                  Text(
-                      text = buyDateError!!,
-                      color = MaterialTheme.colorScheme.error,
-                      style = MaterialTheme.typography.bodySmall,
-                      modifier = Modifier.fillMaxWidth(),
-                      textAlign = TextAlign.Start)
-                }
+                    dateError = buyDateError,
+                    labelResId = R.string.buy_date_hint,
+                    testTag = "inputFoodBuyDate")
                 Spacer(modifier = Modifier.height(32.dp))
               }
 
               item(key = "submitButton") {
-                // Submit Button
                 Button(
                     onClick = {
                       validateAllFieldsWhenSubmitButton()
