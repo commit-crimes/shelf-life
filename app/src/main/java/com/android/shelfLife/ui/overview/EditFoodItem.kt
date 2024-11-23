@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,6 +21,7 @@ import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodItem.*
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.utils.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,6 +73,18 @@ fun EditFoodItemScreen(
                   onClick = { navigationActions.goBack() },
                   modifier = Modifier.testTag("goBackButton")) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go Back")
+                  }
+            },
+            actions = {
+              IconButton(
+                  onClick = {
+                    selectedFood?.let {
+                      houseHoldViewModel.deleteFoodItem(it)
+                      navigationActions.navigateTo(Route.OVERVIEW)
+                    }
+                  },
+                  modifier = Modifier.testTag("deleteFoodItem")) {
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
                   }
             })
       }) { innerPadding ->
