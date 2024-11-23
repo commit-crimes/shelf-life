@@ -9,6 +9,7 @@ interface RecipesRepository {
     USE_ONLY_HOUSEHOLD_ITEMS,
     HIGH_PROTEIN,
     LOW_CALORIE,
+    PERSONAL, // Recipe written by user
   }
 
   /**

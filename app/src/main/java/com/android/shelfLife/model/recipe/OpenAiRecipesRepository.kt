@@ -75,6 +75,10 @@ class OpenAiRecipesRepository(
       RecipesRepository.SearchRecipeType.LOW_CALORIE -> {
         LOW_CALORIE_SYSTEM_PROMPT to "$LOW_CALORIE_USER_PROMPT$foodItemsNames."
       }
+      RecipesRepository.SearchRecipeType.PERSONAL -> {
+        throw IllegalArgumentException(
+            "SearchRecipeType.PERSONAL is not supported for recipe generation as it is reserved for user-created recipes.")
+      }
     }
   }
 
@@ -148,7 +152,7 @@ class OpenAiRecipesRepository(
         val message = response.choices.firstOrNull()?.message
         message?.toolCalls?.firstOrNull()?.let { toolCall ->
           require(toolCall is ToolCall.Function) { "Tool call is not a function" }
-          val toolResponse = toolCall.execute()
+          val toolResponse = toolCall.execute(searchRecipeType)
 
           // Convert the tool response into a recipe object
           val generatedRecipe =
@@ -157,7 +161,8 @@ class OpenAiRecipesRepository(
                   instructions = toolResponse.instructions,
                   servings = toolResponse.servings,
                   time = toolResponse.time,
-                  ingredients = toolResponse.ingredients)
+                  ingredients = toolResponse.ingredients,
+                  recipeTypes = listOf(searchRecipeType))
 
           onSuccess(listOf(generatedRecipe)) // Return the generated recipe
         } ?: onFailure(Exception("No tool call generated"))
@@ -169,7 +174,7 @@ class OpenAiRecipesRepository(
 
   private val availableFunctions = mapOf("_createRecipeFunction" to ::_createRecipeFunction)
 
-  private fun ToolCall.Function.execute(): Recipe {
+  private fun ToolCall.Function.execute(recipeType: RecipesRepository.SearchRecipeType): Recipe {
     val functionToCall =
         availableFunctions[function.name] ?: error("Function ${function.name} not found")
     val functionArgs = function.argumentsAsJson()
@@ -182,7 +187,7 @@ class OpenAiRecipesRepository(
     val servings = functionArgs["servings"]?.jsonPrimitive?.int ?: 2
     val time = functionArgs["time"]?.jsonPrimitive?.content?.toIntOrNull()?.minutes ?: 30.minutes
 
-    return _createRecipeFunction(ingredients, instructions, servings, time)
+    return _createRecipeFunction(ingredients, instructions, servings, time, recipeType)
   }
 
   @JvmName("_createRecipeFunction") // allowing tests to access this function using reflection
@@ -190,11 +195,16 @@ class OpenAiRecipesRepository(
       ingredients: List<String>,
       instructions: List<String>,
       servings: Int,
-      time: kotlin.time.Duration
+      time: kotlin.time.Duration,
+      recipeType: RecipesRepository.SearchRecipeType
   ): Recipe {
 
     // TODO: logic to find and create a new list of Ingredients
     return Recipe(
-        name = "Generated Recipe", instructions = instructions, servings = servings, time = time)
+        name = "Generated Recipe",
+        instructions = instructions,
+        servings = servings,
+        time = time,
+        recipeTypes = listOf(recipeType))
   }
 }
