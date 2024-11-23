@@ -98,6 +98,11 @@ fun OverviewScreen(
                         } else {
                           selectedFilters.remove(filter)
                         }
+                      },
+                      showDeleteOption = multipleSelectedFoodItems.value.isNotEmpty(),
+                      onDeleteClick = {
+                        householdViewModel.deleteMultipleFoodItems(multipleSelectedFoodItems.value)
+                        listFoodItemsViewModel.clearMultipleSelectedFoodItems()
                       })
                 }
               },
