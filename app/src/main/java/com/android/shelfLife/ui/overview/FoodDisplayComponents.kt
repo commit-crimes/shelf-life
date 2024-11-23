@@ -120,20 +120,21 @@ fun FoodItemCard(
           ?: "No Expiry Date"
   val expiryDateMessage = getExpiryMessageBasedOnDays(timeRemainingInDays, formattedExpiryDate)
 
-
-    if ((expiryDateMessage == "Expired") && (foodItem.status != FoodStatus.EXPIRED)){
-        val newFoodItem = FoodItem(
+  // checks if the foodItem has expired and its status has not been updated
+  if ((expiryDateMessage == "Expired") && (foodItem.status != FoodStatus.EXPIRED)) {
+    // creates a newFoodItem to update the one that's wrong
+    val newFoodItem =
+        FoodItem(
             uid = foodItem.uid,
             foodFacts = foodItem.foodFacts,
             location = foodItem.location,
             expiryDate = foodItem.expiryDate,
             openDate = foodItem.openDate,
             buyDate = foodItem.buyDate,
-            status = FoodStatus.EXPIRED
-        )
-        householdViewModel.editFoodItem(newFoodItem, foodItem)
-        listFoodItemsViewModel.selectFoodItem(newFoodItem)
-    }
+            status = FoodStatus.EXPIRED)
+    householdViewModel.editFoodItem(newFoodItem, foodItem)
+    listFoodItemsViewModel.selectFoodItem(newFoodItem)
+  }
 
   // Composable UI
   ElevatedCard(

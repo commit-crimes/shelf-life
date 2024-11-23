@@ -45,27 +45,23 @@ fun AmountField(
     modifier: Modifier = Modifier,
     testTag: String = ""
 ) {
-    Column(modifier = modifier) {
-        OutlinedTextField(
-            value = amount,
-            onValueChange = onAmountChange,
-            label = { Text(stringResource(id = R.string.amount_hint)) },
-            isError = amountError != null,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag(testTag)
-        )
-        if (amountError != null) {
-            Text(
-                text = amountError,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Start
-            )
-        }
+  Column(modifier = modifier) {
+    OutlinedTextField(
+        value = amount,
+        onValueChange = onAmountChange,
+        label = { Text(stringResource(id = R.string.amount_hint)) },
+        isError = amountError != null,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        modifier = Modifier.fillMaxWidth().testTag(testTag))
+    if (amountError != null) {
+      Text(
+          text = amountError,
+          color = MaterialTheme.colorScheme.error,
+          style = MaterialTheme.typography.bodySmall,
+          modifier = Modifier.fillMaxWidth(),
+          textAlign = TextAlign.Start)
     }
+  }
 }
 
 @Composable
