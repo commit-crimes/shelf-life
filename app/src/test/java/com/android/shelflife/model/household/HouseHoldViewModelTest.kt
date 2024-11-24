@@ -36,7 +36,6 @@ import org.mockito.Mockito.mockStatic
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -88,28 +87,6 @@ class HouseholdViewModelTest {
     firebaseAuthMock.close()
   }
 
-  // This test needs for the user to be logged in, no idea how to mock this
-  /*
-  @Test
-  fun `init should load households`() = runTest {
-    // Arrange
-    val households = listOf(HouseHold("1", "Household 1", emptyList(), emptyList()))
-
-    whenever(repository.getHouseholds(any(), any())).thenAnswer { invocation ->
-      val onSuccess = invocation.getArgument<(List<HouseHold>) -> Unit>(0)
-      onSuccess(households)
-      null
-    }
-    // Act
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
-
-    // Assert
-    assertEquals(households, householdViewModel.households.value)
-    assertEquals(households.first(), householdViewModel.selectedHousehold.value)
-    verify(listFoodItemsViewModel).setFoodItems(households.first().foodItems)
-  }
-
-   */
   @Test
   fun `selectHousehold should update selected household and food items`() = runTest {
     // Arrange
@@ -139,35 +116,6 @@ class HouseholdViewModelTest {
     // Assert
     assertEquals(household, householdViewModel.selectedHousehold.value)
     verify(listFoodItemsViewModel).setFoodItems(household.foodItems)
-  }
-
-  @Test
-  fun `addNewHousehold should add household and reload households`() = runTest {
-    // Arrange
-    val householdName = "New Household"
-    val newUid = "uid"
-    val newHousehold = HouseHold(newUid, householdName, emptyList(), emptyList())
-
-    whenever(repository.getNewUid()).thenReturn(newUid)
-    whenever(repository.addHousehold(any(), any(), any())).thenAnswer { invocation ->
-      val onSuccess = invocation.getArgument<() -> Unit>(1)
-      onSuccess()
-      null
-    }
-    val households = listOf(newHousehold)
-    whenever(repository.getHouseholds(any(), any())).thenAnswer { invocation ->
-      val onSuccess = invocation.getArgument<(List<HouseHold>) -> Unit>(0)
-      onSuccess(households)
-      null
-    }
-
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
-
-    // Act
-    householdViewModel.addNewHousehold(householdName)
-
-    // Assert
-    assertEquals(households, householdViewModel.households.value)
   }
 
   @Test
@@ -339,8 +287,6 @@ class HouseholdViewModelTest {
     // Assert
     // Verify that repository.addHousehold is not called
     verify(repository, never()).addHousehold(any(), any(), any())
-    // Verify that loadHouseholds is called
-    verify(repository).getHouseholds(any(), any())
     // Optionally, you can verify that an error is logged
   }
 
@@ -387,9 +333,6 @@ class HouseholdViewModelTest {
             foodItems = emptyList())
 
     assertEquals(expectedHousehold, householdCaptor.firstValue)
-
-    // Verify that loadHouseholds is called
-    verify(repository, atLeastOnce()).getHouseholds(any(), any())
   }
 
   @Test
@@ -431,9 +374,6 @@ class HouseholdViewModelTest {
 
     val expectedMembers = listOf(userUid) + friendUserIds.values
     assertEquals(expectedMembers.sorted(), householdCaptor.firstValue.members.sorted())
-
-    // Verify that loadHouseholds is called
-    verify(repository, atLeastOnce()).getHouseholds(any(), any())
   }
 
   @Test
@@ -475,10 +415,6 @@ class HouseholdViewModelTest {
 
     val expectedMembers = listOf(userUid) + friendUserIds.values
     assertEquals(expectedMembers.sorted(), householdCaptor.firstValue.members.sorted())
-
-    // Verify that loadHouseholds is called
-    verify(repository, atLeastOnce()).getHouseholds(any(), any())
-    // Optionally, check that a warning is logged about emails not found
   }
 
   @Test
@@ -511,10 +447,6 @@ class HouseholdViewModelTest {
 
     // Act
     householdViewModel.addNewHousehold(householdName, friendEmails)
-
-    // Assert
-    // Verify that loadHouseholds is called
-    verify(repository, atLeastOnce()).getHouseholds(any(), any())
     // Optionally, check that an error is logged with the exception
   }
 

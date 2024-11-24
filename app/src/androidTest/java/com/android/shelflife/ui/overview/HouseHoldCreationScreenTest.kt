@@ -2,6 +2,7 @@ package com.android.shelflife.ui.overview
 
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -136,7 +137,7 @@ class HouseHoldCreationScreenTest {
           navigationActions = navigationActions, householdViewModel = householdViewModel)
     }
     composeTestRule.onNodeWithTag("DeleteButton").performClick()
-    composeTestRule.onNodeWithTag("ConfirmDeleteButton").performClick()
+    composeTestRule.onNodeWithTag("confirmDeleteHouseholdButton").performClick()
     verify(houseHoldRepository).deleteHouseholdById(any(), any(), any())
   }
 
@@ -148,7 +149,7 @@ class HouseHoldCreationScreenTest {
           navigationActions = navigationActions, householdViewModel = householdViewModel)
     }
     composeTestRule.onNodeWithTag("DeleteButton").performClick()
-    composeTestRule.onNodeWithTag("CancelDeleteButton").performClick()
+    composeTestRule.onNodeWithTag("cancelDeleteHouseholdButton").performClick()
     composeTestRule.onNodeWithTag("DeleteConfirmationDialog").assertDoesNotExist()
   }
 
@@ -160,6 +161,7 @@ class HouseHoldCreationScreenTest {
           navigationActions = navigationActions, householdViewModel = householdViewModel)
     }
     val email = "test@example.com"
+    composeTestRule.onNodeWithTag("AddEmailFab").performClick()
     composeTestRule.onNodeWithTag("EmailInputField").performTextInput(email)
     composeTestRule.onNodeWithTag("AddEmailButton").performClick()
 
@@ -167,15 +169,16 @@ class HouseHoldCreationScreenTest {
   }
 
   @Test
-  fun addingEmailAddsNewTextBox() {
+  fun addingEmailDoesNotDisplayNewTextBox() {
     householdViewModel.selectHouseholdToEdit(null)
     composeTestRule.setContent {
       HouseHoldCreationScreen(
           navigationActions = navigationActions, householdViewModel = householdViewModel)
     }
     val email = "example@example.com"
+    composeTestRule.onNodeWithTag("AddEmailFab").performClick()
     composeTestRule.onNodeWithTag("EmailInputField").performTextInput(email)
     composeTestRule.onNodeWithTag("AddEmailButton").performClick()
-    composeTestRule.onNodeWithTag("EmailInputField").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("EmailInputField").assertIsNotDisplayed()
   }
 }
