@@ -107,8 +107,8 @@ class HouseholdViewModelTest {
     assertEquals(households.first(), householdViewModel.selectedHousehold.value)
     verify(listFoodItemsViewModel).setFoodItems(households.first().foodItems)
   }
-
    */
+
   @Test
   fun `selectHousehold should update selected household and food items`() = runTest {
     // Arrange
