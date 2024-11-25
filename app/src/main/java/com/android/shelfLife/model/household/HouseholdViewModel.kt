@@ -119,7 +119,7 @@ class HouseholdViewModel(
     }
   }
 
-  fun getUserIdsByEmails(emails: List<String>, callback: (Map<String, String>) -> Unit) {
+  fun getUserIdsByEmails(emails: Set<String>, callback: (Map<String, String>) -> Unit) {
     repository.getUserIds(emails) { emailToUid -> callback(emailToUid) }
   }
 
@@ -132,7 +132,7 @@ class HouseholdViewModel(
    *
    * @param householdName - The name of the household to be added.
    */
-  fun addNewHousehold(householdName: String, friendEmails: List<String?> = emptyList()) {
+  fun addNewHousehold(householdName: String, friendEmails: Set<String?> = emptySet()) {
     val currentUser = FirebaseAuth.getInstance().currentUser
     if (currentUser != null) {
       val householdUid = repository.getNewUid()
@@ -156,11 +156,13 @@ class HouseholdViewModel(
                   sendInvitation(household, email!!)
                 }
                 households.value.plus(household)
-                loadHouseholds()
               },
               onFailure = { exception ->
                 Log.e("HouseholdViewModel", "Error adding household: $exception")
               })
+          // Update the list of households locally, this saves resources and ensures that
+          // the UI is updated
+          updateViewModelStateWithHousehold(household)
         }
       } else {
         // No friend emails, add household with current user only
@@ -177,7 +179,7 @@ class HouseholdViewModel(
             })
         // Update the list of households locally, this saves resources and ensures that
         // the UI is updated
-        updateViewModelStateWithHousehold(householdWithMembers)
+        updateViewModelStateWithHousehold(household)
       }
     } else {
       Log.e("HouseholdViewModel", "User not logged in")

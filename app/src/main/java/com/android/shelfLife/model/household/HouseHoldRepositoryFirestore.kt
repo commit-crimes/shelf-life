@@ -157,7 +157,7 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
     }
   }
 
-  override fun getUserIds(users: List<String?>, callback: (Map<String, String>) -> Unit) {
+  override fun getUserIds(users: Set<String?>, callback: (Map<String, String>) -> Unit) {
     if (users.isEmpty()) {
       callback(emptyMap())
       return

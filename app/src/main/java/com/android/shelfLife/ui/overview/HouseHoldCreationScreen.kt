@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.overview
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -36,10 +35,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.creationScreen.CreationScreenViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.utils.DeletionConfirmationPopUp
 import kotlinx.coroutines.launch
-import com.android.shelfLife.ui.navigation.Screen
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,7 +58,7 @@ fun HouseHoldCreationScreen(
   var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
 
   // Mutable state list to hold member emails
-  val memberEmailList = creationScreenViewModel.emailList.collectAsState()
+  val memberEmailList by creationScreenViewModel.emailList.collectAsState()
   var emailInput by rememberSaveable { mutableStateOf("") }
   var showEmailTextField by rememberSaveable { mutableStateOf(false) }
 
@@ -83,7 +81,7 @@ fun HouseHoldCreationScreen(
 
   // Function to add email card to the list and scroll to the bottom
   fun addEmailCard() {
-    if (emailInput.isNotBlank() && emailInput.trim() !in memberEmailList.value) {
+    if (emailInput.isNotBlank() && emailInput.trim() !in memberEmailList) {
       creationScreenViewModel.addEmail(emailInput.trim())
       emailInput = ""
     }
@@ -158,7 +156,7 @@ fun HouseHoldCreationScreen(
                           .verticalScroll(columnScrollState)
                           .weight(1f),
               ) {
-                memberEmailList.value.forEach { email ->
+                memberEmailList.forEach { email ->
                   ElevatedCard(
                       elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
                       modifier =
