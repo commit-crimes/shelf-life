@@ -51,7 +51,6 @@ fun HouseHoldCreationScreen(
   }
   val coroutineScope = rememberCoroutineScope()
   val householdToEdit by householdViewModel.householdToEdit.collectAsState()
-  val memberEmails by householdViewModel.memberEmails.collectAsState()
 
   var isError by rememberSaveable { mutableStateOf(false) }
   var houseHoldName by rememberSaveable { mutableStateOf(householdToEdit?.name ?: "") }

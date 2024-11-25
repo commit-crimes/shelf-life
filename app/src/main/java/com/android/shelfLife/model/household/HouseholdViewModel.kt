@@ -78,9 +78,13 @@ class HouseholdViewModel(
         onSuccess = { householdList ->
           _households.value = householdList
           Log.d("HouseholdViewModel", "Households loaded successfully")
+          Log.d("HouseholdViewModel", "Households: $householdList")
           loadSelectedHouseholdUid { uid ->
             if (uid != null) {
+              Log.d("HouseholdViewModel", "Selected household UID: $uid")
               selectHousehold(householdList.find { it.uid == uid } ?: householdList.firstOrNull())
+            } else {
+              selectHousehold(householdList.firstOrNull())
             }
             updateSelectedHousehold()
             finishedLoading.value = true
@@ -282,23 +286,5 @@ class HouseholdViewModel(
       val updatedFoodItems = selectedHousehold.foodItems.minus(foodItems)
       updateHousehold(selectedHousehold.copy(foodItems = updatedFoodItems))
     }
-  }
-
-  /**
-   * Factory for creating a [HouseholdViewModel] with a constructor that takes a
-   * [HouseHoldRepository] and a [ListFoodItemsViewModel].
-   */
-  companion object {
-    val Factory: ViewModelProvider.Factory =
-        object : ViewModelProvider.Factory {
-          @Suppress("UNCHECKED_CAST")
-          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            val firebaseFirestore = FirebaseFirestore.getInstance()
-            val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
-            val listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
-            val repository = HouseholdRepositoryFirestore(firebaseFirestore)
-            return HouseholdViewModel(repository, listFoodItemsViewModel) as T
-          }
-        }
   }
 }

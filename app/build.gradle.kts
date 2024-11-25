@@ -110,6 +110,7 @@ android {
         res.setSrcDirs(emptyList<File>())
         resources.setSrcDirs(emptyList<File>())
     }
+
 }
 
 // Jacoco test configuration
@@ -119,6 +120,8 @@ tasks.withType<Test> {
         excludes = listOf("jdk.internal.*")
     }
 }
+
+
 
 sonar {
     properties {
