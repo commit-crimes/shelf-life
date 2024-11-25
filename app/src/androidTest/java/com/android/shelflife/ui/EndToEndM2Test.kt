@@ -95,15 +95,16 @@ class EndToEndM2Test {
     barcodeScannerViewModel = mockk(relaxed = true)
     foodItemRepository = mock(FoodItemRepository::class.java)
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
-      houseHoldRepository = mock(HouseholdRepositoryFirestore::class.java)
-      householdViewModel =
-          HouseholdViewModel(
-              houseHoldRepository as HouseholdRepositoryFirestore,
-              listFoodItemsViewModel,
-              invitationRepository = mockk<InvitationRepositoryFirestore>(),
-              dataStore)
-      listRecipesViewModel = ListRecipesViewModel()
-      invitationViewModel = InvitationViewModel(mockk<InvitationRepositoryFirestore>())
+    houseHoldRepository = mock(HouseholdRepositoryFirestore::class.java)
+    dataStore = mock<DataStore<Preferences>>()
+    householdViewModel =
+        HouseholdViewModel(
+            houseHoldRepository as HouseholdRepositoryFirestore,
+            listFoodItemsViewModel,
+            invitationRepository = mockk<InvitationRepositoryFirestore>(),
+            dataStore)
+    listRecipesViewModel = ListRecipesViewModel()
+    invitationViewModel = InvitationViewModel(mockk<InvitationRepositoryFirestore>())
 
     foodFactsRepository = FakeFoodFactsRepository()
     foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)

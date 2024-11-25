@@ -83,12 +83,13 @@ class EndToEndM1Test {
     foodItemRepository = mock(FoodItemRepository::class.java)
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
     dataStore = org.mockito.kotlin.mock<DataStore<Preferences>>()
-      houseHoldRepository = mock(HouseholdRepositoryFirestore::class.java)
-      householdViewModel =
-          HouseholdViewModel(
-              houseHoldRepository as HouseholdRepositoryFirestore,
-              listFoodItemsViewModel,
-              invitationRepository = mockk<InvitationRepositoryFirestore>(), dataStore)
+    houseHoldRepository = mock(HouseholdRepositoryFirestore::class.java)
+    householdViewModel =
+        HouseholdViewModel(
+            houseHoldRepository as HouseholdRepositoryFirestore,
+            listFoodItemsViewModel,
+            invitationRepository = mockk<InvitationRepositoryFirestore>(),
+            dataStore)
     listRecipesViewModel = ListRecipesViewModel()
 
     foodFactsRepository = FakeFoodFactsRepository()

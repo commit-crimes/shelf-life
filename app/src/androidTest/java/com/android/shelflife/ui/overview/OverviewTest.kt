@@ -53,7 +53,11 @@ class OverviewTest {
     houseHoldRepository = mock()
     invitationRepository = mockk<InvitationRepositoryFirestore>()
     householdViewModel =
-        HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel, invitationRepository, mock<DataStore<Preferences>>())
+        HouseholdViewModel(
+            houseHoldRepository,
+            listFoodItemsViewModel,
+            invitationRepository,
+            mock<DataStore<Preferences>>())
 
     whenever(navigationActions.currentRoute()).thenReturn(Route.OVERVIEW)
 

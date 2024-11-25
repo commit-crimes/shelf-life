@@ -58,7 +58,10 @@ class AddRecipesTest {
     houseHoldRepository = mock()
     householdViewModel =
         HouseholdViewModel(
-            houseHoldRepository, listFoodItemsViewModel, mock<DataStore<Preferences>>())
+            houseHoldRepository,
+            listFoodItemsViewModel,
+            mockk<InvitationRepositoryFirestore>(relaxed = true),
+            mock<DataStore<Preferences>>())
 
     val foodFacts =
         FoodFacts(

@@ -7,10 +7,10 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.shelfLife.dataStore
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.invitations.InvitationRepository
-import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -82,16 +82,16 @@ class HouseholdViewModel(
           _households.value = householdList
           Log.d("HouseholdViewModel", "Households loaded successfully")
           Log.d("HouseholdViewModel", "Selected household: ${_selectedHousehold.value}")
-            loadSelectedHouseholdUid { uid ->
-                if (uid != null) {
-                    Log.d("HouseholdViewModel", "Selected household UID: $uid")
-                    selectHousehold(householdList.find { it.uid == uid } ?: householdList.firstOrNull())
-                } else {
-                    selectHousehold(householdList.firstOrNull())
-                }
-                updateSelectedHousehold()
-                finishedLoading.value = true
+          loadSelectedHouseholdUid { uid ->
+            if (uid != null) {
+              Log.d("HouseholdViewModel", "Selected household UID: $uid")
+              selectHousehold(householdList.find { it.uid == uid } ?: householdList.firstOrNull())
+            } else {
+              selectHousehold(householdList.firstOrNull())
             }
+            updateSelectedHousehold()
+            finishedLoading.value = true
+          }
         },
         onFailure = { exception ->
           Log.e("HouseholdViewModel", "Error loading households: $exception")
@@ -326,6 +326,7 @@ class HouseholdViewModel(
    * Factory for creating a [HouseholdViewModel] with a constructor that takes a
    * [HouseHoldRepository] and a [ListFoodItemsViewModel].
    */
+  /*
   companion object {
     val Factory: ViewModelProvider.Factory =
         object : ViewModelProvider.Factory {
@@ -339,5 +340,6 @@ class HouseholdViewModel(
             return HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepository) as T
           }
         }
-  }
+
+   */
 }

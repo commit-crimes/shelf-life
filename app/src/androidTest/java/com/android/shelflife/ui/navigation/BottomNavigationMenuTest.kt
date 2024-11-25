@@ -3,6 +3,8 @@ package com.android.shelflife.ui.navigation
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
@@ -38,7 +40,8 @@ class BottomNavigationMenuTest {
         HouseholdViewModel(
             mockRepository,
             mockListFoodItemsViewModel,
-            mockk<InvitationRepositoryFirestore>(relaxed = true))
+            mockk<InvitationRepositoryFirestore>(relaxed = true),
+            mock<DataStore<Preferences>>())
   }
 
   @Test
