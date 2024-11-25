@@ -12,6 +12,7 @@ import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
 import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
@@ -44,7 +45,10 @@ class HouseHoldSelectionDrawerTest {
     mockFoodItemViewModel = mockk(relaxed = true)
     // Use real MutableStateFlow instances in the ViewModel
     householdViewModel =
-        HouseholdViewModel(mockHouseholdRepository, mockFoodItemViewModel, mockk(relaxed = true))
+        HouseholdViewModel(
+            mockHouseholdRepository,
+            mockFoodItemViewModel,
+            mockk<InvitationRepositoryFirestore>(relaxed = true))
 
     // Replace the ViewModel's flows with our test flows
     householdViewModel.households = householdsFlow

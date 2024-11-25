@@ -27,6 +27,7 @@ import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
 import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
@@ -96,9 +97,9 @@ class EndToEndM2Test {
         HouseholdViewModel(
             houseHoldRepository as HouseholdRepositoryFirestore,
             listFoodItemsViewModel,
-            invitationRepository = mockk())
+            invitationRepository = mockk<InvitationRepositoryFirestore>())
     listRecipesViewModel = ListRecipesViewModel()
-    invitationViewModel = mockk()
+    invitationViewModel = InvitationViewModel(mockk<InvitationRepositoryFirestore>())
 
     foodFactsRepository = FakeFoodFactsRepository()
     foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)

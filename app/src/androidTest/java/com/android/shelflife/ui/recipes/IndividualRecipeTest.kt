@@ -10,9 +10,9 @@ import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
-import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
@@ -30,7 +30,7 @@ class IndividualRecipeTest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var listFoodItemsViewModel: ListFoodItemsViewModel
   private lateinit var listRecipesViewModel: ListRecipesViewModel
-  private lateinit var houseHoldRepository: HouseHoldRepository
+  private lateinit var houseHoldRepository: HouseholdRepositoryFirestore
   private lateinit var householdViewModel: HouseholdViewModel
 
   private lateinit var houseHold: HouseHold
@@ -46,9 +46,9 @@ class IndividualRecipeTest {
     houseHoldRepository = mock()
     householdViewModel =
         HouseholdViewModel(
-            houseHoldRepository as HouseholdRepositoryFirestore,
+            houseHoldRepository,
             listFoodItemsViewModel,
-            mockk(relaxed = true))
+            mockk<InvitationRepositoryFirestore>(relaxed = true))
 
     val foodFacts =
         FoodFacts(

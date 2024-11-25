@@ -30,13 +30,13 @@ class InvitationViewModel(private val invitationRepository: InvitationRepository
         })
   }
 
-    /**
-     * Sends an invitation to a user to join a household.
-     *
-     * @param household The household to invite the user to.
-     * @param invitedUserEmail The email of the user to invite.
-     */
-    private fun sendInvitation(household: HouseHold, invitedUserEmail: String) {
+  /**
+   * Sends an invitation to a user to join a household.
+   *
+   * @param household The household to invite the user to.
+   * @param invitedUserEmail The email of the user to invite.
+   */
+  private fun sendInvitation(household: HouseHold, invitedUserEmail: String) {
     invitationRepository.sendInvitation(
         household = household,
         invitedUserEmail = invitedUserEmail,
@@ -46,12 +46,12 @@ class InvitationViewModel(private val invitationRepository: InvitationRepository
         })
   }
 
-    /**
-     * Accepts an invitation.
-     *
-     * @param invitation The invitation to accept.
-     */
-    fun acceptInvitation(invitation: Invitation) {
+  /**
+   * Accepts an invitation.
+   *
+   * @param invitation The invitation to accept.
+   */
+  fun acceptInvitation(invitation: Invitation) {
     invitationRepository.acceptInvitation(
         invitation,
         onSuccess = {
@@ -65,12 +65,12 @@ class InvitationViewModel(private val invitationRepository: InvitationRepository
         })
   }
 
-    /**
-     * Declines an invitation.
-     *
-     * @param invitation The invitation to decline.
-     */
-    fun declineInvitation(invitation: Invitation) {
+  /**
+   * Declines an invitation.
+   *
+   * @param invitation The invitation to decline.
+   */
+  fun declineInvitation(invitation: Invitation) {
     invitationRepository.declineInvitation(
         invitation,
         onSuccess = {

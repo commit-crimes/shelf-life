@@ -12,8 +12,9 @@ import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseHoldRepository
-import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.invitations.InvitationRepository
+import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
@@ -36,7 +37,7 @@ class OverviewTest {
   private lateinit var listFoodItemsViewModel: ListFoodItemsViewModel
   private lateinit var houseHoldRepository: HouseHoldRepository
   private lateinit var householdViewModel: HouseholdViewModel
-
+  private lateinit var invitationRepository: InvitationRepository
   private lateinit var houseHold: HouseHold
 
   @get:Rule val composeTestRule = createComposeRule()
@@ -48,11 +49,9 @@ class OverviewTest {
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
 
     houseHoldRepository = mock()
+    invitationRepository = mockk<InvitationRepositoryFirestore>()
     householdViewModel =
-        HouseholdViewModel(
-            houseHoldRepository as HouseholdRepositoryFirestore,
-            listFoodItemsViewModel,
-            mockk(relaxed = true))
+        HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel, invitationRepository)
 
     whenever(navigationActions.currentRoute()).thenReturn(Route.OVERVIEW)
 

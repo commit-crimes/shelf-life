@@ -142,9 +142,7 @@ class InvitationScreenTest {
     val invitationViewModel = InvitationViewModel(emptyRepository)
     composeTestRule.setContent {
       InvitationScreen(
-          householdViewModel = householdViewModel,
-          invitationViewModel = invitationViewModel,
-          navigationActions = navigationActions)
+          invitationViewModel = invitationViewModel, navigationActions = navigationActions)
     }
     composeTestRule.onNodeWithText("No pending invitations").assertIsDisplayed()
   }
@@ -159,7 +157,6 @@ class InvitationScreenTest {
 
     composeTestRule.setContent {
       InvitationScreen(
-          householdViewModel = householdViewModel,
           invitationViewModel = InvitationViewModel(invitationRepository),
           navigationActions = navigationActions)
     }

@@ -151,8 +151,7 @@ fun ShelfLifeApp() {
       }
       composable(Route.INVITATIONS) {
         InvitationScreen(
-            invitationViewModel = invitationViewModel,
-            navigationActions = navigationActions)
+            invitationViewModel = invitationViewModel, navigationActions = navigationActions)
       }
     }
   }
