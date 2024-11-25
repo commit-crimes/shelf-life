@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -47,12 +47,12 @@ fun ProfileScreen(
     navigationActions: NavigationActions,
     account: GoogleSignInAccount? = null,
     signOutUser: () -> Unit = {},
-    householdViewModel: HouseholdViewModel
+    invitationViewModel: InvitationViewModel
 ) {
   val context = LocalContext.current
   val currentAccount = remember { account ?: getGoogleAccount(context) }
 
-  val invitations by householdViewModel.invitations.collectAsState()
+  val invitations by invitationViewModel.invitations.collectAsState()
 
   var expanded by remember { mutableStateOf(false) }
 

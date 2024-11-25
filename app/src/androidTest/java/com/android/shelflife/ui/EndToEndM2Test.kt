@@ -25,7 +25,9 @@ import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -67,6 +69,7 @@ class EndToEndM2Test {
   private lateinit var foodFactsViewModel: FoodFactsViewModel
   private lateinit var foodFactsRepository: FakeFoodFactsRepository
   private lateinit var listRecipesViewModel: ListRecipesViewModel
+  private lateinit var invitationViewModel: InvitationViewModel
 
   private lateinit var navController: NavHostController
   private lateinit var houseHold: HouseHold
@@ -88,9 +91,14 @@ class EndToEndM2Test {
     barcodeScannerViewModel = mockk(relaxed = true)
     foodItemRepository = mock(FoodItemRepository::class.java)
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
-    houseHoldRepository = mock(HouseHoldRepository::class.java)
-    householdViewModel = HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel)
+    houseHoldRepository = mock(HouseholdRepositoryFirestore::class.java)
+    householdViewModel =
+        HouseholdViewModel(
+            houseHoldRepository as HouseholdRepositoryFirestore,
+            listFoodItemsViewModel,
+            invitationRepository = mockk())
     listRecipesViewModel = ListRecipesViewModel()
+    invitationViewModel = mockk()
 
     foodFactsRepository = FakeFoodFactsRepository()
     foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)
@@ -163,7 +171,7 @@ class EndToEndM2Test {
               navigationActions = navigationActions,
               account = account,
               signOutUser = signOutUser,
-              householdViewModel = householdViewModel)
+              invitationViewModel = invitationViewModel)
         }
         composable(Screen.HOUSEHOLD_CREATION) {
           HouseHoldCreationScreen(navigationActions, householdViewModel = householdViewModel)

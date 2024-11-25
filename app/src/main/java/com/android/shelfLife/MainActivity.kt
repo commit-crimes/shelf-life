@@ -20,6 +20,8 @@ import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
+import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
@@ -60,6 +62,8 @@ fun ShelfLifeApp() {
   val firebaseFirestore = FirebaseFirestore.getInstance()
   val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
   val listFoodItemViewModel = viewModel { ListFoodItemsViewModel(foodItemRepository) }
+  val invitationRepositoryFirestore = InvitationRepositoryFirestore(firebaseFirestore)
+  val invitationViewModel = viewModel { InvitationViewModel(invitationRepositoryFirestore) }
   val foodFactsRepository = OpenFoodFactsRepository(OkHttpClient())
   val foodFactsViewModel = viewModel { FoodFactsViewModel(foodFactsRepository) }
   val context = LocalContext.current
@@ -77,7 +81,10 @@ fun ShelfLifeApp() {
 
   // Initialize HouseholdViewModel only if the user is logged in
   val householdViewModel = viewModel {
-    HouseholdViewModel(HouseholdRepositoryFirestore(firebaseFirestore), listFoodItemViewModel)
+    HouseholdViewModel(
+        houseHoldRepository = HouseholdRepositoryFirestore(firebaseFirestore),
+        listFoodItemsViewModel = listFoodItemViewModel,
+        invitationRepository = invitationRepositoryFirestore)
   }
 
   NavHost(navController = navController, startDestination = startingRoute) {
@@ -140,10 +147,13 @@ fun ShelfLifeApp() {
             signOutUser = {
               signOutUser(context) { navigationActions.navigateToAndClearBackStack(Route.AUTH) }
             },
-            householdViewModel = householdViewModel)
+            invitationViewModel = invitationViewModel)
       }
       composable(Route.INVITATIONS) {
-        InvitationScreen(viewModel = householdViewModel, navigationActions = navigationActions)
+        InvitationScreen(
+            householdViewModel = householdViewModel,
+            invitationViewModel = invitationViewModel,
+            navigationActions = navigationActions)
       }
     }
   }

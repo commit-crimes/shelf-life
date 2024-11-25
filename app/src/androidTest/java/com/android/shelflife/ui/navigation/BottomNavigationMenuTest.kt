@@ -7,6 +7,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.invitations.InvitationRepository
+import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.TopLevelDestinations
 import com.android.shelfLife.ui.profile.ProfileScreen
@@ -24,6 +26,7 @@ class BottomNavigationMenuTest {
   @get:Rule val composeTestRule = createComposeRule()
   private lateinit var navigationActions: NavigationActions
   private lateinit var householdViewModel: HouseholdViewModel
+  private lateinit var invitationRepository: InvitationRepository
 
   @Before
   fun setUp() {
@@ -31,13 +34,16 @@ class BottomNavigationMenuTest {
     navigationActions = mock()
     val mockRepository: HouseholdRepositoryFirestore = mockk(relaxed = true)
     val mockListFoodItemsViewModel: ListFoodItemsViewModel = mockk(relaxed = true)
-    householdViewModel = HouseholdViewModel(mockRepository, mockListFoodItemsViewModel)
+    householdViewModel =
+        HouseholdViewModel(mockRepository, mockListFoodItemsViewModel, invitationRepository)
   }
 
   @Test
   fun testBottomNavigationMenuFromProfileToOverview() {
     composeTestRule.setContent {
-      ProfileScreen(navigationActions, householdViewModel = householdViewModel)
+      ProfileScreen(
+          navigationActions = navigationActions,
+          invitationViewModel = InvitationViewModel(invitationRepository))
     }
     composeTestRule.onNodeWithTag(TopLevelDestinations.OVERVIEW.textId).performClick()
     verify(navigationActions).navigateTo(TopLevelDestinations.OVERVIEW)

@@ -13,6 +13,7 @@ import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.overview.HouseHoldCreationScreen
@@ -45,7 +46,11 @@ class HouseHoldCreationScreenTest {
     houseHoldRepository = mock(HouseHoldRepository::class.java)
     foodItemRepository = mock(FoodItemRepository::class.java)
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
-    householdViewModel = HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel)
+    householdViewModel =
+        HouseholdViewModel(
+            houseHoldRepository as HouseholdRepositoryFirestore,
+            listFoodItemsViewModel,
+            mockk(relaxed = true))
 
     MockKAnnotations.init(this)
     mockedNavigationActions = mockk(relaxed = true)

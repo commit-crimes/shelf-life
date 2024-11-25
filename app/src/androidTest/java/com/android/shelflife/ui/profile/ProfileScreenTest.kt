@@ -7,8 +7,9 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.NavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
+import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.profile.ProfileScreen
@@ -27,13 +28,14 @@ class ProfileScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
   private lateinit var householdViewModel: HouseholdViewModel
+  private lateinit var invitationViewModel: InvitationViewModel
 
   @Before
   fun setUp() {
     MockKAnnotations.init(this, relaxUnitFun = true)
-    val mockRepository: HouseholdRepositoryFirestore = mockk(relaxed = true)
+    val mockRepository: InvitationRepositoryFirestore = mockk(relaxed = true)
     val mockListFoodItemsViewModel: ListFoodItemsViewModel = mockk(relaxed = true)
-    householdViewModel = HouseholdViewModel(mockRepository, mockListFoodItemsViewModel)
+    invitationViewModel = InvitationViewModel(mockRepository)
   }
 
   @Test
@@ -43,7 +45,7 @@ class ProfileScreenTest {
       ProfileScreen(
           navigationActions = navigationActions,
           account = null,
-          householdViewModel = householdViewModel)
+          invitationViewModel = invitationViewModel)
     }
 
     composeTestRule.onNodeWithTag("profileNameText").assertIsDisplayed().assertTextEquals("Guest")
@@ -64,7 +66,7 @@ class ProfileScreenTest {
       ProfileScreen(
           navigationActions = navigationActions,
           account = account,
-          householdViewModel = householdViewModel)
+          invitationViewModel = invitationViewModel)
     }
 
     composeTestRule.onNodeWithTag("profileNameText").assertTextEquals("John Smith")
@@ -87,7 +89,7 @@ class ProfileScreenTest {
       ProfileScreen(
           navigationActions = navigationActions,
           account = account,
-          householdViewModel = householdViewModel)
+          invitationViewModel = invitationViewModel)
     }
 
     composeTestRule
@@ -103,7 +105,7 @@ class ProfileScreenTest {
       ProfileScreen(
           navigationActions = navigationActions,
           account = null,
-          householdViewModel = householdViewModel)
+          invitationViewModel = invitationViewModel)
     }
 
     composeTestRule.onNodeWithTag("profileEmailText").assertDoesNotExist()
@@ -122,7 +124,7 @@ class ProfileScreenTest {
           navigationActions = navigationActions,
           account = null,
           signOutUser = signOutUser,
-          householdViewModel = householdViewModel)
+          invitationViewModel = invitationViewModel)
     }
 
     composeTestRule.onNodeWithTag("logoutButton").assertIsDisplayed().performClick()
@@ -141,7 +143,7 @@ class ProfileScreenTest {
       ProfileScreen(
           navigationActions = navigationActions,
           account = null,
-          householdViewModel = householdViewModel)
+          invitationViewModel = invitationViewModel)
     }
 
     composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
@@ -154,7 +156,7 @@ class ProfileScreenTest {
       ProfileScreen(
           navigationActions = navigationActions,
           account = null,
-          householdViewModel = householdViewModel)
+          invitationViewModel = invitationViewModel)
     }
 
     composeTestRule.onNodeWithText("Profile").assertIsDisplayed().assertIsSelected()
@@ -169,7 +171,7 @@ class ProfileScreenTest {
       ProfileScreen(
           navigationActions = navigationActions,
           account = null,
-          householdViewModel = householdViewModel)
+          invitationViewModel = invitationViewModel)
     }
 
     composeTestRule.onNodeWithText("Recipes").performClick()
@@ -187,7 +189,7 @@ class ProfileScreenTest {
       ProfileScreen(
           navigationActions = navigationActions,
           account = null,
-          householdViewModel = householdViewModel)
+          invitationViewModel = invitationViewModel)
     }
 
     composeTestRule.onNodeWithTag("dropdownMenu_App Theme").performClick()

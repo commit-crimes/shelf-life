@@ -17,11 +17,13 @@ import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.recipes.AddRecipeScreen
 import com.google.firebase.Timestamp
+import io.mockk.mockk
 import java.util.Date
 import org.junit.Before
 import org.junit.Rule
@@ -52,7 +54,11 @@ class AddRecipesTest {
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
     listRecipesViewModel = ListRecipesViewModel()
     houseHoldRepository = mock()
-    householdViewModel = HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel)
+    householdViewModel =
+        HouseholdViewModel(
+            houseHoldRepository as HouseholdRepositoryFirestore,
+            listFoodItemsViewModel,
+            mockk(relaxed = true))
 
     val foodFacts =
         FoodFacts(

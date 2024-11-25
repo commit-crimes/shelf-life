@@ -12,12 +12,14 @@ import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.overview.OverviewScreen
 import com.google.firebase.Timestamp
+import io.mockk.mockk
 import java.util.*
 import junit.framework.TestCase.assertEquals
 import org.junit.Before
@@ -46,7 +48,11 @@ class OverviewTest {
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
 
     houseHoldRepository = mock()
-    householdViewModel = HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel)
+    householdViewModel =
+        HouseholdViewModel(
+            houseHoldRepository as HouseholdRepositoryFirestore,
+            listFoodItemsViewModel,
+            mockk(relaxed = true))
 
     whenever(navigationActions.currentRoute()).thenReturn(Route.OVERVIEW)
 

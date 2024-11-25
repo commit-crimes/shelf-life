@@ -43,7 +43,8 @@ class HouseHoldSelectionDrawerTest {
     mockHouseholdRepository = mockk(relaxed = true)
     mockFoodItemViewModel = mockk(relaxed = true)
     // Use real MutableStateFlow instances in the ViewModel
-    householdViewModel = HouseholdViewModel(mockHouseholdRepository, mockFoodItemViewModel)
+    householdViewModel =
+        HouseholdViewModel(mockHouseholdRepository, mockFoodItemViewModel, mockk(relaxed = true))
 
     // Replace the ViewModel's flows with our test flows
     householdViewModel.households = householdsFlow

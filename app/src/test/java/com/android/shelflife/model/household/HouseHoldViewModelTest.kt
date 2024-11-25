@@ -13,6 +13,8 @@ import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
+import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -32,6 +34,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockedStatic
+import org.mockito.Mockito.mock
 import org.mockito.Mockito.mockStatic
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
@@ -60,6 +63,8 @@ class HouseholdViewModelTest {
   @Mock private lateinit var firebaseUser: FirebaseUser
 
   private lateinit var firebaseAuthMock: MockedStatic<FirebaseAuth>
+  private lateinit var invitationRepositoryFirestore: InvitationRepositoryFirestore
+  private lateinit var invitationViewModel: InvitationViewModel
 
   @Before
   fun setup() {
@@ -73,8 +78,9 @@ class HouseholdViewModelTest {
     // Mock FirebaseAuth.getInstance()
     firebaseAuthMock = mockStatic(FirebaseAuth::class.java)
     firebaseAuthMock.`when`<FirebaseAuth> { FirebaseAuth.getInstance() }.thenReturn(firebaseAuth)
-
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+    invitationRepositoryFirestore = mock(InvitationRepositoryFirestore::class.java)
+    householdViewModel =
+        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore)
 
     ShadowLog.clear() // to check Error Logs
   }
@@ -129,7 +135,8 @@ class HouseholdViewModelTest {
 
     val household = HouseHold("1", "Household 1", emptyList(), listOf(foodItem))
 
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+    householdViewModel =
+        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore)
 
     householdViewModel.setHouseholds(listOf(household))
     householdViewModel.selectHousehold(household)
@@ -184,7 +191,8 @@ class HouseholdViewModelTest {
       null
     }
 
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+    householdViewModel =
+        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore)
 
     // Act
     householdViewModel.updateHousehold(household)
@@ -210,7 +218,8 @@ class HouseholdViewModelTest {
       null
     }
 
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+    householdViewModel =
+        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore)
 
     // Act
     householdViewModel.deleteHouseholdById(householdId)
@@ -366,7 +375,8 @@ class HouseholdViewModelTest {
     }
 
     // Initialize the ViewModel
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+    householdViewModel =
+        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore)
 
     // Act
     householdViewModel.addNewHousehold(householdName, friendEmails)
@@ -494,7 +504,8 @@ class HouseholdViewModelTest {
     }
 
     // Initialize the ViewModel
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+    householdViewModel =
+        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore)
 
     // Act
     householdViewModel.addNewHousehold(householdName, friendEmails)
