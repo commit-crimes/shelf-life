@@ -68,6 +68,26 @@ class HouseholdViewModel(
         })
   }
 
+  private fun updateViewModelStateWithHousehold(household: HouseHold) {
+    val currentHouseholds = _households.value
+    val existingHousehold = currentHouseholds.find { it.uid == household.uid }
+
+    // Update the households list
+    _households.value =
+        if (existingHousehold == null) {
+          currentHouseholds.plus(household)
+        } else {
+          currentHouseholds.minus(existingHousehold).plus(household)
+        }
+
+    // Update the selected household if necessary
+    if (_selectedHousehold.value == null) {
+      selectHousehold(_households.value.firstOrNull()) // Default to the first household
+    } else {
+      updateSelectedHousehold()
+    }
+  }
+
   /**
    * Updates the selected household with the latest data from the list of households using the uid,
    * we may need to add another uid than the name.
@@ -155,6 +175,9 @@ class HouseholdViewModel(
             onFailure = { exception ->
               Log.e("HouseholdViewModel", "Error adding household: $exception")
             })
+        // Update the list of households locally, this saves resources and ensures that
+        // the UI is updated
+        updateViewModelStateWithHousehold(householdWithMembers)
       }
     } else {
       Log.e("HouseholdViewModel", "User not logged in")
@@ -173,7 +196,7 @@ class HouseholdViewModel(
         onFailure = { exception ->
           Log.e("HouseholdViewModel", "Error updating household: $exception")
         })
-    loadHouseholds()
+    updateViewModelStateWithHousehold(household)
   }
 
   /**
@@ -188,9 +211,17 @@ class HouseholdViewModel(
         onFailure = { exception ->
           Log.e("HouseholdViewModel", "Error deleting household: $exception")
         })
-    loadHouseholds()
+    // Delete household from the list of households
+    _households.value
+        .find { it.uid == householdId }
+        ?.let { _households.value = _households.value.minus(it) }
+    if (_selectedHousehold.value == null || householdId == _selectedHousehold.value!!.uid) {
+      // If the deleted household was selected, deselect it
+      selectHousehold(_households.value.firstOrNull())
+    }
   }
 
+  // TODO this is a bad way to update the food items, we need a plan to separate the food items from
   // the household
   fun addFoodItem(foodItem: FoodItem) {
     val selectedHousehold = selectedHousehold.value

@@ -320,7 +320,28 @@ class HouseholdViewModelTest {
         verify(repository).updateHousehold(eq(updatedHousehold), any(), any())
         assertEquals(households, householdViewModel.households.value)
       }
+/*
+  @Test
+  fun `addNewHousehold logs error when user is not logged in`() = runTest {
+    // Arrange
+    val householdName = "Test Household"
+    val friendEmails = emptyList<String>()
 
+    whenever(firebaseAuth.currentUser).thenReturn(null)
+
+    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+
+    // Act
+    householdViewModel.addNewHousehold(householdName, friendEmails)
+
+    // Assert
+    // Verify that repository.addHousehold is not called
+    verify(repository, never()).addHousehold(any(), any(), any())
+    // Verify that loadHouseholds is called
+    verify(repository).getHouseholds(any(), any())
+    // Optionally, you can verify that an error is logged
+  }
+*/
   @Test
   fun `addNewHousehold adds household with current user when friendEmails is empty`() = runTest {
     // Arrange
@@ -365,7 +386,89 @@ class HouseholdViewModelTest {
 
     assertEquals(expectedHousehold, householdCaptor.firstValue)
   }
+/*
+  @Test
+  fun `addNewHousehold adds household with friends when friendEmails are provided`() = runTest {
+    // Arrange
+    val householdName = "Test Household"
+    val friendEmails = listOf("friend1@example.com", "friend2@example.com")
+    val userUid = "currentUserUid"
+    val householdUid = "newHouseholdUid"
+    val friendUserIds =
+        mapOf("friend1@example.com" to "friend1Uid", "friend2@example.com" to "friend2Uid")
 
+    whenever(firebaseAuth.currentUser).thenReturn(firebaseUser)
+    whenever(firebaseUser.uid).thenReturn(userUid)
+    whenever(repository.getNewUid()).thenReturn(householdUid)
+
+    // Mock getUserIds to return friendUserIds
+    whenever(repository.getUserIds(eq(friendEmails), any())).thenAnswer { invocation ->
+      val callback = invocation.getArgument<(Map<String, String>) -> Unit>(1)
+      callback(friendUserIds)
+    }
+
+    // Mock addHousehold
+    whenever(repository.addHousehold(any(), any(), any())).thenAnswer { invocation ->
+      val onSuccess = invocation.getArgument<() -> Unit>(1)
+      onSuccess()
+    }
+
+    // Initialize the ViewModel
+    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+
+    // Act
+    householdViewModel.addNewHousehold(householdName, friendEmails)
+
+    // Assert
+    // Capture the household passed to addHousehold
+    val householdCaptor = argumentCaptor<HouseHold>()
+    verify(repository).addHousehold(householdCaptor.capture(), any(), any())
+
+    val expectedMembers = listOf(userUid) + friendUserIds.values
+    assertEquals(expectedMembers.sorted(), householdCaptor.firstValue.members.sorted())
+  }
+
+  @Test
+  fun `addNewHousehold handles emails not found`() = runTest {
+    // Arrange
+    val householdName = "Test Household"
+    val friendEmails = listOf("friend1@example.com", "friend2@example.com", "notfound@example.com")
+    val userUid = "currentUserUid"
+    val householdUid = "newHouseholdUid"
+    val friendUserIds =
+        mapOf("friend1@example.com" to "friend1Uid", "friend2@example.com" to "friend2Uid")
+
+    whenever(firebaseAuth.currentUser).thenReturn(firebaseUser)
+    whenever(firebaseUser.uid).thenReturn(userUid)
+    whenever(repository.getNewUid()).thenReturn(householdUid)
+
+    // Mock getUserIds to return friendUserIds (missing "notfound@example.com")
+    whenever(repository.getUserIds(eq(friendEmails), any())).thenAnswer { invocation ->
+      val callback = invocation.getArgument<(Map<String, String>) -> Unit>(1)
+      callback(friendUserIds)
+    }
+
+    // Mock addHousehold
+    whenever(repository.addHousehold(any(), any(), any())).thenAnswer { invocation ->
+      val onSuccess = invocation.getArgument<() -> Unit>(1)
+      onSuccess()
+    }
+
+    // Initialize the ViewModel
+    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+
+    // Act
+    householdViewModel.addNewHousehold(householdName, friendEmails)
+
+    // Assert
+    // Capture the household passed to addHousehold
+    val householdCaptor = argumentCaptor<HouseHold>()
+    verify(repository).addHousehold(householdCaptor.capture(), any(), any())
+
+    val expectedMembers = listOf(userUid) + friendUserIds.values
+    assertEquals(expectedMembers.sorted(), householdCaptor.firstValue.members.sorted())
+  }
+*/
   @Test
   fun `addNewHousehold handles addHousehold failure`() = runTest {
     // Arrange
