@@ -32,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.shelfLife.model.creationScreen.CreationScreenViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.utils.DeletionConfirmationPopUp
@@ -43,6 +45,10 @@ fun HouseHoldCreationScreen(
     navigationActions: NavigationActions,
     householdViewModel: HouseholdViewModel,
 ) {
+  val memberEmails by householdViewModel.memberEmails.collectAsState()
+  val creationScreenViewModel: CreationScreenViewModel = viewModel {
+    CreationScreenViewModel(memberEmails.values.toSet())
+  }
   val coroutineScope = rememberCoroutineScope()
   val householdToEdit by householdViewModel.householdToEdit.collectAsState()
   val memberEmails by householdViewModel.memberEmails.collectAsState()
@@ -53,16 +59,13 @@ fun HouseHoldCreationScreen(
   var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
 
   // Mutable state list to hold member emails
-  val memberEmailList = rememberSaveable { mutableSetOf<String>() }
+  val memberEmailList = creationScreenViewModel.emailList.collectAsState()
   var emailInput by rememberSaveable { mutableStateOf("") }
   var showEmailTextField by rememberSaveable { mutableStateOf(false) }
 
   val columnScrollState = rememberScrollState()
 
   val focusRequester = remember { FocusRequester() }
-
-  // Initialize memberEmailList when memberEmails are fetched
-  LaunchedEffect(memberEmails) { memberEmailList.addAll(memberEmails.values) }
 
   // Scroll to the bottom and focus on the email input field when the email input field is shown
   LaunchedEffect(showEmailTextField) {
@@ -79,9 +82,8 @@ fun HouseHoldCreationScreen(
 
   // Function to add email card to the list and scroll to the bottom
   fun addEmailCard() {
-    if (emailInput.isNotBlank()) {
-      // TODO check if email is valid
-      memberEmailList.add(emailInput.trim())
+    if (emailInput.isNotBlank() && emailInput.trim() !in memberEmailList.value) {
+      creationScreenViewModel.addEmail(emailInput.trim())
       emailInput = ""
     }
     showEmailTextField = false
@@ -155,7 +157,7 @@ fun HouseHoldCreationScreen(
                           .verticalScroll(columnScrollState)
                           .weight(1f),
               ) {
-                memberEmailList.forEach { email ->
+                memberEmailList.value.forEach { email ->
                   ElevatedCard(
                       elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
                       modifier =
@@ -172,7 +174,7 @@ fun HouseHoldCreationScreen(
                                   style = TextStyle(fontSize = 16.sp),
                                   modifier = Modifier.weight(1f))
                               IconButton(
-                                  onClick = { memberEmailList.remove(email) },
+                                  onClick = { creationScreenViewModel.removeEmail(email) },
                                   modifier = Modifier.testTag("RemoveEmailButton")) {
                                     Icon(
                                         imageVector = Icons.Default.Delete,
@@ -237,27 +239,28 @@ fun HouseHoldCreationScreen(
                             isError = true
                           } else {
                             coroutineScope.launch {
-                              householdViewModel.getUserIdsByEmails(memberEmailList.toList()) {
-                                  emailToUid ->
-                                val missingEmails =
-                                    memberEmailList.filter { it !in emailToUid.keys }
-                                if (missingEmails.isNotEmpty()) {
-                                  Log.w(
-                                      "HouseHoldCreationScreen", "Emails not found: $missingEmails")
-                                }
-                                val memberUids = emailToUid.values.toMutableList()
+                              householdViewModel.getUserIdsByEmails(
+                                  memberEmailList.value.toList()) { emailToUid ->
+                                    val missingEmails =
+                                        memberEmailList.value.filter { it !in emailToUid.keys }
+                                    if (missingEmails.isNotEmpty()) {
+                                      Log.w(
+                                          "HouseHoldCreationScreen",
+                                          "Emails not found: $missingEmails")
+                                    }
+                                    val memberUids = emailToUid.values.toMutableList()
 
-                                if (householdToEdit != null) {
-                                  val updatedHouseHold =
-                                      householdToEdit!!.copy(
-                                          name = houseHoldName, members = memberUids)
-                                  householdViewModel.updateHousehold(updatedHouseHold)
-                                } else {
-                                  householdViewModel.addNewHousehold(
-                                      houseHoldName, memberEmailList.toList())
-                                }
-                                navigationActions.goBack()
-                              }
+                                    if (householdToEdit != null) {
+                                      val updatedHouseHold =
+                                          householdToEdit!!.copy(
+                                              name = houseHoldName, members = memberUids)
+                                      householdViewModel.updateHousehold(updatedHouseHold)
+                                    } else {
+                                      householdViewModel.addNewHousehold(
+                                          houseHoldName, memberEmailList.value.toList())
+                                    }
+                                    navigationActions.goBack()
+                                  }
                             }
                           }
                         },

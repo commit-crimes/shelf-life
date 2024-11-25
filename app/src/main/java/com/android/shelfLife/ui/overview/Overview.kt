@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.overview
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,6 +54,9 @@ fun OverviewScreen(
   val userHouseholds by householdViewModel.households.collectAsState()
   val householdViewModelIsLoaded by householdViewModel.finishedLoading.collectAsState()
   val selectedFilters = remember { mutableStateListOf<String>() }
+  val multipleSelectedFoodItems = listFoodItemsViewModel.multipleSelectedFoodItems.collectAsState()
+
+  Log.d("OverviewScreen", "Selected household: $selectedHousehold ${userHouseholds.size}")
 
   val drawerState = rememberDrawerState(DrawerValue.Closed)
   val scope = rememberCoroutineScope()
@@ -97,6 +101,11 @@ fun OverviewScreen(
                         } else {
                           selectedFilters.remove(filter)
                         }
+                      },
+                      showDeleteOption = multipleSelectedFoodItems.value.isNotEmpty(),
+                      onDeleteClick = {
+                        householdViewModel.deleteMultipleFoodItems(multipleSelectedFoodItems.value)
+                        listFoodItemsViewModel.clearMultipleSelectedFoodItems()
                       })
                 }
               },
@@ -124,9 +133,13 @@ fun OverviewScreen(
                   )
               ListFoodItems(
                   foodItems = filteredFoodItems,
+                  listFoodItemsViewModel = listFoodItemsViewModel,
                   onFoodItemClick = { selectedFoodItem ->
                     listFoodItemsViewModel.selectFoodItem(selectedFoodItem)
                     navigationActions.navigateTo(Screen.INDIVIDUAL_FOOD_ITEM)
+                  },
+                  onFoodItemLongHold = { selectedFoodItem ->
+                    listFoodItemsViewModel.selectMultipleFoodItems(selectedFoodItem)
                   })
             }
           }

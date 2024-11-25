@@ -267,4 +267,38 @@ class HouseholdViewModel(
               foodItems = selectedHousehold.foodItems.minus(oldFoodItem).plus(newFoodItem)))
     }
   }
+
+  fun deleteFoodItem(foodItem: FoodItem) {
+    val selectedHousehold = selectedHousehold.value
+    if (selectedHousehold != null) {
+      updateHousehold(
+          selectedHousehold.copy(foodItems = selectedHousehold.foodItems.minus(foodItem)))
+    }
+  }
+
+  fun deleteMultipleFoodItems(foodItems: List<FoodItem>) {
+    val selectedHousehold = selectedHousehold.value
+    if (selectedHousehold != null) {
+      val updatedFoodItems = selectedHousehold.foodItems.minus(foodItems)
+      updateHousehold(selectedHousehold.copy(foodItems = updatedFoodItems))
+    }
+  }
+
+  /**
+   * Factory for creating a [HouseholdViewModel] with a constructor that takes a
+   * [HouseHoldRepository] and a [ListFoodItemsViewModel].
+   */
+  companion object {
+    val Factory: ViewModelProvider.Factory =
+        object : ViewModelProvider.Factory {
+          @Suppress("UNCHECKED_CAST")
+          override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            val firebaseFirestore = FirebaseFirestore.getInstance()
+            val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
+            val listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
+            val repository = HouseholdRepositoryFirestore(firebaseFirestore)
+            return HouseholdViewModel(repository, listFoodItemsViewModel) as T
+          }
+        }
+  }
 }
