@@ -16,7 +16,6 @@ import com.android.shelfLife.ui.navigation.Screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InvitationScreen(
-    householdViewModel: HouseholdViewModel,
     invitationViewModel: InvitationViewModel,
     navigationActions: NavigationActions
 ) {
@@ -33,7 +32,7 @@ fun InvitationScreen(
       // Show list of invitations
       Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
         invitations.forEach { invitation ->
-          InvitationCard(invitation, invitationViewModel, householdViewModel, navigationActions)
+          InvitationCard(invitation, invitationViewModel, navigationActions)
           Spacer(modifier = Modifier.height(8.dp))
         }
       }
@@ -45,7 +44,6 @@ fun InvitationScreen(
 fun InvitationCard(
     invitation: Invitation,
     invitationViewModel: InvitationViewModel,
-    viewModel: HouseholdViewModel,
     navigationActions: NavigationActions
 ) {
   Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation()) {
