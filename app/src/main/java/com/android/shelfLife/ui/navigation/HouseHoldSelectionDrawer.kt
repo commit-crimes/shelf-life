@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.navigation
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -85,11 +86,13 @@ fun HouseHoldSelectionDrawer(
                     editMode = editMode,
                     onHouseholdSelected = { household ->
                       if (household != selectedHousehold) {
+                        Log.d("HouseHoldSelectionDrawer", "Called selectHousehold")
                         householdViewModel.selectHousehold(household)
                       }
                       scope.launch { drawerState.close() }
                     },
                     onHouseholdEditSelected = { household ->
+                      Log.d("HouseHoldSelectionDrawer", "Called selectedHouseholdToEdit")
                       householdViewModel.selectHouseholdToEdit(household)
                       navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
                     },
