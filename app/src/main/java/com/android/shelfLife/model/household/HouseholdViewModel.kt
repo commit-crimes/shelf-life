@@ -1,23 +1,29 @@
 package com.android.shelfLife.model.household
 
 import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.foodItem.FoodItem
-import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.invitations.InvitationRepository
 import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
-open class HouseholdViewModel(
+class HouseholdViewModel(
     private val houseHoldRepository: HouseHoldRepository,
     private val listFoodItemsViewModel: ListFoodItemsViewModel,
-    private val invitationRepository: InvitationRepository
+    private val invitationRepository: InvitationRepository,
+    private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
   private val _households = MutableStateFlow<List<HouseHold>>(emptyList())
   var households: StateFlow<List<HouseHold>> = _households.asStateFlow()
@@ -33,8 +39,11 @@ open class HouseholdViewModel(
 
   var finishedLoading = MutableStateFlow(false)
 
+  private val KEY = stringPreferencesKey("household_uid")
+
   /** Initializes the HouseholdViewModel by loading the list of households from the repository. */
   init {
+    Log.d("HouseholdViewModel", "Initializing HouseholdViewModel")
     FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
       if (firebaseAuth.currentUser != null) {
         loadHouseholds()
@@ -42,8 +51,28 @@ open class HouseholdViewModel(
     }
   }
 
+  /**
+   * Sets the list of households to a new list of households. This is used for testing purposes
+   * only.
+   *
+   * @param households - The new list of household.
+   */
   fun setHouseholds(households: List<HouseHold>) {
     _households.value = households
+  }
+
+  /** Save the selected household UID to DataStore. */
+  private fun saveSelectedHouseholdUid(uid: String?) {
+    Log.d("HouseholdViewModel", "Saving selected household UID: $uid")
+    viewModelScope.launch { dataStore.edit { preferences -> preferences[KEY] = uid ?: "" } }
+  }
+
+  /** Load the selected household UID from DataStore. */
+  private fun loadSelectedHouseholdUid(callback: (String?) -> Unit) {
+    viewModelScope.launch {
+      val uid = dataStore.data.map { preferences -> preferences[KEY] }.first()
+      callback(uid)
+    }
   }
 
   /** Loads the list of households from the repository and updates the [_households] flow. */
@@ -53,12 +82,16 @@ open class HouseholdViewModel(
           _households.value = householdList
           Log.d("HouseholdViewModel", "Households loaded successfully")
           Log.d("HouseholdViewModel", "Selected household: ${_selectedHousehold.value}")
-          if (_selectedHousehold.value == null) {
-            selectHousehold(householdList.firstOrNull()) // Default to the first household
-          } else {
-            updateSelectedHousehold()
-          }
-          finishedLoading.value = true
+            loadSelectedHouseholdUid { uid ->
+                if (uid != null) {
+                    Log.d("HouseholdViewModel", "Selected household UID: $uid")
+                    selectHousehold(householdList.find { it.uid == uid } ?: householdList.firstOrNull())
+                } else {
+                    selectHousehold(householdList.firstOrNull())
+                }
+                updateSelectedHousehold()
+                finishedLoading.value = true
+            }
         },
         onFailure = { exception ->
           Log.e("HouseholdViewModel", "Error loading households: $exception")
@@ -66,7 +99,13 @@ open class HouseholdViewModel(
         })
   }
 
+  /**
+   * Updates the view model state with a new household.
+   *
+   * @param household - The household to update the view model state with.
+   */
   private fun updateViewModelStateWithHousehold(household: HouseHold) {
+    Log.d("HouseholdViewModel", "Updating view model state with household: $household")
     val currentHouseholds = _households.value
     val existingHousehold = currentHouseholds.find { it.uid == household.uid }
 
@@ -80,6 +119,7 @@ open class HouseholdViewModel(
 
     // Update the selected household if necessary
     if (_selectedHousehold.value == null) {
+      Log.d("HouseholdViewModel", "Selected household is null")
       selectHousehold(_households.value.firstOrNull()) // Default to the first household
     } else {
       updateSelectedHousehold()
@@ -87,16 +127,13 @@ open class HouseholdViewModel(
   }
 
   /**
-   * Updates the selected household with the latest data from the list of households using the uid,
-   * we may need to add another uid than the name.
+   * Updates the selected household with the latest data from the list of households using the uid.
    */
   private fun updateSelectedHousehold() {
-    selectedHousehold.value?.let { selectedHousehold ->
+    Log.d("HouseholdViewModel", "Updating selected household")
+    _selectedHousehold.value?.let { selectedHousehold ->
       val updatedHousehold = _households.value.find { it.uid == selectedHousehold.uid }
-      if (updatedHousehold != null) {
-        _selectedHousehold.value = updatedHousehold
-        listFoodItemsViewModel.setFoodItems(_selectedHousehold.value!!.foodItems)
-      }
+      selectHousehold(updatedHousehold)
     }
   }
 
@@ -106,10 +143,19 @@ open class HouseholdViewModel(
    * @param household - The household to select.
    */
   fun selectHousehold(household: HouseHold?) {
+    // Save the selected household UID to DataStore
+    if (_selectedHousehold.value == null || _selectedHousehold.value!!.uid != household?.uid) {
+      saveSelectedHouseholdUid(household?.uid)
+    }
     _selectedHousehold.value = household
     household?.let { listFoodItemsViewModel.setFoodItems(it.foodItems) }
   }
 
+  /**
+   * Selects a household to edit and loads the list of member emails.
+   *
+   * @param household - The household to edit.
+   */
   fun selectHouseholdToEdit(household: HouseHold?) {
     _householdToEdit.value = household
     household?.let {
@@ -119,10 +165,22 @@ open class HouseholdViewModel(
     }
   }
 
+  /**
+   * Gets the user IDs corresponding to a list of emails.
+   *
+   * @param emails - The list of emails to get user IDs for.
+   * @param callback - The callback to be invoked with the map of email to user ID.
+   */
   fun getUserIdsByEmails(emails: Set<String>, callback: (Map<String, String>) -> Unit) {
     houseHoldRepository.getUserIds(emails) { emailToUid -> callback(emailToUid) }
   }
 
+  /**
+   * Checks if a household name already exists in the list of households.
+   *
+   * @param houseHoldName - The name of the household to check.
+   * @return True if the household name already exists, false otherwise.
+   */
   fun checkIfHouseholdNameExists(houseHoldName: String): Boolean {
     return _households.value.any { it.name == houseHoldName }
   }
@@ -232,7 +290,7 @@ open class HouseholdViewModel(
   // TODO this is a bad way to update the food items, we need a plan to separate the food items from
   // the household
   fun addFoodItem(foodItem: FoodItem) {
-    val selectedHousehold = selectedHousehold.value
+    val selectedHousehold = _selectedHousehold.value
     if (selectedHousehold != null) {
       updateHousehold(
           selectedHousehold.copy(foodItems = selectedHousehold.foodItems.plus(foodItem)))
@@ -240,7 +298,7 @@ open class HouseholdViewModel(
   }
 
   fun editFoodItem(newFoodItem: FoodItem, oldFoodItem: FoodItem) {
-    val selectedHousehold = selectedHousehold.value
+    val selectedHousehold = _selectedHousehold.value
     if (selectedHousehold != null) {
       updateHousehold(
           selectedHousehold.copy(

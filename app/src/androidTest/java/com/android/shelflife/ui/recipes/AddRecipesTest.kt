@@ -8,6 +8,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
@@ -56,9 +58,7 @@ class AddRecipesTest {
     houseHoldRepository = mock()
     householdViewModel =
         HouseholdViewModel(
-            houseHoldRepository,
-            listFoodItemsViewModel,
-            mockk<InvitationRepositoryFirestore>(relaxed = true))
+            houseHoldRepository, listFoodItemsViewModel, mock<DataStore<Preferences>>())
 
     val foodFacts =
         FoodFacts(

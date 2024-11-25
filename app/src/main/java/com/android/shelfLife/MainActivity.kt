@@ -1,5 +1,6 @@
 package com.android.shelfLife
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,6 +9,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -45,8 +49,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.OkHttpClient
 
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
+
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
     setContent { ShelfLifeTheme { Surface { ShelfLifeApp() } } }
@@ -84,7 +91,8 @@ fun ShelfLifeApp() {
     HouseholdViewModel(
         houseHoldRepository = HouseholdRepositoryFirestore(firebaseFirestore),
         listFoodItemsViewModel = listFoodItemViewModel,
-        invitationRepository = invitationRepositoryFirestore)
+        invitationRepository = invitationRepositoryFirestore,
+        context.dataStore)
   }
 
   NavHost(navController = navController, startDestination = startingRoute) {

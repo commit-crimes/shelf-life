@@ -3,6 +3,8 @@ package com.android.shelflife.ui
 import android.content.Context
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
@@ -54,6 +56,7 @@ class EndToEndM1Test {
   private lateinit var foodItemRepository: FoodItemRepository
   private lateinit var navigationActions: NavigationActions
   private lateinit var listFoodItemsViewModel: ListFoodItemsViewModel
+  private lateinit var dataStore: DataStore<Preferences>
   private lateinit var houseHoldRepository: HouseHoldRepository
   private lateinit var householdViewModel: HouseholdViewModel
   private lateinit var foodFactsViewModel: FoodFactsViewModel
@@ -79,12 +82,13 @@ class EndToEndM1Test {
     barcodeScannerViewModel = mockk(relaxed = true)
     foodItemRepository = mock(FoodItemRepository::class.java)
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
-    houseHoldRepository = mock(HouseholdRepositoryFirestore::class.java)
-    householdViewModel =
-        HouseholdViewModel(
-            houseHoldRepository as HouseholdRepositoryFirestore,
-            listFoodItemsViewModel,
-            invitationRepository = mockk<InvitationRepositoryFirestore>())
+    dataStore = org.mockito.kotlin.mock<DataStore<Preferences>>()
+      houseHoldRepository = mock(HouseholdRepositoryFirestore::class.java)
+      householdViewModel =
+          HouseholdViewModel(
+              houseHoldRepository as HouseholdRepositoryFirestore,
+              listFoodItemsViewModel,
+              invitationRepository = mockk<InvitationRepositoryFirestore>(), dataStore)
     listRecipesViewModel = ListRecipesViewModel()
 
     foodFactsRepository = FakeFoodFactsRepository()

@@ -4,6 +4,8 @@ import android.content.Context
 import android.net.Uri
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
@@ -65,6 +67,7 @@ class EndToEndM2Test {
   private lateinit var foodItemRepository: FoodItemRepository
   private lateinit var navigationActions: NavigationActions
   private lateinit var listFoodItemsViewModel: ListFoodItemsViewModel
+  private lateinit var dataStore: DataStore<Preferences>
   private lateinit var houseHoldRepository: HouseHoldRepository
   private lateinit var householdViewModel: HouseholdViewModel
   private lateinit var foodFactsViewModel: FoodFactsViewModel
@@ -92,14 +95,15 @@ class EndToEndM2Test {
     barcodeScannerViewModel = mockk(relaxed = true)
     foodItemRepository = mock(FoodItemRepository::class.java)
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
-    houseHoldRepository = mock(HouseholdRepositoryFirestore::class.java)
-    householdViewModel =
-        HouseholdViewModel(
-            houseHoldRepository as HouseholdRepositoryFirestore,
-            listFoodItemsViewModel,
-            invitationRepository = mockk<InvitationRepositoryFirestore>())
-    listRecipesViewModel = ListRecipesViewModel()
-    invitationViewModel = InvitationViewModel(mockk<InvitationRepositoryFirestore>())
+      houseHoldRepository = mock(HouseholdRepositoryFirestore::class.java)
+      householdViewModel =
+          HouseholdViewModel(
+              houseHoldRepository as HouseholdRepositoryFirestore,
+              listFoodItemsViewModel,
+              invitationRepository = mockk<InvitationRepositoryFirestore>(),
+              dataStore)
+      listRecipesViewModel = ListRecipesViewModel()
+      invitationViewModel = InvitationViewModel(mockk<InvitationRepositoryFirestore>())
 
     foodFactsRepository = FakeFoodFactsRepository()
     foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)

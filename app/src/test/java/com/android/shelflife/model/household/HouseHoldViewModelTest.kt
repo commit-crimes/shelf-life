@@ -1,5 +1,7 @@
 package com.android.shelflife.model.household
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.test.platform.app.InstrumentationRegistry
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
@@ -55,6 +57,8 @@ class HouseholdViewModelTest {
 
   @Mock private lateinit var listFoodItemsViewModel: ListFoodItemsViewModel
 
+  @Mock private lateinit var dataStore: DataStore<Preferences>
+
   // Use UnconfinedTestDispatcher for testing coroutines
   private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -80,7 +84,7 @@ class HouseholdViewModelTest {
     firebaseAuthMock.`when`<FirebaseAuth> { FirebaseAuth.getInstance() }.thenReturn(firebaseAuth)
     invitationRepositoryFirestore = mock(InvitationRepositoryFirestore::class.java)
     householdViewModel =
-        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore)
+        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore, dataStore)
 
     ShadowLog.clear() // to check Error Logs
   }
@@ -135,8 +139,8 @@ class HouseholdViewModelTest {
 
     val household = HouseHold("1", "Household 1", emptyList(), listOf(foodItem))
 
-    householdViewModel =
-        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore)
+    householdViewModel = HouseholdViewModel(
+        repository, listFoodItemsViewModel,invitationRepositoryFirestore ,dataStore)
 
     householdViewModel.setHouseholds(listOf(household))
     householdViewModel.selectHousehold(household)
@@ -192,7 +196,7 @@ class HouseholdViewModelTest {
     }
 
     householdViewModel =
-        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore)
+        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore, dataStore)
 
     // Act
     householdViewModel.updateHousehold(household)
@@ -219,7 +223,7 @@ class HouseholdViewModelTest {
     }
 
     householdViewModel =
-        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore)
+        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore, dataStore)
 
     // Act
     householdViewModel.deleteHouseholdById(householdId)
@@ -337,7 +341,7 @@ class HouseholdViewModelTest {
 
       whenever(firebaseAuth.currentUser).thenReturn(null)
 
-      householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+      householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel, dataStore)
 
       // Act
       householdViewModel.addNewHousehold(householdName, friendEmails)
@@ -376,7 +380,7 @@ class HouseholdViewModelTest {
 
     // Initialize the ViewModel
     householdViewModel =
-        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore)
+        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore, dataStore)
 
     // Act
     householdViewModel.addNewHousehold(householdName, friendEmails)
@@ -505,7 +509,7 @@ class HouseholdViewModelTest {
 
     // Initialize the ViewModel
     householdViewModel =
-        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore)
+        HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepositoryFirestore, dataStore)
 
     // Act
     householdViewModel.addNewHousehold(householdName, friendEmails)

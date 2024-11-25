@@ -9,6 +9,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
@@ -51,7 +53,8 @@ class HouseHoldCreationScreenTest {
         HouseholdViewModel(
             houseHoldRepository,
             listFoodItemsViewModel,
-            mockk<InvitationRepositoryFirestore>(relaxed = true))
+            mockk<InvitationRepositoryFirestore>(relaxed = true),
+            org.mockito.kotlin.mock<DataStore<Preferences>>())
 
     MockKAnnotations.init(this)
     mockedNavigationActions = mockk(relaxed = true)
