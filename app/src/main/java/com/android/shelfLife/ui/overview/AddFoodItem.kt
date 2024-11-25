@@ -98,27 +98,26 @@ fun AddFoodItemScreen(
               }
 
               item(key = "amountAndUnit") {
-                Row(
-                    modifier = Modifier.fillMaxWidth()) {
-                      AmountField(
-                          amount = amount,
-                          onAmountChange = { newValue ->
-                            amount = newValue
-                            amountError = validateAmount(amount)
-                          },
-                          amountError = amountError,
-                          modifier = Modifier.weight(1f),
-                          testTag = "inputFoodAmount")
-                      Spacer(modifier = Modifier.width(8.dp))
-                      UnitDropdownField(
-                          unit = unit,
-                          onUnitChange = { unit = it },
-                          unitExpanded = unitExpanded,
-                          onUnitExpandedChange = { unitExpanded = it },
-                          modifier = Modifier.weight(1f),
-                          testTag = "inputFoodUnit")
-                    }
-                  Spacer(modifier = Modifier.height(16.dp))
+                Row(modifier = Modifier.fillMaxWidth()) {
+                  AmountField(
+                      amount = amount,
+                      onAmountChange = { newValue ->
+                        amount = newValue
+                        amountError = validateAmount(amount)
+                      },
+                      amountError = amountError,
+                      modifier = Modifier.weight(1f),
+                      testTag = "inputFoodAmount")
+                  Spacer(modifier = Modifier.width(8.dp))
+                  UnitDropdownField(
+                      unit = unit,
+                      onUnitChange = { unit = it },
+                      unitExpanded = unitExpanded,
+                      onUnitExpandedChange = { unitExpanded = it },
+                      modifier = Modifier.weight(1f),
+                      testTag = "inputFoodUnit")
+                }
+                Spacer(modifier = Modifier.height(16.dp))
               }
 
               item(key = "category") {
