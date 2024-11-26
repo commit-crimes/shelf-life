@@ -17,7 +17,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -27,8 +26,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -40,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -60,6 +56,7 @@ import com.android.shelfLife.ui.theme.primaryContainerDark
 import com.android.shelfLife.ui.theme.primaryContainerLight
 import com.android.shelfLife.ui.theme.secondaryContainerDark
 import com.android.shelfLife.ui.theme.secondaryContainerLight
+import com.android.shelfLife.ui.utils.TopBar
 import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -95,31 +92,10 @@ fun AddRecipeScreen(
   Scaffold(
       modifier = Modifier.testTag("addRecipeScreen"),
       topBar = {
-        // add a topBar
-        TopAppBar(
-            colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    actionIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer),
-            modifier = Modifier.testTag("topBar"),
-            navigationIcon = {
-              // Back button to return to the previous screen
-              IconButton(
-                  onClick = { navigationActions.goBack() },
-                  modifier = Modifier.testTag("goBackArrow")) {
-                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Go back Icon")
-                  }
-            },
-            // Title of the screen: Recipe name
-            title = {
-              Text(
-                  text = stringResource(R.string.title_of_AddRecipeScreen),
-                  style =
-                      MaterialTheme.typography.bodyLarge.copy(
-                          fontSize = 24.sp, fontWeight = FontWeight.Bold))
-            })
+        TopBar(
+            onClick = { navigationActions.goBack() },
+            title = stringResource(R.string.title_of_AddRecipeScreen),
+            titleTestTag = "addRecipeTitle")
       }) {
         // I use a lazy column so that I can add more ingredients and steps, and it also makes sure
         // its scrollable

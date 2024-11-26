@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.overview
+package com.android.shelflife.ui.overview
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.*
@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.overview.AddFoodItemScreen
 import com.android.shelfLife.ui.utils.formatTimestampToDate
 import com.google.firebase.Timestamp
 import io.mockk.MockKAnnotations
@@ -331,7 +332,7 @@ class AddFoodItemScreenTest {
     }
 
     // Click the back button
-    composeTestRule.onNodeWithTag("goBackButton").performClick()
+    composeTestRule.onNodeWithTag("goBackArrow").performClick()
 
     // Verify that the navigation action was called
     verify { navigationActions.goBack() }

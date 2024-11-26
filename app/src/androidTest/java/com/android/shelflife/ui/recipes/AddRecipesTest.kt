@@ -107,6 +107,7 @@ class AddRecipesTest {
     setUpAddRecipesScreen()
     composeTestRule.onNodeWithTag("addRecipeScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("topBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addRecipeTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("goBackArrow").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputRecipeTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputRecipeServings").assertIsDisplayed()

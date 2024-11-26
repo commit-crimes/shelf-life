@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -62,19 +61,10 @@ fun EditFoodItemScreen(
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
-        TopAppBar(
-            title = {
-              Text(
-                  modifier = Modifier.testTag("editFoodItemTitle"),
-                  text = stringResource(id = R.string.edit_food_item_title))
-            },
-            navigationIcon = {
-              IconButton(
-                  onClick = { navigationActions.goBack() },
-                  modifier = Modifier.testTag("goBackButton")) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go Back")
-                  }
-            },
+        TopBar(
+            onClick = { navigationActions.goBack() },
+            title = stringResource(id = R.string.edit_food_item_title),
+            titleTestTag = "editFoodItemTitle",
             actions = {
               IconButton(
                   onClick = {

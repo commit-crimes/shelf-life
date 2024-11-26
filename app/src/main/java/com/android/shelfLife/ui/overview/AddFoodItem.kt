@@ -3,8 +3,6 @@ package com.android.shelfLife.ui.overview
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -64,19 +62,10 @@ fun AddFoodItemScreen(
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
-        TopAppBar(
-            title = {
-              Text(
-                  modifier = Modifier.testTag("addFoodItemTitle"),
-                  text = stringResource(id = R.string.add_food_item_title))
-            },
-            navigationIcon = {
-              IconButton(
-                  onClick = { navigationActions.goBack() },
-                  modifier = Modifier.testTag("goBackButton")) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go Back")
-                  }
-            })
+        TopBar(
+            onClick = { navigationActions.goBack() },
+            title = stringResource(id = R.string.add_food_item_title),
+            titleTestTag = "addFoodItemTitle")
       }) { innerPadding ->
         LazyColumn(
             modifier =
