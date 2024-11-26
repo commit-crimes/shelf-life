@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -25,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -67,249 +67,229 @@ fun AddRecipeScreen(
     listRecipesViewModel: ListRecipesViewModel,
     householdViewModel: HouseholdViewModel
 ) {
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    var title by remember { mutableStateOf("") }
-    var servings by remember { mutableStateOf("") }
-    var time by remember { mutableStateOf("") }
-    val ingredients = remember { mutableStateListOf<Ingredient>() }
-    val instructions = remember { mutableStateListOf<String>() }
+  var title by remember { mutableStateOf("") }
+  var servings by remember { mutableStateOf("") }
+  var time by remember { mutableStateOf("") }
+  val ingredients = remember { mutableStateListOf<Ingredient>() }
+  val instructions = remember { mutableStateListOf<String>() }
 
-    var showIngredientDialog by remember { mutableStateOf(false) }
+  var showIngredientDialog by remember { mutableStateOf(false) }
 
-    var error = false
-    var titleError by remember { mutableStateOf<String?>(null) }
-    var servingsError by remember { mutableStateOf<String?>(null) }
-    var timeError by remember { mutableStateOf<String?>(null) }
-    var instructionsError by remember { mutableStateOf(false) }
+  var error = false
+  var titleError by remember { mutableStateOf<String?>(null) }
+  var servingsError by remember { mutableStateOf<String?>(null) }
+  var timeError by remember { mutableStateOf<String?>(null) }
+  var instructionsError by remember { mutableStateOf(false) }
 
-    fun validateInstructions() {
-        instructionsError = instructions.any { it.isBlank() }
-    }
+  fun validateInstructions() {
+    instructionsError = instructions.any { it.isBlank() }
+  }
 
-    Scaffold(
-        modifier = Modifier.testTag("addRecipeScreen"),
-        topBar = {
-            CustomTopAppBar(
-                onClick = { navigationActions.goBack() },
-                title = stringResource(R.string.title_of_AddRecipeScreen),
-                titleTestTag = "addRecipeTitle"
-            )
-        },
-        content = { paddingValues -> // New content parameter
-            LazyColumn(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .padding(horizontal = 20.dp)
-                    .fillMaxSize()
-            ) {
-                // Recipe title
-                item {
-                    OutlinedTextField(
-                        value = title,
-                        onValueChange = {
-                            title = it
-                            titleError =
-                                if (title.isEmpty()) context.getString(R.string.error_message_title_of_recipe)
-                                else null
-                        },
-                        label = { Text(stringResource(R.string.title_of_recipe)) },
-                        modifier = Modifier
-                            .fillMaxWidth()
+  Scaffold(
+      modifier = Modifier.testTag("addRecipeScreen"),
+      topBar = {
+        CustomTopAppBar(
+            onClick = { navigationActions.goBack() },
+            title = stringResource(R.string.title_of_AddRecipeScreen),
+            titleTestTag = "addRecipeTitle")
+      },
+      content = { paddingValues -> // New content parameter
+        LazyColumn(
+            modifier = Modifier.padding(paddingValues).padding(horizontal = 20.dp).fillMaxSize()) {
+              // Recipe title
+              item {
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = {
+                      title = it
+                      titleError =
+                          if (title.isEmpty())
+                              context.getString(R.string.error_message_title_of_recipe)
+                          else null
+                    },
+                    label = { Text(stringResource(R.string.title_of_recipe)) },
+                    modifier =
+                        Modifier.fillMaxWidth()
                             .padding(vertical = 10.dp)
-                            .testTag("inputRecipeTitle")
-                    )
-                }
+                            .testTag("inputRecipeTitle"))
+              }
 
-                // Error message for title
-                item { ErrorTextBox(titleError, "titleErrorMessage") }
+              // Error message for title
+              item { ErrorTextBox(titleError, "titleErrorMessage") }
 
-                // Recipe servings
-                item {
-                    OutlinedTextField(
-                        value = servings,
-                        onValueChange = {
-                            servings = it
-                            servingsError =
-                                if (servings.isEmpty()) context.getString(R.string.error_message_servings)
-                                else null
-                        },
-                        label = { Text(stringResource(R.string.servings)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier
-                            .fillMaxWidth()
+              // Recipe servings
+              item {
+                OutlinedTextField(
+                    value = servings,
+                    onValueChange = {
+                      servings = it
+                      servingsError =
+                          if (servings.isEmpty()) context.getString(R.string.error_message_servings)
+                          else null
+                    },
+                    label = { Text(stringResource(R.string.servings)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier =
+                        Modifier.fillMaxWidth()
                             .padding(vertical = 10.dp)
-                            .testTag("inputRecipeServings")
-                    )
-                }
+                            .testTag("inputRecipeServings"))
+              }
 
-                // Error message for servings
-                item { ErrorTextBox(servingsError, "servingsErrorMessage") }
+              // Error message for servings
+              item { ErrorTextBox(servingsError, "servingsErrorMessage") }
 
-                // Recipe time
-                item {
-                    OutlinedTextField(
-                        value = time,
-                        onValueChange = {
-                            time = it
-                            timeError =
-                                if (time.isEmpty()) context.getString(R.string.error_message_time)
-                                else null
-                        },
-                        label = { Text(stringResource(R.string.time)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier
-                            .fillMaxWidth()
+              // Recipe time
+              item {
+                OutlinedTextField(
+                    value = time,
+                    onValueChange = {
+                      time = it
+                      timeError =
+                          if (time.isEmpty()) context.getString(R.string.error_message_time)
+                          else null
+                    },
+                    label = { Text(stringResource(R.string.time)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier =
+                        Modifier.fillMaxWidth()
                             .padding(vertical = 10.dp)
-                            .testTag("inputRecipeTime")
-                    )
+                            .testTag("inputRecipeTime"))
+              }
+
+              // Error message for time
+              item { ErrorTextBox(timeError, "timeErrorMessage") }
+
+              // Recipe Ingredients Section
+              item {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                  Text(
+                      text = stringResource(R.string.ingredients),
+                      modifier = Modifier.testTag("ingredientSection"))
                 }
+              }
 
-                // Error message for time
-                item { ErrorTextBox(timeError, "timeErrorMessage") }
+              itemsIndexed(ingredients) { index, ingredient ->
+                IngredientItem(
+                    index = index,
+                    ingredient = ingredient,
+                    onRemoveClick = {
+                      if (ingredients.size > 0) {
+                        ingredients.removeAt(index)
+                      }
+                    })
+              }
 
-                // Recipe Ingredients Section
-                item {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = stringResource(R.string.ingredients),
-                            modifier = Modifier.testTag("ingredientSection")
-                        )
-                    }
+              // Add Ingredient Button
+              item {
+                Spacer(modifier = Modifier.height(4.dp))
+                Button(
+                    onClick = { showIngredientDialog = true },
+                    modifier = Modifier.height(40.dp).testTag("addIngredientButton"),
+                    content = {
+                      Icon(imageVector = Icons.Default.Add, contentDescription = "Add Ingredient")
+                    })
+              }
+
+              // Instructions Section
+              item {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                  Text(
+                      text = stringResource(R.string.instructions),
+                      modifier = Modifier.testTag("instructionSection"))
                 }
+              }
 
-                itemsIndexed(ingredients) { index, ingredient ->
-                    IngredientItem(
-                        index = index,
-                        ingredient = ingredient,
-                        onRemoveClick = {
-                            if (ingredients.size > 0) {
-                                ingredients.removeAt(index)
-                            }
-                        }
-                    )
-                }
+              itemsIndexed(instructions) { index, instruction ->
+                InstructionItem(
+                    index = index,
+                    instruction = instruction,
+                    onInstructionChange = { newInstruction ->
+                      instructions[index] = newInstruction
+                      validateInstructions()
+                    },
+                    onRemoveClick = { instructions.removeAt(index) })
+              }
 
-                // Add Ingredient Button
-                item {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Button(
-                        onClick = { showIngredientDialog = true },
-                        modifier = Modifier.height(40.dp).testTag("addIngredientButton"),
-                        content = {
-                            Icon(imageVector = Icons.Default.Add, contentDescription = "Add Ingredient")
-                        }
-                    )
-                }
+              // Add Instruction Button
+              item {
+                Spacer(modifier = Modifier.height(4.dp))
+                Button(
+                    onClick = { instructions.add("") },
+                    modifier = Modifier.height(40.dp).testTag("addInstructionButton"),
+                    content = {
+                      Icon(imageVector = Icons.Default.Add, contentDescription = "Add Instruction")
+                    })
+              }
 
-                // Instructions Section
-                item {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = stringResource(R.string.instructions),
-                            modifier = Modifier.testTag("instructionSection")
-                        )
-                    }
-                }
-
-                itemsIndexed(instructions) { index, instruction ->
-                    InstructionItem(
-                        index = index,
-                        instruction = instruction,
-                        onInstructionChange = { newInstruction ->
-                            instructions[index] = newInstruction
-                            validateInstructions()
-                        },
-                        onRemoveClick = { instructions.removeAt(index) }
-                    )
-                }
-
-                // Add Instruction Button
-                item {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Button(
-                        onClick = { instructions.add("") },
-                        modifier = Modifier.height(40.dp).testTag("addInstructionButton"),
-                        content = {
-                            Icon(imageVector = Icons.Default.Add, contentDescription = "Add Instruction")
-                        }
-                    )
-                }
-
-                // Footer Buttons
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 20.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        // Cancel Button
-                        Button(
-                            onClick = { navigationActions.goBack() },
-                            modifier = Modifier.height(40.dp).testTag("cancelButton"),
-                            colors = ButtonDefaults.buttonColors(containerColor = errorContainerDark)
-                        ) {
+              // Footer Buttons
+              item {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp),
+                    horizontalArrangement = Arrangement.Center) {
+                      // Cancel Button
+                      Button(
+                          onClick = { navigationActions.goBack() },
+                          modifier = Modifier.height(40.dp).testTag("cancelButton"),
+                          colors =
+                              ButtonDefaults.buttonColors(containerColor = errorContainerDark)) {
                             Text(text = stringResource(R.string.cancel_button), fontSize = 18.sp)
-                        }
+                          }
 
-                        Spacer(Modifier.width(24.dp))
+                      Spacer(Modifier.width(24.dp))
 
-                        // Add Button
-                        Button(
-                            onClick = {
-                                validateInstructions()
-                                error =
-                                    title.isEmpty() ||
-                                            time.isEmpty() ||
-                                            servings.isEmpty() ||
-                                            ingredients.isEmpty() ||
-                                            instructions.isEmpty() ||
-                                            instructionsError
-                                if (!error) {
-                                    listRecipesViewModel.addRecipeToList(
-                                        recipe = Recipe(
-                                            name = title,
-                                            instructions = instructions.toList(),
-                                            servings = servings.toInt(),
-                                            time = (time.toDouble() * 60.0).seconds,
-                                            ingredients = ingredients.toList(),
-                                            recipeTypes = listOf(RecipesRepository.SearchRecipeType.PERSONAL)
-                                        )
-                                    )
-                                    navigationActions.goBack()
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        "Please correct the errors before submitting.",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            },
-                            modifier = Modifier.height(40.dp).testTag("addButton"),
-                            colors = ButtonDefaults.buttonColors(containerColor = primaryContainerLight)
-                        ) {
+                      // Add Button
+                      Button(
+                          onClick = {
+                            validateInstructions()
+                            error =
+                                title.isEmpty() ||
+                                    time.isEmpty() ||
+                                    servings.isEmpty() ||
+                                    ingredients.isEmpty() ||
+                                    instructions.isEmpty() ||
+                                    instructionsError
+                            if (!error) {
+                              listRecipesViewModel.addRecipeToList(
+                                  recipe =
+                                      Recipe(
+                                          name = title,
+                                          instructions = instructions.toList(),
+                                          servings = servings.toInt(),
+                                          time = (time.toDouble() * 60.0).seconds,
+                                          ingredients = ingredients.toList(),
+                                          recipeTypes =
+                                              listOf(RecipesRepository.SearchRecipeType.PERSONAL)))
+                              navigationActions.goBack()
+                            } else {
+                              Toast.makeText(
+                                      context,
+                                      "Please correct the errors before submitting.",
+                                      Toast.LENGTH_SHORT)
+                                  .show()
+                            }
+                          },
+                          modifier = Modifier.height(40.dp).testTag("addButton"),
+                          colors =
+                              ButtonDefaults.buttonColors(containerColor = primaryContainerLight)) {
                             Text(
                                 text = stringResource(R.string.add_button),
                                 fontSize = 18.sp,
-                                color = onSecondaryDark
-                            )
-                        }
+                                color = onSecondaryDark)
+                          }
                     }
-                }
+              }
             }
 
-            if (showIngredientDialog) {
-                IngredientDialog(
-                    ingredients = ingredients,
-                    onDismiss = { showIngredientDialog = false },
-                    onAddIngredient = { showIngredientDialog = false }
-                )
-            }
+        if (showIngredientDialog) {
+          IngredientDialog(
+              ingredients = ingredients,
+              onDismiss = { showIngredientDialog = false },
+              onAddIngredient = { showIngredientDialog = false })
         }
-    )
+      })
 }
-
 
 /**
  * A composable function that displays a single instruction step in a recipe.
