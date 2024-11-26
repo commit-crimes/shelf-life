@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.overview
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,25 +7,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.overview.OverviewScreenViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -48,20 +46,19 @@ fun OverviewScreen(
     householdViewModel: HouseholdViewModel,
     listFoodItemsViewModel: ListFoodItemsViewModel
 ) {
+  val overviewScreenViewModel = viewModel<OverviewScreenViewModel>()
+
   val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
-  var searchQuery by remember { mutableStateOf("") }
   val foodItems by listFoodItemsViewModel.foodItems.collectAsState()
   val userHouseholds by householdViewModel.households.collectAsState()
   val householdViewModelIsLoaded by householdViewModel.finishedLoading.collectAsState()
-  val selectedFilters = remember { mutableStateListOf<String>() }
+  val selectedFilters by overviewScreenViewModel.selectedFilters.collectAsState()
   val multipleSelectedFoodItems = listFoodItemsViewModel.multipleSelectedFoodItems.collectAsState()
 
-  Log.d("OverviewScreen", "Selected household: $selectedHousehold ${userHouseholds.size}")
+  var searchQuery by rememberSaveable { mutableStateOf("") }
 
-  val drawerState = rememberDrawerState(DrawerValue.Closed)
+  val drawerState by overviewScreenViewModel.drawerState.collectAsState()
   val scope = rememberCoroutineScope()
-
-  val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
 
   HouseHoldSelectionDrawer(
       scope = scope,
@@ -93,14 +90,10 @@ fun OverviewScreen(
                   TopNavigationBar(
                       houseHold = it,
                       onHamburgerClick = { scope.launch { drawerState.open() } },
-                      filters = filters,
+                      filters = overviewScreenViewModel.filters,
                       selectedFilters = selectedFilters,
-                      onFilterChange = { filter, isSelected ->
-                        if (isSelected) {
-                          selectedFilters.add(filter)
-                        } else {
-                          selectedFilters.remove(filter)
-                        }
+                      onFilterChange = { filter, _ ->
+                        overviewScreenViewModel.toggleFilter(filter)
                       },
                       showDeleteOption = multipleSelectedFoodItems.value.isNotEmpty(),
                       onDeleteClick = {
