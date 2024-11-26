@@ -24,6 +24,7 @@ import com.android.shelfLife.model.foodItem.FoodStorageLocation
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.overview.EditFoodItemScreen
 import com.android.shelfLife.ui.utils.formatTimestampToDate
 import com.google.firebase.Timestamp
@@ -33,6 +34,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -323,5 +325,24 @@ class EditFoodItemScreenTest {
 
     // Verify that the navigation action was called
     verify { navigationActions.goBack() }
+  }
+
+  @Test
+  fun testDeleteFoodItem() = runTest {
+    composeTestRule.setContent {
+      EditFoodItemScreen(
+          navigationActions = navigationActions,
+          houseHoldViewModel = houseHoldViewModel,
+          foodItemViewModel = foodItemViewModel)
+    }
+
+    // Perform click on the delete icon
+    composeTestRule.onNodeWithTag("deleteFoodItem").performClick()
+
+    // Verify that the deleteFoodItem function was called
+    io.mockk.verify { houseHoldViewModel.deleteFoodItem(foodItem) }
+
+    // Verify that the navigation action was triggered
+    io.mockk.verify { navigationActions.navigateTo(Route.OVERVIEW) }
   }
 }

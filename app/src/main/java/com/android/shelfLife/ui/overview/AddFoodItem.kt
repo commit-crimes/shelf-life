@@ -30,6 +30,7 @@ fun AddFoodItemScreen(
     foodItemViewModel: ListFoodItemsViewModel,
     paddingValues: PaddingValues = PaddingValues(16.dp)
 ) {
+
   var foodName by remember { mutableStateOf("") }
   var amount by remember { mutableStateOf("") }
   var unit by remember { mutableStateOf(FoodUnit.GRAM) }
