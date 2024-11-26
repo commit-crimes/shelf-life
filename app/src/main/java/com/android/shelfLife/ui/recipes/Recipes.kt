@@ -18,15 +18,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -60,8 +57,10 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
+import com.android.shelfLife.ui.utils.SearchBar
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipesScreen(
     navigationActions: NavigationActions,
@@ -130,9 +129,11 @@ fun RecipesScreen(
               },
               content = { paddingValues ->
                 Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-                  RecipesSearchBar(query) { newQuery ->
-                    query = newQuery // Update the query when user types
-                  } // Pass query and update function to the search bar
+                  SearchBar(
+                      query = query,
+                      onQueryChange = { query = it },
+                      placeholder = "Search recipe",
+                      searchBarTestTag = "recipeSearchBar")
 
                   if (filteredRecipes.isEmpty()) {
                     Box(
@@ -154,63 +155,6 @@ fun RecipesScreen(
                 }
               })
         }
-      }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-/**
- * A composable function that displays a search bar for filtering recipes.
- *
- * @param query The current search query as a string.
- * @param onQueryChange A callback function that gets triggered whenever the query changes, updating
- *   the query state in the parent composable.
- *
- * This search bar provides a text input field where users can type to search for recipes. The UI
- * layout consists of a box container that holds the search bar. It uses a `SearchBar` from the
- * Material3 library, with options for managing its active state and search behavior.
- * - The `query` parameter represents the current text in the search bar.
- * - The `onQueryChange` function is invoked each time the user updates the search query, allowing
- *   the parent composable to filter recipes based on user input.
- * - The search bar displays a placeholder "Search recipes" when the query is empty.
- * - The trailing icon (search icon) allows users to toggle the search bar's active state.
- */
-fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
-  var isActive by remember {
-    mutableStateOf(false)
-  } // State to manage whether the search bar is active
-
-  Box(
-      modifier =
-          Modifier.fillMaxWidth()
-              .height(100.dp)
-              .testTag("recipeSearchBar") // Set a fixed height for the search bar container
-      ) {
-        SearchBar(
-            query = query, // The current query string displayed in the search bar
-            onQueryChange = { newQuery ->
-              onQueryChange(newQuery)
-            }, // Updates the query when the user types
-            placeholder = {
-              Text("Search recipes") // Placeholder text shown when the query is empty
-            },
-            onSearch = {},
-            active = isActive, // Determines whether the search bar is in an active state
-            onActiveChange = { active -> isActive = active }, // Callback to update the active state
-            modifier =
-                Modifier.fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-                    .testTag("searchBar"), // Padding around the search bar
-            trailingIcon = {
-              IconButton(onClick = { isActive = false }) { // Button to deactivate the search bar
-                Icon(
-                    Icons.Default.Search,
-                    contentDescription =
-                        "icon for recipes search bar" // Accessibility description for the search
-                    // icon
-                    )
-              }
-            }) {}
       }
 }
 

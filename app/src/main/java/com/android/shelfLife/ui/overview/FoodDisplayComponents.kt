@@ -13,21 +13,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -165,45 +157,5 @@ fun FoodItemCard(
               color = progressBarColor,
               trackColor = LightGray)
         }
-      }
-}
-
-/**
- * Composable function to display the search bar for filtering food items
- *
- * @param query The current query string
- * @param onQueryChange The callback to update the query string
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun FoodSearchBar(query: String, onQueryChange: (String) -> Unit) {
-  Box(
-      modifier = Modifier.fillMaxWidth().padding(16.dp), // Outer padding for spacing
-      contentAlignment = Alignment.Center // Center the SearchBar within the Box
-      ) {
-        SearchBar(
-            colors =
-                SearchBarDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                ),
-            shadowElevation = 3.dp,
-            query = query,
-            onQueryChange = onQueryChange,
-            placeholder = { Text("Search food item") },
-            onSearch = { /* Optional: Handle search action if needed */},
-            active = false,
-            onActiveChange = {},
-            leadingIcon = {},
-            trailingIcon = {
-              IconButton(onClick = {}) {
-                Icon(Icons.Default.Search, contentDescription = "Search Icon")
-              }
-            },
-            modifier =
-                Modifier.widthIn(
-                        max = 600.dp) // Restrict max width to prevent over-stretching on large
-                    // screens
-                    .fillMaxWidth(0.9f) // Make it responsive and occupy 90% of available width
-                    .testTag("foodSearchBar")) {}
       }
 }
