@@ -62,7 +62,7 @@ fun AddFoodItemScreen(
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
-        TopBar(
+        CustomTopAppBar(
             onClick = { navigationActions.goBack() },
             title = stringResource(id = R.string.add_food_item_title),
             titleTestTag = "addFoodItemTitle")

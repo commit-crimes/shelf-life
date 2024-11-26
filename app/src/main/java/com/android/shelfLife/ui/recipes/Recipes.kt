@@ -57,7 +57,7 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
-import com.android.shelfLife.ui.utils.SearchBar
+import com.android.shelfLife.ui.utils.CustomSearchBar
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -129,7 +129,7 @@ fun RecipesScreen(
               },
               content = { paddingValues ->
                 Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-                  SearchBar(
+                  CustomSearchBar(
                       query = query,
                       onQueryChange = { query = it },
                       placeholder = "Search recipe",

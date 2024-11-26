@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,7 +37,7 @@ import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.utils.TopBar
+import com.android.shelfLife.ui.utils.CustomTopAppBar
 import kotlin.math.floor
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,7 +80,7 @@ fun IndividualRecipeScreen(
   Scaffold(
       modifier = Modifier.testTag("individualRecipesScreen"),
       topBar = {
-        TopBar(
+        CustomTopAppBar(
             onClick = { navigationActions.goBack() },
             title = selectedRecipe.name,
             titleTestTag = "individualRecipeTitle")

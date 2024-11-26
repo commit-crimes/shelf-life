@@ -56,7 +56,7 @@ import com.android.shelfLife.ui.theme.primaryContainerDark
 import com.android.shelfLife.ui.theme.primaryContainerLight
 import com.android.shelfLife.ui.theme.secondaryContainerDark
 import com.android.shelfLife.ui.theme.secondaryContainerLight
-import com.android.shelfLife.ui.utils.TopBar
+import com.android.shelfLife.ui.utils.CustomTopAppBar
 import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -92,7 +92,7 @@ fun AddRecipeScreen(
   Scaffold(
       modifier = Modifier.testTag("addRecipeScreen"),
       topBar = {
-        TopBar(
+        CustomTopAppBar(
             onClick = { navigationActions.goBack() },
             title = stringResource(R.string.title_of_AddRecipeScreen),
             titleTestTag = "addRecipeTitle")

@@ -61,7 +61,7 @@ fun EditFoodItemScreen(
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
-        TopBar(
+        CustomTopAppBar(
             onClick = { navigationActions.goBack() },
             title = stringResource(id = R.string.edit_food_item_title),
             titleTestTag = "editFoodItemTitle",

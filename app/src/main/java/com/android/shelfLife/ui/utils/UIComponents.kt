@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar(
+fun CustomTopAppBar(
     onClick: () -> Unit,
     title: String,
     titleTestTag: String,
@@ -58,7 +58,7 @@ fun TopBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(
+fun CustomSearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
     placeholder: String,
