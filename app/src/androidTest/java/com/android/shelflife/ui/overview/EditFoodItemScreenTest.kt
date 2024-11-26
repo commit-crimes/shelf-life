@@ -139,20 +139,20 @@ class EditFoodItemScreenTest {
     // Enter invalid amount (letters)
     composeTestRule.onNodeWithTag("editFoodAmount").performTextInput("abc")
     // Verify error message is displayed
-    composeTestRule.onNodeWithText("Amount must be a number.").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Amount must be a number").assertIsDisplayed()
 
     // Enter invalid amount (negative number)
     composeTestRule.onNodeWithTag("editFoodAmount").performTextClearance()
     composeTestRule.onNodeWithTag("editFoodAmount").performTextInput("-5")
     // Verify error message is displayed
-    composeTestRule.onNodeWithText("Amount must be positive.").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Amount must be positive").assertIsDisplayed()
 
     // Enter valid amount
     composeTestRule.onNodeWithTag("editFoodAmount").performTextClearance()
     composeTestRule.onNodeWithTag("editFoodAmount").performTextInput("10")
     // Verify error messages are gone
-    composeTestRule.onNodeWithText("Amount must be a number.").assertDoesNotExist()
-    composeTestRule.onNodeWithText("Amount must be positive.").assertDoesNotExist()
+    composeTestRule.onNodeWithText("Amount must be a number").assertDoesNotExist()
+    composeTestRule.onNodeWithText("Amount must be positive").assertDoesNotExist()
   }
 
   @Test
@@ -215,7 +215,7 @@ class EditFoodItemScreenTest {
     composeTestRule
         .onNodeWithTag("editFoodItemScreen")
         .performScrollToNode(hasTestTag("editFoodAmount"))
-    composeTestRule.onNodeWithText("Amount cannot be empty.").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Amount cannot be empty").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("editFoodItemScreen")
         .performScrollToNode(hasTestTag("editFoodExpireDate"))

@@ -28,20 +28,20 @@
     <string name="add_button">Add</string>
 
     <!-- Error Messages -->
-    <string name="submission_error_message">Please correct the errors before submitting.</string>
-    <string name="open_date_before_buy_date_error">Open Date cannot be before Buy Date.</string>
-    <string name="expire_date_before_buy_date_error">Expire Date cannot be before Buy Date.</string>
-    <string name="expire_date_in_past_error">Expire Date cannot be in the past.</string>
-    <string name="open_date_after_expire_date_error">Open Date cannot be after Expire Date.</string>
-    <string name="amount_empty_error">Amount cannot be empty.</string>
-    <string name="amount_not_number_error">Amount must be a number.</string>
-    <string name="amount_negative_error">Amount must be positive.</string>
-    <string name="food_name_empty_error">Food name cannot be empty.</string>
-    <string name="food_name_invalid_error">Food name contains invalid characters.</string>
-    <string name="date_empty_error">Date cannot be empty.</string>
-    <string name="date_invalid_format_error">Date must be in ddMMyyyy format.</string>
-    <string name="date_invalid_error">Invalid date.</string>
-    <string name="date_incomplete_error">Incomplete date.</string>
+    <string name="submission_error_message">Please correct the errors before submitting</string>
+    <string name="open_date_before_buy_date_error">Open Date cannot be before Buy Date</string>
+    <string name="expire_date_before_buy_date_error">Expire Date cannot be before Buy Date</string>
+    <string name="expire_date_in_past_error">Expire Date cannot be in the past</string>
+    <string name="open_date_after_expire_date_error">Open Date cannot be after Expire Date</string>
+    <string name="amount_empty_error">Amount cannot be empty</string>
+    <string name="amount_not_number_error">Amount must be a number</string>
+    <string name="amount_negative_error">Amount must be positive</string>
+    <string name="food_name_empty_error">Food name cannot be empty</string>
+    <string name="food_name_invalid_error">Food name contains invalid characters</string>
+    <string name="date_empty_error">Date cannot be empty</string>
+    <string name="date_invalid_format_error">Date must be in ddMMyyyy format</string>
+    <string name="date_invalid_error">Invalid date</string>
+    <string name="date_incomplete_error">Incomplete date</string>
 
     <!-- Toast Messages -->
     <string name="food_added_message">Food item added.</string>
