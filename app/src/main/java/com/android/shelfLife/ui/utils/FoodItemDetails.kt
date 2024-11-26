@@ -15,6 +15,11 @@ import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodItem.FoodItem
 
+/**
+ * Composable function to display the details of a food item.
+ *
+ * @param foodItem The food item whose details are to be displayed.
+ */
 @Composable
 fun FoodItemDetails(foodItem: FoodItem) {
   val textStyle = TextStyle(fontSize = 14.sp)
@@ -85,6 +90,13 @@ fun FoodItemDetails(foodItem: FoodItem) {
       }
 }
 
+/**
+ * Composable function to display a text detail of a food item.
+ *
+ * @param text The text to be displayed.
+ * @param tag The test tag for the text.
+ * @param style The style to be applied to the text.
+ */
 @Composable
 fun FoodItemDetailText(text: String, tag: String, style: TextStyle) {
   Text(text = text, style = style, modifier = Modifier.testTag(tag))

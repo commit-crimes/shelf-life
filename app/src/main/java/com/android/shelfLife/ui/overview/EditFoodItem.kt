@@ -24,6 +24,14 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.utils.*
 
+/**
+ * Composable function to display the Edit Food Item screen.
+ *
+ * @param navigationActions The navigation actions to be used in the screen.
+ * @param houseHoldViewModel The ViewModel for the household.
+ * @param foodItemViewModel The ViewModel for the food items.
+ * @param paddingValues The padding values to be applied to the screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditFoodItemScreen(
@@ -52,7 +60,9 @@ fun EditFoodItemScreen(
   var locationExpanded by remember { mutableStateOf(false) }
 
   val context = LocalContext.current
-
+  /**
+  * Validates all fields when the submit button is clicked.
+  */
   fun validateAllFieldsWhenSubmitButton() {
     amountErrorResId = validateAmount(amount)
     buyDateErrorResId = validateBuyDate(buyDate)

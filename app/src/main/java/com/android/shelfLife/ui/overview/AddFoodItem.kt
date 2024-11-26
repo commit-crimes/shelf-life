@@ -22,6 +22,14 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.utils.*
 import com.google.firebase.Timestamp
 
+/**
+ * Composable function to display the Add Food Item screen.
+ *
+ * @param navigationActions The navigation actions to be used in the screen.
+ * @param houseHoldViewModel The ViewModel for the household.
+ * @param foodItemViewModel The ViewModel for the food items.
+ * @param paddingValues The padding values to be applied to the screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddFoodItemScreen(

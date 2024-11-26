@@ -24,7 +24,14 @@ import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.ui.utils.*
 import com.google.firebase.Timestamp
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Composable function to display the food input content.
+ *
+ * @param foodFacts The food facts to be displayed.
+ * @param onSubmit Callback function to handle the submission of the food item.
+ * @param onCancel Callback function to handle the cancellation of the input.
+ * @param foodItemViewModel The ViewModel for the food items.
+ */
 @Composable
 fun FoodInputContent(
     foodFacts: FoodFacts,
