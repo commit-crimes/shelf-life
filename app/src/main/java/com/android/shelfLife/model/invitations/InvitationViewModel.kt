@@ -16,9 +16,30 @@ class InvitationViewModel(private val invitationRepository: InvitationRepository
   init {
     FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
       if (firebaseAuth.currentUser != null) {
-        loadInvitations()
+        startListeningForInvitations()
+      } else {
+        stopListeningForInvitations()
       }
     }
+  }
+
+  /** Starts listening for real-time updates to invitations. */
+  private fun startListeningForInvitations() {
+    invitationRepository.addInvitationListener(
+        onUpdate = { invitationList -> _invitations.value = invitationList },
+        onError = { exception ->
+          Log.e("InvitationViewModel", "Error listening for invitations: $exception")
+        })
+  }
+
+  /** Stops listening for real-time updates to invitations. */
+  private fun stopListeningForInvitations() {
+    invitationRepository.removeInvitationListener()
+  }
+
+  override fun onCleared() {
+    super.onCleared()
+    stopListeningForInvitations()
   }
 
   /** Loads the list of invitations from the repository and updates the [_invitations] flow. */

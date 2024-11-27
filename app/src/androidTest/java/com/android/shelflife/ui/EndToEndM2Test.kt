@@ -48,7 +48,9 @@ import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.utils.formatTimestampToDate
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.Timestamp
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import java.util.*
 import org.junit.Before
@@ -74,6 +76,7 @@ class EndToEndM2Test {
   private lateinit var foodFactsRepository: FakeFoodFactsRepository
   private lateinit var listRecipesViewModel: ListRecipesViewModel
   private lateinit var invitationViewModel: InvitationViewModel
+  private lateinit var invitationRepository: InvitationRepositoryFirestore
 
   private lateinit var navController: NavHostController
   private lateinit var houseHold: HouseHold
@@ -97,14 +100,16 @@ class EndToEndM2Test {
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
     houseHoldRepository = mock(HouseholdRepositoryFirestore::class.java)
     dataStore = mock<DataStore<Preferences>>()
+    invitationRepository = mockk<InvitationRepositoryFirestore>()
+    every { invitationRepository.removeInvitationListener() } just Runs
     householdViewModel =
         HouseholdViewModel(
             houseHoldRepository as HouseholdRepositoryFirestore,
             listFoodItemsViewModel,
-            invitationRepository = mockk<InvitationRepositoryFirestore>(),
+            invitationRepository = invitationRepository,
             dataStore)
     listRecipesViewModel = ListRecipesViewModel()
-    invitationViewModel = InvitationViewModel(mockk<InvitationRepositoryFirestore>())
+    invitationViewModel = InvitationViewModel(invitationRepository)
 
     foodFactsRepository = FakeFoodFactsRepository()
     foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)

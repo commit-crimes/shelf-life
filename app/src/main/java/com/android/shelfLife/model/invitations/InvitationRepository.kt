@@ -3,6 +3,17 @@ package com.android.shelfLife.model.invitations
 import com.android.shelfLife.model.household.HouseHold
 
 interface InvitationRepository {
+
+  /**
+   * Sets up a real-time listener for invitations for the current user.
+   *
+   * @param onUpdate The callback to invoke with the updated list of invitations.
+   * @param onError The callback to invoke in case of an error.
+   */
+  fun addInvitationListener(onUpdate: (List<Invitation>) -> Unit, onError: (Exception) -> Unit)
+
+  /** Removes the real-time listener for invitations. */
+  fun removeInvitationListener()
   /**
    * Declines an invitation.
    *

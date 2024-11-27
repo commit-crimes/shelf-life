@@ -49,6 +49,15 @@ class InvitationScreenTest {
           onSuccess(listOf(testInvitation))
         }
 
+        override fun addInvitationListener(
+            onUpdate: (List<Invitation>) -> Unit,
+            onError: (Exception) -> Unit
+        ) {
+          onUpdate(listOf(testInvitation))
+        }
+
+        override fun removeInvitationListener() {}
+
         override fun declineInvitation(
             invitation: Invitation,
             onSuccess: () -> Unit,

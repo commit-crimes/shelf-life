@@ -7,8 +7,48 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 
-class InvitationRepositoryFirestore(private val db: FirebaseFirestore) : InvitationRepository {
+open class InvitationRepositoryFirestore(private val db: FirebaseFirestore) : InvitationRepository {
+
+  private var listenerRegistration: ListenerRegistration? = null
+
+  /**
+   * Sets up a real-time listener for invitations for the current user.
+   *
+   * @param onUpdate The callback to invoke with the updated list of invitations.
+   * @param onError The callback to invoke in case of an error.
+   */
+  override fun addInvitationListener(
+      onUpdate: (List<Invitation>) -> Unit,
+      onError: (Exception) -> Unit
+  ) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    if (currentUser != null) {
+      listenerRegistration =
+          db.collection("invitations")
+              .whereEqualTo("invitedUserId", currentUser.uid)
+              .addSnapshotListener { snapshots, error ->
+                if (error != null) {
+                  onError(error)
+                  return@addSnapshotListener
+                }
+
+                if (snapshots != null) {
+                  val invitations =
+                      snapshots.documents.mapNotNull { doc -> convertToInvitation(doc) }
+                  onUpdate(invitations)
+                }
+              }
+    } else {
+      onError(Exception("User not logged in"))
+    }
+  }
+
+  /** Removes the real-time listener for invitations. */
+  override fun removeInvitationListener() {
+    listenerRegistration?.remove()
+  }
 
   /**
    * Sends an invitation to a user to join a household.
