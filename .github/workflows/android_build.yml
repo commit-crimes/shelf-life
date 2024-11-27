@@ -37,17 +37,27 @@ jobs:
         run: |
           echo "$GOOGLE_SERVICES" | base64 --decode > ./app/google-services.json
 
+      - name: Decode Keystore
+        env:
+          ENCODED_STRING: ${{ secrets.KEYSTORE_BASE_64 }}
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.DEBUG_KEYSTORE_PASSWORD }}
+          RELEASE_KEYSTORE_ALIAS: ${{ secrets.DEBUG_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.DEBUG_KEY_PASSWORD }}
+
+        run: |
+          echo $ENCODED_STRING > keystore-b64.txt
+          base64 -d keystore-b64.txt > keystore.jks
+
       # Grant execute permission for gradlew
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      # Build and Copy APK
-      - name: Build and Copy APK
-        run: ./gradlew copyApks
-
-      # List APK files in releases directory
-      - name: List APK files
-        run: ls -l app/releases/
+      - name: Build Debug apk
+        env:
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.DEBUG_KEYSTORE_PASSWORD }}
+          RELEASE_KEYSTORE_ALIAS: ${{ secrets.DEBUG_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.DEBUG_KEY_PASSWORD }}
+        run: ./gradlew assembleDebug --stacktrace
 
       # Upload the APK as an artifact
       - name: Upload APK
