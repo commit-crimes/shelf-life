@@ -1,4 +1,3 @@
-import jdk.internal.org.jline.utils.Log.debug
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -50,7 +49,7 @@ android {
         }
     }
     signingConfigs{
-        create("debug"){
+        getByName("debug"){
             storeFile = file("../keystore.jks")
             storePassword = System.getenv("DEBUG_KEYSTORE_PASSWORD")
             keyAlias  = System.getenv("DEBUG_KEY_ALIAS")
@@ -70,7 +69,6 @@ android {
         debug {
             enableUnitTestCoverage = true
             enableAndroidTestCoverage = true
-            signingConfigs.add(signingConfigs.getByName("debug"))
         }
     }
 
