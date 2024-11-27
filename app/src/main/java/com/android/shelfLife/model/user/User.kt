@@ -9,13 +9,13 @@ data class User(
     val invitationUIDs: List<String> = emptyList()
     // TODO add macros param if we decide to do it
 ) {
-    override fun toString(): String {
-        return "User:(" +
-                "UID: ${uid}\n" +
-                "Username: ${username}\n" +
-                "Email: ${email}\n" +
-                "Household UIDs: ${householdUIDs.toString()}\n" +
-                "Recipe UIDs: ${recipeUIDs.toString()}\n" +
-                "Invitation UIDs: ${invitationUIDs.toString()}\n)"
-    }
+  override fun toString(): String {
+    return "User:(" +
+        "UID: ${uid}\n" +
+        "Username: ${username}\n" +
+        "Email: ${email}\n" +
+        "Household UIDs: ${householdUIDs.toString()}\n" +
+        "Recipe UIDs: ${recipeUIDs.toString()}\n" +
+        "Invitation UIDs: ${invitationUIDs.toString()}\n)"
+  }
 }
