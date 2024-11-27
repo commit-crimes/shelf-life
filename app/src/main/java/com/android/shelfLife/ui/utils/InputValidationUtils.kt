@@ -1,16 +1,18 @@
 package com.android.shelfLife.ui.utils
 
+import com.android.shelfLife.R
+
 /**
  * Validates the food name.
  *
  * @param foodName The food name to validate.
- * @return The error message if the food name is invalid, null otherwise.
+ * @return The resource ID of the error message if the food name is invalid, null otherwise.
  */
-fun validateFoodName(foodName: String): String? {
+fun validateFoodName(foodName: String): Int? {
   val namePattern = Regex("^[a-zA-Z0-9\\s\\-,'()]+\$")
   return when {
-    foodName.isBlank() -> "Food name cannot be empty."
-    !namePattern.matches(foodName) -> "Food name contains invalid characters."
+    foodName.isBlank() -> R.string.food_name_empty_error
+    !namePattern.matches(foodName) -> R.string.food_name_invalid_error
     else -> null
   }
 }
@@ -19,13 +21,13 @@ fun validateFoodName(foodName: String): String? {
  * Validates the amount.
  *
  * @param amount The amount to validate.
- * @return The error message if the amount is invalid, null otherwise.
+ * @return The resource ID of the error message if the amount is invalid, null otherwise.
  */
-fun validateAmount(amount: String): String? {
+fun validateAmount(amount: String): Int? {
   return when {
-    amount.isBlank() -> "Amount cannot be empty."
-    amount.toDoubleOrNull() == null -> "Amount must be a number."
-    amount.toDouble() <= 0 -> "Amount must be positive."
+    amount.isBlank() -> R.string.amount_empty_error
+    amount.toDoubleOrNull() == null -> R.string.amount_not_number_error
+    amount.toDouble() <= 0 -> R.string.amount_negative_error
     else -> null
   }
 }
@@ -34,10 +36,10 @@ fun validateAmount(amount: String): String? {
  * Validates the buy date.
  *
  * @param buyDate The buy date to validate.
- * @return The error message if the buy date is invalid, null otherwise.
+ * @return The resource ID of the error message if the buy date is invalid, null otherwise.
  */
-fun validateBuyDate(buyDate: String): String? {
-  return getDateErrorMessage(buyDate)
+fun validateBuyDate(buyDate: String): Int? {
+  return getDateErrorMessageResId(buyDate)
 }
 
 /**
@@ -45,22 +47,19 @@ fun validateBuyDate(buyDate: String): String? {
  *
  * @param expireDate The expire date to validate.
  * @param buyDate The buy date to compare with.
- * @param buyDateError The error message for the buy date.
- * @return The error message if the expire date is invalid, null otherwise.
+ * @param buyDateErrorResId The resource ID of the error message for the buy date.
+ * @return The resource ID of the error message if the expire date is invalid, null otherwise.
  */
-fun validateExpireDate(expireDate: String, buyDate: String, buyDateError: String?): String? {
-  var error = getDateErrorMessage(expireDate)
-  if (error == null && expireDate.length == 8 && buyDateError == null && buyDate.length == 8) {
+fun validateExpireDate(expireDate: String, buyDate: String, buyDateErrorResId: Int?): Int? {
+  var errorResId = getDateErrorMessageResId(expireDate)
+  if (errorResId == null && buyDateErrorResId == null) {
     if (!isDateAfterOrEqual(expireDate, buyDate)) {
-      error = "Expire Date cannot be before Buy Date"
+      errorResId = R.string.expire_date_before_buy_date_error
+    } else if (!isValidDateNotPast(expireDate)) {
+      errorResId = R.string.expire_date_in_past_error
     }
   }
-  if (error == null && expireDate.length == 8) {
-    if (!isValidDateNotPast(expireDate)) {
-      error = "Expire Date cannot be in the past"
-    }
-  }
-  return error
+  return errorResId
 }
 
 /**
@@ -68,36 +67,28 @@ fun validateExpireDate(expireDate: String, buyDate: String, buyDateError: String
  *
  * @param openDate The open date to validate.
  * @param buyDate The buy date to compare with.
- * @param buyDateError The error message for the buy date.
+ * @param buyDateErrorResId The resource ID of the error message for the buy date.
  * @param expireDate The expire date to compare with.
- * @param expireDateError The error message for the expire date.
- * @return The error message if the open date is invalid, null otherwise.
+ * @param expireDateErrorResId The resource ID of the error message for the expire date.
+ * @return The resource ID of the error message if the open date is invalid, null otherwise.
  */
 fun validateOpenDate(
     openDate: String,
     buyDate: String,
-    buyDateError: String?,
+    buyDateErrorResId: Int?,
     expireDate: String,
-    expireDateError: String?
-): String? {
-  var error = getDateErrorMessage(openDate, isRequired = false)
-  if (error == null &&
+    expireDateErrorResId: Int?
+): Int? {
+  var errorResId = getDateErrorMessageResId(openDate, isRequired = false)
+  if (errorResId == null &&
       openDate.isNotEmpty() &&
-      buyDateError == null &&
-      openDate.length == 8 &&
-      buyDate.length == 8) {
+      buyDateErrorResId == null &&
+      expireDateErrorResId == null) {
     if (!isDateAfterOrEqual(openDate, buyDate)) {
-      error = "Open Date cannot be before Buy Date"
+      errorResId = R.string.open_date_before_buy_date_error
+    } else if (!isDateAfterOrEqual(expireDate, openDate)) {
+      errorResId = R.string.open_date_after_expire_date_error
     }
   }
-  if (error == null &&
-      openDate.isNotEmpty() &&
-      expireDateError == null &&
-      openDate.length == 8 &&
-      expireDate.length == 8) {
-    if (!isDateAfterOrEqual(expireDate, openDate)) {
-      error = "Open Date cannot be after Expire Date"
-    }
-  }
-  return error
+  return errorResId
 }
