@@ -132,7 +132,7 @@ fun HouseHoldCreationScreen(
                     if (isError) {
                       Text(
                           modifier = Modifier.fillMaxWidth(),
-                          text = "Household name already exists",
+                          text = "Household name already exists or is empty",
                           color = MaterialTheme.colorScheme.error)
                     }
                   },
@@ -232,9 +232,10 @@ fun HouseHoldCreationScreen(
                             ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.secondaryContainer),
                         onClick = {
-                          if (householdViewModel.checkIfHouseholdNameExists(houseHoldName) &&
-                              (householdToEdit == null ||
-                                  houseHoldName != householdToEdit!!.name)) {
+                          if (houseHoldName.isBlank() ||
+                              householdViewModel.checkIfHouseholdNameExists(houseHoldName) &&
+                                  (householdToEdit == null ||
+                                      houseHoldName != householdToEdit!!.name)) {
                             isError = true
                           } else {
                             if (householdToEdit != null) {
