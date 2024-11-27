@@ -60,7 +60,7 @@ jobs:
         run: ./gradlew assembleDebug --stacktrace
 
       - name: Get release file apk path
-        id: debugApk
+        id: releaseApk
         run: echo "apkfile=$(find app/build/outputs/apk/release/*.apk)" >> $GITHUB_OUTPUT
 
       # Upload the APK as an artifact
