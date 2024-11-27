@@ -49,7 +49,7 @@ android {
         }
     }
     signingConfigs{
-        getByName("debug"){
+        named("debug"){
             storeFile = file("../keystore.jks")
             storePassword = System.getenv("DEBUG_KEYSTORE_PASSWORD")
             keyAlias  = System.getenv("DEBUG_KEY_ALIAS")
