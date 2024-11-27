@@ -59,8 +59,9 @@ jobs:
           DEBUG_KEY_PASSWORD: ${{ secrets.DEBUG_KEY_PASSWORD }}
         run: ./gradlew assembleDebug --stacktrace
 
-      - name: Run signing report
-        run: ./gradlew signingReport
+      - name: Move APK to releases folder
+        run: mv app/build/outputs/apk/debug/app-debug.apk app/releases/app-debug.apk
+
       # Upload the APK as an artifact
       - name: Upload APK
         uses: actions/upload-artifact@v3
