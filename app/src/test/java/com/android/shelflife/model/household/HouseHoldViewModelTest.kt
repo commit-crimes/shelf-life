@@ -38,6 +38,7 @@ import org.mockito.Mock
 import org.mockito.MockedStatic
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.mockStatic
+import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
@@ -82,7 +83,7 @@ class HouseholdViewModelTest {
     // Mock FirebaseAuth.getInstance()
     firebaseAuthMock = mockStatic(FirebaseAuth::class.java)
     firebaseAuthMock.`when`<FirebaseAuth> { FirebaseAuth.getInstance() }.thenReturn(firebaseAuth)
-    invitationRepositoryFirestore = mock(InvitationRepositoryFirestore::class.java)
+    invitationRepositoryFirestore = mock<InvitationRepositoryFirestore>()
     householdViewModel =
         HouseholdViewModel(
             repository, listFoodItemsViewModel, invitationRepositoryFirestore, dataStore)
@@ -532,6 +533,10 @@ class HouseholdViewModelTest {
       val onFailure = invocation.getArgument<(Exception) -> Unit>(2)
       onFailure(exception)
       null
+    }
+    whenever(invitationRepositoryFirestore.sendInvitation(any(), any(), any(), any())).thenAnswer {
+      val onSuccess = it.getArgument<(HouseHold) -> Unit>(2)
+      onSuccess(HouseHold("1", "Household 1", emptyList(), emptyList()))
     }
     // Act
     householdViewModel.updateHousehold(household)

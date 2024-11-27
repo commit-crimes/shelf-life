@@ -7,7 +7,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.shelfLife.dataStore
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.invitations.InvitationRepository
@@ -34,7 +33,7 @@ class HouseholdViewModel(
   private val _householdToEdit = MutableStateFlow<HouseHold?>(null)
   val householdToEdit: StateFlow<HouseHold?> = _householdToEdit.asStateFlow()
 
-  private val _memberEmails = MutableStateFlow<Map<String, String>>(emptyMap())
+  val _memberEmails = MutableStateFlow<Map<String, String>>(emptyMap())
   val memberEmails: StateFlow<Map<String, String>> = _memberEmails.asStateFlow()
 
   var finishedLoading = MutableStateFlow(false)
@@ -65,6 +64,16 @@ class HouseholdViewModel(
   private fun saveSelectedHouseholdUid(uid: String?) {
     Log.d("HouseholdViewModel", "Saving selected household UID: $uid")
     viewModelScope.launch { dataStore.edit { preferences -> preferences[KEY] = uid ?: "" } }
+  }
+
+  fun populateMemberEmails(houseHold: HouseHold) {
+    houseHoldRepository.getUserEmails(houseHold.members) { uidToEmail ->
+      _memberEmails.value = uidToEmail
+    }
+  }
+
+  fun wipeMemberEmails() {
+    _memberEmails.value = emptyMap()
   }
 
   /** Load the selected household UID from DataStore. */
@@ -256,6 +265,23 @@ class HouseholdViewModel(
    * @param household - The updated household.
    */
   fun updateHousehold(household: HouseHold) {
+    households.value
+        .find { it.uid == household.uid }
+        ?.let {
+          if (it.members != household.members) {
+            populateMemberEmails(household)
+            for (email in household.members.minus(it.members.toSet())) {
+              invitationRepository.sendInvitation(
+                  household = household,
+                  invitedUserEmail = email,
+                  onSuccess = { Log.d("HouseholdViewModel", "Invitation sent successfully") },
+                  onFailure = { exception ->
+                    Log.e("HouseholdViewModel", "Error sending invitation: $exception")
+                  })
+            }
+            wipeMemberEmails()
+          }
+        }
     houseHoldRepository.updateHousehold(
         household,
         onSuccess = { Log.d("HouseholdViewModel", "Household updated successfully") },

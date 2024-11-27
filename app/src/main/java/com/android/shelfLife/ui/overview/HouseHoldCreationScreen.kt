@@ -45,12 +45,12 @@ fun HouseHoldCreationScreen(
     navigationActions: NavigationActions,
     householdViewModel: HouseholdViewModel,
 ) {
-  val memberEmails by householdViewModel.memberEmails.collectAsState()
-  val creationScreenViewModel: CreationScreenViewModel = viewModel {
-    CreationScreenViewModel(memberEmails.values.toSet())
-  }
   val coroutineScope = rememberCoroutineScope()
   val householdToEdit by householdViewModel.householdToEdit.collectAsState()
+  val creationScreenViewModel: CreationScreenViewModel = viewModel {
+    if (householdToEdit != null) householdViewModel.populateMemberEmails(householdToEdit!!)
+    CreationScreenViewModel(householdViewModel.memberEmails.value.values.toSet())
+  }
 
   var isError by rememberSaveable { mutableStateOf(false) }
   var houseHoldName by rememberSaveable { mutableStateOf(householdToEdit?.name ?: "") }
@@ -270,7 +270,10 @@ fun HouseHoldCreationScreen(
                         colors =
                             ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.secondaryContainer),
-                        onClick = { navigationActions.goBack() },
+                        onClick = {
+                          householdViewModel.wipeMemberEmails()
+                          navigationActions.goBack()
+                        },
                     ) {
                       Text(
                           "Cancel",
