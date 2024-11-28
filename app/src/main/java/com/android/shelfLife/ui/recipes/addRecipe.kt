@@ -40,23 +40,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
-import com.android.shelfLife.R
-import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.model.recipe.RecipePrompt
-import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.theme.errorContainerDark
 import com.android.shelfLife.ui.theme.onSecondaryDark
@@ -266,47 +260,45 @@ fun AddRecipeScreen(
 
                   // Add button
                   Button(
-                    // check that everything has been entered
-                    onClick = {
-                      validateInstructions()
-                      error =
-                        title.isEmpty() ||
+                      // check that everything has been entered
+                      onClick = {
+                        validateInstructions()
+                        error =
+                            title.isEmpty() ||
                                 time.isEmpty() ||
                                 servings.isEmpty() ||
                                 ingredients.isEmpty() ||
                                 instructions.isEmpty() ||
                                 instructionsError
-                      if (!error) {
-                        listRecipesViewModel.saveRecipe(
-                          recipe = Recipe(
-                            uid =  listRecipesViewModel.getUID(),
-                            name = title,
-                            instructions = instructions.toList(),
-                            servings = servings.toFloat(),
-                            time = (time.toDouble() * 60.0).seconds,
-                            ingredients = ingredients.toList()))
-                        navigationActions.goBack()
-                      } else {
-                        // if not a Toast appears
-                        Toast.makeText(
-                          context,
-                          "Please correct the errors before submitting.",
-                          Toast.LENGTH_SHORT)
-                          .show()
+                        if (!error) {
+                          listRecipesViewModel.saveRecipe(
+                              recipe =
+                                  Recipe(
+                                      uid = listRecipesViewModel.getUID(),
+                                      name = title,
+                                      instructions = instructions.toList(),
+                                      servings = servings.toFloat(),
+                                      time = (time.toDouble() * 60.0).seconds,
+                                      ingredients = ingredients.toList()))
+                          navigationActions.goBack()
+                        } else {
+                          // if not a Toast appears
+                          Toast.makeText(
+                                  context,
+                                  "Please correct the errors before submitting.",
+                                  Toast.LENGTH_SHORT)
+                              .show()
+                        }
+                      },
+                      modifier = Modifier.height(40.dp).testTag("addButton"),
+                      colors =
+                          ButtonDefaults.buttonColors(containerColor = primaryContainerLight)) {
+                        Text(
+                            text = stringResource(R.string.add_button),
+                            fontSize = 18.sp,
+                            color = onSecondaryDark)
                       }
-                    },
-                    modifier = Modifier.height(40.dp).testTag("addButton"),
-                    colors =
-                    ButtonDefaults.buttonColors(containerColor = primaryContainerLight)) {
-                    Text(
-                      text = stringResource(R.string.add_button),
-                      fontSize = 18.sp,
-                      color = onSecondaryDark)
-                  }
-
-            }
-
-
+                }
           }
         }
 
@@ -393,7 +385,7 @@ fun IngredientItem(index: Int, ingredient: Ingredient, onRemoveClick: () -> Unit
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
     // title of ingredient
     Text(
-        text = stringResource(R.string.ingredient_item, index + 1, ingredient.foodFacts.name),
+        text = stringResource(R.string.ingredient_item, index + 1, ingredient.name),
         modifier = Modifier.testTag("ingredientItem"))
     // delete button
     IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteIngredientButton")) {
@@ -504,10 +496,7 @@ fun IngredientDialog(
                 val quantity = ingredientQuantity.toDouble()
                 // create the new ingredient
                 val newIngredient =
-                    Ingredient(
-                        name = ingredientName,
-                        quantity = Quantity(quantity, ingredientUnit)
-                      )
+                    Ingredient(name = ingredientName, quantity = Quantity(quantity, ingredientUnit))
                 // adding it into our list of ingredients
                 ingredients.add(newIngredient)
                 onAddIngredient()
