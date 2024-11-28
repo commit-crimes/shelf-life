@@ -58,6 +58,7 @@ import com.android.shelfLife.ui.theme.primaryContainerDark
 import com.android.shelfLife.ui.theme.primaryContainerLight
 import com.android.shelfLife.ui.theme.secondaryContainerDark
 import com.android.shelfLife.ui.theme.secondaryContainerLight
+import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import kotlin.time.Duration.Companion.seconds
 
@@ -226,61 +227,42 @@ fun AddRecipeScreen(
 
               // Footer Buttons
               item {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp),
-                    horizontalArrangement = Arrangement.Center) {
-                      // Cancel Button
-                      Button(
-                          onClick = { navigationActions.goBack() },
-                          modifier = Modifier.height(40.dp).testTag("cancelButton"),
-                          colors =
-                              ButtonDefaults.buttonColors(containerColor = secondaryContainerLight,
-                                  contentColor = onSecondaryDark)) {
-                            Text(text = stringResource(R.string.cancel_button), fontSize = 18.sp)
-                          }
-
-                      Spacer(Modifier.width(24.dp))
-
-                      // Add Button
-                      Button(
-                          onClick = {
-                            validateInstructions()
-                            error =
-                                title.isEmpty() ||
-                                    time.isEmpty() ||
-                                    servings.isEmpty() ||
-                                    ingredients.isEmpty() ||
-                                    instructions.isEmpty() ||
-                                    instructionsError
-                            if (!error) {
+                  CustomButtons(
+                      button1OnClick = { navigationActions.goBack() },
+                      button1TestTag = "cancelButton",
+                      button1Text =  stringResource(R.string.cancel_button),
+                      button2OnClick = {
+                          validateInstructions()
+                          error =
+                              title.isEmpty() ||
+                                      time.isEmpty() ||
+                                      servings.isEmpty() ||
+                                      ingredients.isEmpty() ||
+                                      instructions.isEmpty() ||
+                                      instructionsError
+                          if (!error) {
                               listRecipesViewModel.addRecipeToList(
                                   recipe =
-                                      Recipe(
-                                          name = title,
-                                          instructions = instructions.toList(),
-                                          servings = servings.toInt(),
-                                          time = (time.toDouble() * 60.0).seconds,
-                                          ingredients = ingredients.toList(),
-                                          recipeTypes =
-                                              listOf(RecipesRepository.SearchRecipeType.PERSONAL)))
+                                  Recipe(
+                                      name = title,
+                                      instructions = instructions.toList(),
+                                      servings = servings.toInt(),
+                                      time = (time.toDouble() * 60.0).seconds,
+                                      ingredients = ingredients.toList(),
+                                      recipeTypes =
+                                      listOf(RecipesRepository.SearchRecipeType.PERSONAL)))
                               navigationActions.goBack()
-                            } else {
+                          } else {
                               Toast.makeText(
-                                      context,
-                                      "Please correct the errors before submitting.",
-                                      Toast.LENGTH_SHORT)
+                                  context,
+                                  "Please correct the errors before submitting.",
+                                  Toast.LENGTH_SHORT)
                                   .show()
-                            }
-                          },
-                          modifier = Modifier.height(40.dp).testTag("addButton"),
-                          colors =
-                              ButtonDefaults.buttonColors(containerColor = primaryContainerDark,
-                                  contentColor = secondaryContainerLight)) {
-                            Text(
-                                text = stringResource(R.string.add_button),
-                                fontSize = 18.sp)
                           }
-                    }
+                      },
+                      button2TestTag = "addButton",
+                      button2Text = stringResource(R.string.add_button)
+                  )
               }
             }
 

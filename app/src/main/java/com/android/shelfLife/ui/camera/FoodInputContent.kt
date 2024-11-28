@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -142,56 +143,47 @@ fun FoodInputContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-              Button(
-                  onClick = { onCancel() },
-                  colors =
-                      ButtonDefaults.buttonColors(
-                          containerColor = MaterialTheme.colorScheme.secondary),
-                  modifier = Modifier.weight(1f).height(50.dp).testTag("cancelButton")) {
-                    Text(text = "Cancel", fontSize = 18.sp)
-                  }
-              Button(
-                  onClick = {
-                    validateAllFieldsWhenSubmitButton()
-                    val isExpireDateValid = expireDateError == null && expireDate.isNotEmpty()
-                    val isOpenDateValid = openDateError == null
-                    val isBuyDateValid = buyDateError == null && buyDate.isNotEmpty()
+        CustomButtons(
+            button1OnClick = { onCancel() },
+            button1TestTag = "cancelButton",
+            button1Text = stringResource(R.string.cancel_button),
+            button2OnClick = {
+                validateAllFieldsWhenSubmitButton()
+                val isExpireDateValid = expireDateError == null && expireDate.isNotEmpty()
+                val isOpenDateValid = openDateError == null
+                val isBuyDateValid = buyDateError == null && buyDate.isNotEmpty()
 
-                    val expiryTimestamp = formatDateToTimestamp(expireDate)
-                    val openTimestamp =
-                        if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
-                    val buyTimestamp = formatDateToTimestamp(buyDate)
+                val expiryTimestamp = formatDateToTimestamp(expireDate)
+                val openTimestamp =
+                    if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
+                val buyTimestamp = formatDateToTimestamp(buyDate)
 
-                    if (isExpireDateValid &&
-                        isOpenDateValid &&
-                        isBuyDateValid &&
-                        expiryTimestamp != null &&
-                        buyTimestamp != null) {
-                      val newFoodItem =
-                          FoodItem(
-                              uid = foodItemViewModel.getUID(),
-                              foodFacts = foodFacts,
-                              location = location,
-                              expiryDate = expiryTimestamp,
-                              openDate = openTimestamp,
-                              buyDate = buyTimestamp)
+                if (isExpireDateValid &&
+                    isOpenDateValid &&
+                    isBuyDateValid &&
+                    expiryTimestamp != null &&
+                    buyTimestamp != null) {
+                    val newFoodItem =
+                        FoodItem(
+                            uid = foodItemViewModel.getUID(),
+                            foodFacts = foodFacts,
+                            location = location,
+                            expiryDate = expiryTimestamp,
+                            openDate = openTimestamp,
+                            buyDate = buyTimestamp)
 
-                      Toast.makeText(context, "Food item added", Toast.LENGTH_SHORT).show()
-                      onSubmit(newFoodItem)
-                    } else {
-                      Toast.makeText(
-                              context,
-                              "Please correct the errors before submitting.",
-                              Toast.LENGTH_SHORT)
-                          .show()
-                    }
-                  },
-                  modifier = Modifier.weight(1f).height(50.dp).testTag("submitButton")) {
-                    Text(text = "Submit", fontSize = 18.sp)
-                  }
-            }
+                    Toast.makeText(context, "Food item added", Toast.LENGTH_SHORT).show()
+                    onSubmit(newFoodItem)
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Please correct the errors before submitting.",
+                        Toast.LENGTH_SHORT)
+                        .show()
+                }
+            },
+            button2TestTag = "submitButton",
+            button2Text = stringResource(R.string.submit_button),
+        )
       }
 }
