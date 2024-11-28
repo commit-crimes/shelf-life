@@ -267,12 +267,14 @@ class HouseholdViewModel(
               val email = uidToEmail[uid]
               if (email != null) {
                 invitationRepository.sendInvitation(
-                  household = household,
-                  invitedUserEmail = email,
-                  onSuccess = { Log.d("HouseholdViewModel", "Invitation sent successfully to $email") },
-                  onFailure = { exception ->
-                    Log.e("HouseholdViewModel", "Error sending invitation to $email: $exception")
-                  })
+                    household = household,
+                    invitedUserEmail = email,
+                    onSuccess = {
+                      Log.d("HouseholdViewModel", "Invitation sent successfully to $email")
+                    },
+                    onFailure = { exception ->
+                      Log.e("HouseholdViewModel", "Error sending invitation to $email: $exception")
+                    })
               } else {
                 Log.e("HouseholdViewModel", "No email found for UID: $uid")
               }

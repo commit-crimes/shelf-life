@@ -38,6 +38,7 @@ import org.mockito.Mock
 import org.mockito.MockedStatic
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.mockStatic
+import org.mockito.Mockito.spy
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
@@ -181,33 +182,41 @@ class HouseholdViewModelTest {
     assertEquals(households, householdViewModel.households.value)
   }*/
 
-  @Test
-  fun `updateHousehold should update household and reload households`() = runTest {
-    // Arrange
-    val household = HouseHold("1", "Updated Household", emptyList(), emptyList())
+    @Test
+    fun `updateHousehold with new members should send invitations`() = runTest {
+        // Arrange
+        val oldHousehold = HouseHold("1", "Old Household", listOf("uid1"), emptyList())
+        val updatedHousehold = oldHousehold.copy(members = listOf("uid1", "uid2"))
 
-    whenever(repository.updateHousehold(any(), any(), any())).thenAnswer { invocation ->
-      val onSuccess = invocation.getArgument<() -> Unit>(1)
-      onSuccess()
-      null
+        householdViewModel.setHouseholds(listOf(oldHousehold))
+
+        // Mock getUserEmails to return email for uid2
+        whenever(repository.getUserEmails(eq(listOf("uid2")), any())).thenAnswer { invocation ->
+            val callback = invocation.getArgument<(Map<String, String>) -> Unit>(1)
+            callback(mapOf("uid2" to "user2@example.com"))
+        }
+
+        // Mock invitationRepository to confirm invitation is sent
+        whenever(invitationRepositoryFirestore.sendInvitation(any(), any(), any(), any())).thenAnswer { invocation ->
+            val onSuccess = invocation.getArgument<() -> Unit>(2)
+            onSuccess()
+        }
+
+        // Act
+        householdViewModel.updateHousehold(updatedHousehold)
+
+        // Assert
+        // Verify that getUserEmails is called with the new member UID
+        verify(repository).getUserEmails(eq(listOf("uid2")), any())
+
+        // Verify that invitation is sent to the new member's email
+        verify(invitationRepositoryFirestore).sendInvitation(
+            eq(updatedHousehold),
+            eq("user2@example.com"),
+            any(),
+            any()
+        )
     }
-    val households = listOf(household)
-    whenever(repository.getHouseholds(any(), any())).thenAnswer { invocation ->
-      val onSuccess = invocation.getArgument<(List<HouseHold>) -> Unit>(0)
-      onSuccess(households)
-      null
-    }
-
-    householdViewModel =
-        HouseholdViewModel(
-            repository, listFoodItemsViewModel, invitationRepositoryFirestore, dataStore)
-
-    // Act
-    householdViewModel.updateHousehold(household)
-
-    // Assert
-    assertEquals(households, householdViewModel.households.value)
-  }
 
   @Test
   fun `deleteHouseholdById should delete household and reload households`() = runTest {
@@ -237,106 +246,45 @@ class HouseholdViewModelTest {
     assertEquals(households, householdViewModel.households.value)
   }
 
-  @Test
-  fun `addFoodItem should add food item to selected household and update it`() = runTest {
-    // Arrange
-    val foodFacts =
-        FoodFacts(
-            name = "Apple",
-            barcode = "123456789",
-            quantity = Quantity(1.0, FoodUnit.COUNT),
-            category = FoodCategory.FRUIT,
-            nutritionFacts = NutritionFacts(energyKcal = 52))
-
-    val foodItem =
-        FoodItem(
-            uid = "1",
-            foodFacts = foodFacts,
-            location = FoodStorageLocation.PANTRY,
-            expiryDate = Timestamp.now(),
-            status = FoodStatus.CLOSED)
-
-    val household = HouseHold("1", "Household 1", emptyList(), emptyList())
-
-    val updatedHousehold = household.copy(foodItems = household.foodItems + foodItem)
-    val households = listOf(updatedHousehold)
-
-    whenever(repository.updateHousehold(any(), any(), any())).thenAnswer { invocation ->
-      val onSuccess = invocation.getArgument<() -> Unit>(1)
-      onSuccess()
-      null
-    }
-    whenever(repository.getHouseholds(any(), any())).thenAnswer { invocation ->
-      val onSuccess = invocation.getArgument<(List<HouseHold>) -> Unit>(0)
-      onSuccess(households)
-      null
-    }
-
-    householdViewModel.setHouseholds(listOf(household))
-    householdViewModel.selectHousehold(household)
-
-    // Act
-    householdViewModel.addFoodItem(foodItem)
-
-    // Assert
-    verify(repository).updateHousehold(eq(updatedHousehold), any(), any())
-    assertEquals(households, householdViewModel.households.value)
-  }
-
-  @Test
-  fun `editFoodItem should remove old food item and add new food item to selected household and update it`() =
-      runTest {
+    @Test
+    fun `addFoodItem should call updateHousehold with updated household`() = runTest {
         // Arrange
-        val foodFacts =
-            FoodFacts(
-                name = "Apple",
-                barcode = "123456789",
-                quantity = Quantity(1.0, FoodUnit.COUNT),
-                category = FoodCategory.FRUIT,
-                nutritionFacts = NutritionFacts(energyKcal = 52))
-
-        val foodItem =
-            FoodItem(
-                uid = "1",
-                foodFacts = foodFacts,
-                location = FoodStorageLocation.PANTRY,
-                expiryDate = Timestamp.now(),
-                status = FoodStatus.CLOSED)
-
-        val newFoodItem =
-            FoodItem(
-                uid = "2",
-                foodFacts = foodFacts,
-                location = FoodStorageLocation.FRIDGE,
-                expiryDate = Timestamp.now(),
-                status = FoodStatus.CLOSED)
-
-        val household = HouseHold("1", "Household 1", emptyList(), List(1) { foodItem })
-
-        val updatedHousehold =
-            household.copy(foodItems = household.foodItems - foodItem + newFoodItem)
-        val households = listOf(updatedHousehold)
-
-        whenever(repository.updateHousehold(any(), any(), any())).thenAnswer { invocation ->
-          val onSuccess = invocation.getArgument<() -> Unit>(1)
-          onSuccess()
-          null
-        }
-        whenever(repository.getHouseholds(any(), any())).thenAnswer { invocation ->
-          val onSuccess = invocation.getArgument<(List<HouseHold>) -> Unit>(0)
-          onSuccess(households)
-          null
-        }
-
+        val foodItem = mock<FoodItem>()
+        val household = HouseHold("1", "Household 1", emptyList(), emptyList())
+        householdViewModel.setHouseholds(listOf(household))
         householdViewModel.selectHousehold(household)
 
+        // Spy on householdViewModel to verify method calls
+        val spyViewModel = spy(householdViewModel)
+
         // Act
-        householdViewModel.editFoodItem(newFoodItem, foodItem)
+        spyViewModel.addFoodItem(foodItem)
 
         // Assert
-        verify(repository).updateHousehold(eq(updatedHousehold), any(), any())
-        assertEquals(households, householdViewModel.households.value)
-      }
+        val expectedHousehold = household.copy(foodItems = household.foodItems + foodItem)
+        verify(spyViewModel).updateHousehold(expectedHousehold)
+    }
+
+    @Test
+    fun `editFoodItem should call updateHousehold with updated household`() = runTest {
+        // Arrange
+        val oldFoodItem = mock<FoodItem>()
+        val newFoodItem = mock<FoodItem>()
+        val household = HouseHold("1", "Household 1", emptyList(), listOf(oldFoodItem))
+        householdViewModel.setHouseholds(listOf(household))
+        householdViewModel.selectHousehold(household)
+
+        // Spy on householdViewModel
+        val spyViewModel = spy(householdViewModel)
+
+        // Act
+        spyViewModel.editFoodItem(newFoodItem, oldFoodItem)
+
+        // Assert
+        val expectedFoodItems = household.foodItems - oldFoodItem + newFoodItem
+        val expectedHousehold = household.copy(foodItems = expectedFoodItems)
+        verify(spyViewModel).updateHousehold(expectedHousehold)
+    }
   /*
     @Test
     fun `addNewHousehold logs error when user is not logged in`() = runTest {
@@ -523,31 +471,24 @@ class HouseholdViewModelTest {
     // Optionally, check that an error is logged with the exception
   }
 
-  @Test
-  fun updateHousehold_shouldLogErrorWhenFails() = runTest {
-    // Arrange
-    val household = HouseHold("1", "New household", emptyList(), emptyList())
-    val exception = Exception("Test exception")
+    @Test
+    fun updateHousehold_shouldLogErrorWhenOldHouseholdNotFound() = runTest {
+        // Arrange
+        val household = HouseHold("non_existing_uid", "New Household", emptyList(), emptyList())
+        householdViewModel.setHouseholds(emptyList()) // No households present
 
-    whenever(repository.updateHousehold(any(), any(), any())).thenAnswer { invocation ->
-      val onFailure = invocation.getArgument<(Exception) -> Unit>(2)
-      onFailure(exception)
-      null
-    }
-    whenever(invitationRepositoryFirestore.sendInvitation(any(), any(), any(), any())).thenAnswer {
-      val onSuccess = it.getArgument<(HouseHold) -> Unit>(2)
-      onSuccess(HouseHold("1", "Household 1", emptyList(), emptyList()))
-    }
-    // Act
-    householdViewModel.updateHousehold(household)
+        // Act
+        householdViewModel.updateHousehold(household)
 
-    // Verify that the error was logged
-    val logEntries = ShadowLog.getLogs()
-    assertTrue(
-        logEntries.any {
-          it.tag == "HouseholdViewModel" && it.msg == "Error updating household: $exception"
-        })
-  }
+        // Assert
+        val logEntries = ShadowLog.getLogs()
+        assertTrue(
+            logEntries.any {
+                it.tag == "HouseholdViewModel" &&
+                        it.msg == "Old household not found for UID: ${household.uid}"
+            }
+        )
+    }
 
   @Test
   fun deleteHousehold_shouldLogErrorWhenFails() = runTest {
