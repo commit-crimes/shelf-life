@@ -55,6 +55,8 @@ class AddRecipesTest {
   fun setUp() {
     navigationActions = mock()
     foodItemRepository = mock()
+    recipeRepository = mock()
+    recipeGeneratorRepository = mock()
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
     listRecipesViewModel = ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
     houseHoldRepository = mock()

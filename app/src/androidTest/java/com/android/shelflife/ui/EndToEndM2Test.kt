@@ -29,7 +29,7 @@ import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
-import com.android.shelfLife.model.recipe.RecipeGeneratorOpenAIRepository
+import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -72,7 +72,7 @@ class EndToEndM2Test {
   private lateinit var foodFactsViewModel: FoodFactsViewModel
   private lateinit var foodFactsRepository: FakeFoodFactsRepository
   private lateinit var recipeRepository: RecipeRepository
-  private lateinit var recipeGeneratorOpenAIRepository: RecipeGeneratorOpenAIRepository
+  private lateinit var recipeGeneratorRepository: RecipeGeneratorRepository
   private lateinit var listRecipesViewModel: ListRecipesViewModel
 
   private lateinit var navController: NavHostController
@@ -97,11 +97,11 @@ class EndToEndM2Test {
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
     dataStore = org.mockito.kotlin.mock<DataStore<Preferences>>()
     houseHoldRepository = mock(HouseHoldRepository::class.java)
-    recipeRepository = mock()
-    recipeGeneratorOpenAIRepository = mock()
+    recipeRepository = mock(RecipeRepository::class.java)
+    recipeGeneratorRepository = mock(RecipeGeneratorRepository::class.java)
 
     householdViewModel = HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel, dataStore)
-    listRecipesViewModel = ListRecipesViewModel(recipeRepository, recipeGeneratorOpenAIRepository)
+    listRecipesViewModel = ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
 
     foodFactsRepository = FakeFoodFactsRepository()
     foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)
