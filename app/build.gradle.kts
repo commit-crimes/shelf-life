@@ -50,7 +50,7 @@ android {
     }
     signingConfigs{
         val isCI = System.getenv("GITHUB_ACTIONS")?.toBoolean() ?: false
-        if(isCI){
+        if(isCI && System.getenv("GITHUB_WORKFLOW") == "Build Android APK"){
             named("debug"){
                 storeFile = file("../keystore.jks")
                 storePassword = System.getenv("DEBUG_KEYSTORE_PASSWORD")
