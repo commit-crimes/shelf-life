@@ -51,6 +51,8 @@ import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipesRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.theme.errorContainerDark
+import com.android.shelfLife.ui.theme.onPrimaryContainerDark
+import com.android.shelfLife.ui.theme.onPrimaryContainerLight
 import com.android.shelfLife.ui.theme.onSecondaryDark
 import com.android.shelfLife.ui.theme.primaryContainerDark
 import com.android.shelfLife.ui.theme.primaryContainerLight
@@ -65,7 +67,6 @@ import kotlin.time.Duration.Companion.seconds
 fun AddRecipeScreen(
     navigationActions: NavigationActions,
     listRecipesViewModel: ListRecipesViewModel,
-    householdViewModel: HouseholdViewModel
 ) {
   val context = LocalContext.current
 
@@ -233,7 +234,8 @@ fun AddRecipeScreen(
                           onClick = { navigationActions.goBack() },
                           modifier = Modifier.height(40.dp).testTag("cancelButton"),
                           colors =
-                              ButtonDefaults.buttonColors(containerColor = errorContainerDark)) {
+                              ButtonDefaults.buttonColors(containerColor = secondaryContainerLight,
+                                  contentColor = onSecondaryDark)) {
                             Text(text = stringResource(R.string.cancel_button), fontSize = 18.sp)
                           }
 
@@ -272,11 +274,11 @@ fun AddRecipeScreen(
                           },
                           modifier = Modifier.height(40.dp).testTag("addButton"),
                           colors =
-                              ButtonDefaults.buttonColors(containerColor = primaryContainerLight)) {
+                              ButtonDefaults.buttonColors(containerColor = primaryContainerDark,
+                                  contentColor = secondaryContainerLight)) {
                             Text(
                                 text = stringResource(R.string.add_button),
-                                fontSize = 18.sp,
-                                color = onSecondaryDark)
+                                fontSize = 18.sp)
                           }
                     }
               }
