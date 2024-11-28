@@ -344,6 +344,18 @@ class HouseholdViewModel(
     }
   }
 
+  fun deleteMember(memberUid: String) {
+    val selectedHousehold = selectedHousehold.value
+    if (selectedHousehold != null) {
+      val updatedMembers = selectedHousehold.members.minus(memberUid)
+
+      houseHoldRepository.updateHousehold(
+          selectedHousehold.copy(members = updatedMembers),
+          { Log.d("HouseholdViewModel", "Member deleted successfully") },
+          { exception -> Log.e("HouseholdViewModel", "Error deleting member: $exception") })
+    }
+  }
+
   /**
    * Factory for creating a [HouseholdViewModel] with a constructor that takes a
    * [HouseHoldRepository] and a [ListFoodItemsViewModel].

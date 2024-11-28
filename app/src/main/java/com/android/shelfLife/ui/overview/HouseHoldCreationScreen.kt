@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.overview
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -178,7 +179,22 @@ fun HouseHoldCreationScreen(
                               if (email != FirebaseAuth.getInstance().currentUser?.email ||
                                   householdToEdit != null) {
                                 IconButton(
-                                    onClick = { creationScreenViewModel.removeEmail(email) },
+                                    onClick = {
+                                      creationScreenViewModel.removeEmail(email)
+                                      if (householdToEdit != null) {
+                                        // Get the UID corresponding to the email
+                                        val uid =
+                                            memberEmails.entries.find { it.value == email }?.key
+                                        if (uid != null) {
+                                          householdViewModel.deleteMember(uid)
+                                        } else {
+                                          // Handle the case where UID is not found
+                                          Log.e(
+                                              "HouseHoldCreationScreen",
+                                              "UID not found for email: $email")
+                                        }
+                                      }
+                                    },
                                     modifier = Modifier.testTag("RemoveEmailButton")) {
                                       Icon(
                                           imageVector = Icons.Default.Delete,
