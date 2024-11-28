@@ -4,6 +4,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -28,6 +29,7 @@ class AddFoodItemScreenTest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var houseHoldViewModel: HouseholdViewModel
   private lateinit var foodItemViewModel: ListFoodItemsViewModel
+  private lateinit var foodFactViewModel: FoodFactsViewModel
 
   @Before
   fun setUp() {
@@ -37,6 +39,7 @@ class AddFoodItemScreenTest {
     navigationActions = mockk(relaxed = true)
     houseHoldViewModel = mockk(relaxed = true)
     foodItemViewModel = mockk(relaxed = true)
+    foodFactViewModel = mockk(relaxed = true)
 
     // Mock getUID() to return a valid UID
     every { foodItemViewModel.getUID() } returns "testUID"
@@ -49,7 +52,8 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(
           navigationActions = navigationActions,
           houseHoldViewModel = houseHoldViewModel,
-          foodItemViewModel = foodItemViewModel)
+          foodItemViewModel = foodItemViewModel,
+          foodFactsViewModel = foodFactViewModel)
     }
 
     // Verify that all input fields are displayed
@@ -103,7 +107,8 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(
           navigationActions = navigationActions,
           houseHoldViewModel = houseHoldViewModel,
-          foodItemViewModel = foodItemViewModel)
+          foodItemViewModel = foodItemViewModel,
+          foodFactsViewModel = foodFactViewModel)
     }
 
     // Enter invalid food name
@@ -124,7 +129,8 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(
           navigationActions = navigationActions,
           houseHoldViewModel = houseHoldViewModel,
-          foodItemViewModel = foodItemViewModel)
+          foodItemViewModel = foodItemViewModel,
+          foodFactsViewModel = foodFactViewModel)
     }
 
     // Enter invalid amount (letters)
@@ -152,7 +158,8 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(
           navigationActions = navigationActions,
           houseHoldViewModel = houseHoldViewModel,
-          foodItemViewModel = foodItemViewModel)
+          foodItemViewModel = foodItemViewModel,
+          foodFactsViewModel = foodFactViewModel)
     }
 
     // Open the unit dropdown
@@ -169,7 +176,8 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(
           navigationActions = navigationActions,
           houseHoldViewModel = houseHoldViewModel,
-          foodItemViewModel = foodItemViewModel)
+          foodItemViewModel = foodItemViewModel,
+          foodFactsViewModel = foodFactViewModel)
     }
 
     // Open the category dropdown
@@ -186,7 +194,8 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(
           navigationActions = navigationActions,
           houseHoldViewModel = houseHoldViewModel,
-          foodItemViewModel = foodItemViewModel)
+          foodItemViewModel = foodItemViewModel,
+          foodFactsViewModel = foodFactViewModel)
     }
 
     // Open the location dropdown
@@ -203,7 +212,8 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(
           navigationActions = navigationActions,
           houseHoldViewModel = houseHoldViewModel,
-          foodItemViewModel = foodItemViewModel)
+          foodItemViewModel = foodItemViewModel,
+          foodFactsViewModel = foodFactViewModel)
     }
 
     // Enter invalid expire date
@@ -228,7 +238,8 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(
           navigationActions = navigationActions,
           houseHoldViewModel = houseHoldViewModel,
-          foodItemViewModel = foodItemViewModel)
+          foodItemViewModel = foodItemViewModel,
+          foodFactsViewModel = foodFactViewModel)
     }
     // Scroll to the submit button
     composeTestRule.onNodeWithTag("addFoodItemScreen").performScrollToNode(hasTestTag("foodSave"))
@@ -256,7 +267,8 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(
           navigationActions = navigationActions,
           houseHoldViewModel = houseHoldViewModel,
-          foodItemViewModel = foodItemViewModel)
+          foodItemViewModel = foodItemViewModel,
+          foodFactsViewModel = foodFactViewModel)
     }
 
     // Fill in valid inputs
@@ -293,7 +305,8 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(
           navigationActions = navigationActions,
           houseHoldViewModel = houseHoldViewModel,
-          foodItemViewModel = foodItemViewModel)
+          foodItemViewModel = foodItemViewModel,
+          foodFactsViewModel = foodFactViewModel)
     }
 
     // Enter buy date
@@ -327,7 +340,8 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(
           navigationActions = navigationActions,
           houseHoldViewModel = houseHoldViewModel,
-          foodItemViewModel = foodItemViewModel)
+          foodItemViewModel = foodItemViewModel,
+          foodFactsViewModel = foodFactViewModel)
     }
 
     // Click the back button
@@ -335,5 +349,65 @@ class AddFoodItemScreenTest {
 
     // Verify that the navigation action was called
     verify { navigationActions.goBack() }
+  }
+
+  @Test
+  fun verifyClearFoodFactsSuggestionsCalledOnDispose() {
+    composeTestRule.setContent {
+      AddFoodItemScreen(
+          navigationActions = navigationActions,
+          houseHoldViewModel = houseHoldViewModel,
+          foodItemViewModel = foodItemViewModel,
+          foodFactsViewModel = foodFactViewModel)
+    }
+
+    composeTestRule.onNodeWithTag("goBackButton").performClick()
+    verify { foodFactViewModel.clearFoodFactsSuggestions() }
+  }
+
+  @Test
+  fun testImageSelection() {
+    composeTestRule.setContent {
+      AddFoodItemScreen(
+          navigationActions = navigationActions,
+          houseHoldViewModel = houseHoldViewModel,
+          foodItemViewModel = foodItemViewModel,
+          foodFactsViewModel = foodFactViewModel)
+    }
+
+    // Enter a food name to trigger image suggestions
+    composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Apple")
+
+    // Wait for suggestions to appear
+    composeTestRule.waitForIdle()
+
+    // Select the first image suggestion
+    composeTestRule
+        .onNodeWithTag("addFoodItemScreen")
+        .performScrollToNode(hasTestTag("foodFactImage"))
+    composeTestRule.onNodeWithTag("foodFactImage").performClick()
+
+    // Verify that the selected image is displayed
+    composeTestRule.onNodeWithTag("selectedImage").assertIsDisplayed()
+  }
+
+  @Test
+  fun testNoImageOptionSelection() {
+    composeTestRule.setContent {
+      AddFoodItemScreen(
+          navigationActions = navigationActions,
+          houseHoldViewModel = houseHoldViewModel,
+          foodItemViewModel = foodItemViewModel,
+          foodFactsViewModel = foodFactViewModel)
+    }
+
+    // Scroll to the "No Image" option
+    composeTestRule
+        .onNodeWithTag("addFoodItemScreen")
+        .performScrollToNode(hasTestTag("noImageOption"))
+    composeTestRule.onNodeWithTag("noImageOption").performClick()
+
+    // Verify that the default image is displayed
+    composeTestRule.onNodeWithTag("defaultImage").assertIsDisplayed()
   }
 }

@@ -150,7 +150,8 @@ class EndToEndM2Test {
           OverviewScreen(navigationActions, householdViewModel, listFoodItemsViewModel)
         }
         composable(Screen.ADD_FOOD) {
-          AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemsViewModel)
+          AddFoodItemScreen(
+              navigationActions, householdViewModel, listFoodItemsViewModel, foodFactsViewModel)
         }
         composable(Route.SCANNER) {
           BarcodeScannerScreen(

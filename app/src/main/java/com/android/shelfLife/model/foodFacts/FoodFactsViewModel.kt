@@ -23,7 +23,6 @@ class FoodFactsViewModel(private val repository: FoodFactsRepository) : ViewMode
   private val _searchStatus = MutableStateFlow<SearchStatus>(SearchStatus.Idle)
   val searchStatus: StateFlow<SearchStatus> = _searchStatus
 
-
   // Existing properties
   private val _query = MutableStateFlow("")
   val query: StateFlow<String> = _query
@@ -61,16 +60,13 @@ class FoodFactsViewModel(private val repository: FoodFactsRepository) : ViewMode
     _query.update { newQuery }
     viewModelScope.launch {
       repository.searchFoodFacts(
-        FoodSearchInput.Query(newQuery),
-        onSuccess = { foodFactsList ->
-          // Filter out items without images
-          val filteredList = foodFactsList.filter { it.imageUrl.isNotEmpty() }
-          _foodFactsSuggestions.value = filteredList
-        },
-        onFailure = {
-          _foodFactsSuggestions.value = emptyList()
-        }
-      )
+          FoodSearchInput.Query(newQuery),
+          onSuccess = { foodFactsList ->
+            // Filter out items without images
+            val filteredList = foodFactsList.filter { it.imageUrl.isNotEmpty() }
+            _foodFactsSuggestions.value = filteredList
+          },
+          onFailure = { _foodFactsSuggestions.value = emptyList() })
     }
   }
 

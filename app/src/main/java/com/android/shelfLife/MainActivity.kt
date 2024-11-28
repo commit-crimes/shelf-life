@@ -40,7 +40,6 @@ import com.android.shelfLife.ui.profile.ProfileScreen
 import com.android.shelfLife.ui.recipes.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
-import com.android.shelfLife.ui.utils.ImageSelectionScreen
 import com.android.shelfLife.ui.utils.signOutUser
 import com.example.compose.ShelfLifeTheme
 import com.google.firebase.auth.FirebaseAuth
@@ -101,7 +100,8 @@ fun ShelfLifeApp() {
         OverviewScreen(navigationActions, householdViewModel, listFoodItemViewModel)
       }
       composable(Screen.ADD_FOOD) {
-        AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel,foodFactsViewModel)
+        AddFoodItemScreen(
+            navigationActions, householdViewModel, listFoodItemViewModel, foodFactsViewModel)
       }
       composable(Screen.EDIT_FOOD) {
         EditFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
