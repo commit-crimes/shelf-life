@@ -1,4 +1,4 @@
-package com.android.shelfLife.repository.newFoodItem
+package com.android.shelfLife.model.newFoodItem
 
 import com.android.shelfLife.model.newFoodItem.FoodItem
 
