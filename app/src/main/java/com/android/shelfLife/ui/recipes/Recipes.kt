@@ -18,7 +18,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -173,23 +175,29 @@ fun RecipeItem(
     listRecipesViewModel: ListRecipesViewModel
 ) {
   var clickOnRecipe by remember { mutableStateOf(false) } // State to track if the recipe is clicked
+  val cardColor =
+      if (clickOnRecipe) MaterialTheme.colorScheme.primaryContainer
+      else MaterialTheme.colorScheme.background
+  val elevation = if (clickOnRecipe) 16.dp else 8.dp
+
   // The card that visually represents the recipe item
-  Column(
+  ElevatedCard(
+      colors = CardDefaults.elevatedCardColors(containerColor = cardColor),
+      elevation = CardDefaults.elevatedCardElevation(defaultElevation = elevation),
       modifier =
           Modifier.fillMaxWidth() // Make the card fill the available width
-              .padding(8.dp) // Add padding around the card
+              .padding(horizontal = 16.dp, vertical = 8.dp) // Add padding around the card
               .clickable(onClick = { clickOnRecipe = true }) // Handle clicks on the card
               .testTag("recipesCards")) {
         // Layout for the content inside the card
         Row(
             modifier =
                 Modifier.fillMaxWidth() // Fill the width inside the card
-                    .padding(18.dp) // Add padding inside the card for layout spacing
-            ) {
+                    .padding(2.dp)) {
               // Column for recipe details: name, servings, and time
               Column(
                   modifier =
-                      Modifier.width(275.dp) // Set the width of the column
+                      Modifier.width(240.dp) // Set the width of the column
                           .size(80.dp) // Set the size of the column
                           .padding(vertical = 12.dp) // Add vertical padding inside the column
                           .padding(horizontal = 18.dp) // Add horizontal padding inside the column
@@ -226,7 +234,7 @@ fun RecipeItem(
                           Spacer(
                               modifier =
                                   Modifier.width(
-                                      8.dp)) // Add a horizontal space between servings and time
+                                      2.dp)) // Add a horizontal space between servings and time
 
                           // Display the total cooking time
                           Text(

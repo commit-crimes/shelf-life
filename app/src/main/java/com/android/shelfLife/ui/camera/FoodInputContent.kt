@@ -10,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -68,19 +67,9 @@ fun FoodInputContent(
         // Food information
         Row(verticalAlignment = Alignment.CenterVertically) {
           Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = foodFacts.name,
-                style =
-                    TextStyle(
-                        fontSize = 20.sp
-                    ))
+            Text(text = foodFacts.name, style = TextStyle(fontSize = 20.sp))
 
-            Text(
-                text = foodFacts.category.name,
-                style =
-                    TextStyle(
-                        fontSize = 13.sp
-                    ))
+            Text(text = foodFacts.category.name, style = TextStyle(fontSize = 13.sp))
           }
 
           Image(

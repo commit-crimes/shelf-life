@@ -60,7 +60,7 @@ fun CustomTopAppBar(
               contentDescription = stringResource(R.string.go_back_button_description))
         }
       },
-      //title of TopappBar
+      // title of TopappBar
       title = {
         Text(
             text = title,
