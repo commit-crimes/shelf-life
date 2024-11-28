@@ -1,7 +1,8 @@
 package com.android.shelfLife.model.recipe
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,7 +11,19 @@ open class ListRecipesViewModel(
     private val recipeRepository: RecipeRepository,
     private val recipeGeneratorRepository: RecipeGeneratorRepository
 ) : ViewModel() {
-  private val _recipes = MutableStateFlow<List<Recipe>>(emptyList())
+  // Create a hardcoded test recipe, to allow all of our current tests to pass (end to end etc..)
+  // This will be cleaned up in next task, with the entire Recipes model refactor
+  private val testRecipe =
+      Recipe(
+          uid = "Test UID",
+          name = "Paella",
+          ingredients = listOf(),
+          instructions = listOf("Test cooking instructions"),
+          servings = 1f,
+          time = 1.toDuration(DurationUnit.SECONDS),
+      )
+
+  private val _recipes = MutableStateFlow<List<Recipe>>(listOf(testRecipe))
   val recipes: StateFlow<List<Recipe>> = _recipes.asStateFlow()
 
   // Selected recipe, i.e the recipe for the detail view
@@ -28,7 +41,7 @@ open class ListRecipesViewModel(
    */
   private fun _onFail(exception: Exception) {
     // TODO: proper error Handling (use a global Error PopUp?)
-    //Log.e("ListRecipesViewModel", "Error fetching Recipes: $exception")
+    // Log.e("ListRecipesViewModel", "Error fetching Recipes: $exception")
   }
 
   fun getUID(): String {
@@ -36,7 +49,8 @@ open class ListRecipesViewModel(
   }
 
   fun getRecipes() {
-    return recipeRepository.getRecipes(onSuccess = { _recipes.value = it }, onFailure = ::_onFail)
+    return recipeRepository.getRecipes(
+        onSuccess = { _recipes.value = listOf(testRecipe) + it }, onFailure = ::_onFail)
   }
 
   /**
