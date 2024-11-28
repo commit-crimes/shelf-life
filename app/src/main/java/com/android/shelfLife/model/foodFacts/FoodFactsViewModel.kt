@@ -23,6 +23,7 @@ class FoodFactsViewModel(private val repository: FoodFactsRepository) : ViewMode
   private val _searchStatus = MutableStateFlow<SearchStatus>(SearchStatus.Idle)
   val searchStatus: StateFlow<SearchStatus> = _searchStatus
 
+
   // Existing properties
   private val _query = MutableStateFlow("")
   val query: StateFlow<String> = _query
@@ -51,10 +52,26 @@ class FoodFactsViewModel(private val repository: FoodFactsRepository) : ViewMode
     _searchStatus.value = SearchStatus.Idle
   }
 
+  fun clearFoodFactsSuggestions() {
+    _foodFactsSuggestions.value = emptyList()
+  }
+
   // Function to set a new query and trigger a search using a query string
   fun searchByQuery(newQuery: String) {
     _query.update { newQuery }
-    searchFoodFacts(FoodSearchInput.Query(newQuery))
+    viewModelScope.launch {
+      repository.searchFoodFacts(
+        FoodSearchInput.Query(newQuery),
+        onSuccess = { foodFactsList ->
+          // Filter out items without images
+          val filteredList = foodFactsList.filter { it.imageUrl.isNotEmpty() }
+          _foodFactsSuggestions.value = filteredList
+        },
+        onFailure = {
+          _foodFactsSuggestions.value = emptyList()
+        }
+      )
+    }
   }
 
   // Private function to search FoodFacts using the repository with either Query or Barcode input

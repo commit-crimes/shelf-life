@@ -45,4 +45,16 @@
     <string name="cancel_button">Cancel</string>
     <string name="add_button">Add</string>
 
+    <string name="select_image_label">Select an Image:</string>
+    <string name="no_image_option">No Image</string>
+    <string name="selected_image_label">Selected Image:</string>
+    <string name="default_image_label">Default Image Selected:</string>
+    <string name="submit_button_label">Submit</string>
+    <string name="correct_errors_message">Please correct the errors before submitting.</string>
+    <string name="food_name_error_empty">Food name cannot be empty.</string>
+    <string name="food_name_error_invalid">Food name contains invalid characters.</string>
+    <string name="amount_error_empty">Amount cannot be empty.</string>
+    <string name="amount_error_not_number">Amount must be a number.</string>
+    <string name="amount_error_negative">Amount must be positive.</string>
+
 </resources>
