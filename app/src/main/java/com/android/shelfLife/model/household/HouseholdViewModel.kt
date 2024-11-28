@@ -348,12 +348,13 @@ class HouseholdViewModel(
     val selectedHousehold = selectedHousehold.value
     if (selectedHousehold != null) {
       val updatedMembers = selectedHousehold.members.minus(memberUid)
-
+      households.value.find { it.uid == selectedHousehold.uid }!!.copy(members = updatedMembers)
       houseHoldRepository.updateHousehold(
           selectedHousehold.copy(members = updatedMembers),
           { Log.d("HouseholdViewModel", "Member deleted successfully") },
           { exception -> Log.e("HouseholdViewModel", "Error deleting member: $exception") })
     }
+    loadHouseholds()
   }
 
   /**

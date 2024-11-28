@@ -181,19 +181,6 @@ fun HouseHoldCreationScreen(
                                 IconButton(
                                     onClick = {
                                       creationScreenViewModel.removeEmail(email)
-                                      if (householdToEdit != null) {
-                                        // Get the UID corresponding to the email
-                                        val uid =
-                                            memberEmails.entries.find { it.value == email }?.key
-                                        if (uid != null) {
-                                          householdViewModel.deleteMember(uid)
-                                        } else {
-                                          // Handle the case where UID is not found
-                                          Log.e(
-                                              "HouseHoldCreationScreen",
-                                              "UID not found for email: $email")
-                                        }
-                                      }
                                     },
                                     modifier = Modifier.testTag("RemoveEmailButton")) {
                                       Icon(
@@ -260,15 +247,23 @@ fun HouseHoldCreationScreen(
                             isError = true
                           } else {
                             if (householdToEdit != null) {
-                              householdViewModel.getUserIdsByEmails(
-                                  memberEmailList,
-                                  callback = { emailToUserIds ->
-                                    val updatedHouseHold =
-                                        householdToEdit!!.copy(
-                                            name = houseHoldName,
-                                            members = emailToUserIds.values.toList())
-                                    householdViewModel.updateHousehold(updatedHouseHold)
-                                  })
+                                (householdViewModel.householdToEdit.value?.members!! - memberEmails.keys).forEach { uid ->
+                                    val email =
+                                        memberEmails.entries.find { it.key == uid }?.value!!
+                                    if (email != null) {
+                                        Log.d(
+                                            "HouseHoldCreationScreen",
+                                            "Email: $email, UiD: $uid"
+                                        )
+                                        householdViewModel.deleteMember(uid)
+                                        creationScreenViewModel.removeEmail(email)
+                                    } else {
+                                        Log.e(
+                                            "HouseHoldCreationScreen",
+                                            "UID not found for email: $email"
+                                        )
+                                    }
+                                }
                             } else {
                               householdViewModel.addNewHousehold(houseHoldName, memberEmailList)
                             }
