@@ -9,17 +9,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
+import com.android.shelfLife.model.invitations.InvitationRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class HouseholdViewModel(
-    private val repository: HouseHoldRepository,
+    private val houseHoldRepository: HouseHoldRepository,
     private val listFoodItemsViewModel: ListFoodItemsViewModel,
+    private val invitationRepository: InvitationRepository,
     private val dataStore: DataStore<Preferences>
 ) : ViewModel() {
   private val _households = MutableStateFlow<List<HouseHold>>(emptyList())
@@ -44,6 +47,13 @@ class HouseholdViewModel(
     FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
       if (firebaseAuth.currentUser != null) {
         loadHouseholds()
+      }
+    }
+    viewModelScope.launch {
+      householdToEdit.filterNotNull().collect { household ->
+        houseHoldRepository.getUserEmails(household.members) { uidToEmail ->
+          _memberEmails.value = uidToEmail
+        }
       }
     }
   }
@@ -74,11 +84,11 @@ class HouseholdViewModel(
 
   /** Loads the list of households from the repository and updates the [_households] flow. */
   private fun loadHouseholds() {
-    repository.getHouseholds(
+    houseHoldRepository.getHouseholds(
         onSuccess = { householdList ->
           _households.value = householdList
           Log.d("HouseholdViewModel", "Households loaded successfully")
-          Log.d("HouseholdViewModel", "Households: $householdList")
+          Log.d("HouseholdViewModel", "Selected household: ${_selectedHousehold.value}")
           loadSelectedHouseholdUid { uid ->
             if (uid != null) {
               Log.d("HouseholdViewModel", "Selected household UID: $uid")
@@ -155,9 +165,6 @@ class HouseholdViewModel(
    */
   fun selectHouseholdToEdit(household: HouseHold?) {
     _householdToEdit.value = household
-    household?.let {
-      repository.getUserEmails(it.members) { uidToEmail -> _memberEmails.value = uidToEmail }
-    }
   }
 
   /**
@@ -166,8 +173,8 @@ class HouseholdViewModel(
    * @param emails - The list of emails to get user IDs for.
    * @param callback - The callback to be invoked with the map of email to user ID.
    */
-  fun getUserIdsByEmails(emails: List<String>, callback: (Map<String, String>) -> Unit) {
-    repository.getUserIds(emails) { emailToUid -> callback(emailToUid) }
+  fun getUserIdsByEmails(emails: Set<String>, callback: (Map<String, String>) -> Unit) {
+    houseHoldRepository.getUserIds(emails) { emailToUid -> callback(emailToUid) }
   }
 
   /**
@@ -185,31 +192,58 @@ class HouseholdViewModel(
    *
    * @param householdName - The name of the household to be added.
    */
-  fun addNewHousehold(householdName: String, friendEmails: List<String> = emptyList()) {
+  fun addNewHousehold(householdName: String, friendEmails: Set<String?> = emptySet()) {
     val currentUser = FirebaseAuth.getInstance().currentUser
     if (currentUser != null) {
-      val householdUid = repository.getNewUid()
-      val household = HouseHold(householdUid, householdName, emptyList(), emptyList())
+      val householdUid = houseHoldRepository.getNewUid()
+      var household = HouseHold(householdUid, householdName, listOf(currentUser.uid), emptyList())
 
-      // Get user IDs corresponding to friend emails
-      repository.getUserIds(friendEmails) { emailToUserId ->
-        val emailsNotFound = friendEmails.filter { it !in emailToUserId.keys }
-        if (emailsNotFound.isNotEmpty()) {
-          Log.w("HouseholdViewModel", "Emails not found: $emailsNotFound")
+      if (friendEmails.isNotEmpty()) { // Corrected condition
+        houseHoldRepository.getUserIds(friendEmails) { emailToUserId ->
+          val emailsNotFound = friendEmails.filter { it !in emailToUserId.keys }
+          if (emailsNotFound.isNotEmpty()) {
+            Log.w("HouseholdViewModel", "Emails not found: $emailsNotFound")
+          }
+
+          houseHoldRepository.addHousehold(
+              household,
+              onSuccess = {
+                Log.d("HouseholdViewModel", "Household added successfully")
+                // Send invitations to friends
+                for (email in friendEmails.filter { it != currentUser.email }) {
+                  invitationRepository.sendInvitation(
+                      household = household,
+                      invitedUserEmail = email!!,
+                      onSuccess = { Log.d("HouseholdViewModel", "Invitation sent successfully") },
+                      onFailure = { exception ->
+                        Log.e("HouseholdViewModel", "Error sending invitation: $exception")
+                      })
+                }
+                households.value.plus(household)
+              },
+              onFailure = { exception ->
+                Log.e("HouseholdViewModel", "Error adding household: $exception")
+              })
+          // Update the list of households locally, this saves resources and ensures that
+          // the UI is updated
+          updateViewModelStateWithHousehold(household)
         }
-        val friendUserIds = emailToUserId.values.toList()
-        val allMembers = friendUserIds.plus(currentUser.uid)
-        val householdWithMembers = household.copy(members = allMembers)
-
-        repository.addHousehold(
-            householdWithMembers,
-            onSuccess = { Log.d("HouseholdViewModel", "Household added successfully") },
+      } else {
+        // No friend emails, add household with current user only
+        household = household.copy(members = listOf(currentUser.uid))
+        houseHoldRepository.addHousehold(
+            household,
+            onSuccess = {
+              Log.d("HouseholdViewModel", "Household added successfully")
+              households.value.plus(household)
+              loadHouseholds()
+            },
             onFailure = { exception ->
               Log.e("HouseholdViewModel", "Error adding household: $exception")
             })
         // Update the list of households locally, this saves resources and ensures that
         // the UI is updated
-        updateViewModelStateWithHousehold(householdWithMembers)
+        updateViewModelStateWithHousehold(household)
       }
     } else {
       Log.e("HouseholdViewModel", "User not logged in")
@@ -222,13 +256,35 @@ class HouseholdViewModel(
    * @param household - The updated household.
    */
   fun updateHousehold(household: HouseHold) {
-    repository.updateHousehold(
-        household,
-        onSuccess = { Log.d("HouseholdViewModel", "Household updated successfully") },
-        onFailure = { exception ->
-          Log.e("HouseholdViewModel", "Error updating household: $exception")
-        })
-    updateViewModelStateWithHousehold(household)
+    val oldHousehold = households.value.find { it.uid == household.uid }
+    if (oldHousehold != null) {
+      if (oldHousehold.members != household.members) {
+        val newMemberUids = household.members.toSet() - oldHousehold.members.toSet()
+        if (newMemberUids.isNotEmpty()) {
+          // Fetch emails for the new member UIDs
+          houseHoldRepository.getUserEmails(newMemberUids.toList()) { uidToEmail ->
+            for (uid in newMemberUids) {
+              val email = uidToEmail[uid]
+              if (email != null) {
+                invitationRepository.sendInvitation(
+                    household = household,
+                    invitedUserEmail = email,
+                    onSuccess = {
+                      Log.d("HouseholdViewModel", "Invitation sent successfully to $email")
+                    },
+                    onFailure = { exception ->
+                      Log.e("HouseholdViewModel", "Error sending invitation to $email: $exception")
+                    })
+              } else {
+                Log.e("HouseholdViewModel", "No email found for UID: $uid")
+              }
+            }
+          }
+        }
+      }
+    } else {
+      Log.e("HouseholdViewModel", "Old household not found for UID: ${household.uid}")
+    }
   }
 
   /**
@@ -237,7 +293,7 @@ class HouseholdViewModel(
    * @param householdId - The unique ID of the household to delete.
    */
   fun deleteHouseholdById(householdId: String) {
-    repository.deleteHouseholdById(
+    houseHoldRepository.deleteHouseholdById(
         householdId,
         onSuccess = { Log.d("HouseholdViewModel", "Household deleted successfully") },
         onFailure = { exception ->
@@ -287,4 +343,38 @@ class HouseholdViewModel(
       updateHousehold(selectedHousehold.copy(foodItems = updatedFoodItems))
     }
   }
+
+  fun deleteMember(memberUid: String) {
+    val selectedHousehold = selectedHousehold.value
+    if (selectedHousehold != null) {
+      val updatedMembers = selectedHousehold.members.minus(memberUid)
+      households.value.find { it.uid == selectedHousehold.uid }!!.copy(members = updatedMembers)
+      houseHoldRepository.updateHousehold(
+          selectedHousehold.copy(members = updatedMembers),
+          { Log.d("HouseholdViewModel", "Member deleted successfully") },
+          { exception -> Log.e("HouseholdViewModel", "Error deleting member: $exception") })
+    }
+    loadHouseholds()
+  }
+
+  /**
+   * Factory for creating a [HouseholdViewModel] with a constructor that takes a
+   * [HouseHoldRepository] and a [ListFoodItemsViewModel].
+   */
+  /*
+  companion object {
+    val Factory: ViewModelProvider.Factory =
+        object : ViewModelProvider.Factory {
+          @Suppress("UNCHECKED_CAST")
+          override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            val firebaseFirestore = FirebaseFirestore.getInstance()
+            val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
+            val listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
+            val invitationRepository = InvitationRepositoryFirestore(firebaseFirestore)
+            val repository = HouseholdRepositoryFirestore(firebaseFirestore)
+            return HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepository) as T
+          }
+        }
+
+   */
 }

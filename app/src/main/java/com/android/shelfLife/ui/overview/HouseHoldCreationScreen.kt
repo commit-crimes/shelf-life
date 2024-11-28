@@ -36,7 +36,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.creationScreen.CreationScreenViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.utils.DeletionConfirmationPopUp
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,12 +47,14 @@ fun HouseHoldCreationScreen(
     navigationActions: NavigationActions,
     householdViewModel: HouseholdViewModel,
 ) {
-  val memberEmails by householdViewModel.memberEmails.collectAsState()
-  val creationScreenViewModel: CreationScreenViewModel = viewModel {
-    CreationScreenViewModel(memberEmails.values.toSet())
-  }
   val coroutineScope = rememberCoroutineScope()
   val householdToEdit by householdViewModel.householdToEdit.collectAsState()
+  val memberEmails by householdViewModel.memberEmails.collectAsState()
+  val creationScreenViewModel: CreationScreenViewModel = viewModel()
+
+  LaunchedEffect(memberEmails) {
+    creationScreenViewModel.setEmails(memberEmails.values.toMutableSet())
+  }
 
   var isError by rememberSaveable { mutableStateOf(false) }
   var houseHoldName by rememberSaveable { mutableStateOf(householdToEdit?.name ?: "") }
@@ -58,7 +62,7 @@ fun HouseHoldCreationScreen(
   var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
 
   // Mutable state list to hold member emails
-  val memberEmailList = creationScreenViewModel.emailList.collectAsState()
+  val memberEmailList by creationScreenViewModel.emailList.collectAsState()
   var emailInput by rememberSaveable { mutableStateOf("") }
   var showEmailTextField by rememberSaveable { mutableStateOf(false) }
 
@@ -81,7 +85,7 @@ fun HouseHoldCreationScreen(
 
   // Function to add email card to the list and scroll to the bottom
   fun addEmailCard() {
-    if (emailInput.isNotBlank() && emailInput.trim() !in memberEmailList.value) {
+    if (emailInput.isNotBlank() && emailInput.trim() !in memberEmailList) {
       creationScreenViewModel.addEmail(emailInput.trim())
       emailInput = ""
     }
@@ -156,7 +160,7 @@ fun HouseHoldCreationScreen(
                           .verticalScroll(columnScrollState)
                           .weight(1f),
               ) {
-                memberEmailList.value.forEach { email ->
+                memberEmailList.forEach { email ->
                   ElevatedCard(
                       elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
                       modifier =
@@ -172,13 +176,18 @@ fun HouseHoldCreationScreen(
                                   text = email,
                                   style = TextStyle(fontSize = 16.sp),
                                   modifier = Modifier.weight(1f))
-                              IconButton(
-                                  onClick = { creationScreenViewModel.removeEmail(email) },
-                                  modifier = Modifier.testTag("RemoveEmailButton")) {
-                                    Icon(
-                                        imageVector = Icons.Default.Delete,
-                                        contentDescription = "Remove Email")
-                                  }
+                              if (email != FirebaseAuth.getInstance().currentUser?.email ||
+                                  householdToEdit != null) {
+                                IconButton(
+                                    onClick = {
+                                      creationScreenViewModel.removeEmail(email)
+                                    },
+                                    modifier = Modifier.testTag("RemoveEmailButton")) {
+                                      Icon(
+                                          imageVector = Icons.Default.Delete,
+                                          contentDescription = "Remove Email")
+                                    }
+                              }
                             }
                       }
                 }
@@ -220,7 +229,6 @@ fun HouseHoldCreationScreen(
                       tint = MaterialTheme.colorScheme.onSecondaryContainer)
                 }
               }
-
               // Confirm and Cancel buttons
               Row(
                   modifier = Modifier.fillMaxWidth().padding(top = 25.dp, bottom = 60.dp),
@@ -238,30 +246,28 @@ fun HouseHoldCreationScreen(
                                       houseHoldName != householdToEdit!!.name)) {
                             isError = true
                           } else {
-                            coroutineScope.launch {
-                              householdViewModel.getUserIdsByEmails(
-                                  memberEmailList.value.toList()) { emailToUid ->
-                                    val missingEmails =
-                                        memberEmailList.value.filter { it !in emailToUid.keys }
-                                    if (missingEmails.isNotEmpty()) {
-                                      Log.w(
-                                          "HouseHoldCreationScreen",
-                                          "Emails not found: $missingEmails")
-                                    }
-                                    val memberUids = emailToUid.values.toMutableList()
-
-                                    if (householdToEdit != null) {
-                                      val updatedHouseHold =
-                                          householdToEdit!!.copy(
-                                              name = houseHoldName, members = memberUids)
-                                      householdViewModel.updateHousehold(updatedHouseHold)
+                            if (householdToEdit != null) {
+                                (householdViewModel.householdToEdit.value?.members!! - memberEmails.keys).forEach { uid ->
+                                    val email =
+                                        memberEmails.entries.find { it.key == uid }?.value!!
+                                    if (email != null) {
+                                        Log.d(
+                                            "HouseHoldCreationScreen",
+                                            "Email: $email, UiD: $uid"
+                                        )
+                                        householdViewModel.deleteMember(uid)
+                                        creationScreenViewModel.removeEmail(email)
                                     } else {
-                                      householdViewModel.addNewHousehold(
-                                          houseHoldName, memberEmailList.value.toList())
+                                        Log.e(
+                                            "HouseHoldCreationScreen",
+                                            "UID not found for email: $email"
+                                        )
                                     }
-                                    navigationActions.goBack()
-                                  }
+                                }
+                            } else {
+                              householdViewModel.addNewHousehold(houseHoldName, memberEmailList)
                             }
+                            navigationActions.navigateTo(Screen.OVERVIEW)
                           }
                         },
                     ) {
