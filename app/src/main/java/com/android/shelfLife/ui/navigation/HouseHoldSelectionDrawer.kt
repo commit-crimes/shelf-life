@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.navigation
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +12,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -20,7 +20,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -32,8 +31,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.ui.utils.DeletionConfirmationPopUp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -45,13 +44,12 @@ fun HouseHoldSelectionDrawer(
     householdViewModel: HouseholdViewModel,
     content: @Composable () -> Unit
 ) {
-  val userHouseholds = householdViewModel.households.collectAsState().value
+  val userHouseholds by householdViewModel.households.collectAsState()
   val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
   var editMode by remember { mutableStateOf(false) }
 
   // State for confirmation dialog
   var showDeleteDialog by remember { mutableStateOf(false) }
-  var householdToDelete by remember { mutableStateOf<HouseHold?>(null) }
 
   // Disable edit mode when the drawer is closed
   LaunchedEffect(drawerState.isClosed) {
@@ -88,16 +86,18 @@ fun HouseHoldSelectionDrawer(
                     editMode = editMode,
                     onHouseholdSelected = { household ->
                       if (household != selectedHousehold) {
+                        Log.d("HouseHoldSelectionDrawer", "Called selectHousehold")
                         householdViewModel.selectHousehold(household)
                       }
                       scope.launch { drawerState.close() }
                     },
                     onHouseholdEditSelected = { household ->
+                      Log.d("HouseHoldSelectionDrawer", "Called selectedHouseholdToEdit")
                       householdViewModel.selectHouseholdToEdit(household)
                       navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
                     },
                     onHouseholdDeleteSelected = { household ->
-                      householdToDelete = household
+                      householdViewModel.selectHouseholdToEdit(household)
                       showDeleteDialog = true
                     },
                     modifier = Modifier.testTag("householdElement_$index"),
@@ -136,35 +136,9 @@ fun HouseHoldSelectionDrawer(
       content = content)
 
   // Confirmation Dialog for Deletion
-  if (showDeleteDialog && householdToDelete != null) {
-    AlertDialog(
-        onDismissRequest = { showDeleteDialog = false },
-        title = { Text("Delete Household") },
-        text = { Text("Are you sure you want to delete '${householdToDelete!!.name}'?") },
-        confirmButton = {
-          TextButton(
-              onClick = {
-                householdViewModel.deleteHouseholdById(householdToDelete!!.uid)
-                if (householdToDelete == selectedHousehold) {
-                  // If the deleted household was selected, deselect it
-                  householdViewModel.selectHousehold(null)
-                }
-                householdToDelete = null
-                showDeleteDialog = false
-              },
-              modifier = Modifier.testTag("confirmDeleteHouseholdButton")) {
-                Text("Delete", color = MaterialTheme.colorScheme.error)
-              }
-        },
-        dismissButton = {
-          TextButton(
-              onClick = {
-                householdToDelete = null
-                showDeleteDialog = false
-              },
-              modifier = Modifier.testTag("cancelDeleteHouseholdButton")) {
-                Text("Cancel")
-              }
-        })
-  }
+  DeletionConfirmationPopUp(
+      showDeleteDialog = showDeleteDialog,
+      onDismiss = { showDeleteDialog = false },
+      onConfirm = { showDeleteDialog = false },
+      householdViewModel = householdViewModel)
 }

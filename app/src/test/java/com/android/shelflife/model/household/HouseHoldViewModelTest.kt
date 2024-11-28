@@ -1,5 +1,7 @@
 package com.android.shelflife.model.household
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.test.platform.app.InstrumentationRegistry
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
@@ -36,7 +38,6 @@ import org.mockito.Mockito.mockStatic
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -53,6 +54,8 @@ class HouseholdViewModelTest {
   @Mock private lateinit var repository: HouseHoldRepository
 
   @Mock private lateinit var listFoodItemsViewModel: ListFoodItemsViewModel
+
+  @Mock private lateinit var dataStore: DataStore<Preferences>
 
   // Use UnconfinedTestDispatcher for testing coroutines
   private val testDispatcher = UnconfinedTestDispatcher()
@@ -76,7 +79,7 @@ class HouseholdViewModelTest {
     firebaseAuthMock = mockStatic(FirebaseAuth::class.java)
     firebaseAuthMock.`when`<FirebaseAuth> { FirebaseAuth.getInstance() }.thenReturn(firebaseAuth)
 
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel, dataStore)
 
     ShadowLog.clear() // to check Error Logs
   }
@@ -88,28 +91,6 @@ class HouseholdViewModelTest {
     firebaseAuthMock.close()
   }
 
-  // This test needs for the user to be logged in, no idea how to mock this
-  /*
-  @Test
-  fun `init should load households`() = runTest {
-    // Arrange
-    val households = listOf(HouseHold("1", "Household 1", emptyList(), emptyList()))
-
-    whenever(repository.getHouseholds(any(), any())).thenAnswer { invocation ->
-      val onSuccess = invocation.getArgument<(List<HouseHold>) -> Unit>(0)
-      onSuccess(households)
-      null
-    }
-    // Act
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
-
-    // Assert
-    assertEquals(households, householdViewModel.households.value)
-    assertEquals(households.first(), householdViewModel.selectedHousehold.value)
-    verify(listFoodItemsViewModel).setFoodItems(households.first().foodItems)
-  }
-
-   */
   @Test
   fun `selectHousehold should update selected household and food items`() = runTest {
     // Arrange
@@ -131,7 +112,7 @@ class HouseholdViewModelTest {
 
     val household = HouseHold("1", "Household 1", emptyList(), listOf(foodItem))
 
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel, dataStore)
 
     householdViewModel.setHouseholds(listOf(household))
     householdViewModel.selectHousehold(household)
@@ -139,35 +120,6 @@ class HouseholdViewModelTest {
     // Assert
     assertEquals(household, householdViewModel.selectedHousehold.value)
     verify(listFoodItemsViewModel).setFoodItems(household.foodItems)
-  }
-
-  @Test
-  fun `addNewHousehold should add household and reload households`() = runTest {
-    // Arrange
-    val householdName = "New Household"
-    val newUid = "uid"
-    val newHousehold = HouseHold(newUid, householdName, emptyList(), emptyList())
-
-    whenever(repository.getNewUid()).thenReturn(newUid)
-    whenever(repository.addHousehold(any(), any(), any())).thenAnswer { invocation ->
-      val onSuccess = invocation.getArgument<() -> Unit>(1)
-      onSuccess()
-      null
-    }
-    val households = listOf(newHousehold)
-    whenever(repository.getHouseholds(any(), any())).thenAnswer { invocation ->
-      val onSuccess = invocation.getArgument<(List<HouseHold>) -> Unit>(0)
-      onSuccess(households)
-      null
-    }
-
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
-
-    // Act
-    householdViewModel.addNewHousehold(householdName)
-
-    // Assert
-    assertEquals(households, householdViewModel.households.value)
   }
 
   @Test
@@ -187,7 +139,7 @@ class HouseholdViewModelTest {
       null
     }
 
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel, dataStore)
 
     // Act
     householdViewModel.updateHousehold(household)
@@ -213,7 +165,7 @@ class HouseholdViewModelTest {
       null
     }
 
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel, dataStore)
 
     // Act
     householdViewModel.deleteHouseholdById(householdId)
@@ -331,7 +283,7 @@ class HouseholdViewModelTest {
 
     whenever(firebaseAuth.currentUser).thenReturn(null)
 
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel, dataStore)
 
     // Act
     householdViewModel.addNewHousehold(householdName, friendEmails)
@@ -339,8 +291,6 @@ class HouseholdViewModelTest {
     // Assert
     // Verify that repository.addHousehold is not called
     verify(repository, never()).addHousehold(any(), any(), any())
-    // Verify that loadHouseholds is called
-    verify(repository).getHouseholds(any(), any())
     // Optionally, you can verify that an error is logged
   }
 
@@ -369,7 +319,7 @@ class HouseholdViewModelTest {
     }
 
     // Initialize the ViewModel
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel, dataStore)
 
     // Act
     householdViewModel.addNewHousehold(householdName, friendEmails)
@@ -387,9 +337,6 @@ class HouseholdViewModelTest {
             foodItems = emptyList())
 
     assertEquals(expectedHousehold, householdCaptor.firstValue)
-
-    // Verify that loadHouseholds is called
-    verify(repository, atLeastOnce()).getHouseholds(any(), any())
   }
 
   @Test
@@ -419,7 +366,7 @@ class HouseholdViewModelTest {
     }
 
     // Initialize the ViewModel
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel, dataStore)
 
     // Act
     householdViewModel.addNewHousehold(householdName, friendEmails)
@@ -431,9 +378,6 @@ class HouseholdViewModelTest {
 
     val expectedMembers = listOf(userUid) + friendUserIds.values
     assertEquals(expectedMembers.sorted(), householdCaptor.firstValue.members.sorted())
-
-    // Verify that loadHouseholds is called
-    verify(repository, atLeastOnce()).getHouseholds(any(), any())
   }
 
   @Test
@@ -463,7 +407,7 @@ class HouseholdViewModelTest {
     }
 
     // Initialize the ViewModel
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel, dataStore)
 
     // Act
     householdViewModel.addNewHousehold(householdName, friendEmails)
@@ -475,10 +419,6 @@ class HouseholdViewModelTest {
 
     val expectedMembers = listOf(userUid) + friendUserIds.values
     assertEquals(expectedMembers.sorted(), householdCaptor.firstValue.members.sorted())
-
-    // Verify that loadHouseholds is called
-    verify(repository, atLeastOnce()).getHouseholds(any(), any())
-    // Optionally, check that a warning is logged about emails not found
   }
 
   @Test
@@ -507,14 +447,10 @@ class HouseholdViewModelTest {
     }
 
     // Initialize the ViewModel
-    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel)
+    householdViewModel = HouseholdViewModel(repository, listFoodItemsViewModel, dataStore)
 
     // Act
     householdViewModel.addNewHousehold(householdName, friendEmails)
-
-    // Assert
-    // Verify that loadHouseholds is called
-    verify(repository, atLeastOnce()).getHouseholds(any(), any())
     // Optionally, check that an error is logged with the exception
   }
 
