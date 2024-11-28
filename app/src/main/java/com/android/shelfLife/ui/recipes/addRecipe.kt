@@ -271,16 +271,16 @@ fun AddRecipeScreen(
                                 instructions.isEmpty() ||
                                 instructionsError
                         if (!error) {
+                          navigationActions.goBack()
                           listRecipesViewModel.saveRecipe(
                               recipe =
                                   Recipe(
-                                      uid = listRecipesViewModel.getUID(),
+                                      uid = "",
                                       name = title,
                                       instructions = instructions.toList(),
                                       servings = servings.toFloat(),
                                       time = (time.toDouble() * 60.0).seconds,
                                       ingredients = ingredients.toList()))
-                          navigationActions.goBack()
                         } else {
                           // if not a Toast appears
                           Toast.makeText(
