@@ -5,12 +5,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class CreationScreenViewModel(emailList: Set<String>) : ViewModel() {
-  private val _emailList = MutableStateFlow<Set<String>>(emptySet())
-  val emailList: StateFlow<Set<String>> = _emailList.asStateFlow()
+class CreationScreenViewModel : ViewModel() {
+  private val _emailList = MutableStateFlow<MutableSet<String>>(mutableSetOf())
+  val emailList: StateFlow<MutableSet<String>> = _emailList.asStateFlow()
 
-  init {
-    _emailList.value = emailList
+  fun setEmails(emails: Set<String>) {
+    _emailList.value = emails.toMutableSet()
   }
 
   fun addEmail(email: String) {

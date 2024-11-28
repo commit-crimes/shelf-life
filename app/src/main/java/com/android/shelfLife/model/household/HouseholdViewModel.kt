@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -48,6 +49,13 @@ class HouseholdViewModel(
         loadHouseholds()
       }
     }
+    viewModelScope.launch {
+      householdToEdit.filterNotNull().collect { household ->
+        houseHoldRepository.getUserEmails(household.members) { uidToEmail ->
+          _memberEmails.value = uidToEmail
+        }
+      }
+    }
   }
 
   /**
@@ -64,16 +72,6 @@ class HouseholdViewModel(
   private fun saveSelectedHouseholdUid(uid: String?) {
     Log.d("HouseholdViewModel", "Saving selected household UID: $uid")
     viewModelScope.launch { dataStore.edit { preferences -> preferences[KEY] = uid ?: "" } }
-  }
-
-  fun populateMemberEmails(houseHold: HouseHold) {
-    houseHoldRepository.getUserEmails(houseHold.members) { uidToEmail ->
-      _memberEmails.value = uidToEmail
-    }
-  }
-
-  fun wipeMemberEmails() {
-    _memberEmails.value = emptyMap()
   }
 
   /** Load the selected household UID from DataStore. */
@@ -167,11 +165,6 @@ class HouseholdViewModel(
    */
   fun selectHouseholdToEdit(household: HouseHold?) {
     _householdToEdit.value = household
-    household?.let {
-      houseHoldRepository.getUserEmails(it.members) { uidToEmail ->
-        _memberEmails.value = uidToEmail
-      }
-    }
   }
 
   /**
@@ -263,23 +256,33 @@ class HouseholdViewModel(
    * @param household - The updated household.
    */
   fun updateHousehold(household: HouseHold) {
-    households.value
-        .find { it.uid == household.uid }
-        ?.let {
-          if (it.members != household.members) {
-            populateMemberEmails(household)
-            for (email in household.members.minus(it.members.toSet())) {
-              invitationRepository.sendInvitation(
+    val oldHousehold = households.value.find { it.uid == household.uid }
+    if (oldHousehold != null) {
+      if (oldHousehold.members != household.members) {
+        val newMemberUids = household.members.toSet() - oldHousehold.members.toSet()
+        if (newMemberUids.isNotEmpty()) {
+          // Fetch emails for the new member UIDs
+          houseHoldRepository.getUserEmails(newMemberUids.toList()) { uidToEmail ->
+            for (uid in newMemberUids) {
+              val email = uidToEmail[uid]
+              if (email != null) {
+                invitationRepository.sendInvitation(
                   household = household,
                   invitedUserEmail = email,
-                  onSuccess = { Log.d("HouseholdViewModel", "Invitation sent successfully") },
+                  onSuccess = { Log.d("HouseholdViewModel", "Invitation sent successfully to $email") },
                   onFailure = { exception ->
-                    Log.e("HouseholdViewModel", "Error sending invitation: $exception")
+                    Log.e("HouseholdViewModel", "Error sending invitation to $email: $exception")
                   })
+              } else {
+                Log.e("HouseholdViewModel", "No email found for UID: $uid")
+              }
             }
-            wipeMemberEmails()
           }
         }
+      }
+    } else {
+      Log.e("HouseholdViewModel", "Old household not found for UID: ${household.uid}")
+    }
   }
 
   /**
