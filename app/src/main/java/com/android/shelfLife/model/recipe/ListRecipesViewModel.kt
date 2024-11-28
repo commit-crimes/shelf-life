@@ -1,6 +1,5 @@
 package com.android.shelfLife.model.recipe
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +27,7 @@ open class ListRecipesViewModel(
    */
   private fun _onFail(exception: Exception) {
     // TODO: proper error Handling (use a global Error PopUp?)
-    Log.e("ListRecipesViewModel", "Error fetching Recipes: $exception")
+    //Log.e("ListRecipesViewModel", "Error fetching Recipes: $exception")
   }
 
   fun getUID(): String {
@@ -74,7 +73,7 @@ open class ListRecipesViewModel(
    *
    * @param recipe The Recipe to be selected.
    */
-  fun selectRecipe(recipe: Recipe) {
+  fun selectRecipe(recipe: Recipe?) {
     _selectedRecipe.value = recipe
   }
 }
