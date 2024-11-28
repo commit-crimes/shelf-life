@@ -28,7 +28,7 @@ open class ListRecipesViewModel(
    */
   private fun _onFail(exception: Exception) {
     // TODO: proper error Handling (use a global Error PopUp?)
-    Log.e("ListRecipesViewModel", "Error fetching Recipes: $exception")
+    //Log.e("ListRecipesViewModel", "Error fetching Recipes: $exception")
   }
 
   fun getUID(): String {
@@ -48,7 +48,7 @@ open class ListRecipesViewModel(
     val newRecipe = recipe.copy(uid = getUID())
     _recipes.value +=
         newRecipe // until the big model refactor, lets simply add it to the list to have the
-                  // correct local state
+    // correct local state
     recipeRepository.addRecipe(
         recipe = newRecipe, onSuccess = { getRecipes() }, onFailure = ::_onFail)
   }
