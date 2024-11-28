@@ -7,6 +7,8 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
@@ -21,6 +23,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
 
 @RunWith(AndroidJUnit4::class)
 class HouseHoldSelectionDrawerTest {
@@ -43,7 +46,9 @@ class HouseHoldSelectionDrawerTest {
     mockHouseholdRepository = mockk(relaxed = true)
     mockFoodItemViewModel = mockk(relaxed = true)
     // Use real MutableStateFlow instances in the ViewModel
-    householdViewModel = HouseholdViewModel(mockHouseholdRepository, mockFoodItemViewModel)
+    householdViewModel =
+        HouseholdViewModel(
+            mockHouseholdRepository, mockFoodItemViewModel, mock<DataStore<Preferences>>())
 
     // Replace the ViewModel's flows with our test flows
     householdViewModel.households = householdsFlow

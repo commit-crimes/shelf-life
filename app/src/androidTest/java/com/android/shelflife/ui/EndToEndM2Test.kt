@@ -4,6 +4,8 @@ import android.content.Context
 import android.net.Uri
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
@@ -62,6 +64,7 @@ class EndToEndM2Test {
   private lateinit var foodItemRepository: FoodItemRepository
   private lateinit var navigationActions: NavigationActions
   private lateinit var listFoodItemsViewModel: ListFoodItemsViewModel
+  private lateinit var dataStore: DataStore<Preferences>
   private lateinit var houseHoldRepository: HouseHoldRepository
   private lateinit var householdViewModel: HouseholdViewModel
   private lateinit var foodFactsViewModel: FoodFactsViewModel
@@ -88,8 +91,10 @@ class EndToEndM2Test {
     barcodeScannerViewModel = mockk(relaxed = true)
     foodItemRepository = mock(FoodItemRepository::class.java)
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
+    dataStore = org.mockito.kotlin.mock<DataStore<Preferences>>()
     houseHoldRepository = mock(HouseHoldRepository::class.java)
-    householdViewModel = HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel)
+
+    householdViewModel = HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel, dataStore)
     listRecipesViewModel = ListRecipesViewModel()
 
     foodFactsRepository = FakeFoodFactsRepository()
@@ -167,7 +172,9 @@ class EndToEndM2Test {
         }
         composable(Screen.INDIVIDUAL_FOOD_ITEM) {
           IndividualFoodItemScreen(
-              navigationActions = navigationActions, foodItemViewModel = listFoodItemsViewModel)
+              navigationActions = navigationActions,
+              houseHoldViewModel = householdViewModel,
+              foodItemViewModel = listFoodItemsViewModel)
         }
         composable(Route.RECIPES) {
           RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
@@ -245,8 +252,8 @@ class EndToEndM2Test {
     composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
     composeTestRule.runOnUiThread { foodFactsViewModel.searchByBarcode(1234567890L) }
     composeTestRule.onNodeWithTag("locationDropdown").performClick()
-    composeTestRule.onNodeWithTag("locationOption_PANTRY").performClick()
-    composeTestRule.onNodeWithTag("locationTextField").assertTextContains("pantry")
+    composeTestRule.onNodeWithTag("dropDownItem_Pantry").performClick()
+    composeTestRule.onNodeWithTag("dropdownMenu_Select location").assertTextContains("Pantry")
     composeTestRule.onNodeWithTag("expireDateTextField").performTextInput("29122024")
     composeTestRule.onNodeWithTag("submitButton").performClick()
   }
@@ -261,6 +268,7 @@ class EndToEndM2Test {
     composeTestRule.onNodeWithTag("HouseHoldCreationScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextClearance()
     composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextInput("My House Rocks")
+    composeTestRule.onNodeWithTag("AddEmailFab").performClick()
     composeTestRule.onNodeWithTag("EmailInputField").performTextClearance()
     composeTestRule.onNodeWithTag("EmailInputField").performTextInput("dogwaterson@gmail.com")
     composeTestRule.onNodeWithTag("ConfirmButton").performClick()

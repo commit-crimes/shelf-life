@@ -1,8 +1,7 @@
-// UtilsTest.kt
-
 package com.android.shelfLife.ui.utils
 
 import androidx.compose.ui.text.AnnotatedString
+import com.android.shelfLife.R
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.*
@@ -137,22 +136,22 @@ class DateUtilsUnitTest {
   }
 
   @Test
-  fun testGetDateErrorMessage() {
+  fun testGetDateErrorMessageResId() {
     // Empty date required
-    val error1 = getDateErrorMessage("", true)
-    assertEquals("Date cannot be empty", error1)
+    val error1ResId = getDateErrorMessageResId("", true)
+    assertEquals(R.string.date_empty_error, error1ResId)
     // Empty date not required
-    val error2 = getDateErrorMessage("", false)
-    assertNull(error2)
+    val error2ResId = getDateErrorMessageResId("", false)
+    assertNull(error2ResId)
     // Incomplete date
-    val error3 = getDateErrorMessage("010120", true)
-    assertEquals("Incomplete date", error3)
+    val error3ResId = getDateErrorMessageResId("010120", true)
+    assertEquals(R.string.date_incomplete_error, error3ResId)
     // Invalid date
-    val error4 = getDateErrorMessage("31022020", true)
-    assertEquals("Invalid date", error4)
+    val error4ResId = getDateErrorMessageResId("31022020", true)
+    assertEquals(R.string.date_invalid_error, error4ResId)
     // Valid date
-    val error5 = getDateErrorMessage("01012020", true)
-    assertNull(error5)
+    val error5ResId = getDateErrorMessageResId("01012020", true)
+    assertNull(error5ResId)
   }
 
   @Test
@@ -186,7 +185,7 @@ class DateUtilsUnitTest {
     val offsetMapping = transformedText.offsetMapping
     val originalOffset = 4
     val transformedOffset = offsetMapping.originalToTransformed(originalOffset)
-    val expectedTransformedOffset = 5 // Due to the slash at position 2
+    val expectedTransformedOffset = 5 // Due to the slashes added
     assertEquals(expectedTransformedOffset, transformedOffset)
   }
 

@@ -16,6 +16,7 @@ data class Recipe(
     val time: Duration, // time it takes to cook
     val ingredients: List<Ingredient> =
         listOf(), // ingredients in recipe
+    val recipeType: RecipeType = RecipeType.USE_SOON_TO_EXPIRE
 )
 
 /**
@@ -43,4 +44,5 @@ enum class RecipeType {
     USE_ONLY_HOUSEHOLD_ITEMS,
     HIGH_PROTEIN,
     LOW_CALORIE,
+    PERSONAL
 }

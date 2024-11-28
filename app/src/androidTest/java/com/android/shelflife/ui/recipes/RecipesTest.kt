@@ -2,6 +2,8 @@ package com.android.shelflife.ui.recipes
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
@@ -46,7 +48,9 @@ class RecipesTest {
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
     listRecipesViewModel = ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
     houseHoldRepository = mock()
-    householdViewModel = HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel)
+    householdViewModel =
+        HouseholdViewModel(
+            houseHoldRepository, listFoodItemsViewModel, mock<DataStore<Preferences>>())
 
     val foodFacts =
         FoodFacts(
@@ -157,5 +161,105 @@ class RecipesTest {
     composeTestRule.onNodeWithTag("addRecipeFab").performClick()
     composeTestRule.waitForIdle()
     verify(navigationActions).navigateTo(com.android.shelfLife.ui.navigation.Screen.ADD_RECIPE)
+  }
+
+  @Test
+  fun filtersAppearWhenFilterIconIsClicked() {
+    setUpRecipesScreen()
+
+    composeTestRule.onNodeWithTag("filterIcon").performClick()
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag("filterBar").assertExists().assertIsDisplayed()
+  }
+
+  @Test
+  fun filtersRecipesBasedOnSelectedFilter() {
+    setUpRecipesScreen()
+
+    composeTestRule.onNodeWithTag("filterIcon").performClick()
+
+    // Apply a filter (e.g., "Soon to expire")
+    composeTestRule.onNodeWithText("Soon to expire").performClick()
+    composeTestRule.waitForIdle()
+
+    // Check if the list is filtered by the selected filter
+    // Assuming the filter hides recipes that don't match the criteria
+    composeTestRule.onAllNodesWithTag("recipesCards").onFirst().assertExists()
+  }
+
+  @Test
+  fun multipleFiltersWorkTogether() {
+    setUpRecipesScreen()
+
+    composeTestRule.onNodeWithTag("filterIcon").performClick()
+
+    // Apply two filters: "Soon to expire" and "High protein"
+    composeTestRule.onNodeWithText("Soon to expire").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithText("High protein").performClick()
+    composeTestRule.waitForIdle()
+
+    // Check that the filtered list now includes recipes that match both filters
+    composeTestRule.onAllNodesWithTag("recipesCards").onFirst().assertExists()
+  }
+
+  @Test
+  fun filteredRecipesListUpdatesWhenFilterIsToggled() {
+    setUpRecipesScreen()
+
+    composeTestRule.onNodeWithTag("filterIcon").performClick()
+    // Apply a filter: "Soon to expire"
+    composeTestRule.onNodeWithText("Soon to expire").performClick()
+    composeTestRule.waitForIdle()
+
+    // Check that the recipes list is filtered
+    composeTestRule.onAllNodesWithTag("recipesCards").onFirst().assertExists()
+
+    // Remove the filter
+    composeTestRule.onNodeWithText("Soon to expire").performClick()
+    composeTestRule.waitForIdle()
+
+    // Check that the recipes list now includes all recipes again
+    composeTestRule.onAllNodesWithTag("recipesCards").onFirst().assertExists()
+  }
+
+  @Test
+  fun searchQueryCombinesWithFilters() {
+    setUpRecipesScreen()
+
+    composeTestRule.onNodeWithTag("filterIcon").performClick()
+
+    // Apply a filter: "Soon to expire"
+    composeTestRule.onNodeWithText("Soon to expire").performClick()
+    composeTestRule.waitForIdle()
+
+    // Enter a search query
+
+    composeTestRule.onNodeWithTag("searchBar").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule
+        .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("searchBar")))
+        .performTextInput("Pa")
+
+    // Check that the recipes list is filtered by the search query, not the active filter
+    composeTestRule.onAllNodesWithTag("recipesCards").onFirst().assertIsDisplayed()
+    composeTestRule.onNodeWithText("Pa").assertIsDisplayed()
+  }
+
+  @Test
+  fun showTextIfNoRecipeOption() {
+    setUpRecipesScreen()
+
+    composeTestRule.onNodeWithTag("filterIcon").performClick()
+
+    composeTestRule.onNodeWithTag("searchBar").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule
+        .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("searchBar")))
+        .performTextInput("ZZZYZZZYZ")
+    composeTestRule.waitForIdle()
+
+    composeTestRule.onNodeWithTag("noRecipesAvailableText").assertIsDisplayed()
   }
 }
