@@ -11,7 +11,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.*
@@ -179,59 +178,57 @@ fun AddFoodItemScreen(
               }
 
               item(key = "buttons") {
+                CustomButtons(
+                    button1OnClick = { navigationActions.goBack() },
+                    button1TestTag = "cancelButton",
+                    button1Text = stringResource(R.string.cancel_button),
+                    button2OnClick = {
+                      validateAllFieldsWhenSubmitButton()
+                      val isExpireDateValid = expireDateError == null && expireDate.isNotEmpty()
+                      val isOpenDateValid = openDateError == null
+                      val isBuyDateValid = buyDateError == null && buyDate.isNotEmpty()
+                      val isFoodNameValid = foodNameError == null
+                      val isAmountValid = amountError == null
 
-                  CustomButtons(
-                      button1OnClick = {navigationActions.goBack()},
-                      button1TestTag = "cancelButton",
-                      button1Text = stringResource(R.string.cancel_button),
-                      button2OnClick = {
-                          validateAllFieldsWhenSubmitButton()
-                          val isExpireDateValid = expireDateError == null && expireDate.isNotEmpty()
-                          val isOpenDateValid = openDateError == null
-                          val isBuyDateValid = buyDateError == null && buyDate.isNotEmpty()
-                          val isFoodNameValid = foodNameError == null
-                          val isAmountValid = amountError == null
+                      val expiryTimestamp = formatDateToTimestamp(expireDate)
+                      val openTimestamp =
+                          if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
+                      val buyTimestamp = formatDateToTimestamp(buyDate)
 
-                          val expiryTimestamp = formatDateToTimestamp(expireDate)
-                          val openTimestamp =
-                              if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
-                          val buyTimestamp = formatDateToTimestamp(buyDate)
-
-                          if (isExpireDateValid &&
-                              isOpenDateValid &&
-                              isBuyDateValid &&
-                              isFoodNameValid &&
-                              isAmountValid &&
-                              expiryTimestamp != null &&
-                              buyTimestamp != null) {
-                              val foodFacts =
-                                  FoodFacts(
-                                      name = foodName,
-                                      barcode = "",
-                                      quantity = Quantity(amount.toDouble(), unit),
-                                      category = category)
-                              val newFoodItem =
-                                  FoodItem(
-                                      uid = foodItemViewModel.getUID(),
-                                      foodFacts = foodFacts,
-                                      location = location,
-                                      expiryDate = expiryTimestamp,
-                                      openDate = openTimestamp,
-                                      buyDate = buyTimestamp,
-                                      status = FoodStatus.CLOSED)
-                              houseHoldViewModel.addFoodItem(newFoodItem)
-                              navigationActions.goBack()
-                          } else {
-                              Toast.makeText(
-                                  context,
-                                  "Please correct the errors before submitting.",
-                                  Toast.LENGTH_SHORT)
-                                  .show()
-                          }
-                      },
-                      button2TestTag = "foodSave",
-                      button2Text = stringResource(R.string.submit_button)
-                      )
+                      if (isExpireDateValid &&
+                          isOpenDateValid &&
+                          isBuyDateValid &&
+                          isFoodNameValid &&
+                          isAmountValid &&
+                          expiryTimestamp != null &&
+                          buyTimestamp != null) {
+                        val foodFacts =
+                            FoodFacts(
+                                name = foodName,
+                                barcode = "",
+                                quantity = Quantity(amount.toDouble(), unit),
+                                category = category)
+                        val newFoodItem =
+                            FoodItem(
+                                uid = foodItemViewModel.getUID(),
+                                foodFacts = foodFacts,
+                                location = location,
+                                expiryDate = expiryTimestamp,
+                                openDate = openTimestamp,
+                                buyDate = buyTimestamp,
+                                status = FoodStatus.CLOSED)
+                        houseHoldViewModel.addFoodItem(newFoodItem)
+                        navigationActions.goBack()
+                      } else {
+                        Toast.makeText(
+                                context,
+                                "Please correct the errors before submitting.",
+                                Toast.LENGTH_SHORT)
+                            .show()
+                      }
+                    },
+                    button2TestTag = "foodSave",
+                    button2Text = stringResource(R.string.submit_button))
               }
             }
       }

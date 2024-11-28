@@ -2,7 +2,6 @@ package com.android.shelfLife.ui.recipes
 
 import android.annotation.SuppressLint
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
@@ -39,21 +37,16 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipesRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.theme.errorContainerDark
-import com.android.shelfLife.ui.theme.onPrimaryContainerDark
-import com.android.shelfLife.ui.theme.onPrimaryContainerLight
-import com.android.shelfLife.ui.theme.onSecondaryDark
 import com.android.shelfLife.ui.theme.primaryContainerDark
 import com.android.shelfLife.ui.theme.primaryContainerLight
 import com.android.shelfLife.ui.theme.secondaryContainerDark
@@ -227,42 +220,41 @@ fun AddRecipeScreen(
 
               // Footer Buttons
               item {
-                  CustomButtons(
-                      button1OnClick = { navigationActions.goBack() },
-                      button1TestTag = "cancelButton",
-                      button1Text =  stringResource(R.string.cancel_button),
-                      button2OnClick = {
-                          validateInstructions()
-                          error =
-                              title.isEmpty() ||
-                                      time.isEmpty() ||
-                                      servings.isEmpty() ||
-                                      ingredients.isEmpty() ||
-                                      instructions.isEmpty() ||
-                                      instructionsError
-                          if (!error) {
-                              listRecipesViewModel.addRecipeToList(
-                                  recipe =
-                                  Recipe(
-                                      name = title,
-                                      instructions = instructions.toList(),
-                                      servings = servings.toInt(),
-                                      time = (time.toDouble() * 60.0).seconds,
-                                      ingredients = ingredients.toList(),
-                                      recipeTypes =
-                                      listOf(RecipesRepository.SearchRecipeType.PERSONAL)))
-                              navigationActions.goBack()
-                          } else {
-                              Toast.makeText(
-                                  context,
-                                  "Please correct the errors before submitting.",
-                                  Toast.LENGTH_SHORT)
-                                  .show()
-                          }
-                      },
-                      button2TestTag = "addButton",
-                      button2Text = stringResource(R.string.add_button)
-                  )
+                CustomButtons(
+                    button1OnClick = { navigationActions.goBack() },
+                    button1TestTag = "cancelButton",
+                    button1Text = stringResource(R.string.cancel_button),
+                    button2OnClick = {
+                      validateInstructions()
+                      error =
+                          title.isEmpty() ||
+                              time.isEmpty() ||
+                              servings.isEmpty() ||
+                              ingredients.isEmpty() ||
+                              instructions.isEmpty() ||
+                              instructionsError
+                      if (!error) {
+                        listRecipesViewModel.addRecipeToList(
+                            recipe =
+                                Recipe(
+                                    name = title,
+                                    instructions = instructions.toList(),
+                                    servings = servings.toInt(),
+                                    time = (time.toDouble() * 60.0).seconds,
+                                    ingredients = ingredients.toList(),
+                                    recipeTypes =
+                                        listOf(RecipesRepository.SearchRecipeType.PERSONAL)))
+                        navigationActions.goBack()
+                      } else {
+                        Toast.makeText(
+                                context,
+                                "Please correct the errors before submitting.",
+                                Toast.LENGTH_SHORT)
+                            .show()
+                      }
+                    },
+                    button2TestTag = "addButton",
+                    button2Text = stringResource(R.string.add_button))
               }
             }
 

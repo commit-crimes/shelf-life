@@ -136,9 +136,7 @@ fun ShelfLifeApp() {
       composable(Screen.INDIVIDUAL_RECIPE) {
         IndividualRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)
       }
-      composable(Screen.ADD_RECIPE) {
-        AddRecipeScreen(navigationActions, listRecipesViewModel)
-      }
+      composable(Screen.ADD_RECIPE) { AddRecipeScreen(navigationActions, listRecipesViewModel) }
     }
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
       composable(Screen.PROFILE) {

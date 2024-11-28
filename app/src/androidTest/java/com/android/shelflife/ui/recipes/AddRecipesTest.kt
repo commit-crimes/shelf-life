@@ -96,8 +96,7 @@ class AddRecipesTest {
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
       AddRecipeScreen(
-          navigationActions = navigationActions,
-          listRecipesViewModel = listRecipesViewModel)
+          navigationActions = navigationActions, listRecipesViewModel = listRecipesViewModel)
     }
   }
 
