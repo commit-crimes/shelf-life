@@ -126,6 +126,7 @@ fun OverviewScreen(
                   )
               ListFoodItems(
                   foodItems = filteredFoodItems,
+                  householdViewModel = householdViewModel,
                   listFoodItemsViewModel = listFoodItemsViewModel,
                   onFoodItemClick = { selectedFoodItem ->
                     listFoodItemsViewModel.selectFoodItem(selectedFoodItem)
