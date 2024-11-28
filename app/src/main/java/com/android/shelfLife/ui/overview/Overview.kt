@@ -128,6 +128,7 @@ fun OverviewScreen(
                   searchBarTestTag = "foodSearchBar")
               ListFoodItems(
                   foodItems = filteredFoodItems,
+                  householdViewModel = householdViewModel,
                   listFoodItemsViewModel = listFoodItemsViewModel,
                   onFoodItemClick = { selectedFoodItem ->
                     listFoodItemsViewModel.selectFoodItem(selectedFoodItem)

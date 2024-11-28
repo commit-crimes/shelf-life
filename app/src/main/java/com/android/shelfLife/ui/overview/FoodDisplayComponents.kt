@@ -37,7 +37,9 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.foodItem.FoodStatus
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
+import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.utils.getExpiryMessageBasedOnDays
 import com.android.shelfLife.ui.utils.getProgressBarState
 import com.google.firebase.Timestamp
@@ -52,6 +54,7 @@ import java.util.Locale
 @Composable
 fun ListFoodItems(
     foodItems: List<FoodItem>,
+    householdViewModel: HouseholdViewModel,
     listFoodItemsViewModel: ListFoodItemsViewModel,
     onFoodItemClick: (FoodItem) -> Unit,
     onFoodItemLongHold: (FoodItem) -> Unit
@@ -69,6 +72,7 @@ fun ListFoodItems(
         // Call a composable that renders each individual to-do item
         FoodItemCard(
             foodItem = item,
+            householdViewModel,
             listFoodItemsViewModel = listFoodItemsViewModel,
             onClick = { onFoodItemClick(item) },
             onLongPress = { onFoodItemLongHold(item) })
@@ -81,6 +85,7 @@ fun ListFoodItems(
 @Composable
 fun FoodItemCard(
     foodItem: FoodItem,
+    householdViewModel: HouseholdViewModel,
     listFoodItemsViewModel: ListFoodItemsViewModel,
     onClick: () -> Unit = {},
     onLongPress: () -> Unit = {}
@@ -106,6 +111,22 @@ fun FoodItemCard(
       expiryDate?.toDate()?.let { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(it) }
           ?: "No Expiry Date"
   val expiryDateMessage = getExpiryMessageBasedOnDays(timeRemainingInDays, formattedExpiryDate)
+
+  // checks if the foodItem has expired and its status has not been updated
+  if ((expiryDateMessage == "Expired") && (foodItem.status != FoodStatus.EXPIRED)) {
+    // creates a newFoodItem to update the one that's wrong
+    val newFoodItem =
+        FoodItem(
+            uid = foodItem.uid,
+            foodFacts = foodItem.foodFacts,
+            location = foodItem.location,
+            expiryDate = foodItem.expiryDate,
+            openDate = foodItem.openDate,
+            buyDate = foodItem.buyDate,
+            status = FoodStatus.EXPIRED)
+    householdViewModel.editFoodItem(newFoodItem, foodItem)
+    listFoodItemsViewModel.selectFoodItem(newFoodItem)
+  }
 
   // Composable UI
   ElevatedCard(

@@ -4,10 +4,10 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import com.android.shelfLife.R
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 /**
  * Converts a Timestamp into an Int representing the minutes.
@@ -68,21 +68,21 @@ class DateVisualTransformation : VisualTransformation {
 }
 
 /**
- * Helper function to get error message for date input.
+ * Helper function to get error message resource ID for date input.
  *
  * @param dateStr The date string to validate.
  * @param isRequired Whether the date is required.
- * @return The error message if the date is invalid, null otherwise.
+ * @return The resource ID of the error message if the date is invalid, null otherwise.
  */
-fun getDateErrorMessage(dateStr: String, isRequired: Boolean = true): String? {
+fun getDateErrorMessageResId(dateStr: String, isRequired: Boolean = true): Int? {
   if (dateStr.isEmpty()) {
-    return if (isRequired) "Date cannot be empty" else null
+    return if (isRequired) R.string.date_empty_error else null
   }
   if (dateStr.length != 8) {
-    return "Incomplete date"
+    return R.string.date_incomplete_error
   }
   val formattedDateStr = insertSlashes(dateStr)
-  return if (isValidDate(formattedDateStr)) null else "Invalid date"
+  return if (isValidDate(formattedDateStr)) null else R.string.date_invalid_error
 }
 
 /**
@@ -231,7 +231,7 @@ fun formatTimestampToDate(timestamp: Timestamp): String {
  * Function to format a Timestamp to a date string to be displayed (includes the slashes).
  *
  * @param timestamp The Timestamp to format.
- * @return The formatted date string (stored as digits without slashes).
+ * @return The formatted date string with slashes.
  */
 fun formatTimestampToDisplayDate(timestamp: Timestamp): String {
   val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())

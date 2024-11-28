@@ -26,7 +26,14 @@ import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.ui.utils.*
 import com.google.firebase.Timestamp
 
-@OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Composable function to display the food input content.
+ *
+ * @param foodFacts The food facts to be displayed.
+ * @param onSubmit Callback function to handle the submission of the food item.
+ * @param onCancel Callback function to handle the cancellation of the input.
+ * @param foodItemViewModel The ViewModel for the food items.
+ */
 @Composable
 fun FoodInputContent(
     foodFacts: FoodFacts,
@@ -40,17 +47,18 @@ fun FoodInputContent(
   var openDate by rememberSaveable { mutableStateOf("") }
   var buyDate by rememberSaveable { mutableStateOf(formatTimestampToDate(Timestamp.now())) }
 
-  var expireDateError by remember { mutableStateOf<String?>(null) }
-  var openDateError by remember { mutableStateOf<String?>(null) }
-  var buyDateError by remember { mutableStateOf<String?>(null) }
+  var expireDateErrorResId by remember { mutableStateOf<Int?>(null) }
+  var openDateErrorResId by remember { mutableStateOf<Int?>(null) }
+  var buyDateErrorResId by remember { mutableStateOf<Int?>(null) }
 
   var locationExpanded by remember { mutableStateOf(false) }
 
   /** Validates all fields when the submit button is clicked. */
   fun validateAllFieldsWhenSubmitButton() {
-    buyDateError = validateBuyDate(buyDate)
-    expireDateError = validateExpireDate(expireDate, buyDate, buyDateError)
-    openDateError = validateOpenDate(openDate, buyDate, buyDateError, expireDate, expireDateError)
+    buyDateErrorResId = validateBuyDate(buyDate)
+    expireDateErrorResId = validateExpireDate(expireDate, buyDate, buyDateErrorResId)
+    openDateErrorResId =
+        validateOpenDate(openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
   }
 
   Column(
@@ -101,12 +109,13 @@ fun FoodInputContent(
             date = expireDate,
             onDateChange = { newValue ->
               expireDate = newValue.filter { it.isDigit() }
-              expireDateError = validateExpireDate(expireDate, buyDate, buyDateError)
+              expireDateErrorResId = validateExpireDate(expireDate, buyDate, buyDateErrorResId)
               // Re-validate Open Date since it depends on Expire Date
-              openDateError =
-                  validateOpenDate(openDate, buyDate, buyDateError, expireDate, expireDateError)
+              openDateErrorResId =
+                  validateOpenDate(
+                      openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
             },
-            dateError = expireDateError,
+            dateErrorResId = expireDateErrorResId,
             labelResId = R.string.expire_date_hint,
             testTag = "expireDateTextField")
 
@@ -117,10 +126,11 @@ fun FoodInputContent(
             date = openDate,
             onDateChange = { newValue ->
               openDate = newValue.filter { it.isDigit() }
-              openDateError =
-                  validateOpenDate(openDate, buyDate, buyDateError, expireDate, expireDateError)
+              openDateErrorResId =
+                  validateOpenDate(
+                      openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
             },
-            dateError = openDateError,
+            dateErrorResId = openDateErrorResId,
             labelResId = R.string.open_date_hint,
             testTag = "openDateTextField")
 
@@ -131,13 +141,14 @@ fun FoodInputContent(
             date = buyDate,
             onDateChange = { newValue ->
               buyDate = newValue.filter { it.isDigit() }
-              buyDateError = validateBuyDate(buyDate)
+              buyDateErrorResId = validateBuyDate(buyDate)
               // Re-validate Expire Date and Open Date since they depend on Buy Date
-              expireDateError = validateExpireDate(expireDate, buyDate, buyDateError)
-              openDateError =
-                  validateOpenDate(openDate, buyDate, buyDateError, expireDate, expireDateError)
+              expireDateErrorResId = validateExpireDate(expireDate, buyDate, buyDateErrorResId)
+              openDateErrorResId =
+                  validateOpenDate(
+                      openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
             },
-            dateError = buyDateError,
+            dateErrorResId = buyDateErrorResId,
             labelResId = R.string.buy_date_hint,
             testTag = "buyDateTextField")
 
@@ -148,37 +159,37 @@ fun FoodInputContent(
             button1TestTag = "cancelButton",
             button1Text = stringResource(R.string.cancel_button),
             button2OnClick = {
-              validateAllFieldsWhenSubmitButton()
-              val isExpireDateValid = expireDateError == null && expireDate.isNotEmpty()
-              val isOpenDateValid = openDateError == null
-              val isBuyDateValid = buyDateError == null && buyDate.isNotEmpty()
+                validateAllFieldsWhenSubmitButton()
+                val isExpireDateValid = expireDateErrorResId == null && expireDate.isNotEmpty()
+                val isOpenDateValid = openDateErrorResId == null
+                val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
 
-              val expiryTimestamp = formatDateToTimestamp(expireDate)
-              val openTimestamp =
-                  if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
-              val buyTimestamp = formatDateToTimestamp(buyDate)
+                val expiryTimestamp = formatDateToTimestamp(expireDate)
+                val openTimestamp =
+                    if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
+                val buyTimestamp = formatDateToTimestamp(buyDate)
 
-              if (isExpireDateValid &&
-                  isOpenDateValid &&
-                  isBuyDateValid &&
-                  expiryTimestamp != null &&
-                  buyTimestamp != null) {
-                val newFoodItem =
-                    FoodItem(
-                        uid = foodItemViewModel.getUID(),
-                        foodFacts = foodFacts,
-                        location = location,
-                        expiryDate = expiryTimestamp,
-                        openDate = openTimestamp,
-                        buyDate = buyTimestamp)
+                if (isExpireDateValid &&
+                    isOpenDateValid &&
+                    isBuyDateValid &&
+                    expiryTimestamp != null &&
+                    buyTimestamp != null) {
+                    val newFoodItem =
+                        FoodItem(
+                            uid = foodItemViewModel.getUID(),
+                            foodFacts = foodFacts,
+                            location = location,
+                            expiryDate = expiryTimestamp,
+                            openDate = openTimestamp,
+                            buyDate = buyTimestamp)
 
-                Toast.makeText(context, "Food item added", Toast.LENGTH_SHORT).show()
-                onSubmit(newFoodItem)
-              } else {
-                Toast.makeText(
-                        context, "Please correct the errors before submitting.", Toast.LENGTH_SHORT)
-                    .show()
-              }
+                    Toast.makeText(context, R.string.food_added_message, Toast.LENGTH_SHORT)
+                        .show()
+                    onSubmit(newFoodItem)
+                } else {
+                    Toast.makeText(context, R.string.submission_error_message, Toast.LENGTH_SHORT)
+                        .show()
+                }
             },
             button2TestTag = "submitButton",
             button2Text = stringResource(R.string.submit_button),
