@@ -33,7 +33,7 @@ class HouseholdViewModel(
   private val _householdToEdit = MutableStateFlow<HouseHold?>(null)
   val householdToEdit: StateFlow<HouseHold?> = _householdToEdit.asStateFlow()
 
-  val _memberEmails = MutableStateFlow<Map<String, String>>(emptyMap())
+  private val _memberEmails = MutableStateFlow<Map<String, String>>(emptyMap())
   val memberEmails: StateFlow<Map<String, String>> = _memberEmails.asStateFlow()
 
   var finishedLoading = MutableStateFlow(false)
@@ -203,7 +203,7 @@ class HouseholdViewModel(
     val currentUser = FirebaseAuth.getInstance().currentUser
     if (currentUser != null) {
       val householdUid = houseHoldRepository.getNewUid()
-      var household = HouseHold(householdUid, householdName, emptyList(), emptyList())
+      var household = HouseHold(householdUid, householdName, listOf(currentUser.uid), emptyList())
 
       if (friendEmails.isNotEmpty()) { // Corrected condition
         houseHoldRepository.getUserIds(friendEmails) { emailToUserId ->
@@ -211,8 +211,6 @@ class HouseholdViewModel(
           if (emailsNotFound.isNotEmpty()) {
             Log.w("HouseholdViewModel", "Emails not found: $emailsNotFound")
           }
-          val friendUserIds = emailToUserId.values.toList()
-          household = household.copy(members = friendUserIds.plus(currentUser.uid))
 
           houseHoldRepository.addHousehold(
               household,

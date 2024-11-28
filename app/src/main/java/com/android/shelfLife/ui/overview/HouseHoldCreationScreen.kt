@@ -48,7 +48,7 @@ fun HouseHoldCreationScreen(
   val coroutineScope = rememberCoroutineScope()
   val householdToEdit by householdViewModel.householdToEdit.collectAsState()
   val creationScreenViewModel: CreationScreenViewModel = viewModel {
-    if (householdToEdit != null) householdViewModel.populateMemberEmails(householdToEdit!!)
+      if (householdToEdit != null) householdViewModel.populateMemberEmails(householdToEdit!!)
     CreationScreenViewModel(householdViewModel.memberEmails.value.values.toSet())
   }
 
