@@ -280,13 +280,6 @@ class HouseholdViewModel(
             wipeMemberEmails()
           }
         }
-    houseHoldRepository.updateHousehold(
-        household,
-        onSuccess = { Log.d("HouseholdViewModel", "Household updated successfully") },
-        onFailure = { exception ->
-          Log.e("HouseholdViewModel", "Error updating household: $exception")
-        })
-    updateViewModelStateWithHousehold(household)
   }
 
   /**
