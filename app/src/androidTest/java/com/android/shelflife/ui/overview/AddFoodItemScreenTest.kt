@@ -96,6 +96,7 @@ class AddFoodItemScreenTest {
 
     composeTestRule.onNodeWithTag("addFoodItemScreen").performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").assertIsDisplayed()
+      composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
   }
 
   @Test
@@ -337,4 +338,18 @@ class AddFoodItemScreenTest {
     // Verify that the navigation action was called
     verify { navigationActions.goBack() }
   }
+
+    @Test
+    fun testCancelButtonNavigatesBack(){
+        composeTestRule.setContent {
+            AddFoodItemScreen(
+                navigationActions = navigationActions,
+                houseHoldViewModel = houseHoldViewModel,
+                foodItemViewModel = foodItemViewModel)
+        }
+
+        composeTestRule.onNodeWithTag("cancelButton").performClick()
+
+        verify { navigationActions.goBack() }
+    }
 }
