@@ -48,6 +48,17 @@ android {
             isIncludeAndroidResources = true
         }
     }
+    signingConfigs{
+        val isCI = System.getenv("GITHUB_ACTIONS")?.toBoolean() ?: false
+        if(isCI && System.getenv("GITHUB_WORKFLOW") == "Build Android APK"){
+            named("debug"){
+                storeFile = file("../keystore.jks")
+                storePassword = System.getenv("DEBUG_KEYSTORE_PASSWORD")
+                keyAlias  = System.getenv("DEBUG_KEY_ALIAS")
+                keyPassword  = System.getenv("DEBUG_KEY_PASSWORD")
+            }
+        }
+    }
 
     buildTypes {
         release {
