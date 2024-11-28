@@ -13,19 +13,13 @@ interface HouseHoldRepository {
    */
   suspend fun getHouseholds(listOfHouseHoldUid: List<String>): List<HouseHold>
 
-  /**
-   * Adds a new household to the repository.
-   */
+  /** Adds a new household to the repository. */
   suspend fun addHousehold(household: HouseHold)
 
-  /**
-   * Updates an existing household in the repository.
-   */
+  /** Updates an existing household in the repository. */
   suspend fun updateHousehold(household: HouseHold)
 
-  /**
-   * Deletes a household by its unique ID.
-   */
+  /** Deletes a household by its unique ID. */
   suspend fun deleteHouseholdById(id: String)
 
   /**

@@ -8,9 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class HouseholdViewModel(
-  private val repository: HouseHoldRepository
-) : ViewModel() {
+class HouseholdViewModel(private val repository: HouseHoldRepository) : ViewModel() {
 
   // StateFlow to hold the list of households
   private val _households = MutableStateFlow<List<HouseHold>>(emptyList())

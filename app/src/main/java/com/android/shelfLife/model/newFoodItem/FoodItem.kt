@@ -28,16 +28,16 @@ data class FoodItem(
 
 /** Represents the status of a food item. */
 enum class FoodStatus {
-    UNOPENED,
-    OPENED,
-    CONSUMED,
-    EXPIRED
+  UNOPENED,
+  OPENED,
+  CONSUMED,
+  EXPIRED
 }
 
 /** Represents storage locations within the household. */
 enum class FoodStorageLocation {
-    PANTRY,
-    FRIDGE,
-    FREEZER,
-    OTHER
+  PANTRY,
+  FRIDGE,
+  FREEZER,
+  OTHER
 }

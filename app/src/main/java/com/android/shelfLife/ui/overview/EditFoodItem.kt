@@ -60,9 +60,7 @@ fun EditFoodItemScreen(
   var locationExpanded by remember { mutableStateOf(false) }
 
   val context = LocalContext.current
-  /**
-  * Validates all fields when the submit button is clicked.
-  */
+  /** Validates all fields when the submit button is clicked. */
   fun validateAllFieldsWhenSubmitButton() {
     amountErrorResId = validateAmount(amount)
     buyDateErrorResId = validateBuyDate(buyDate)

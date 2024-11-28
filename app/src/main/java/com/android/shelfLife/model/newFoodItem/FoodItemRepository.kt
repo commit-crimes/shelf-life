@@ -1,7 +1,5 @@
 package com.android.shelfLife.model.newFoodItem
 
-import com.android.shelfLife.model.newFoodItem.FoodItem
-
 interface FoodItemRepository {
 
   /**
