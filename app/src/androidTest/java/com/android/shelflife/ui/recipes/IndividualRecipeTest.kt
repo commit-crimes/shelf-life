@@ -15,7 +15,7 @@ import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
-import com.android.shelfLife.model.recipe.RecipeGeneratorOpenAIRepository
+import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
@@ -35,7 +35,7 @@ class IndividualRecipeTest {
   private lateinit var houseHoldRepository: HouseHoldRepository
   private lateinit var householdViewModel: HouseholdViewModel
   private lateinit var recipeRepository: RecipeRepository
-  private lateinit var recipeGeneratorOpenAIRepository: RecipeGeneratorOpenAIRepository
+  private lateinit var recipeGeneratorRepository: RecipeGeneratorRepository
 
   private lateinit var houseHold: HouseHold
 
@@ -46,9 +46,9 @@ class IndividualRecipeTest {
     navigationActions = mock()
     foodItemRepository = mock()
     recipeRepository = mock()
-    recipeGeneratorOpenAIRepository = mock()
+    recipeGeneratorRepository = mock()
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
-    listRecipesViewModel = ListRecipesViewModel(recipeRepository, recipeGeneratorOpenAIRepository)
+    listRecipesViewModel = ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
     houseHoldRepository = mock()
     householdViewModel =
         HouseholdViewModel(
@@ -117,7 +117,7 @@ class IndividualRecipeTest {
 
   @Test
   fun foodItemListIsDisplayedWhenFoodItemsExist() {
-    setUpIndividualRecipeScreen(selectedRecipeIndex = 2)
+    setUpIndividualRecipeScreen(selectedRecipeIndex = 0)
     verifyCommonUIElements()
   }
 
@@ -141,7 +141,7 @@ class IndividualRecipeTest {
 
   @Test
   fun clickGoBackArrowNavigatesBack() {
-    setUpIndividualRecipeScreen(selectedRecipeIndex = 2)
+    setUpIndividualRecipeScreen(selectedRecipeIndex = 0)
 
     // Click on the go back arrow
     composeTestRule.onNodeWithTag("goBackArrow").performClick()

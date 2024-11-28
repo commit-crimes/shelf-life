@@ -147,7 +147,7 @@ class RecipesTest {
     composeTestRule.waitForIdle()
     composeTestRule
         .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("searchBar")))
-        .performTextInput("Tortilla de patata")
+        .performTextInput("Paella")
 
     // Click on the recipe and verify navigation
     composeTestRule.onNodeWithTag("recipesCards").performClick()

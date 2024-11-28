@@ -1,6 +1,8 @@
 package com.android.shelfLife.model.recipe
 
 import androidx.lifecycle.ViewModel
+import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodFacts.Quantity
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,8 +19,15 @@ open class ListRecipesViewModel(
       Recipe(
           uid = "Test UID",
           name = "Paella",
-          ingredients = listOf(),
-          instructions = listOf("Test cooking instructions"),
+          ingredients =
+              listOf(
+                  Ingredient("Rice", Quantity(100.0, FoodUnit.GRAM)),
+                  Ingredient("Chicken", Quantity(500.0, FoodUnit.GRAM))),
+          instructions =
+              listOf(
+                  "Test cooking instructions",
+                  "Test cooking instructions 2",
+                  "Test cooking instructions 3"),
           servings = 1f,
           time = 1.toDuration(DurationUnit.SECONDS),
       )
