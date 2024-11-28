@@ -192,7 +192,7 @@ fun FoodInputContent(
                 }
             },
             button2TestTag = "submitButton",
-            button2Text = stringResource(R.string.submit_button),
+            button2Text = stringResource(R.string.submit_button_text),
         )
       }
 }

@@ -27,9 +27,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.android.shelfLife.R
 import com.android.shelfLife.ui.theme.onSecondaryDark
 import com.android.shelfLife.ui.theme.primaryContainerDark
 import com.android.shelfLife.ui.theme.secondaryContainerLight
@@ -53,7 +55,7 @@ fun CustomTopAppBar(
       navigationIcon = {
         // Back button to return to the previous screen
         IconButton(onClick = onClick, modifier = Modifier.testTag("goBackArrow")) {
-          Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Go back Icon")
+          Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(R.string.go_back_button_description))
         }
       },
       title = {
