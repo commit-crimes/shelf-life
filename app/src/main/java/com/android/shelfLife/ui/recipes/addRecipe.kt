@@ -46,7 +46,7 @@ import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipesRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.theme.errorContainerDark
+import com.android.shelfLife.ui.theme.onSecondaryDark
 import com.android.shelfLife.ui.theme.primaryContainerDark
 import com.android.shelfLife.ui.theme.primaryContainerLight
 import com.android.shelfLife.ui.theme.secondaryContainerDark
@@ -468,8 +468,8 @@ fun IngredientDialog(
             modifier = Modifier.testTag("addIngredientButton2"),
             colors =
                 ButtonDefaults.buttonColors(
-                    containerColor = primaryContainerLight,
-                    contentColor = secondaryContainerDark)) {
+                    containerColor = primaryContainerDark,
+                    contentColor = secondaryContainerLight)) {
               Text(stringResource(R.string.add_ingredient))
             }
       },
@@ -478,7 +478,9 @@ fun IngredientDialog(
         Button(
             onClick = onDismiss,
             modifier = Modifier.testTag("cancelIngredientButton"),
-            colors = ButtonDefaults.buttonColors(containerColor = errorContainerDark)) {
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = secondaryContainerLight, contentColor = onSecondaryDark)) {
               Text(stringResource(R.string.cancel_button))
             }
       })
