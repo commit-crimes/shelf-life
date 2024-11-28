@@ -27,7 +27,7 @@ open class ListRecipesViewModel(
    */
   private fun _onFail(exception: Exception) {
     // TODO: proper error Handling (use a global Error PopUp?)
-    //Log.e("ListRecipesViewModel", "Error fetching Recipes: $exception")
+    // Log.e("ListRecipesViewModel", "Error fetching Recipes: $exception")
   }
 
   fun getUID(): String {

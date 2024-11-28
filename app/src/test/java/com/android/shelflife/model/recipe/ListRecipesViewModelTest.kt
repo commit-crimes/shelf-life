@@ -7,13 +7,13 @@ import com.android.shelfLife.model.recipe.RecipePrompt
 import com.android.shelfLife.model.recipe.RecipeRepository
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.*
 import org.mockito.kotlin.any
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 class ListRecipesViewModelTest {
 
@@ -37,7 +37,8 @@ class ListRecipesViewModelTest {
 
   @Test
   fun fetchesRecipesSuccessfully() = runBlocking {
-    val recipes = listOf(Recipe("1", "Recipe 1", listOf(), 1f, 1.toDuration(DurationUnit.SECONDS), listOf()))
+    val recipes =
+        listOf(Recipe("1", "Recipe 1", listOf(), 1f, 1.toDuration(DurationUnit.SECONDS), listOf()))
     `when`(recipeRepository.getRecipes(any(), any())).thenAnswer {
       (it.arguments[0] as (List<Recipe>) -> Unit).invoke(recipes)
     }
@@ -59,12 +60,13 @@ class ListRecipesViewModelTest {
   @Test
   fun generatesRecipeSuccessfully() = runBlocking {
     val recipePrompt = RecipePrompt("prompt")
-    val generatedRecipe = Recipe("1", "Generated Recipe", listOf(), 1f, 1.toDuration(DurationUnit.SECONDS), listOf())
+    val generatedRecipe =
+        Recipe("1", "Generated Recipe", listOf(), 1f, 1.toDuration(DurationUnit.SECONDS), listOf())
     `when`(recipeGeneratorRepository.generateRecipe(any(), any(), any())).thenAnswer {
       (it.arguments[1] as (Recipe) -> Unit).invoke(generatedRecipe)
     }
     var result: Recipe? = null
-    viewModel.generateRecipe(recipePrompt, { result = it }, { })
+    viewModel.generateRecipe(recipePrompt, { result = it }, {})
     assertEquals(generatedRecipe, result)
   }
 
@@ -76,7 +78,7 @@ class ListRecipesViewModelTest {
       (it.arguments[2] as (Exception) -> Unit).invoke(exception)
     }
     var error: Exception? = null
-    viewModel.generateRecipe(recipePrompt, { }, { error = it })
+    viewModel.generateRecipe(recipePrompt, {}, { error = it })
     assertEquals(exception, error)
   }
 

@@ -214,33 +214,33 @@ class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepos
    * @param recipe The Recipe object to convert.
    * @return A Firestore document.
    */
-//  fun convertRecipeToMap(recipe: Recipe): Map<String, Any?> {
-//    return try {
-//      mapOf(
-//          "uid" to recipe.uid,
-//          "name" to recipe.name,
-//          "instructions" to recipe.instructions,
-//          "servings" to recipe.servings,
-//          "time" to recipe.time.toLong(DurationUnit.SECONDS),
-//          "ingredients" to
-//              recipe.ingredients.map {
-//                mapOf(
-//                    "name" to it.name,
-//                    "quantity" to
-//                        mapOf("amount" to it.quantity.amount, "unit" to it.quantity.unit.name),
-//                    "macros" to
-//                        mapOf(
-//                            "energyKcal" to it.macros.energyKcal,
-//                            "fat" to it.macros.fat,
-//                            "saturatedFat" to it.macros.saturatedFat,
-//                            "carbohydrates" to it.macros.carbohydrates,
-//                            "sugars" to it.macros.sugars,
-//                            "proteins" to it.macros.proteins,
-//                            "salt" to it.macros.salt))
-//              })
-//    } catch (e: Exception) {
-//      Log.e("RecipeRepository", "Error converting Recipe to map", e)
-//      emptyMap()
-//    }
-//  }
+  //  fun convertRecipeToMap(recipe: Recipe): Map<String, Any?> {
+  //    return try {
+  //      mapOf(
+  //          "uid" to recipe.uid,
+  //          "name" to recipe.name,
+  //          "instructions" to recipe.instructions,
+  //          "servings" to recipe.servings,
+  //          "time" to recipe.time.toLong(DurationUnit.SECONDS),
+  //          "ingredients" to
+  //              recipe.ingredients.map {
+  //                mapOf(
+  //                    "name" to it.name,
+  //                    "quantity" to
+  //                        mapOf("amount" to it.quantity.amount, "unit" to it.quantity.unit.name),
+  //                    "macros" to
+  //                        mapOf(
+  //                            "energyKcal" to it.macros.energyKcal,
+  //                            "fat" to it.macros.fat,
+  //                            "saturatedFat" to it.macros.saturatedFat,
+  //                            "carbohydrates" to it.macros.carbohydrates,
+  //                            "sugars" to it.macros.sugars,
+  //                            "proteins" to it.macros.proteins,
+  //                            "salt" to it.macros.salt))
+  //              })
+  //    } catch (e: Exception) {
+  //      Log.e("RecipeRepository", "Error converting Recipe to map", e)
+  //      emptyMap()
+  //    }
+  //  }
 }
