@@ -50,7 +50,7 @@ open class ListRecipesViewModel(
 
   fun getRecipes() {
     return recipeRepository.getRecipes(
-        onSuccess = { _recipes.value = listOf(testRecipe) + it }, onFailure = ::_onFail)
+        onSuccess = { _recipes.value = it + listOf(testRecipe) }, onFailure = ::_onFail)
   }
 
   /**
