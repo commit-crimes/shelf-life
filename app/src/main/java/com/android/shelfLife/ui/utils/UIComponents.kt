@@ -60,6 +60,7 @@ fun CustomTopAppBar(
               contentDescription = stringResource(R.string.go_back_button_description))
         }
       },
+      //title of TopappBar
       title = {
         Text(
             text = title,
@@ -92,7 +93,7 @@ fun CustomSearchBar(
             query = query,
             onQueryChange = onQueryChange,
             placeholder = { Text(placeholder) },
-            onSearch = { /* Optional: Handle search action if needed */},
+            onSearch = {},
             active = false,
             onActiveChange = {},
             leadingIcon = {},
@@ -122,7 +123,7 @@ fun CustomButtons(
   Row(
       modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp).fillMaxWidth(),
       horizontalArrangement = Arrangement.Center) {
-        // Cancel Button
+        // Button 1
         Button(
             onClick = button1OnClick,
             modifier = Modifier.height(50.dp).weight(1f).testTag(button1TestTag),
@@ -134,7 +135,7 @@ fun CustomButtons(
 
         Spacer(Modifier.width(24.dp))
 
-        // Add Button
+        // Button 2
         Button(
             onClick = button2OnClick,
             modifier = Modifier.height(50.dp).weight(1f).testTag(button2TestTag),

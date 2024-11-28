@@ -72,16 +72,14 @@ fun FoodInputContent(
                 text = foodFacts.name,
                 style =
                     TextStyle(
-                        fontSize = 20.sp,
-                        color = Color(0xFF000000),
+                        fontSize = 20.sp
                     ))
 
             Text(
                 text = foodFacts.category.name,
                 style =
                     TextStyle(
-                        fontSize = 13.sp,
-                        color = Color(0xFF000000),
+                        fontSize = 13.sp
                     ))
           }
 
