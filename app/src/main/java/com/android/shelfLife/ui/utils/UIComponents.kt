@@ -55,7 +55,9 @@ fun CustomTopAppBar(
       navigationIcon = {
         // Back button to return to the previous screen
         IconButton(onClick = onClick, modifier = Modifier.testTag("goBackArrow")) {
-          Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(R.string.go_back_button_description))
+          Icon(
+              imageVector = Icons.Default.ArrowBack,
+              contentDescription = stringResource(R.string.go_back_button_description))
         }
       },
       title = {

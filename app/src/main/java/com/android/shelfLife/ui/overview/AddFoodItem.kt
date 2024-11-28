@@ -208,48 +208,48 @@ fun AddFoodItemScreen(
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(R.string.cancel_button),
                     button2OnClick = {
-                        validateAllFieldsWhenSubmitButton()
-                        val isExpireDateValid =
-                            expireDateErrorResId == null && expireDate.isNotEmpty()
-                        val isOpenDateValid = openDateErrorResId == null
-                        val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
-                        val isFoodNameValid = foodNameErrorResId == null
-                        val isAmountValid = amountErrorResId == null
+                      validateAllFieldsWhenSubmitButton()
+                      val isExpireDateValid =
+                          expireDateErrorResId == null && expireDate.isNotEmpty()
+                      val isOpenDateValid = openDateErrorResId == null
+                      val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
+                      val isFoodNameValid = foodNameErrorResId == null
+                      val isAmountValid = amountErrorResId == null
 
-                        val expiryTimestamp = formatDateToTimestamp(expireDate)
-                        val openTimestamp =
-                            if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
-                        val buyTimestamp = formatDateToTimestamp(buyDate)
+                      val expiryTimestamp = formatDateToTimestamp(expireDate)
+                      val openTimestamp =
+                          if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
+                      val buyTimestamp = formatDateToTimestamp(buyDate)
 
-                        if (isExpireDateValid &&
-                            isOpenDateValid &&
-                            isBuyDateValid &&
-                            isFoodNameValid &&
-                            isAmountValid &&
-                            expiryTimestamp != null &&
-                            buyTimestamp != null) {
-                            val foodFacts =
-                                FoodFacts(
-                                    name = foodName,
-                                    barcode = "",
-                                    quantity = Quantity(amount.toDouble(), unit),
-                                    category = category)
-                            val newFoodItem =
-                                FoodItem(
-                                    uid = foodItemViewModel.getUID(),
-                                    foodFacts = foodFacts,
-                                    location = location,
-                                    expiryDate = expiryTimestamp,
-                                    openDate = openTimestamp,
-                                    buyDate = buyTimestamp,
-                                    status = FoodStatus.CLOSED)
-                            houseHoldViewModel.addFoodItem(newFoodItem)
-                            navigationActions.goBack()
-                        } else {
-                            Toast.makeText(
+                      if (isExpireDateValid &&
+                          isOpenDateValid &&
+                          isBuyDateValid &&
+                          isFoodNameValid &&
+                          isAmountValid &&
+                          expiryTimestamp != null &&
+                          buyTimestamp != null) {
+                        val foodFacts =
+                            FoodFacts(
+                                name = foodName,
+                                barcode = "",
+                                quantity = Quantity(amount.toDouble(), unit),
+                                category = category)
+                        val newFoodItem =
+                            FoodItem(
+                                uid = foodItemViewModel.getUID(),
+                                foodFacts = foodFacts,
+                                location = location,
+                                expiryDate = expiryTimestamp,
+                                openDate = openTimestamp,
+                                buyDate = buyTimestamp,
+                                status = FoodStatus.CLOSED)
+                        houseHoldViewModel.addFoodItem(newFoodItem)
+                        navigationActions.goBack()
+                      } else {
+                        Toast.makeText(
                                 context, R.string.submission_error_message, Toast.LENGTH_SHORT)
-                                .show()
-                        }
+                            .show()
+                      }
                     },
                     button2TestTag = "foodSave",
                     button2Text = stringResource(R.string.submit_button_text))

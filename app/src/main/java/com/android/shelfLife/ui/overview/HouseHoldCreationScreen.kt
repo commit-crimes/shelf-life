@@ -3,7 +3,6 @@ package com.android.shelfLife.ui.overview
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,15 +26,18 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.shelfLife.R
 import com.android.shelfLife.model.creationScreen.CreationScreenViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.DeletionConfirmationPopUp
 import kotlinx.coroutines.launch
 
@@ -222,75 +224,122 @@ fun HouseHoldCreationScreen(
               }
 
               // Confirm and Cancel buttons
-              Row(
-                  modifier = Modifier.fillMaxWidth().padding(top = 25.dp, bottom = 60.dp),
-                  verticalAlignment = Alignment.Bottom,
-                  horizontalArrangement = Arrangement.SpaceBetween) {
-                    Button(
-                        modifier = Modifier.testTag("ConfirmButton"),
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer),
-                        onClick = {
-                          if (houseHoldName.isBlank() ||
-                              householdViewModel.checkIfHouseholdNameExists(houseHoldName) &&
-                                  (householdToEdit == null ||
-                                      houseHoldName != householdToEdit!!.name)) {
-                            isError = true
-                          } else {
-                            coroutineScope.launch {
-                              householdViewModel.getUserIdsByEmails(
-                                  memberEmailList.value.toList()) { emailToUid ->
-                                    val missingEmails =
-                                        memberEmailList.value.filter { it !in emailToUid.keys }
-                                    if (missingEmails.isNotEmpty()) {
-                                      Log.w(
-                                          "HouseHoldCreationScreen",
-                                          "Emails not found: $missingEmails")
-                                    }
-                                    val memberUids = emailToUid.values.toMutableList()
-
-                                    if (householdToEdit != null) {
-                                      val updatedHouseHold =
-                                          householdToEdit!!.copy(
-                                              name = houseHoldName, members = memberUids)
-                                      householdViewModel.updateHousehold(updatedHouseHold)
-                                    } else {
-                                      householdViewModel.addNewHousehold(
-                                          houseHoldName, memberEmailList.value.toList())
-                                    }
-                                    navigationActions.goBack()
-                                  }
-                            }
+              CustomButtons(
+                  button1OnClick = { navigationActions.goBack() },
+                  button1TestTag = "CancelButton",
+                  button1Text = stringResource(R.string.cancel_button),
+                  button2OnClick = {
+                    if (houseHoldName.isBlank() ||
+                        householdViewModel.checkIfHouseholdNameExists(houseHoldName) &&
+                            (householdToEdit == null || houseHoldName != householdToEdit!!.name)) {
+                      isError = true
+                    } else {
+                      coroutineScope.launch {
+                        householdViewModel.getUserIdsByEmails(memberEmailList.value.toList()) {
+                            emailToUid ->
+                          val missingEmails =
+                              memberEmailList.value.filter { it !in emailToUid.keys }
+                          if (missingEmails.isNotEmpty()) {
+                            Log.w("HouseHoldCreationScreen", "Emails not found: $missingEmails")
                           }
-                        },
-                    ) {
-                      Text(
-                          "Save",
-                          style =
-                              TextStyle(
-                                  fontSize = 20.sp,
-                                  textAlign = TextAlign.Center,
-                                  color = MaterialTheme.colorScheme.onSecondaryContainer),
-                          modifier = Modifier.padding(7.dp).width(70.dp))
+                          val memberUids = emailToUid.values.toMutableList()
+
+                          if (householdToEdit != null) {
+                            val updatedHouseHold =
+                                householdToEdit!!.copy(name = houseHoldName, members = memberUids)
+                            householdViewModel.updateHousehold(updatedHouseHold)
+                          } else {
+                            householdViewModel.addNewHousehold(
+                                houseHoldName, memberEmailList.value.toList())
+                          }
+                          navigationActions.goBack()
+                        }
+                      }
                     }
-                    Button(
-                        modifier = Modifier.testTag("CancelButton"),
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer),
-                        onClick = { navigationActions.goBack() },
-                    ) {
-                      Text(
-                          "Cancel",
-                          style =
-                              TextStyle(
-                                  fontSize = 20.sp,
-                                  textAlign = TextAlign.Center,
-                                  color = MaterialTheme.colorScheme.onSecondaryContainer),
-                          modifier = Modifier.padding(7.dp).width(70.dp))
-                    }
-                  }
+                  },
+                  button2TestTag = "ConfirmButton",
+                  button2Text = stringResource(R.string.save_button))
+
+              //              Row(
+              //                  modifier = Modifier.fillMaxWidth().padding(top = 25.dp, bottom =
+              // 60.dp),
+              //                  verticalAlignment = Alignment.Bottom,
+              //                  horizontalArrangement = Arrangement.SpaceBetween) {
+              //                    Button(
+              //                        modifier = Modifier.testTag("ConfirmButton"),
+              //                        colors =
+              //                            ButtonDefaults.buttonColors(
+              //                                containerColor =
+              // MaterialTheme.colorScheme.secondaryContainer),
+              //                        onClick = {
+              //                          if (houseHoldName.isBlank() ||
+              //
+              // householdViewModel.checkIfHouseholdNameExists(houseHoldName) &&
+              //                                  (householdToEdit == null ||
+              //                                      houseHoldName != householdToEdit!!.name)) {
+              //                            isError = true
+              //                          } else {
+              //                            coroutineScope.launch {
+              //                              householdViewModel.getUserIdsByEmails(
+              //                                  memberEmailList.value.toList()) { emailToUid ->
+              //                                    val missingEmails =
+              //                                        memberEmailList.value.filter { it !in
+              // emailToUid.keys }
+              //                                    if (missingEmails.isNotEmpty()) {
+              //                                      Log.w(
+              //                                          "HouseHoldCreationScreen",
+              //                                          "Emails not found: $missingEmails")
+              //                                    }
+              //                                    val memberUids =
+              // emailToUid.values.toMutableList()
+              //
+              //                                    if (householdToEdit != null) {
+              //                                      val updatedHouseHold =
+              //                                          householdToEdit!!.copy(
+              //                                              name = houseHoldName, members =
+              // memberUids)
+              //
+              // householdViewModel.updateHousehold(updatedHouseHold)
+              //                                    } else {
+              //                                      householdViewModel.addNewHousehold(
+              //                                          houseHoldName,
+              // memberEmailList.value.toList())
+              //                                    }
+              //                                    navigationActions.goBack()
+              //                                  }
+              //                            }
+              //                          }
+              //                        },
+              //                    ) {
+              //                      Text(
+              //                          "Save",
+              //                          style =
+              //                              TextStyle(
+              //                                  fontSize = 20.sp,
+              //                                  textAlign = TextAlign.Center,
+              //                                  color =
+              // MaterialTheme.colorScheme.onSecondaryContainer),
+              //                          modifier = Modifier.padding(7.dp).width(70.dp))
+              //                    }
+              //                    Button(
+              //                        modifier = Modifier.testTag("CancelButton"),
+              //                        colors =
+              //                            ButtonDefaults.buttonColors(
+              //                                containerColor =
+              // MaterialTheme.colorScheme.secondaryContainer),
+              //                        onClick = { navigationActions.goBack() },
+              //                    ) {
+              //                      Text(
+              //                          "Cancel",
+              //                          style =
+              //                              TextStyle(
+              //                                  fontSize = 20.sp,
+              //                                  textAlign = TextAlign.Center,
+              //                                  color =
+              // MaterialTheme.colorScheme.onSecondaryContainer),
+              //                          modifier = Modifier.padding(7.dp).width(70.dp))
+              //                    }
+              //                  }
 
               // Confirmation Dialog for Deletion
               DeletionConfirmationPopUp(

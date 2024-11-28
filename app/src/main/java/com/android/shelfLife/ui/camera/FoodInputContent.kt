@@ -159,37 +159,36 @@ fun FoodInputContent(
             button1TestTag = "cancelButton",
             button1Text = stringResource(R.string.cancel_button),
             button2OnClick = {
-                validateAllFieldsWhenSubmitButton()
-                val isExpireDateValid = expireDateErrorResId == null && expireDate.isNotEmpty()
-                val isOpenDateValid = openDateErrorResId == null
-                val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
+              validateAllFieldsWhenSubmitButton()
+              val isExpireDateValid = expireDateErrorResId == null && expireDate.isNotEmpty()
+              val isOpenDateValid = openDateErrorResId == null
+              val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
 
-                val expiryTimestamp = formatDateToTimestamp(expireDate)
-                val openTimestamp =
-                    if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
-                val buyTimestamp = formatDateToTimestamp(buyDate)
+              val expiryTimestamp = formatDateToTimestamp(expireDate)
+              val openTimestamp =
+                  if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
+              val buyTimestamp = formatDateToTimestamp(buyDate)
 
-                if (isExpireDateValid &&
-                    isOpenDateValid &&
-                    isBuyDateValid &&
-                    expiryTimestamp != null &&
-                    buyTimestamp != null) {
-                    val newFoodItem =
-                        FoodItem(
-                            uid = foodItemViewModel.getUID(),
-                            foodFacts = foodFacts,
-                            location = location,
-                            expiryDate = expiryTimestamp,
-                            openDate = openTimestamp,
-                            buyDate = buyTimestamp)
+              if (isExpireDateValid &&
+                  isOpenDateValid &&
+                  isBuyDateValid &&
+                  expiryTimestamp != null &&
+                  buyTimestamp != null) {
+                val newFoodItem =
+                    FoodItem(
+                        uid = foodItemViewModel.getUID(),
+                        foodFacts = foodFacts,
+                        location = location,
+                        expiryDate = expiryTimestamp,
+                        openDate = openTimestamp,
+                        buyDate = buyTimestamp)
 
-                    Toast.makeText(context, R.string.food_added_message, Toast.LENGTH_SHORT)
-                        .show()
-                    onSubmit(newFoodItem)
-                } else {
-                    Toast.makeText(context, R.string.submission_error_message, Toast.LENGTH_SHORT)
-                        .show()
-                }
+                Toast.makeText(context, R.string.food_added_message, Toast.LENGTH_SHORT).show()
+                onSubmit(newFoodItem)
+              } else {
+                Toast.makeText(context, R.string.submission_error_message, Toast.LENGTH_SHORT)
+                    .show()
+              }
             },
             button2TestTag = "submitButton",
             button2Text = stringResource(R.string.submit_button_text),
