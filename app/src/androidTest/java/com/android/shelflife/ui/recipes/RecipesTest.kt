@@ -13,6 +13,8 @@ import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
+import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
+import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.google.firebase.Timestamp
@@ -30,6 +32,8 @@ class RecipesTest {
   private lateinit var listRecipesViewModel: ListRecipesViewModel
   private lateinit var houseHoldRepository: HouseHoldRepository
   private lateinit var householdViewModel: HouseholdViewModel
+  private lateinit var recipeGeneratorRepository: RecipeGeneratorRepository
+  private lateinit var recipeRepository: RecipeRepository
 
   private lateinit var houseHold: HouseHold
 
@@ -40,7 +44,7 @@ class RecipesTest {
     navigationActions = mock()
     foodItemRepository = mock()
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
-    listRecipesViewModel = ListRecipesViewModel()
+    listRecipesViewModel = ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
     houseHoldRepository = mock()
     householdViewModel = HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel)
 

@@ -208,7 +208,6 @@ class RecipeGeneratorOpenAIRepository(
           onSuccess(recipe) // Return the generated recipe
         } ?: onFailure(Exception("No tool call generated"))
       } catch (e: Exception) {
-        Log.e("RecipeGeneratorOpenAIRepository", "Error generating recipe: $e")
         onFailure(e)
       }
 
@@ -240,14 +239,12 @@ class RecipeGeneratorOpenAIRepository(
         }
       } ?: emptyList()
     } catch (e: Exception) {
-      Log.e("ToolCall", "Error extracting ingredients: $e")
       emptyList()
     }
 
     val instructions = try {
       functionArgs["instructions"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
     } catch (e: Exception) {
-      Log.e("ToolCall", "Error extracting instructions: $e")
       emptyList()
     }
 

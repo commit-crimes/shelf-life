@@ -1,4 +1,3 @@
-/*
 package com.android.shelfLife.model.recipe
 
 import com.aallam.openai.api.chat.ChatChoice
@@ -38,8 +37,9 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration
 
-class OpenAiRecipeGeneratorRepositoryTest {
+class OpenAiRecipeRepositoryTest {
 
   @Mock private lateinit var mockOpenAI: OpenAI
   private lateinit var openAiRecipesRepository: RecipeGeneratorOpenAIRepository
@@ -64,11 +64,11 @@ class OpenAiRecipeGeneratorRepositoryTest {
         RecipeGeneratorOpenAIRepository(openai = mockOpenAI, dispatcher = testDispatcher)
   }
 
-  */
+
 /**
    * Test for every recipe type enum value, ensuring that the correct system and user prompts are
    * generated.
-   *//*
+   */
 
   @Test
   fun `getPromptsForMode should return correct prompts for all recipe types`() {
@@ -78,23 +78,23 @@ class OpenAiRecipeGeneratorRepositoryTest {
             .getDeclaredMethod(
                 "getPromptsForMode",
                 List::class.java,
-                RecipeGeneratorRepository.SearchRecipeType::class.java)
+                RecipeType::class.java)
     method.isAccessible = true // Make the method accessible
 
     // Define expected system and user prompts for each search type
     val ingredientsString = testFoodItems.joinToString(", ") { it.toString() }
     val expectedPrompts =
         mapOf(
-            RecipeGeneratorRepository.SearchRecipeType.USE_SOON_TO_EXPIRE to
+            RecipeType.USE_SOON_TO_EXPIRE to
                 (RecipeGeneratorOpenAIRepository.USE_SOON_TO_EXPIRE_SYSTEM_PROMPT to
                     "${RecipeGeneratorOpenAIRepository.USE_SOON_TO_EXPIRE_USER_PROMPT}${ingredientsString}."),
-            RecipeGeneratorRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS to
+            RecipeType.USE_ONLY_HOUSEHOLD_ITEMS to
                 (RecipeGeneratorOpenAIRepository.USE_ONLY_HOUSEHOLD_ITEMS_SYSTEM_PROMPT to
                     "${RecipeGeneratorOpenAIRepository.USE_ONLY_HOUSEHOLD_ITEMS_USER_PROMPT}${ingredientsString}."),
-            RecipeGeneratorRepository.SearchRecipeType.HIGH_PROTEIN to
+            RecipeType.HIGH_PROTEIN to
                 (RecipeGeneratorOpenAIRepository.HIGH_PROTEIN_SYSTEM_PROMPT to
                     "${RecipeGeneratorOpenAIRepository.HIGH_PROTEIN_USER_PROMPT}${ingredientsString}."),
-            RecipeGeneratorRepository.SearchRecipeType.LOW_CALORIE to
+            RecipeType.LOW_CALORIE to
                 (RecipeGeneratorOpenAIRepository.LOW_CALORIE_SYSTEM_PROMPT to
                     "${RecipeGeneratorOpenAIRepository.LOW_CALORIE_USER_PROMPT}${ingredientsString}."))
 
@@ -112,18 +112,17 @@ class OpenAiRecipeGeneratorRepositoryTest {
   }
 
   @Test
-  fun `generateRecipes should call OpenAI with appropriate request`() =
+  fun `generateRecipe should call OpenAI with appropriate request`() =
       runTest(testDispatcher) {
         val mockResponse = mockRecipeResponse()
         whenever(mockOpenAI.chatCompletion(any(), anyOrNull())).thenReturn(mockResponse)
 
-        var recipesResult: List<Recipe>? = null
-        openAiRecipesRepository.generateRecipes(
-            testFoodItems,
-            RecipeGeneratorRepository.SearchRecipeType.USE_SOON_TO_EXPIRE,
-            onSuccess = { recipes ->
-              println("Success: Recipes generated successfully $recipes")
-              recipesResult = recipes
+        var recipeResult: Recipe? = null
+        openAiRecipesRepository.generateRecipe(
+            recipePrompt = RecipePrompt("Generated Recipe", RecipeType.USE_SOON_TO_EXPIRE, ingredients = testFoodItems),
+            onSuccess = { recipe ->
+              println("Success: Recipes generated successfully $recipe")
+              recipeResult = recipe
             },
             onFailure = { e ->
               println("FAILURE: $e")
@@ -132,21 +131,19 @@ class OpenAiRecipeGeneratorRepositoryTest {
 
         // No need to advance time with UnconfinedTestDispatcher
 
-        assertNotNull(recipesResult)
-        assertEquals(1, recipesResult?.size)
-        assertEquals("Generated Recipe", recipesResult?.first()?.name)
+        assertNotNull(recipeResult)
+        assertEquals("Generated Recipe", recipeResult?.name)
       }
 
   @Test
-  fun `generateRecipes should call onFailure on exception`() =
+  fun `generateRecipe should call onFailure on exception`() =
       runTest(testDispatcher) {
         whenever(mockOpenAI.chatCompletion(any(), anyOrNull()))
             .thenThrow(RuntimeException("API error"))
 
         var errorMessage: String? = null
-        openAiRecipesRepository.generateRecipes(
-            testFoodItems,
-            RecipeGeneratorRepository.SearchRecipeType.USE_SOON_TO_EXPIRE,
+        openAiRecipesRepository.generateRecipe(
+            recipePrompt = RecipePrompt("Generated Recipe", RecipeType.USE_SOON_TO_EXPIRE, ingredients = testFoodItems),
             onSuccess = { fail("Expected failure callback") },
             onFailure = { error ->
               println("FAILURE: $error")
@@ -156,11 +153,11 @@ class OpenAiRecipeGeneratorRepositoryTest {
         assertEquals("API error", errorMessage)
       }
 
-  */
+
 /**
    * Uses "hacky" reflection to test private method (Prof. Candea's suggestion:
    * https://edstem.org/eu/courses/1567/discussion/131808)
-   *//*
+   */
 
   @Test
   fun `test _createRecipeFunction using reflection`() {
@@ -171,7 +168,11 @@ class OpenAiRecipeGeneratorRepositoryTest {
 
     method.isAccessible = true
 
-    val ingredients = listOf("Chicken", "Rice", "Broccoli")
+    val ingredients = listOf(
+        mapOf("name" to "Chicken", "quantity" to 2, "unit" to "pieces"),
+        mapOf("name" to "Rice", "quantity" to 1, "unit" to "cup"),
+        mapOf("name" to "Broccoli", "quantity" to 1, "unit" to "head")
+    )
     val instructions = listOf("Cook rice", "Steam broccoli", "Grill chicken")
     val servings = 5
     val time = 100.seconds // Original Duration value
@@ -182,21 +183,13 @@ class OpenAiRecipeGeneratorRepositoryTest {
     // Invoke the private method
     val recipe =
         method.invoke(openAiRecipesRepository, ingredients, instructions, servings, timeInMillis)
-            as Recipe
+            as Map<*, *>
 
     // Assertions for the returned Recipe
     assertNotNull(recipe)
-    assertEquals("Generated Recipe", recipe.name)
-    assertEquals(instructions, recipe.instructions)
-    assertEquals(servings, recipe.servings)
-
-    // Assert that the Recipe's time matches the expected time in milliseconds
-    // REALLY STRANGE expected and real values, due to JVM compiling Duration into a Long and it
-    // messes up everything...
-    assertEquals(
-        timeInMillis.microseconds.toDouble(DurationUnit.MILLISECONDS),
-        recipe.time.toDouble(DurationUnit.MICROSECONDS) * 2,
-        0.1) // Consistent units
+    assertEquals("Generated Recipe", recipe["name"])
+    assertEquals(instructions, recipe["instructions"])
+    assertEquals(servings, recipe["servings"])
   }
 
   // Mock method for generating a recipe response
@@ -206,10 +199,23 @@ class OpenAiRecipeGeneratorRepositoryTest {
       put(
           "ingredients",
           buildJsonArray {
-            add("Chicken")
-            add("Rice")
-            add("Broccoli")
+          add(buildJsonObject {
+            put("name", "Chicken")
+            put("quantity", 2)
+            put("unit", "pieces")
           })
+          add(buildJsonObject {
+            put("name", "Rice")
+            put("quantity", 1)
+            put("unit", "cup")
+          })
+          add(buildJsonObject {
+            put("name", "Broccoli")
+            put("quantity", 1)
+            put("unit", "head")
+          })
+        }
+      )
       put("servings", 2)
       put("time", "30 minutes")
       putJsonArray("instructions") {
@@ -253,4 +259,3 @@ class OpenAiRecipeGeneratorRepositoryTest {
         choices = listOf(mockChoice))
   }
 }
-*/
