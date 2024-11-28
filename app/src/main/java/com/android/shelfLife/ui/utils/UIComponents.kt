@@ -36,6 +36,14 @@ import com.android.shelfLife.ui.theme.onSecondaryDark
 import com.android.shelfLife.ui.theme.primaryContainerDark
 import com.android.shelfLife.ui.theme.secondaryContainerLight
 
+/**
+ * A customizable top app bar with a navigation icon and optional action items.
+ *
+ * @param onClick Callback for the navigation icon (typically used for "back" navigation).
+ * @param title The title text to display in the app bar.
+ * @param titleTestTag A test tag identifier for the title text.
+ * @param actions A composable lambda to provide custom action buttons/icons in the app bar.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTopAppBar(
@@ -72,6 +80,14 @@ fun CustomTopAppBar(
       actions = actions)
 }
 
+/**
+ * A custom search bar with a placeholder and query handling logic.
+ *
+ * @param query The current search query text.
+ * @param onQueryChange Callback invoked when the query text changes.
+ * @param placeholder The placeholder text displayed when the query is empty.
+ * @param searchBarTestTag A test tag identifier for the search bar.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomSearchBar(
@@ -111,6 +127,16 @@ fun CustomSearchBar(
       }
 }
 
+/**
+ * A row of two customizable buttons with separate actions and styles.
+ *
+ * @param button1OnClick Callback for the first button click.
+ * @param button1TestTag A test tag identifier for the first button.
+ * @param button1Text The text to display on the first button.
+ * @param button2OnClick Callback for the second button click.
+ * @param button2TestTag A test tag identifier for the second button.
+ * @param button2Text The text to display on the second button.
+ */
 @Composable
 fun CustomButtons(
     button1OnClick: () -> Unit,
