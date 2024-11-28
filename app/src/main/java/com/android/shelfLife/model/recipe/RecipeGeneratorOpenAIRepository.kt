@@ -83,6 +83,10 @@ class RecipeGeneratorOpenAIRepository(
       RecipeType.LOW_CALORIE -> {
         LOW_CALORIE_SYSTEM_PROMPT to "$LOW_CALORIE_USER_PROMPT$foodItemsNames."
       }
+      RecipeType.PERSONAL -> {
+        throw IllegalArgumentException(
+          "SearchRecipeType.PERSONAL is not supported for recipe generation as it is reserved for user-created recipes.")
+      }
     }
   }
 
@@ -189,7 +193,7 @@ class RecipeGeneratorOpenAIRepository(
           // Construct the final Recipe object from the tool response
           val generatedRecipe = Recipe(
             uid = "0", // Placeholder UID
-            name = toolResponse["name"] as String,
+            name = recipePrompt.name,
             instructions = toolResponse["instructions"] as List<String>,
             servings = (toolResponse["servings"] as Int).toFloat(),
             time = (toolResponse["time"] as Long).minutes,
@@ -202,10 +206,10 @@ class RecipeGeneratorOpenAIRepository(
                 ),
                 macros = NutritionFacts() // Default macros
               )
-            }
+            },
+            recipeType=recipePrompt.recipeType
           )
-          val recipe = generatedRecipe.copy(name = recipePrompt.name)
-          onSuccess(recipe) // Return the generated recipe
+          onSuccess(generatedRecipe) // Return the generated recipe
         } ?: onFailure(Exception("No tool call generated"))
       } catch (e: Exception) {
         onFailure(e)
