@@ -46,7 +46,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
                 .get()
                 .await()
 
-            val fetchedFoodItems = snapshot.documents.mapNotNull { it.toFoodItem() }
+            val fetchedFoodItems = snapshot.documents.mapNotNull { it.toObject(FoodItem::class.java) }
             _foodItems.value = fetchedFoodItems
             fetchedFoodItems
         } catch (e: Exception) {
@@ -114,7 +114,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
                     return@addSnapshotListener
                 }
                 if (snapshot != null) {
-                    val updatedFoodItems = snapshot.documents.mapNotNull { it.toFoodItem() }
+                    val updatedFoodItems = snapshot.documents.mapNotNull { it.toObject(FoodItem::class.java) }
                     _foodItems.value = updatedFoodItems
                 }
             }
