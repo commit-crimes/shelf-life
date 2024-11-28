@@ -106,6 +106,11 @@ jobs:
 
       # 11. Assemble the project and run lint checks
       - name: Assemble and Link
+        env:
+          ENCODED_STRING: ${{ secrets.KEYSTORE_BASE_64 }}
+          DEBUG_KEYSTORE_PASSWORD: ${{ secrets.DEBUG_KEYSTORE_PASSWORD }}
+          DEBUG_KEY_ALIAS: ${{ secrets.DEBUG_KEY_ALIAS }}
+          DEBUG_KEY_PASSWORD: ${{ secrets.DEBUG_KEY_PASSWORD }}
         run: ./gradlew assemble lint --parallel --build-cache
 
       # 12. Run all tests (unit and integration)
