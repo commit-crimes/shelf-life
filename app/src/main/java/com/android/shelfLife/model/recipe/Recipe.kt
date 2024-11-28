@@ -33,7 +33,7 @@ data class Ingredient(
     val quantity: Quantity,
     val macros: NutritionFacts =
         NutritionFacts() // need to save base macros to estimate correctly the macros of the recipe
-                         // (and allow dynamic updates to macros when executing a recipe)
+    // (and allow dynamic updates to macros when executing a recipe)
 )
 
 enum class RecipeType {

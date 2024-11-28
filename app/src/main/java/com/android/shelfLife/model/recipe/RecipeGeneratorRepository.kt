@@ -1,12 +1,7 @@
 package com.android.shelfLife.model.recipe
 
-import com.android.shelfLife.model.foodItem.FoodItem
-
-/**
- * Interface describing a model for generating recipes
- */
+/** Interface describing a model for generating recipes */
 interface RecipeGeneratorRepository {
-
 
   /**
    * Generates a recipe based on the provided search input.
@@ -17,8 +12,8 @@ interface RecipeGeneratorRepository {
    * @param onFailure Callback function to handle recipe generation failures.
    */
   fun generateRecipe(
-    recipePrompt: RecipePrompt,
-    onSuccess: (Recipe) -> Unit,
-    onFailure: (Exception) -> Unit
+      recipePrompt: RecipePrompt,
+      onSuccess: (Recipe) -> Unit,
+      onFailure: (Exception) -> Unit
   )
 }

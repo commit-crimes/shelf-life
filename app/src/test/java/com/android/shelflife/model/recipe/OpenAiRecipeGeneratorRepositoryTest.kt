@@ -14,9 +14,7 @@ import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodItem.FoodItem
 import java.lang.reflect.Method
-import kotlin.time.Duration.Companion.microseconds
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -37,7 +35,6 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.whenever
-import kotlin.time.Duration
 
 class OpenAiRecipeRepositoryTest {
 
@@ -64,21 +61,16 @@ class OpenAiRecipeRepositoryTest {
         RecipeGeneratorOpenAIRepository(openai = mockOpenAI, dispatcher = testDispatcher)
   }
 
-
-/**
+  /**
    * Test for every recipe type enum value, ensuring that the correct system and user prompts are
    * generated.
    */
-
   @Test
   fun `getPromptsForMode should return correct prompts for all recipe types`() {
     val method: Method =
         RecipeGeneratorOpenAIRepository::class
             .java
-            .getDeclaredMethod(
-                "getPromptsForMode",
-                List::class.java,
-                RecipeType::class.java)
+            .getDeclaredMethod("getPromptsForMode", List::class.java, RecipeType::class.java)
     method.isAccessible = true // Make the method accessible
 
     // Define expected system and user prompts for each search type
@@ -119,7 +111,9 @@ class OpenAiRecipeRepositoryTest {
 
         var recipeResult: Recipe? = null
         openAiRecipesRepository.generateRecipe(
-            recipePrompt = RecipePrompt("Generated Recipe", RecipeType.USE_SOON_TO_EXPIRE, ingredients = testFoodItems),
+            recipePrompt =
+                RecipePrompt(
+                    "Generated Recipe", RecipeType.USE_SOON_TO_EXPIRE, ingredients = testFoodItems),
             onSuccess = { recipe ->
               println("Success: Recipes generated successfully $recipe")
               recipeResult = recipe
@@ -143,7 +137,9 @@ class OpenAiRecipeRepositoryTest {
 
         var errorMessage: String? = null
         openAiRecipesRepository.generateRecipe(
-            recipePrompt = RecipePrompt("Generated Recipe", RecipeType.USE_SOON_TO_EXPIRE, ingredients = testFoodItems),
+            recipePrompt =
+                RecipePrompt(
+                    "Generated Recipe", RecipeType.USE_SOON_TO_EXPIRE, ingredients = testFoodItems),
             onSuccess = { fail("Expected failure callback") },
             onFailure = { error ->
               println("FAILURE: $error")
@@ -153,12 +149,10 @@ class OpenAiRecipeRepositoryTest {
         assertEquals("API error", errorMessage)
       }
 
-
-/**
+  /**
    * Uses "hacky" reflection to test private method (Prof. Candea's suggestion:
    * https://edstem.org/eu/courses/1567/discussion/131808)
    */
-
   @Test
   fun `test _createRecipeFunction using reflection`() {
     val method =
@@ -168,11 +162,11 @@ class OpenAiRecipeRepositoryTest {
 
     method.isAccessible = true
 
-    val ingredients = listOf(
-        mapOf("name" to "Chicken", "quantity" to 2, "unit" to "pieces"),
-        mapOf("name" to "Rice", "quantity" to 1, "unit" to "cup"),
-        mapOf("name" to "Broccoli", "quantity" to 1, "unit" to "head")
-    )
+    val ingredients =
+        listOf(
+            mapOf("name" to "Chicken", "quantity" to 2, "unit" to "pieces"),
+            mapOf("name" to "Rice", "quantity" to 1, "unit" to "cup"),
+            mapOf("name" to "Broccoli", "quantity" to 1, "unit" to "head"))
     val instructions = listOf("Cook rice", "Steam broccoli", "Grill chicken")
     val servings = 5
     val time = 100.seconds // Original Duration value
@@ -199,23 +193,25 @@ class OpenAiRecipeRepositoryTest {
       put(
           "ingredients",
           buildJsonArray {
-          add(buildJsonObject {
-            put("name", "Chicken")
-            put("quantity", 2)
-            put("unit", "pieces")
+            add(
+                buildJsonObject {
+                  put("name", "Chicken")
+                  put("quantity", 2)
+                  put("unit", "pieces")
+                })
+            add(
+                buildJsonObject {
+                  put("name", "Rice")
+                  put("quantity", 1)
+                  put("unit", "cup")
+                })
+            add(
+                buildJsonObject {
+                  put("name", "Broccoli")
+                  put("quantity", 1)
+                  put("unit", "head")
+                })
           })
-          add(buildJsonObject {
-            put("name", "Rice")
-            put("quantity", 1)
-            put("unit", "cup")
-          })
-          add(buildJsonObject {
-            put("name", "Broccoli")
-            put("quantity", 1)
-            put("unit", "head")
-          })
-        }
-      )
       put("servings", 2)
       put("time", "30 minutes")
       putJsonArray("instructions") {

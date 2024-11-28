@@ -1,33 +1,23 @@
 package com.android.shelflife.model.recipe
 
-import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
-import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.QuerySnapshot
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.DocumentReference
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.mockito.Mockito.*
-import org.mockito.junit.MockitoJUnit
-import org.mockito.junit.MockitoRule
-
 import com.android.shelfLife.model.recipe.Recipe
+import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.*
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
-import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
@@ -36,8 +26,6 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.capture
 import org.mockito.kotlin.mock
 import org.robolectric.RobolectricTestRunner
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 @RunWith(RobolectricTestRunner::class)
 class RecipeRepositoryFirestoreTest {
@@ -49,14 +37,14 @@ class RecipeRepositoryFirestoreTest {
 
   private lateinit var recipeRepository: RecipeRepositoryFirestore
 
-  private val testRecipe = Recipe(
-    uid = "recipe1",
-    name = "Test Recipe",
-    instructions = listOf("Step 1", "Step 2"),
-    servings = 4.0f,
-    time = 3600.toDuration(DurationUnit.SECONDS),
-    ingredients = emptyList()
-  )
+  private val testRecipe =
+      Recipe(
+          uid = "recipe1",
+          name = "Test Recipe",
+          instructions = listOf("Step 1", "Step 2"),
+          servings = 4.0f,
+          time = 3600.toDuration(DurationUnit.SECONDS),
+          ingredients = emptyList())
 
   @Before
   fun setUp() {
@@ -182,7 +170,7 @@ class RecipeRepositoryFirestoreTest {
     verify(onFailure, never()).invoke(any())
   }
 
-/*  @Test
+  /*  @Test
   fun `convertToRecipe correctly parses document to Recipe`() {
     `when`(mockDocumentSnapshot.getString("uid")).thenReturn("recipe1")
     `when`(mockDocumentSnapshot.getString("name")).thenReturn("Test Recipe")
