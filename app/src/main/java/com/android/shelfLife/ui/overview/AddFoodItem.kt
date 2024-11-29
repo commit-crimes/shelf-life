@@ -1,8 +1,14 @@
 package com.android.shelfLife.ui.overview
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import coil3.compose.rememberAsyncImagePainter
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.*
@@ -208,57 +215,136 @@ fun AddFoodItemScreen(
                 Spacer(modifier = Modifier.height(32.dp))
               }
 
+            if (foodFacts.isNotEmpty()) {
+                item(key = "selectImage") {
+                    Text(
+                        text = stringResource(id = R.string.select_image_label),
+                        modifier = Modifier.testTag("selectImage"))
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(foodFacts.take(10)) { foodFact ->
+                            Box(
+                                modifier =
+                                Modifier.fillMaxWidth(0.3f)
+                                    .aspectRatio(1f)
+                                    .border(
+                                        width = if (selectedImage == foodFact) 2.dp else 1.dp,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
+                                    .clickable { selectedImage = foodFact }
+                                    .testTag("foodImage")) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(foodFact.imageUrl),
+                                    contentDescription = foodFact.name,
+                                    modifier = Modifier.fillMaxSize())
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
+
+            // Add a "No Image" option
+            item("noImage") {
+                Box(
+                    modifier =
+                    Modifier.size(100.dp)
+                        .border(
+                            width = if (selectedImage == null) 4.dp else 1.dp,
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .clickable {
+                            selectedImage = null // Indicate no image selected
+                        }
+                        .testTag("noImage"),
+                    contentAlignment = Alignment.Center) {
+                    Text(
+                        stringResource(id = R.string.no_image_option),
+                        modifier = Modifier.testTag("noImageText"))
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            // Display Selected Image
+            selectedImage?.let {
+                item {
+                    Text(
+                        stringResource(id = R.string.selected_image_label),
+                        modifier = Modifier.testTag("selectedImageText"))
+                    Image(
+                        painter = rememberAsyncImagePainter(it.imageUrl),
+                        contentDescription = null,
+                        modifier = Modifier.size(150.dp).padding(8.dp).testTag("selectedImage"))
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
+                ?: item {
+                    Text(
+                        stringResource(id = R.string.default_image_label),
+                        modifier = Modifier.testTag("defaultImageText"))
+                    Image(
+                        painter = rememberAsyncImagePainter(FoodFacts.DEFAULT_IMAGE_URL),
+                        contentDescription = null,
+                        modifier = Modifier.size(150.dp).padding(8.dp).testTag("defaultImage"))
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
               item(key = "buttons") {
                 CustomButtons(
                     button1OnClick = { navigationActions.goBack() },
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(R.string.cancel_button),
                     button2OnClick = {
-                      validateAllFieldsWhenSubmitButton()
-                      val isExpireDateValid =
-                          expireDateErrorResId == null && expireDate.isNotEmpty()
-                      val isOpenDateValid = openDateErrorResId == null
-                      val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
-                      val isFoodNameValid = foodNameErrorResId == null
-                      val isAmountValid = amountErrorResId == null
+                        validateAllFieldsWhenSubmitButton()
+                        val isExpireDateValid =
+                            expireDateErrorResId == null && expireDate.isNotEmpty()
+                        val isOpenDateValid = openDateErrorResId == null
+                        val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
+                        val isFoodNameValid = foodNameErrorResId == null
+                        val isAmountValid = amountErrorResId == null
 
-                      val expiryTimestamp = formatDateToTimestamp(expireDate)
-                      val openTimestamp =
-                          if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
-                      val buyTimestamp = formatDateToTimestamp(buyDate)
+                        val expiryTimestamp = formatDateToTimestamp(expireDate)
+                        val openTimestamp =
+                            if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
+                        val buyTimestamp = formatDateToTimestamp(buyDate)
 
-                      if (isExpireDateValid &&
-                          isOpenDateValid &&
-                          isBuyDateValid &&
-                          isFoodNameValid &&
-                          isAmountValid &&
-                          expiryTimestamp != null &&
-                          buyTimestamp != null) {
-                        val foodFacts =
-                            FoodFacts(
-                                name = foodName,
-                                barcode = selectedImage?.barcode ?: "",
-                                quantity = Quantity(amount.toDouble(), unit),
-                                category = category,
-                                nutritionFacts = selectedImage?.nutritionFacts ?: NutritionFacts(),
-                                imageUrl = selectedImage?.imageUrl ?: FoodFacts.DEFAULT_IMAGE_URL)
-                        val newFoodItem =
-                            FoodItem(
-                                uid = foodItemViewModel.getUID(),
-                                foodFacts = foodFacts,
-                                location = location,
-                                expiryDate = expiryTimestamp,
-                                openDate = openTimestamp,
-                                buyDate = buyTimestamp,
-                                status = FoodStatus.CLOSED)
-                        houseHoldViewModel.addFoodItem(newFoodItem)
-                        foodFactsViewModel.clearFoodFactsSuggestions()
-                        navigationActions.goBack()
-                      } else {
-                        Toast.makeText(
+                        if (isExpireDateValid &&
+                            isOpenDateValid &&
+                            isBuyDateValid &&
+                            isFoodNameValid &&
+                            isAmountValid &&
+                            expiryTimestamp != null &&
+                            buyTimestamp != null) {
+                            val foodFacts =
+                                FoodFacts(
+                                    name = foodName,
+                                    barcode = selectedImage?.barcode ?: "",
+                                    quantity = Quantity(amount.toDouble(), unit),
+                                    category = category,
+                                    nutritionFacts = selectedImage?.nutritionFacts ?: NutritionFacts(),
+                                    imageUrl = selectedImage?.imageUrl ?: FoodFacts.DEFAULT_IMAGE_URL)
+                            val newFoodItem =
+                                FoodItem(
+                                    uid = foodItemViewModel.getUID(),
+                                    foodFacts = foodFacts,
+                                    location = location,
+                                    expiryDate = expiryTimestamp,
+                                    openDate = openTimestamp,
+                                    buyDate = buyTimestamp,
+                                    status = FoodStatus.CLOSED)
+                            houseHoldViewModel.addFoodItem(newFoodItem)
+                            foodFactsViewModel.clearFoodFactsSuggestions()
+                            navigationActions.goBack()
+                        } else {
+                            Toast.makeText(
                                 context, R.string.submission_error_message, Toast.LENGTH_SHORT)
-                            .show()
-                      }
+                                .show()
+                        }
                     },
                     button2TestTag = "foodSave",
                     button2Text = stringResource(R.string.submit_button_text))
