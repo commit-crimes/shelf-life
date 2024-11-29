@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.R
 import com.android.shelfLife.model.creationScreen.CreationScreenViewModel
+import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
@@ -241,17 +242,32 @@ fun HouseHoldCreationScreen(
                       isError = true
                     } else {
                       if (householdToEdit != null) {
-                        (householdViewModel.householdToEdit.value?.members!! - memberEmails.keys)
-                            .forEach { uid ->
-                              val email = memberEmails.entries.find { it.key == uid }?.value!!
-                              if (email != null) {
-                                Log.d("HouseHoldCreationScreen", "Email: $email, UiD: $uid")
-                                householdViewModel.deleteMember(uid)
-                                creationScreenViewModel.removeEmail(email)
-                              } else {
-                                Log.e("HouseHoldCreationScreen", "UID not found for email: $email")
+                          var updatedHouseHold = householdToEdit!!.copy(name = houseHoldName)
+                          householdViewModel.getUserIdsByEmails(
+                              memberEmailList,
+                              callback = { emailToUserIds ->
+                                  if (emailToUserIds.isNotEmpty()) {
+                                      val oldUidList = updatedHouseHold.members
+                                      val uidList = memberEmailList.map { emailToUserIds[it]!! }
+                                      if (oldUidList.size < uidList.size) {
+                                          householdViewModel.updateHousehold(
+                                              householdToEdit!!.copy(
+                                                  name = houseHoldName,
+                                                  members = uidList
+                                              ), false
+                                          )
+                                      } else if (oldUidList.size > uidList.size) {
+                                          householdViewModel.updateHousehold(
+                                              householdToEdit!!.copy(
+                                                  name = houseHoldName,
+                                                  members = uidList
+                                              ), true
+                                          )
+                                      }
+                                      householdViewModel.updateHousehold(updatedHouseHold)
+                                  }
                               }
-                            }
+                          )
                       } else {
                         householdViewModel.addNewHousehold(houseHoldName, memberEmailList)
                       }
