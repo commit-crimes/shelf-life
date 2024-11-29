@@ -115,7 +115,8 @@ fun ShelfLifeApp() {
         OverviewScreen(navigationActions, householdViewModel, listFoodItemViewModel)
       }
       composable(Screen.ADD_FOOD) {
-        AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
+        AddFoodItemScreen(
+            navigationActions, householdViewModel, listFoodItemViewModel, foodFactsViewModel)
       }
       composable(Screen.EDIT_FOOD) {
         EditFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)

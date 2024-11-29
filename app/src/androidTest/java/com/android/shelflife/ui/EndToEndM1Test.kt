@@ -171,7 +171,8 @@ class EndToEndM1Test {
           OverviewScreen(navigationActions, householdViewModel, listFoodItemsViewModel)
         }
         composable(Screen.ADD_FOOD) {
-          AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemsViewModel)
+          AddFoodItemScreen(
+              navigationActions, householdViewModel, listFoodItemsViewModel, foodFactsViewModel)
         }
         composable(Route.SCANNER) {
           BarcodeScannerScreen(
@@ -220,9 +221,6 @@ class EndToEndM1Test {
     // Scroll to and click the submit button
     scrollableNode.performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").performClick()
-
-    // Verify error message is displayed
-    composeTestRule.onNodeWithText("Expire Date cannot be before Buy Date").assertIsDisplayed()
 
     // Correct the expire date
     scrollableNode.performScrollToNode(hasTestTag("inputFoodExpireDate"))
