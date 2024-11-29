@@ -243,7 +243,8 @@ fun AddFoodItemScreen(
                         items(foodFacts.take(10)) { foodFact ->
                           Box(
                               modifier =
-                                  Modifier.size(100.dp)
+                                  Modifier.fillMaxWidth(0.3f)
+                                      .aspectRatio(1f)
                                       .border(
                                           width = if (selectedImage == foodFact) 2.dp else 1.dp,
                                           color = MaterialTheme.colorScheme.primary,
