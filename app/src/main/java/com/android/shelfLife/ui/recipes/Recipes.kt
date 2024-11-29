@@ -135,7 +135,7 @@ fun RecipesScreen(
                       query = query,
                       onQueryChange = { query = it },
                       placeholder = "Search recipe",
-                      searchBarTestTag = "recipeSearchBar")
+                      searchBarTestTag = "searchBar")
 
                   if (filteredRecipes.isEmpty()) {
                     Box(
