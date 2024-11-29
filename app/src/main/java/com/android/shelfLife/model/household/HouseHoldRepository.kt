@@ -46,7 +46,7 @@ interface HouseHoldRepository {
    * @param users - The list of users of which we want the IDs.
    * @param callback - Called when the user IDs are successfully retrieved.
    */
-  fun getUserIds(users: List<String>, callback: (Map<String, String>) -> Unit)
+  fun getUserIds(users: Set<String?>, callback: (Map<String, String>) -> Unit)
 
   /**
    * Gets the user emails for a list of users in the repository we want.

@@ -24,12 +24,15 @@ import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
+import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.RecipeGeneratorOpenAIRepository
 import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
+import com.android.shelfLife.ui.invitations.InvitationScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
@@ -67,6 +70,8 @@ fun ShelfLifeApp() {
   val firebaseFirestore = FirebaseFirestore.getInstance()
   val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
   val listFoodItemViewModel = viewModel { ListFoodItemsViewModel(foodItemRepository) }
+  val invitationRepositoryFirestore = InvitationRepositoryFirestore(firebaseFirestore)
+  val invitationViewModel = viewModel { InvitationViewModel(invitationRepositoryFirestore) }
   val foodFactsRepository = OpenFoodFactsRepository(OkHttpClient())
   val foodFactsViewModel = viewModel { FoodFactsViewModel(foodFactsRepository) }
   val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
@@ -91,7 +96,10 @@ fun ShelfLifeApp() {
   // Initialize HouseholdViewModel only if the user is logged in
   val householdViewModel = viewModel {
     HouseholdViewModel(
-        HouseholdRepositoryFirestore(firebaseFirestore), listFoodItemViewModel, context.dataStore)
+        houseHoldRepository = HouseholdRepositoryFirestore(firebaseFirestore),
+        listFoodItemsViewModel = listFoodItemViewModel,
+        invitationRepository = invitationRepositoryFirestore,
+        context.dataStore)
   }
 
   NavHost(navController = navController, startDestination = startingRoute) {
@@ -154,11 +162,13 @@ fun ShelfLifeApp() {
         ProfileScreen(
             navigationActions,
             signOutUser = {
-              signOutUser(context) {
-                // Navigate to the authentication screen
-                navigationActions.navigateToAndClearBackStack(Route.AUTH)
-              }
-            })
+              signOutUser(context) { navigationActions.navigateToAndClearBackStack(Route.AUTH) }
+            },
+            invitationViewModel = invitationViewModel)
+      }
+      composable(Route.INVITATIONS) {
+        InvitationScreen(
+            invitationViewModel = invitationViewModel, navigationActions = navigationActions)
       }
     }
   }
