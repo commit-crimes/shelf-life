@@ -1,8 +1,16 @@
 package com.android.shelfLife.ui.overview
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,6 +19,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil3.compose.rememberAsyncImagePainter
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.*
@@ -33,6 +43,7 @@ fun AddFoodItemScreen(
     navigationActions: NavigationActions,
     houseHoldViewModel: HouseholdViewModel,
     foodItemViewModel: ListFoodItemsViewModel,
+    foodFactsViewModel: FoodFactsViewModel,
     paddingValues: PaddingValues = PaddingValues(16.dp)
 ) {
 
@@ -54,8 +65,12 @@ fun AddFoodItemScreen(
   var unitExpanded by remember { mutableStateOf(false) }
   var categoryExpanded by remember { mutableStateOf(false) }
   var locationExpanded by remember { mutableStateOf(false) }
+  var selectedImage by remember { mutableStateOf<FoodFacts?>(null) }
+  val foodFacts by foodFactsViewModel.foodFactsSuggestions.collectAsState()
 
   val context = LocalContext.current
+
+  DisposableEffect(Unit) { onDispose { foodFactsViewModel.clearFoodFactsSuggestions() } }
 
   /** Validates all fields when the submit button is clicked. */
   fun validateAllFieldsWhenSubmitButton() {
@@ -89,6 +104,7 @@ fun AddFoodItemScreen(
                     onFoodNameChange = { newValue ->
                       foodName = newValue
                       foodNameErrorResId = validateFoodName(foodName)
+                      foodFactsViewModel.searchByQuery(foodName)
                     },
                     foodNameErrorResId = foodNameErrorResId)
                 Spacer(modifier = Modifier.height(16.dp))
@@ -208,48 +224,51 @@ fun AddFoodItemScreen(
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(R.string.cancel_button),
                     button2OnClick = {
-                      validateAllFieldsWhenSubmitButton()
-                      val isExpireDateValid =
-                          expireDateErrorResId == null && expireDate.isNotEmpty()
-                      val isOpenDateValid = openDateErrorResId == null
-                      val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
-                      val isFoodNameValid = foodNameErrorResId == null
-                      val isAmountValid = amountErrorResId == null
+                        validateAllFieldsWhenSubmitButton()
+                        val isExpireDateValid =
+                            expireDateErrorResId == null && expireDate.isNotEmpty()
+                        val isOpenDateValid = openDateErrorResId == null
+                        val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
+                        val isFoodNameValid = foodNameErrorResId == null
+                        val isAmountValid = amountErrorResId == null
 
-                      val expiryTimestamp = formatDateToTimestamp(expireDate)
-                      val openTimestamp =
-                          if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
-                      val buyTimestamp = formatDateToTimestamp(buyDate)
+                        val expiryTimestamp = formatDateToTimestamp(expireDate)
+                        val openTimestamp =
+                            if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
+                        val buyTimestamp = formatDateToTimestamp(buyDate)
 
-                      if (isExpireDateValid &&
-                          isOpenDateValid &&
-                          isBuyDateValid &&
-                          isFoodNameValid &&
-                          isAmountValid &&
-                          expiryTimestamp != null &&
-                          buyTimestamp != null) {
-                        val foodFacts =
-                            FoodFacts(
-                                name = foodName,
-                                barcode = "",
-                                quantity = Quantity(amount.toDouble(), unit),
-                                category = category)
-                        val newFoodItem =
-                            FoodItem(
-                                uid = foodItemViewModel.getUID(),
-                                foodFacts = foodFacts,
-                                location = location,
-                                expiryDate = expiryTimestamp,
-                                openDate = openTimestamp,
-                                buyDate = buyTimestamp,
-                                status = FoodStatus.CLOSED)
-                        houseHoldViewModel.addFoodItem(newFoodItem)
-                        navigationActions.goBack()
-                      } else {
-                        Toast.makeText(
+                        if (isExpireDateValid &&
+                            isOpenDateValid &&
+                            isBuyDateValid &&
+                            isFoodNameValid &&
+                            isAmountValid &&
+                            expiryTimestamp != null &&
+                            buyTimestamp != null) {
+                            val foodFacts =
+                                FoodFacts(
+                                    name = foodName,
+                                    barcode = selectedImage?.barcode ?: "",
+                                    quantity = Quantity(amount.toDouble(), unit),
+                                    category = category,
+                                    nutritionFacts = selectedImage?.nutritionFacts ?: NutritionFacts(),
+                                    imageUrl = selectedImage?.imageUrl ?: FoodFacts.DEFAULT_IMAGE_URL)
+                            val newFoodItem =
+                                FoodItem(
+                                    uid = foodItemViewModel.getUID(),
+                                    foodFacts = foodFacts,
+                                    location = location,
+                                    expiryDate = expiryTimestamp,
+                                    openDate = openTimestamp,
+                                    buyDate = buyTimestamp,
+                                    status = FoodStatus.CLOSED)
+                            houseHoldViewModel.addFoodItem(newFoodItem)
+                            foodFactsViewModel.clearFoodFactsSuggestions()
+                            navigationActions.goBack()
+                        } else {
+                            Toast.makeText(
                                 context, R.string.submission_error_message, Toast.LENGTH_SHORT)
-                            .show()
-                      }
+                                .show()
+                        }
                     },
                     button2TestTag = "foodSave",
                     button2Text = stringResource(R.string.submit_button_text))

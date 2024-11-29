@@ -139,17 +139,17 @@ fun IndividualRecipeScreen(
 @Composable
 fun DisplayIngredient(ingredient: Ingredient) {
   val unit =
-      when (ingredient.foodFacts.quantity.unit) {
+      when (ingredient.quantity.unit) {
         FoodUnit.GRAM -> "gr"
         FoodUnit.ML -> "ml"
         FoodUnit.COUNT -> ""
       }
 
-  val amount = ingredient.foodFacts.quantity.amount
+  val amount = ingredient.quantity.amount
   val quantity = if (floor(amount) == amount) amount.toInt().toString() else amount.toString()
 
   Text(
-      text = " - ${quantity}${unit} of ${ingredient.foodFacts.name}",
+      text = " - ${quantity}${unit} of ${ingredient.name}",
       modifier = Modifier.testTag("recipeIngredient"))
 }
 

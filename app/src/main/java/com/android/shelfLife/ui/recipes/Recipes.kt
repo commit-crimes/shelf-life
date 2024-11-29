@@ -50,7 +50,7 @@ import com.android.shelfLife.R
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.model.recipe.RecipesRepository
+import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -283,13 +283,13 @@ fun RecipeItem(
  * @return The corresponding `RecipesRepository.SearchRecipeType` enum value.
  * @throws IllegalArgumentException If the input string does not match any known recipe type.
  */
-fun stringToSearchRecipeType(string: String): RecipesRepository.SearchRecipeType {
+fun stringToSearchRecipeType(string: String): RecipeType {
   return when (string) {
-    "Soon to expire" -> RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE
-    "Only household items" -> RecipesRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS
-    "High protein" -> RecipesRepository.SearchRecipeType.HIGH_PROTEIN
-    "Low calories" -> RecipesRepository.SearchRecipeType.LOW_CALORIE
-    "Personal" -> RecipesRepository.SearchRecipeType.PERSONAL
+    "Soon to expire" -> RecipeType.USE_SOON_TO_EXPIRE
+    "Only household items" -> RecipeType.USE_ONLY_HOUSEHOLD_ITEMS
+    "High protein" -> RecipeType.HIGH_PROTEIN
+    "Low calories" -> RecipeType.LOW_CALORIE
+    "Personal" -> RecipeType.PERSONAL
     else -> throw IllegalArgumentException("Unknown filter: $string")
   }
 }
@@ -320,8 +320,8 @@ fun filterRecipes(
       listRecipes.filter { recipe ->
         // Check if recipe matches selected filters
         (selectedFilters.isEmpty() ||
-            recipe.recipeTypes.any { recipeType ->
-              selectedFilters.any { filter -> recipeType == stringToSearchRecipeType(filter) }
+            selectedFilters.any { filter ->
+              recipe.recipeType == stringToSearchRecipeType(filter)
             }) &&
             // Check if recipe matches the search query
             (query.isEmpty() || recipe.name.contains(query, ignoreCase = true))

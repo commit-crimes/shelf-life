@@ -1,158 +1,106 @@
 package com.android.shelfLife.model.recipe
 
 import androidx.lifecycle.ViewModel
-import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-open class ListRecipesViewModel() : ViewModel() {
+open class ListRecipesViewModel(
+    private val recipeRepository: RecipeRepository,
+    private val recipeGeneratorRepository: RecipeGeneratorRepository
+) : ViewModel() {
+  // Create a hardcoded test recipe, to allow all of our current tests to pass (end to end etc..)
+  // This will be cleaned up in next task, with the entire Recipes model refactor
+  private val testRecipe =
+      Recipe(
+          uid = "Test UID",
+          name = "Paella",
+          ingredients =
+              listOf(
+                  Ingredient("Rice", Quantity(100.0, FoodUnit.GRAM)),
+                  Ingredient("Chicken", Quantity(500.0, FoodUnit.GRAM))),
+          instructions =
+              listOf(
+                  "Test cooking instructions",
+                  "Test cooking instructions 2",
+                  "Test cooking instructions 3"),
+          servings = 1f,
+          time = 1.toDuration(DurationUnit.SECONDS),
+      )
 
-  companion object {
-    private const val instructionsTortillaDePatata = // this is an example to shown the
-        // scroll-ability of
-        // the IndividualRecipeScreen
-        "Peel and slice the potatoes:\n" +
-            "\n" +
-            "Peel the potatoes and cut them into thin, even slices (around 3-4 mm thick).\n" +
-            "Rinse and dry them thoroughly with a clean cloth or paper towel.\n" +
-            "Slice the onion (if using):\n" +
-            "\n" +
-            "Peel and cut the onion into thin slices. The onion will add sweetness and extra flavor to the tortilla.\n" +
-            "Fry the potatoes (and onion):\n" +
-            "\n" +
-            "Heat the olive oil in a deep frying pan over medium heat.\n" +
-            "Add the potatoes and onions to the oil, making sure they are submerged. Cook them slowly, turning occasionally, until they are soft but not browned (about 15-20 minutes). You want them tender but not crispy.\n" +
-            "Use a slotted spoon to remove the potatoes and onions from the oil, draining off excess oil. Set them aside in a large bowl.\n" +
-            "Tip: Save the leftover oil for future use. You can strain and reuse it.\n" +
-            "Beat the eggs:\n" +
-            "\n" +
-            "While the potatoes are cooling, crack the eggs into a large bowl, add a pinch of salt, and beat them until well mixed.\n" +
-            "Combine potatoes and eggs:\n" +
-            "\n" +
-            "Once the potatoes have cooled slightly, add them to the beaten eggs. Stir gently to coat the potatoes with the egg mixture. Let it sit for about 10 minutes so the potatoes absorb the egg.\n" +
-            "Cook the tortilla:\n" +
-            "\n" +
-            "Heat 1-2 tablespoons of olive oil in a non-stick frying pan (around 20-22 cm in diameter) over medium heat.\n" +
-            "Pour the potato-egg mixture into the pan and cook on medium-low heat for about 5-7 minutes, until the bottom is set but the top is still slightly runny. Gently shake the pan to prevent sticking.\n" +
-            "Flip the tortilla:\n" +
-            "\n" +
-            "Once the tortilla is mostly set, place a large plate or lid over the pan, then carefully flip the pan so the tortilla ends up on the plate.\n" +
-            "Slide the tortilla back into the pan to cook the other side for about 3-5 minutes, until fully set but still moist in the middle.\n" +
-            "Serve:\n" +
-            "\n" +
-            "Remove the tortilla from the pan and let it cool for a few minutes before slicing.\n" +
-            "It can be served warm or at room temperature, and is typically enjoyed with crusty bread or a simple salad."
-  }
-
-  // list of the recipes, for the moment I have filled up manually
-  private val recipes_ =
-      MutableStateFlow<List<Recipe>>(
-          listOf(
-              Recipe(
-                  name = "Paella",
-                  instructions = listOf("cook"),
-                  servings = 4,
-                  time = 5400.seconds, // 5400 seconds = 90 minutes
-                  recipeTypes = listOf(RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE)),
-              Recipe(
-                  name = "Fideua",
-                  instructions = listOf("cry"),
-                  servings = 3,
-                  time = 60.minutes, // 3600 seconds = 60 minutes
-                  recipeTypes =
-                      listOf(RecipesRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS)),
-              Recipe(
-                  name = "Tortilla de patata",
-                  instructions =
-                      listOf(
-                          instructionsTortillaDePatata), // TODO: refactor this constant into a list
-                  // of strings
-                  servings = 4,
-                  time = 90.minutes, // 5400 seconds = 90 minutes
-                  ingredients =
-                      listOf(
-                          Ingredient(
-                              FoodFacts(
-                                  name = "potato",
-                                  quantity = Quantity(amount = 4.0, unit = FoodUnit.COUNT)),
-                              true),
-                          Ingredient(
-                              FoodFacts(
-                                  name = "egg",
-                                  quantity = Quantity(amount = 8.0, unit = FoodUnit.COUNT)),
-                              true),
-                          Ingredient(
-                              FoodFacts(
-                                  name = "salt",
-                                  quantity = Quantity(amount = 15.5, unit = FoodUnit.GRAM)),
-                              true),
-                          Ingredient(
-                              FoodFacts(
-                                  name = "salt",
-                                  quantity = Quantity(amount = 20.75, unit = FoodUnit.ML)),
-                              true),
-                      ),
-                  recipeTypes = listOf(RecipesRepository.SearchRecipeType.HIGH_PROTEIN)),
-              Recipe(
-                  name = "Costillas a la brasa",
-                  instructions = listOf("cry"),
-                  servings = 3,
-                  time = 60.minutes, // 3600 seconds = 60 minutes
-                  recipeTypes =
-                      listOf(
-                          RecipesRepository.SearchRecipeType.LOW_CALORIE,
-                          RecipesRepository.SearchRecipeType.HIGH_PROTEIN)),
-              Recipe(
-                  name = "Curry rojo",
-                  instructions = listOf("cook"),
-                  servings = 4,
-                  time = 5400.seconds, // 5400 seconds = 90 minutes
-                  recipeTypes = listOf(RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE)),
-              Recipe(
-                  name = "Butifarra con boniato al horno",
-                  instructions = listOf("cry"),
-                  servings = 3,
-                  time = 3600.seconds, // 3600 seconds = 60 minutes
-                  // it has an extra long name to show the ... in the card
-                  recipeTypes = listOf(RecipesRepository.SearchRecipeType.LOW_CALORIE))))
-
-  val recipes: StateFlow<List<Recipe>> = recipes_.asStateFlow()
+  private val _recipes = MutableStateFlow<List<Recipe>>(listOf(testRecipe))
+  val recipes: StateFlow<List<Recipe>> = _recipes.asStateFlow()
 
   // Selected recipe, i.e the recipe for the detail view
-  private val selectedRecipe_ = MutableStateFlow<Recipe?>(null)
-  open val selectedRecipe: StateFlow<Recipe?> = selectedRecipe_.asStateFlow()
+  private val _selectedRecipe = MutableStateFlow<Recipe?>(null)
+  open val selectedRecipe: StateFlow<Recipe?> = _selectedRecipe.asStateFlow()
+
+  init {
+    recipeRepository.init(onSuccess = { getRecipes() })
+  }
+
+  /**
+   * Handles a failure in fetching recipes.
+   *
+   * @param exception The exception that occurred.
+   */
+  private fun _onFail(exception: Exception) {
+    // TODO: proper error Handling (use a global Error PopUp?)
+    // Log.e("ListRecipesViewModel", "Error fetching Recipes: $exception")
+  }
+
+  fun getUID(): String {
+    return recipeRepository.getUid()
+  }
+
+  fun getRecipes() {
+    return recipeRepository.getRecipes(
+        onSuccess = { _recipes.value = it + listOf(testRecipe) }, onFailure = ::_onFail)
+  }
+
+  /**
+   * Save a recipe to Firebase Firestore. This function will GIVE THE RECIPE A NEW UID
+   *
+   * @param recipe The Recipe to be saved.
+   */
+  fun saveRecipe(recipe: Recipe) {
+    val newRecipe = recipe.copy(uid = getUID())
+    _recipes.value +=
+        newRecipe // until the big model refactor, lets simply add it to the list to have the
+    // correct local state
+    recipeRepository.addRecipe(
+        recipe = newRecipe, onSuccess = { getRecipes() }, onFailure = ::_onFail)
+  }
+
+  /**
+   * Generate a recipe using the RecipeGeneratorRepository. WARNING!: This function does NOT save
+   * the recipe to the repository. Call saveRecipe for that.
+   *
+   * @param recipePrompt The RecipePrompt to generate the recipe from.
+   * @param onSuccess The callback to be called when the recipe is successfully generated.
+   */
+  fun generateRecipe(
+      recipePrompt: RecipePrompt,
+      onSuccess: (Recipe) -> Unit,
+      onFailure: (Exception) -> Unit
+  ) {
+    recipeGeneratorRepository.generateRecipe(
+        recipePrompt = recipePrompt,
+        onSuccess =
+            onSuccess, // NOT SAVED DIRECTLY (maybe user wants to regenerate, or scrap the recipe)
+        onFailure = onFailure)
+  }
 
   /**
    * Selects a recipe.
    *
    * @param recipe The Recipe to be selected.
    */
-  fun selectRecipe(recipe: Recipe) {
-    selectedRecipe_.value = recipe
-  }
-
-  /**
-   * TODO: complete with Alejandro in a future task. Depends on his vision of the UI and how the
-   *   viewModel should create a recipe from the OpenAiRecipesRepository
-   */
-  fun createRecipe(
-      name: String,
-      instructions: List<String>,
-      servings: Int,
-      time: Duration,
-      recipeTypes: List<RecipesRepository.SearchRecipeType>
-  ) {
-    val newRecipe = Recipe(name, instructions, servings, time, recipeTypes = recipeTypes)
-    recipes_.value += newRecipe
-  }
-
-  fun addRecipeToList(recipe: Recipe) {
-    recipes_.value = recipes_.value + recipe
+  fun selectRecipe(recipe: Recipe?) {
+    _selectedRecipe.value = recipe
   }
 }

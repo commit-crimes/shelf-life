@@ -38,13 +38,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.android.shelfLife.R
-import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.model.recipe.RecipesRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.theme.onSecondaryDark
 import com.android.shelfLife.ui.theme.primaryContainerDark
@@ -78,6 +76,7 @@ fun AddRecipeScreen(
   var timeError by remember { mutableStateOf<String?>(null) }
   var instructionsError by remember { mutableStateOf(false) }
 
+  // Helper function to validate if any instruction is empty
   fun validateInstructions() {
     instructionsError = instructions.any { it.isBlank() }
   }
@@ -225,39 +224,40 @@ fun AddRecipeScreen(
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(R.string.cancel_button),
                     button2OnClick = {
-                      validateInstructions()
-                      error =
-                          title.isEmpty() ||
-                              time.isEmpty() ||
-                              servings.isEmpty() ||
-                              ingredients.isEmpty() ||
-                              instructions.isEmpty() ||
-                              instructionsError
-                      if (!error) {
-                        listRecipesViewModel.addRecipeToList(
-                            recipe =
+                        validateInstructions()
+                        error =
+                            title.isEmpty() ||
+                                    time.isEmpty() ||
+                                    servings.isEmpty() ||
+                                    ingredients.isEmpty() ||
+                                    instructions.isEmpty() ||
+                                    instructionsError
+                        if (!error) {
+                            navigationActions.goBack()
+                            listRecipesViewModel.saveRecipe(
+                                recipe =
                                 Recipe(
+                                    uid = "",
                                     name = title,
                                     instructions = instructions.toList(),
-                                    servings = servings.toInt(),
+                                    servings = servings.toFloat(),
                                     time = (time.toDouble() * 60.0).seconds,
-                                    ingredients = ingredients.toList(),
-                                    recipeTypes =
-                                        listOf(RecipesRepository.SearchRecipeType.PERSONAL)))
-                        navigationActions.goBack()
-                      } else {
-                        Toast.makeText(
+                                    ingredients = ingredients.toList()))
+                        } else {
+                            // if not a Toast appears
+                            Toast.makeText(
                                 context,
                                 "Please correct the errors before submitting.",
                                 Toast.LENGTH_SHORT)
-                            .show()
-                      }
+                                .show()
+                        }
                     },
                     button2TestTag = "addButton",
                     button2Text = stringResource(R.string.add_button))
               }
             }
 
+        // Ingredient Dialog, inside the composable block
         if (showIngredientDialog) {
           IngredientDialog(
               ingredients = ingredients,
@@ -339,7 +339,7 @@ fun IngredientItem(index: Int, ingredient: Ingredient, onRemoveClick: () -> Unit
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
     // title of ingredient
     Text(
-        text = stringResource(R.string.ingredient_item, index + 1, ingredient.foodFacts.name),
+        text = stringResource(R.string.ingredient_item, index + 1, ingredient.name),
         modifier = Modifier.testTag("ingredientItem"))
     // delete button
     IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteIngredientButton")) {
@@ -450,12 +450,7 @@ fun IngredientDialog(
                 val quantity = ingredientQuantity.toDouble()
                 // create the new ingredient
                 val newIngredient =
-                    Ingredient(
-                        foodFacts =
-                            FoodFacts(
-                                name = ingredientName,
-                                quantity = Quantity(quantity, ingredientUnit)),
-                        isOwned = false)
+                    Ingredient(name = ingredientName, quantity = Quantity(quantity, ingredientUnit))
                 // adding it into our list of ingredients
                 ingredients.add(newIngredient)
                 onAddIngredient()

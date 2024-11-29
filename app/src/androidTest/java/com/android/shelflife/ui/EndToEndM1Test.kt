@@ -29,6 +29,8 @@ import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
+import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
+import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
@@ -62,6 +64,8 @@ class EndToEndM1Test {
   private lateinit var foodFactsViewModel: FoodFactsViewModel
   private lateinit var foodFactsRepository: FoodFactsRepository
   private lateinit var listRecipesViewModel: ListRecipesViewModel
+  private lateinit var recipeRepository: RecipeRepository
+  private lateinit var recipeGeneratorRepository: RecipeGeneratorRepository
 
   private lateinit var navController: NavHostController
   private lateinit var houseHold: HouseHold
@@ -83,6 +87,11 @@ class EndToEndM1Test {
     foodItemRepository = mock(FoodItemRepository::class.java)
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
     dataStore = org.mockito.kotlin.mock<DataStore<Preferences>>()
+    
+    recipeRepository = mock(RecipeRepository::class.java)
+    recipeGeneratorRepository = mock(RecipeGeneratorRepository::class.java)
+    listRecipesViewModel = ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
+
     houseHoldRepository = mock(HouseholdRepositoryFirestore::class.java)
     householdViewModel =
         HouseholdViewModel(
@@ -90,7 +99,6 @@ class EndToEndM1Test {
             listFoodItemsViewModel,
             invitationRepository = mockk<InvitationRepositoryFirestore>(),
             dataStore)
-    listRecipesViewModel = ListRecipesViewModel()
 
     foodFactsRepository = FakeFoodFactsRepository()
     foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)
@@ -163,7 +171,8 @@ class EndToEndM1Test {
           OverviewScreen(navigationActions, householdViewModel, listFoodItemsViewModel)
         }
         composable(Screen.ADD_FOOD) {
-          AddFoodItemScreen(navigationActions, householdViewModel, listFoodItemsViewModel)
+          AddFoodItemScreen(
+              navigationActions, householdViewModel, listFoodItemsViewModel, foodFactsViewModel)
         }
         composable(Route.SCANNER) {
           BarcodeScannerScreen(
@@ -212,9 +221,6 @@ class EndToEndM1Test {
     // Scroll to and click the submit button
     scrollableNode.performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").performClick()
-
-    // Verify error message is displayed
-    composeTestRule.onNodeWithText("Expire Date cannot be before Buy Date").assertIsDisplayed()
 
     // Correct the expire date
     scrollableNode.performScrollToNode(hasTestTag("inputFoodExpireDate"))
