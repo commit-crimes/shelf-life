@@ -107,9 +107,7 @@ class AddRecipesTest {
     householdViewModel.selectHousehold(houseHold)
     composeTestRule.setContent {
       AddRecipeScreen(
-          navigationActions = navigationActions,
-          listRecipesViewModel = listRecipesViewModel,
-          householdViewModel = householdViewModel)
+          navigationActions = navigationActions, listRecipesViewModel = listRecipesViewModel)
     }
   }
 
@@ -118,6 +116,7 @@ class AddRecipesTest {
     setUpAddRecipesScreen()
     composeTestRule.onNodeWithTag("addRecipeScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("topBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addRecipeTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("goBackArrow").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputRecipeTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("inputRecipeServings").assertIsDisplayed()

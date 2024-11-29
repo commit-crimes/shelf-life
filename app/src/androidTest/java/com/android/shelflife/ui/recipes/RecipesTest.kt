@@ -106,7 +106,7 @@ class RecipesTest {
   // Helper function to check if the basic UI elements are displayed
   private fun verifyBasicUIElements() {
     composeTestRule.onNodeWithTag("recipesScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("recipeSearchBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("searchBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addRecipeFab").assertIsDisplayed()
   }
 
@@ -138,7 +138,7 @@ class RecipesTest {
     // Verify that only one recipe card is displayed and contains the text "Paella"
     composeTestRule.onAllNodesWithTag("recipesCards").assertCountEquals(1)
     composeTestRule
-        .onNode(hasText("Paella") and hasAnyAncestor(hasTestTag("recipeSearchBar")))
+        .onNode(hasText("Paella") and hasAnyAncestor(hasTestTag("searchBar")))
         .assertIsDisplayed()
   }
 

@@ -2,7 +2,6 @@ package com.android.shelfLife.model.creationScreen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.android.shelfLife.model.household.HouseholdViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,13 +23,11 @@ class CreationScreenViewModel(initialEmails: Set<String> = emptySet()) : ViewMod
   }
 }
 
-class CreationScreenViewModelFactory(
-  private val initialEmails: Set<String>
-) : ViewModelProvider.Factory {
+class CreationScreenViewModelFactory(private val initialEmails: Set<String>) :
+    ViewModelProvider.Factory {
   override fun <T : ViewModel> create(modelClass: Class<T>): T {
     if (modelClass.isAssignableFrom(CreationScreenViewModel::class.java)) {
-      @Suppress("UNCHECKED_CAST")
-      return CreationScreenViewModel(initialEmails) as T
+      @Suppress("UNCHECKED_CAST") return CreationScreenViewModel(initialEmails) as T
     }
     throw IllegalArgumentException("Unknown ViewModel class")
   }

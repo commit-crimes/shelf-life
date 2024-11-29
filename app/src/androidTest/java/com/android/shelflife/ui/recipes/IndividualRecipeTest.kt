@@ -110,7 +110,8 @@ class IndividualRecipeTest {
   private fun verifyCommonUIElements() {
     composeTestRule.onNodeWithTag("individualRecipesScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("topBar").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("recipe").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("topBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("individualRecipeTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("recipeImage").assertIsDisplayed()
     composeTestRule.onNodeWithTag("recipeServings").assertIsDisplayed()
     composeTestRule.onNodeWithTag("recipeTime").assertIsDisplayed()

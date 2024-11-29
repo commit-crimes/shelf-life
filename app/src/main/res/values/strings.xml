@@ -26,6 +26,7 @@
     <string name="submit_button_text">Submit</string>
     <string name="cancel_button">Cancel</string>
     <string name="add_button">Add</string>
+    <string name="save_button">Save</string>
 
     <!-- Error Messages -->
     <string name="submission_error_message">Please correct the errors before submitting</string>

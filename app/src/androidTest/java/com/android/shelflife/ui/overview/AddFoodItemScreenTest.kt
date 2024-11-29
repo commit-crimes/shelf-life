@@ -50,7 +50,6 @@ class AddFoodItemScreenTest {
 
   @Before
   fun setUp() {
-
     MockKAnnotations.init(this, relaxed = true)
 
     // Initialize MockK
@@ -159,6 +158,7 @@ class AddFoodItemScreenTest {
 
     composeTestRule.onNodeWithTag("addFoodItemScreen").performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
   }
 
   @Test
@@ -405,9 +405,30 @@ class AddFoodItemScreenTest {
     }
 
     // Click the back button
-    composeTestRule.onNodeWithTag("goBackButton").performClick()
+    composeTestRule.onNodeWithTag("goBackArrow").performClick()
 
     // Verify that the navigation action was called
+    verify { navigationActions.goBack() }
+  }
+
+  @Test
+  fun testCancelButtonNavigatesBack() {
+    composeTestRule.setContent {
+      AddFoodItemScreen(
+          navigationActions = navigationActions,
+          houseHoldViewModel = houseHoldViewModel,
+          foodItemViewModel = foodItemViewModel,
+          foodFactsViewModel = foodFactsViewModel)
+    }
+
+      composeTestRule
+          .onNodeWithTag("addFoodItemScreen")
+          .performScrollToNode(hasTestTag("cancelButton"))
+
+      composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
+
+      composeTestRule.onNodeWithTag("cancelButton").performClick()
+
     verify { navigationActions.goBack() }
   }
 

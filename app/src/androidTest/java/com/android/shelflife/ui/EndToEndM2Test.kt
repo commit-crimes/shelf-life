@@ -103,7 +103,6 @@ class EndToEndM2Test {
     foodItemRepository = mock(FoodItemRepository::class.java)
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
 
-    
     recipeRepository = mock(RecipeRepository::class.java)
     recipeGeneratorRepository = mock(RecipeGeneratorRepository::class.java)
     listRecipesViewModel = ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
@@ -119,7 +118,6 @@ class EndToEndM2Test {
             invitationRepository = invitationRepository,
             dataStore)
     invitationViewModel = InvitationViewModel(invitationRepository)
-
 
     foodFactsRepository = FakeFoodFactsRepository()
     foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)
@@ -210,9 +208,7 @@ class EndToEndM2Test {
         composable(Screen.INDIVIDUAL_RECIPE) {
           IndividualRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)
         }
-        composable(Screen.ADD_RECIPE) {
-          AddRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)
-        }
+        composable(Screen.ADD_RECIPE) { AddRecipeScreen(navigationActions, listRecipesViewModel) }
         composable(Screen.EDIT_FOOD) {
           EditFoodItemScreen(
               navigationActions = navigationActions,
@@ -332,7 +328,7 @@ class EndToEndM2Test {
         .performTextInput(formatTimestampToDate(Timestamp.now()))
     composeTestRule.onNodeWithTag("editFoodItemScreen").performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").performClick()
-    composeTestRule.onNodeWithTag("IndividualTestScreenGoBack").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("goBackArrow").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
   }
 

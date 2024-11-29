@@ -1,3 +1,5 @@
+// FoodInputContent.kt
+
 package com.android.shelfLife.ui.camera
 
 import android.widget.Toast
@@ -8,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -66,21 +67,9 @@ fun FoodInputContent(
         // Food information
         Row(verticalAlignment = Alignment.CenterVertically) {
           Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = foodFacts.name,
-                style =
-                    TextStyle(
-                        fontSize = 20.sp,
-                        color = Color(0xFF000000),
-                    ))
+            Text(text = foodFacts.name, style = TextStyle(fontSize = 20.sp))
 
-            Text(
-                text = foodFacts.category.name,
-                style =
-                    TextStyle(
-                        fontSize = 13.sp,
-                        color = Color(0xFF000000),
-                    ))
+            Text(text = foodFacts.category.name, style = TextStyle(fontSize = 13.sp))
           }
 
           Image(
@@ -152,54 +141,44 @@ fun FoodInputContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-              Button(
-                  onClick = { onCancel() },
-                  colors =
-                      ButtonDefaults.buttonColors(
-                          containerColor = MaterialTheme.colorScheme.secondary),
-                  modifier = Modifier.weight(1f).height(50.dp).testTag("cancelButton")) {
-                    Text(text = stringResource(id = R.string.cancel_button), fontSize = 18.sp)
-                  }
-              Button(
-                  onClick = {
-                    validateAllFieldsWhenSubmitButton()
-                    val isExpireDateValid = expireDateErrorResId == null && expireDate.isNotEmpty()
-                    val isOpenDateValid = openDateErrorResId == null
-                    val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
+        CustomButtons(
+            button1OnClick = { onCancel() },
+            button1TestTag = "cancelButton",
+            button1Text = stringResource(R.string.cancel_button),
+            button2OnClick = {
+              validateAllFieldsWhenSubmitButton()
+              val isExpireDateValid = expireDateErrorResId == null && expireDate.isNotEmpty()
+              val isOpenDateValid = openDateErrorResId == null
+              val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
 
-                    val expiryTimestamp = formatDateToTimestamp(expireDate)
-                    val openTimestamp =
-                        if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
-                    val buyTimestamp = formatDateToTimestamp(buyDate)
+              val expiryTimestamp = formatDateToTimestamp(expireDate)
+              val openTimestamp =
+                  if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
+              val buyTimestamp = formatDateToTimestamp(buyDate)
 
-                    if (isExpireDateValid &&
-                        isOpenDateValid &&
-                        isBuyDateValid &&
-                        expiryTimestamp != null &&
-                        buyTimestamp != null) {
-                      val newFoodItem =
-                          FoodItem(
-                              uid = foodItemViewModel.getUID(),
-                              foodFacts = foodFacts,
-                              location = location,
-                              expiryDate = expiryTimestamp,
-                              openDate = openTimestamp,
-                              buyDate = buyTimestamp)
+              if (isExpireDateValid &&
+                  isOpenDateValid &&
+                  isBuyDateValid &&
+                  expiryTimestamp != null &&
+                  buyTimestamp != null) {
+                val newFoodItem =
+                    FoodItem(
+                        uid = foodItemViewModel.getUID(),
+                        foodFacts = foodFacts,
+                        location = location,
+                        expiryDate = expiryTimestamp,
+                        openDate = openTimestamp,
+                        buyDate = buyTimestamp)
 
-                      Toast.makeText(context, R.string.food_added_message, Toast.LENGTH_SHORT)
-                          .show()
-                      onSubmit(newFoodItem)
-                    } else {
-                      Toast.makeText(context, R.string.submission_error_message, Toast.LENGTH_SHORT)
-                          .show()
-                    }
-                  },
-                  modifier = Modifier.weight(1f).height(50.dp).testTag("submitButton")) {
-                    Text(text = stringResource(id = R.string.submit_button_text), fontSize = 18.sp)
-                  }
-            }
+                Toast.makeText(context, R.string.food_added_message, Toast.LENGTH_SHORT).show()
+                onSubmit(newFoodItem)
+              } else {
+                Toast.makeText(context, R.string.submission_error_message, Toast.LENGTH_SHORT)
+                    .show()
+              }
+            },
+            button2TestTag = "submitButton",
+            button2Text = stringResource(R.string.submit_button_text),
+        )
       }
 }

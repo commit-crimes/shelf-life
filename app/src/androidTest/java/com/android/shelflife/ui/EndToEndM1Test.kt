@@ -87,7 +87,7 @@ class EndToEndM1Test {
     foodItemRepository = mock(FoodItemRepository::class.java)
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
     dataStore = org.mockito.kotlin.mock<DataStore<Preferences>>()
-    
+
     recipeRepository = mock(RecipeRepository::class.java)
     recipeGeneratorRepository = mock(RecipeGeneratorRepository::class.java)
     listRecipesViewModel = ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
@@ -251,7 +251,7 @@ class EndToEndM1Test {
         .performTextInput("Paella")
     composeTestRule.onAllNodesWithTag("recipesCards").assertCountEquals(1)
     composeTestRule
-        .onNode(hasText("Paella") and hasAnyAncestor(hasTestTag("recipeSearchBar")))
+        .onNode(hasText("Paella") and hasAnyAncestor(hasTestTag("searchBar")))
         .assertIsDisplayed()
   }
 

@@ -4,7 +4,6 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -14,7 +13,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.Quantity
@@ -72,22 +70,10 @@ fun EditFoodItemScreen(
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
-        TopAppBar(
-            title = {
-              Text(
-                  modifier = Modifier.testTag("editFoodItemTitle"),
-                  text = stringResource(id = R.string.edit_food_item_title))
-            },
-            navigationIcon = {
-              IconButton(
-                  onClick = { navigationActions.goBack() },
-                  modifier = Modifier.testTag("goBackButton")) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription =
-                            stringResource(id = R.string.go_back_button_description))
-                  }
-            },
+        CustomTopAppBar(
+            onClick = { navigationActions.goBack() },
+            title = stringResource(id = R.string.edit_food_item_title),
+            titleTestTag = "editFoodItemTitle",
             actions = {
               IconButton(
                   onClick = {
@@ -210,10 +196,12 @@ fun EditFoodItemScreen(
                 Spacer(modifier = Modifier.height(32.dp))
               }
 
-              item(key = "submitButton") {
-                // Submit Button
-                Button(
-                    onClick = {
+              item(key = "buttons") {
+                CustomButtons(
+                    button1OnClick = { navigationActions.goBack() },
+                    button1TestTag = "cancelButton",
+                    button1Text = stringResource(R.string.cancel_button),
+                    button2OnClick = {
                       validateAllFieldsWhenSubmitButton()
                       val isAmountValid = amountErrorResId == null
                       val isExpireDateValid =
@@ -261,22 +249,8 @@ fun EditFoodItemScreen(
                             .show()
                       }
                     },
-                    modifier = Modifier.testTag("foodSave").fillMaxWidth().height(50.dp)) {
-                      Text(
-                          text = stringResource(id = R.string.submit_button_text), fontSize = 18.sp)
-                    }
-                Spacer(modifier = Modifier.height(16.dp))
-              }
-
-              item(key = "cancelButton") {
-                Button(
-                    onClick = { navigationActions.goBack() },
-                    colors =
-                        ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary),
-                    modifier = Modifier.fillMaxWidth().height(50.dp).testTag("cancelButton")) {
-                      Text(text = stringResource(id = R.string.cancel_button), fontSize = 18.sp)
-                    }
+                    button2TestTag = "foodSave",
+                    button2Text = stringResource(R.string.submit_button_text))
               }
             }
       }

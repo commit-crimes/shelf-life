@@ -33,6 +33,7 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
+import com.android.shelfLife.ui.utils.CustomSearchBar
 import kotlinx.coroutines.launch
 
 /**
@@ -122,10 +123,11 @@ fun OverviewScreen(
             Column(
                 modifier = Modifier.padding(paddingValues),
             ) {
-              FoodSearchBar(
+              CustomSearchBar(
                   query = searchQuery,
-                  onQueryChange = { searchQuery = it } // Update the query state when the user types
-                  )
+                  onQueryChange = { searchQuery = it },
+                  placeholder = "Search food item",
+                  searchBarTestTag = "foodSearchBar")
               ListFoodItems(
                   foodItems = filteredFoodItems,
                   householdViewModel = householdViewModel,

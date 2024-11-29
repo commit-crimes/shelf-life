@@ -302,7 +302,7 @@ class EditFoodItemScreenTest {
     }
 
     // Click the back button
-    composeTestRule.onNodeWithTag("goBackButton").performClick()
+    composeTestRule.onNodeWithTag("goBackArrow").performClick()
 
     // Verify that the navigation action was called
     verify { navigationActions.goBack() }

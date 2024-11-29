@@ -255,7 +255,7 @@ class HouseholdViewModel(
    *
    * @param household - The updated household.
    */
-  fun updateHousehold(household: HouseHold) {
+  fun updateHousehold(household: HouseHold, shouldUpdateRepo : Boolean = true) {
     val oldHousehold = households.value.find { it.uid == household.uid }
     if (oldHousehold != null) {
       if (oldHousehold.members != household.members) {
@@ -282,6 +282,14 @@ class HouseholdViewModel(
           }
         }
       }
+        if (shouldUpdateRepo) {
+            houseHoldRepository.updateHousehold(
+                household,
+                onSuccess = { Log.d("HouseholdViewModel", "Household updated successfully") },
+                onFailure = { exception ->
+                Log.e("HouseholdViewModel", "Error updating household: $exception")
+                })
+        }
     } else {
       Log.e("HouseholdViewModel", "Old household not found for UID: ${household.uid}")
     }
@@ -349,12 +357,13 @@ class HouseholdViewModel(
     if (selectedHousehold != null) {
       val updatedMembers = selectedHousehold.members.minus(memberUid)
       households.value.find { it.uid == selectedHousehold.uid }!!.copy(members = updatedMembers)
+      val updatedHousehold = selectedHousehold.copy(members = updatedMembers)
       houseHoldRepository.updateHousehold(
-          selectedHousehold.copy(members = updatedMembers),
+          updatedHousehold,
           { Log.d("HouseholdViewModel", "Member deleted successfully") },
           { exception -> Log.e("HouseholdViewModel", "Error deleting member: $exception") })
+      updateViewModelStateWithHousehold(updatedHousehold)
     }
-    loadHouseholds()
   }
 
   /**

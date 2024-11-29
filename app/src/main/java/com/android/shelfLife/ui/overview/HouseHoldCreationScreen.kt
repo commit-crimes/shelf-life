@@ -3,7 +3,6 @@ package com.android.shelfLife.ui.overview
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,16 +26,20 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.shelfLife.R
 import com.android.shelfLife.model.creationScreen.CreationScreenViewModel
+import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.DeletionConfirmationPopUp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
@@ -179,9 +182,7 @@ fun HouseHoldCreationScreen(
                               if (email != FirebaseAuth.getInstance().currentUser?.email ||
                                   householdToEdit != null) {
                                 IconButton(
-                                    onClick = {
-                                      creationScreenViewModel.removeEmail(email)
-                                    },
+                                    onClick = { creationScreenViewModel.removeEmail(email) },
                                     modifier = Modifier.testTag("RemoveEmailButton")) {
                                       Icon(
                                           imageVector = Icons.Default.Delete,
@@ -230,73 +231,51 @@ fun HouseHoldCreationScreen(
                 }
               }
               // Confirm and Cancel buttons
-              Row(
-                  modifier = Modifier.fillMaxWidth().padding(top = 25.dp, bottom = 60.dp),
-                  verticalAlignment = Alignment.Bottom,
-                  horizontalArrangement = Arrangement.SpaceBetween) {
-                    Button(
-                        modifier = Modifier.testTag("ConfirmButton"),
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer),
-                        onClick = {
-                          if (houseHoldName.isBlank() ||
-                              householdViewModel.checkIfHouseholdNameExists(houseHoldName) &&
-                                  (householdToEdit == null ||
-                                      houseHoldName != householdToEdit!!.name)) {
-                            isError = true
-                          } else {
-                            if (householdToEdit != null) {
-                                (householdViewModel.householdToEdit.value?.members!! - memberEmails.keys).forEach { uid ->
-                                    val email =
-                                        memberEmails.entries.find { it.key == uid }?.value!!
-                                    if (email != null) {
-                                        Log.d(
-                                            "HouseHoldCreationScreen",
-                                            "Email: $email, UiD: $uid"
-                                        )
-                                        householdViewModel.deleteMember(uid)
-                                        creationScreenViewModel.removeEmail(email)
-                                    } else {
-                                        Log.e(
-                                            "HouseHoldCreationScreen",
-                                            "UID not found for email: $email"
-                                        )
-                                    }
-                                }
-                            } else {
-                              householdViewModel.addNewHousehold(houseHoldName, memberEmailList)
-                            }
-                            navigationActions.navigateTo(Screen.OVERVIEW)
-                          }
-                        },
-                    ) {
-                      Text(
-                          "Save",
-                          style =
-                              TextStyle(
-                                  fontSize = 20.sp,
-                                  textAlign = TextAlign.Center,
-                                  color = MaterialTheme.colorScheme.onSecondaryContainer),
-                          modifier = Modifier.padding(7.dp).width(70.dp))
+              CustomButtons(
+                  button1OnClick = { navigationActions.goBack() },
+                  button1TestTag = "CancelButton",
+                  button1Text = stringResource(R.string.cancel_button),
+                  button2OnClick = {
+                    if (houseHoldName.isBlank() ||
+                        householdViewModel.checkIfHouseholdNameExists(houseHoldName) &&
+                            (householdToEdit == null || houseHoldName != householdToEdit!!.name)) {
+                      isError = true
+                    } else {
+                      if (householdToEdit != null) {
+                          var updatedHouseHold = householdToEdit!!.copy(name = houseHoldName)
+                          householdViewModel.getUserIdsByEmails(
+                              memberEmailList,
+                              callback = { emailToUserIds ->
+                                  if (emailToUserIds.isNotEmpty()) {
+                                      val oldUidList = updatedHouseHold.members
+                                      val uidList = memberEmailList.map { emailToUserIds[it]!! }
+                                      if (oldUidList.size < uidList.size) {
+                                          householdViewModel.updateHousehold(
+                                              householdToEdit!!.copy(
+                                                  name = houseHoldName,
+                                                  members = uidList
+                                              ), false
+                                          )
+                                      } else if (oldUidList.size > uidList.size) {
+                                          householdViewModel.updateHousehold(
+                                              householdToEdit!!.copy(
+                                                  name = houseHoldName,
+                                                  members = uidList
+                                              ), true
+                                          )
+                                      }
+                                      householdViewModel.updateHousehold(updatedHouseHold)
+                                  }
+                              }
+                          )
+                      } else {
+                        householdViewModel.addNewHousehold(houseHoldName, memberEmailList)
+                      }
+                      navigationActions.navigateTo(Screen.OVERVIEW)
                     }
-                    Button(
-                        modifier = Modifier.testTag("CancelButton"),
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer),
-                        onClick = { navigationActions.goBack() },
-                    ) {
-                      Text(
-                          "Cancel",
-                          style =
-                              TextStyle(
-                                  fontSize = 20.sp,
-                                  textAlign = TextAlign.Center,
-                                  color = MaterialTheme.colorScheme.onSecondaryContainer),
-                          modifier = Modifier.padding(7.dp).width(70.dp))
-                    }
-                  }
+                  },
+                  button2TestTag = "ConfirmButton",
+                  button2Text = stringResource(R.string.save_button))
 
               // Confirmation Dialog for Deletion
               DeletionConfirmationPopUp(
