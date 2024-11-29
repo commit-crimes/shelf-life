@@ -418,7 +418,8 @@ class AddFoodItemScreenTest {
       AddFoodItemScreen(
           navigationActions = navigationActions,
           houseHoldViewModel = houseHoldViewModel,
-          foodItemViewModel = foodItemViewModel)
+          foodItemViewModel = foodItemViewModel,
+          foodFactsViewModel = foodFactsViewModel)
     }
 
     composeTestRule.onNodeWithTag("cancelButton").performClick()

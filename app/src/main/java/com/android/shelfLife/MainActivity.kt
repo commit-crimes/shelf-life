@@ -154,7 +154,7 @@ fun ShelfLifeApp() {
       }
       composable(Screen.ADD_RECIPE) { AddRecipeScreen(navigationActions, listRecipesViewModel) }
       composable(Screen.ADD_RECIPE) {
-        AddRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)
+        AddRecipeScreen(navigationActions, listRecipesViewModel)
         // To test Ai generated recipes: GenerateRecipeScreen(navigationActions,
         // listRecipesViewModel)
       }
