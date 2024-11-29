@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CircularProgressIndicator
@@ -16,9 +15,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,9 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
@@ -37,6 +31,7 @@ import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.ui.utils.FoodItemDetails
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,22 +45,10 @@ fun IndividualFoodItemScreen(
   Scaffold(
       modifier = Modifier.testTag("IndividualFoodItemScreen"),
       topBar = {
-        TopAppBar(
-            title = {},
-            colors =
-                TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    actionIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer),
-            modifier = Modifier.testTag("topBar"),
-            navigationIcon = {
-              IconButton(
-                  onClick = { navigationActions.goBack() },
-                  modifier = Modifier.testTag("IndividualTestScreenGoBack")) {
-                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Go back Icon")
-                  }
-            },
+        CustomTopAppBar(
+            onClick = { navigationActions.goBack() },
+            title = if (foodItem != null) foodItem!!.foodFacts.name else "",
+            titleTestTag = "IndividualFoodItemName",
             actions = {
               IconButton(
                   onClick = {
@@ -96,11 +79,6 @@ fun IndividualFoodItemScreen(
         LazyColumn(modifier = Modifier.padding(paddingValues)) {
           item {
             if (foodItem != null) {
-              Text(
-                  text = foodItem!!.foodFacts.name,
-                  fontSize = 24.sp,
-                  fontWeight = FontWeight.Bold,
-                  modifier = Modifier.padding(16.dp).testTag("IndividualFoodItemName"))
               AsyncImage(
                   model = foodItem!!.foodFacts.imageUrl,
                   contentDescription = "Food Image",

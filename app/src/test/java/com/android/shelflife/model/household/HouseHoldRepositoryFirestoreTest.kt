@@ -407,7 +407,7 @@ class HouseholdRepositoryFirestoreTest {
 
   @Test
   fun `getUserIds returns correct mapping when users list is not empty and Firestore queries succeed`() {
-    val users = listOf("user1@example.com", "user2@example.com")
+    val users = setOf("user1@example.com", "user2@example.com")
     val callback = mock<(Map<String, String>) -> Unit>()
 
     // Mock Firestore behavior
@@ -415,7 +415,7 @@ class HouseholdRepositoryFirestoreTest {
     `when`(mockFirestore.collection("users")).thenReturn(usersCollectionRef)
 
     val query: Query = mock()
-    `when`(usersCollectionRef.whereIn(eq("email"), eq(users))).thenReturn(query)
+    `when`(usersCollectionRef.whereIn(eq("email"), eq(users.toList()))).thenReturn(query)
 
     val taskQuerySnapshot: Task<QuerySnapshot> = mock()
     `when`(query.get()).thenReturn(taskQuerySnapshot)
@@ -448,7 +448,7 @@ class HouseholdRepositoryFirestoreTest {
 
   @Test
   fun `getUserIds returns correct mapping when users list exceeds batch size and Firestore queries succeed`() {
-    val users = (1..15).map { "user$it@example.com" }
+    val users = (1..15).map { "user$it@example.com" }.toSet()
     val callback = mock<(Map<String, String>) -> Unit>()
 
     // Mock Firestore behavior
@@ -501,7 +501,7 @@ class HouseholdRepositoryFirestoreTest {
 
   @Test
   fun `getUserIds handles Firestore query failure gracefully`() {
-    val users = listOf("user1@example.com", "user2@example.com")
+    val users = setOf("user1@example.com", "user2@example.com")
     val callback = mock<(Map<String, String>) -> Unit>()
 
     // Mock Firestore behavior
@@ -509,7 +509,7 @@ class HouseholdRepositoryFirestoreTest {
     `when`(mockFirestore.collection("users")).thenReturn(usersCollectionRef)
 
     val query: Query = mock()
-    `when`(usersCollectionRef.whereIn(eq("email"), eq(users))).thenReturn(query)
+    `when`(usersCollectionRef.whereIn(eq("email"), eq(users.toList()))).thenReturn(query)
 
     val taskQuerySnapshot: Task<QuerySnapshot> = mock()
     `when`(query.get()).thenReturn(taskQuerySnapshot)
@@ -531,7 +531,7 @@ class HouseholdRepositoryFirestoreTest {
 
   @Test
   fun `getUserIds processes all batches even if some fail`() {
-    val users = (1..20).map { "user$it@example.com" }
+    val users = (1..20).map { "user$it@example.com" }.toSet()
     val callback = mock<(Map<String, String>) -> Unit>()
 
     // Mock Firestore behavior

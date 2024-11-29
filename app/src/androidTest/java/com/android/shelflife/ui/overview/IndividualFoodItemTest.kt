@@ -117,7 +117,7 @@ class IndividualFoodItemScreenTest {
     }
 
     // Perform click on the back button
-    composeTestRule.onNodeWithTag("IndividualTestScreenGoBack").performClick()
+    composeTestRule.onNodeWithTag("goBackArrow").performClick()
 
     // Verify that the navigation action was triggered
     io.mockk.verify { navigationActions.goBack() }

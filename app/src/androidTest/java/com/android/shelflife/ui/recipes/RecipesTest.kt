@@ -12,12 +12,16 @@ import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
-import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
+import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
+import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.google.firebase.Timestamp
+import io.mockk.mockk
 import java.util.Date
 import org.junit.Before
 import org.junit.Rule
@@ -30,8 +34,10 @@ class RecipesTest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var listFoodItemsViewModel: ListFoodItemsViewModel
   private lateinit var listRecipesViewModel: ListRecipesViewModel
-  private lateinit var houseHoldRepository: HouseHoldRepository
+  private lateinit var houseHoldRepository: HouseholdRepositoryFirestore
   private lateinit var householdViewModel: HouseholdViewModel
+  private lateinit var recipeGeneratorRepository: RecipeGeneratorRepository
+  private lateinit var recipeRepository: RecipeRepository
 
   private lateinit var houseHold: HouseHold
 
@@ -41,12 +47,17 @@ class RecipesTest {
   fun setUp() {
     navigationActions = mock()
     foodItemRepository = mock()
+    recipeRepository = mock()
+    recipeGeneratorRepository = mock()
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
-    listRecipesViewModel = ListRecipesViewModel()
+    listRecipesViewModel = ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
     houseHoldRepository = mock()
     householdViewModel =
         HouseholdViewModel(
-            houseHoldRepository, listFoodItemsViewModel, mock<DataStore<Preferences>>())
+            houseHoldRepository,
+            listFoodItemsViewModel,
+            mockk<InvitationRepositoryFirestore>(relaxed = true),
+            mock<DataStore<Preferences>>())
 
     val foodFacts =
         FoodFacts(
@@ -95,7 +106,7 @@ class RecipesTest {
   // Helper function to check if the basic UI elements are displayed
   private fun verifyBasicUIElements() {
     composeTestRule.onNodeWithTag("recipesScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("recipeSearchBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("searchBar").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addRecipeFab").assertIsDisplayed()
   }
 
@@ -127,7 +138,7 @@ class RecipesTest {
     // Verify that only one recipe card is displayed and contains the text "Paella"
     composeTestRule.onAllNodesWithTag("recipesCards").assertCountEquals(1)
     composeTestRule
-        .onNode(hasText("Paella") and hasAnyAncestor(hasTestTag("recipeSearchBar")))
+        .onNode(hasText("Paella") and hasAnyAncestor(hasTestTag("searchBar")))
         .assertIsDisplayed()
   }
 
@@ -141,7 +152,7 @@ class RecipesTest {
     composeTestRule.waitForIdle()
     composeTestRule
         .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("searchBar")))
-        .performTextInput("Tortilla de patata")
+        .performTextInput("Paella")
 
     // Click on the recipe and verify navigation
     composeTestRule.onNodeWithTag("recipesCards").performClick()

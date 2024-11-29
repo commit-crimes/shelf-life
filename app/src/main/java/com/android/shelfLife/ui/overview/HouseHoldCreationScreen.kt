@@ -3,7 +3,6 @@ package com.android.shelfLife.ui.overview
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,16 +26,22 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.shelfLife.R
 import com.android.shelfLife.model.creationScreen.CreationScreenViewModel
+import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.DeletionConfirmationPopUp
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,12 +50,14 @@ fun HouseHoldCreationScreen(
     navigationActions: NavigationActions,
     householdViewModel: HouseholdViewModel,
 ) {
-  val memberEmails by householdViewModel.memberEmails.collectAsState()
-  val creationScreenViewModel: CreationScreenViewModel = viewModel {
-    CreationScreenViewModel(memberEmails.values.toSet())
-  }
   val coroutineScope = rememberCoroutineScope()
   val householdToEdit by householdViewModel.householdToEdit.collectAsState()
+  val memberEmails by householdViewModel.memberEmails.collectAsState()
+  val creationScreenViewModel: CreationScreenViewModel = viewModel()
+
+  LaunchedEffect(memberEmails) {
+    creationScreenViewModel.setEmails(memberEmails.values.toMutableSet())
+  }
 
   var isError by rememberSaveable { mutableStateOf(false) }
   var houseHoldName by rememberSaveable { mutableStateOf(householdToEdit?.name ?: "") }
@@ -58,7 +65,7 @@ fun HouseHoldCreationScreen(
   var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
 
   // Mutable state list to hold member emails
-  val memberEmailList = creationScreenViewModel.emailList.collectAsState()
+  val memberEmailList by creationScreenViewModel.emailList.collectAsState()
   var emailInput by rememberSaveable { mutableStateOf("") }
   var showEmailTextField by rememberSaveable { mutableStateOf(false) }
 
@@ -81,7 +88,7 @@ fun HouseHoldCreationScreen(
 
   // Function to add email card to the list and scroll to the bottom
   fun addEmailCard() {
-    if (emailInput.isNotBlank() && emailInput.trim() !in memberEmailList.value) {
+    if (emailInput.isNotBlank() && emailInput.trim() !in memberEmailList) {
       creationScreenViewModel.addEmail(emailInput.trim())
       emailInput = ""
     }
@@ -156,7 +163,7 @@ fun HouseHoldCreationScreen(
                           .verticalScroll(columnScrollState)
                           .weight(1f),
               ) {
-                memberEmailList.value.forEach { email ->
+                memberEmailList.forEach { email ->
                   ElevatedCard(
                       elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
                       modifier =
@@ -172,13 +179,16 @@ fun HouseHoldCreationScreen(
                                   text = email,
                                   style = TextStyle(fontSize = 16.sp),
                                   modifier = Modifier.weight(1f))
-                              IconButton(
-                                  onClick = { creationScreenViewModel.removeEmail(email) },
-                                  modifier = Modifier.testTag("RemoveEmailButton")) {
-                                    Icon(
-                                        imageVector = Icons.Default.Delete,
-                                        contentDescription = "Remove Email")
-                                  }
+                              if (email != FirebaseAuth.getInstance().currentUser?.email ||
+                                  householdToEdit != null) {
+                                IconButton(
+                                    onClick = { creationScreenViewModel.removeEmail(email) },
+                                    modifier = Modifier.testTag("RemoveEmailButton")) {
+                                      Icon(
+                                          imageVector = Icons.Default.Delete,
+                                          contentDescription = "Remove Email")
+                                    }
+                              }
                             }
                       }
                 }
@@ -220,77 +230,52 @@ fun HouseHoldCreationScreen(
                       tint = MaterialTheme.colorScheme.onSecondaryContainer)
                 }
               }
-
               // Confirm and Cancel buttons
-              Row(
-                  modifier = Modifier.fillMaxWidth().padding(top = 25.dp, bottom = 60.dp),
-                  verticalAlignment = Alignment.Bottom,
-                  horizontalArrangement = Arrangement.SpaceBetween) {
-                    Button(
-                        modifier = Modifier.testTag("ConfirmButton"),
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer),
-                        onClick = {
-                          if (houseHoldName.isBlank() ||
-                              householdViewModel.checkIfHouseholdNameExists(houseHoldName) &&
-                                  (householdToEdit == null ||
-                                      houseHoldName != householdToEdit!!.name)) {
-                            isError = true
-                          } else {
-                            coroutineScope.launch {
-                              householdViewModel.getUserIdsByEmails(
-                                  memberEmailList.value.toList()) { emailToUid ->
-                                    val missingEmails =
-                                        memberEmailList.value.filter { it !in emailToUid.keys }
-                                    if (missingEmails.isNotEmpty()) {
-                                      Log.w(
-                                          "HouseHoldCreationScreen",
-                                          "Emails not found: $missingEmails")
-                                    }
-                                    val memberUids = emailToUid.values.toMutableList()
-
-                                    if (householdToEdit != null) {
-                                      val updatedHouseHold =
-                                          householdToEdit!!.copy(
-                                              name = houseHoldName, members = memberUids)
+              CustomButtons(
+                  button1OnClick = { navigationActions.goBack() },
+                  button1TestTag = "CancelButton",
+                  button1Text = stringResource(R.string.cancel_button),
+                  button2OnClick = {
+                    if (houseHoldName.isBlank() ||
+                        householdViewModel.checkIfHouseholdNameExists(houseHoldName) &&
+                            (householdToEdit == null || houseHoldName != householdToEdit!!.name)) {
+                      isError = true
+                    } else {
+                      if (householdToEdit != null) {
+                          var updatedHouseHold = householdToEdit!!.copy(name = houseHoldName)
+                          householdViewModel.getUserIdsByEmails(
+                              memberEmailList,
+                              callback = { emailToUserIds ->
+                                  if (emailToUserIds.isNotEmpty()) {
+                                      val oldUidList = updatedHouseHold.members
+                                      val uidList = memberEmailList.map { emailToUserIds[it]!! }
+                                      if (oldUidList.size < uidList.size) {
+                                          householdViewModel.updateHousehold(
+                                              householdToEdit!!.copy(
+                                                  name = houseHoldName,
+                                                  members = uidList
+                                              ), false
+                                          )
+                                      } else if (oldUidList.size > uidList.size) {
+                                          householdViewModel.updateHousehold(
+                                              householdToEdit!!.copy(
+                                                  name = houseHoldName,
+                                                  members = uidList
+                                              ), true
+                                          )
+                                      }
                                       householdViewModel.updateHousehold(updatedHouseHold)
-                                    } else {
-                                      householdViewModel.addNewHousehold(
-                                          houseHoldName, memberEmailList.value.toList())
-                                    }
-                                    navigationActions.goBack()
                                   }
-                            }
-                          }
-                        },
-                    ) {
-                      Text(
-                          "Save",
-                          style =
-                              TextStyle(
-                                  fontSize = 20.sp,
-                                  textAlign = TextAlign.Center,
-                                  color = MaterialTheme.colorScheme.onSecondaryContainer),
-                          modifier = Modifier.padding(7.dp).width(70.dp))
+                              }
+                          )
+                      } else {
+                        householdViewModel.addNewHousehold(houseHoldName, memberEmailList)
+                      }
+                      navigationActions.navigateTo(Screen.OVERVIEW)
                     }
-                    Button(
-                        modifier = Modifier.testTag("CancelButton"),
-                        colors =
-                            ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondaryContainer),
-                        onClick = { navigationActions.goBack() },
-                    ) {
-                      Text(
-                          "Cancel",
-                          style =
-                              TextStyle(
-                                  fontSize = 20.sp,
-                                  textAlign = TextAlign.Center,
-                                  color = MaterialTheme.colorScheme.onSecondaryContainer),
-                          modifier = Modifier.padding(7.dp).width(70.dp))
-                    }
-                  }
+                  },
+                  button2TestTag = "ConfirmButton",
+                  button2Text = stringResource(R.string.save_button))
 
               // Confirmation Dialog for Deletion
               DeletionConfirmationPopUp(

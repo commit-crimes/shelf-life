@@ -56,8 +56,6 @@ fun SignInScreen(navigationActions: NavigationActions) {
       rememberFirebaseAuthLauncher(
           onAuthComplete = { result ->
             Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
-
-            // Get the current user
             val currentUser = Firebase.auth.currentUser
             if (currentUser != null) {
               val db = FirebaseFirestore.getInstance()
@@ -67,7 +65,6 @@ fun SignInScreen(navigationActions: NavigationActions) {
             } else {
               Log.e("SignInScreen", "Current user is null after sign-in")
             }
-
             Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
             navigationActions.navigateTo(TopLevelDestinations.OVERVIEW)
           },

@@ -12,12 +12,16 @@ import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
-import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
+import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
+import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
 import com.google.firebase.Timestamp
+import io.mockk.mockk
 import java.util.Date
 import org.junit.Before
 import org.junit.Rule
@@ -30,8 +34,10 @@ class IndividualRecipeTest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var listFoodItemsViewModel: ListFoodItemsViewModel
   private lateinit var listRecipesViewModel: ListRecipesViewModel
-  private lateinit var houseHoldRepository: HouseHoldRepository
+  private lateinit var houseHoldRepository: HouseholdRepositoryFirestore
   private lateinit var householdViewModel: HouseholdViewModel
+  private lateinit var recipeRepository: RecipeRepository
+  private lateinit var recipeGeneratorRepository: RecipeGeneratorRepository
 
   private lateinit var houseHold: HouseHold
 
@@ -41,12 +47,17 @@ class IndividualRecipeTest {
   fun setUp() {
     navigationActions = mock()
     foodItemRepository = mock()
+    recipeRepository = mock()
+    recipeGeneratorRepository = mock()
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
-    listRecipesViewModel = ListRecipesViewModel()
+    listRecipesViewModel = ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
     houseHoldRepository = mock()
     householdViewModel =
         HouseholdViewModel(
-            houseHoldRepository, listFoodItemsViewModel, mock<DataStore<Preferences>>())
+            houseHoldRepository,
+            listFoodItemsViewModel,
+            mockk<InvitationRepositoryFirestore>(relaxed = true),
+            mock<DataStore<Preferences>>())
 
     val foodFacts =
         FoodFacts(
@@ -99,7 +110,8 @@ class IndividualRecipeTest {
   private fun verifyCommonUIElements() {
     composeTestRule.onNodeWithTag("individualRecipesScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("topBar").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("recipe").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("topBar").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("individualRecipeTitle").assertIsDisplayed()
     composeTestRule.onNodeWithTag("recipeImage").assertIsDisplayed()
     composeTestRule.onNodeWithTag("recipeServings").assertIsDisplayed()
     composeTestRule.onNodeWithTag("recipeTime").assertIsDisplayed()
@@ -111,7 +123,7 @@ class IndividualRecipeTest {
 
   @Test
   fun foodItemListIsDisplayedWhenFoodItemsExist() {
-    setUpIndividualRecipeScreen(selectedRecipeIndex = 2)
+    setUpIndividualRecipeScreen(selectedRecipeIndex = 0)
     verifyCommonUIElements()
   }
 
@@ -135,7 +147,7 @@ class IndividualRecipeTest {
 
   @Test
   fun clickGoBackArrowNavigatesBack() {
-    setUpIndividualRecipeScreen(selectedRecipeIndex = 2)
+    setUpIndividualRecipeScreen(selectedRecipeIndex = 0)
 
     // Click on the go back arrow
     composeTestRule.onNodeWithTag("goBackArrow").performClick()

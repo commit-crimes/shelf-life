@@ -18,15 +18,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -51,7 +50,7 @@ import com.android.shelfLife.R
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.model.recipe.RecipesRepository
+import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -60,8 +59,10 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
+import com.android.shelfLife.ui.utils.CustomSearchBar
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipesScreen(
     navigationActions: NavigationActions,
@@ -130,9 +131,11 @@ fun RecipesScreen(
               },
               content = { paddingValues ->
                 Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-                  RecipesSearchBar(query) { newQuery ->
-                    query = newQuery // Update the query when user types
-                  } // Pass query and update function to the search bar
+                  CustomSearchBar(
+                      query = query,
+                      onQueryChange = { query = it },
+                      placeholder = "Search recipe",
+                      searchBarTestTag = "searchBar")
 
                   if (filteredRecipes.isEmpty()) {
                     Box(
@@ -157,63 +160,6 @@ fun RecipesScreen(
       }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-/**
- * A composable function that displays a search bar for filtering recipes.
- *
- * @param query The current search query as a string.
- * @param onQueryChange A callback function that gets triggered whenever the query changes, updating
- *   the query state in the parent composable.
- *
- * This search bar provides a text input field where users can type to search for recipes. The UI
- * layout consists of a box container that holds the search bar. It uses a `SearchBar` from the
- * Material3 library, with options for managing its active state and search behavior.
- * - The `query` parameter represents the current text in the search bar.
- * - The `onQueryChange` function is invoked each time the user updates the search query, allowing
- *   the parent composable to filter recipes based on user input.
- * - The search bar displays a placeholder "Search recipes" when the query is empty.
- * - The trailing icon (search icon) allows users to toggle the search bar's active state.
- */
-fun RecipesSearchBar(query: String, onQueryChange: (String) -> Unit) {
-  var isActive by remember {
-    mutableStateOf(false)
-  } // State to manage whether the search bar is active
-
-  Box(
-      modifier =
-          Modifier.fillMaxWidth()
-              .height(100.dp)
-              .testTag("recipeSearchBar") // Set a fixed height for the search bar container
-      ) {
-        SearchBar(
-            query = query, // The current query string displayed in the search bar
-            onQueryChange = { newQuery ->
-              onQueryChange(newQuery)
-            }, // Updates the query when the user types
-            placeholder = {
-              Text("Search recipes") // Placeholder text shown when the query is empty
-            },
-            onSearch = {},
-            active = isActive, // Determines whether the search bar is in an active state
-            onActiveChange = { active -> isActive = active }, // Callback to update the active state
-            modifier =
-                Modifier.fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-                    .testTag("searchBar"), // Padding around the search bar
-            trailingIcon = {
-              IconButton(onClick = { isActive = false }) { // Button to deactivate the search bar
-                Icon(
-                    Icons.Default.Search,
-                    contentDescription =
-                        "icon for recipes search bar" // Accessibility description for the search
-                    // icon
-                    )
-              }
-            }) {}
-      }
-}
-
 @Composable
 /**
  * Displays a recipe item as a card that the user can click to navigate to the recipe's details.
@@ -229,23 +175,29 @@ fun RecipeItem(
     listRecipesViewModel: ListRecipesViewModel
 ) {
   var clickOnRecipe by remember { mutableStateOf(false) } // State to track if the recipe is clicked
+  val cardColor =
+      if (clickOnRecipe) MaterialTheme.colorScheme.primaryContainer
+      else MaterialTheme.colorScheme.background
+  val elevation = if (clickOnRecipe) 16.dp else 8.dp
+
   // The card that visually represents the recipe item
-  Column(
+  ElevatedCard(
+      colors = CardDefaults.elevatedCardColors(containerColor = cardColor),
+      elevation = CardDefaults.elevatedCardElevation(defaultElevation = elevation),
       modifier =
           Modifier.fillMaxWidth() // Make the card fill the available width
-              .padding(8.dp) // Add padding around the card
+              .padding(horizontal = 16.dp, vertical = 8.dp) // Add padding around the card
               .clickable(onClick = { clickOnRecipe = true }) // Handle clicks on the card
               .testTag("recipesCards")) {
         // Layout for the content inside the card
         Row(
             modifier =
                 Modifier.fillMaxWidth() // Fill the width inside the card
-                    .padding(18.dp) // Add padding inside the card for layout spacing
-            ) {
+                    .padding(2.dp)) {
               // Column for recipe details: name, servings, and time
               Column(
                   modifier =
-                      Modifier.width(275.dp) // Set the width of the column
+                      Modifier.width(240.dp) // Set the width of the column
                           .size(80.dp) // Set the size of the column
                           .padding(vertical = 12.dp) // Add vertical padding inside the column
                           .padding(horizontal = 18.dp) // Add horizontal padding inside the column
@@ -282,7 +234,7 @@ fun RecipeItem(
                           Spacer(
                               modifier =
                                   Modifier.width(
-                                      8.dp)) // Add a horizontal space between servings and time
+                                      2.dp)) // Add a horizontal space between servings and time
 
                           // Display the total cooking time
                           Text(
@@ -331,13 +283,13 @@ fun RecipeItem(
  * @return The corresponding `RecipesRepository.SearchRecipeType` enum value.
  * @throws IllegalArgumentException If the input string does not match any known recipe type.
  */
-fun stringToSearchRecipeType(string: String): RecipesRepository.SearchRecipeType {
+fun stringToSearchRecipeType(string: String): RecipeType {
   return when (string) {
-    "Soon to expire" -> RecipesRepository.SearchRecipeType.USE_SOON_TO_EXPIRE
-    "Only household items" -> RecipesRepository.SearchRecipeType.USE_ONLY_HOUSEHOLD_ITEMS
-    "High protein" -> RecipesRepository.SearchRecipeType.HIGH_PROTEIN
-    "Low calories" -> RecipesRepository.SearchRecipeType.LOW_CALORIE
-    "Personal" -> RecipesRepository.SearchRecipeType.PERSONAL
+    "Soon to expire" -> RecipeType.USE_SOON_TO_EXPIRE
+    "Only household items" -> RecipeType.USE_ONLY_HOUSEHOLD_ITEMS
+    "High protein" -> RecipeType.HIGH_PROTEIN
+    "Low calories" -> RecipeType.LOW_CALORIE
+    "Personal" -> RecipeType.PERSONAL
     else -> throw IllegalArgumentException("Unknown filter: $string")
   }
 }
@@ -368,8 +320,8 @@ fun filterRecipes(
       listRecipes.filter { recipe ->
         // Check if recipe matches selected filters
         (selectedFilters.isEmpty() ||
-            recipe.recipeTypes.any { recipeType ->
-              selectedFilters.any { filter -> recipeType == stringToSearchRecipeType(filter) }
+            selectedFilters.any { filter ->
+              recipe.recipeType == stringToSearchRecipeType(filter)
             }) &&
             // Check if recipe matches the search query
             (query.isEmpty() || recipe.name.contains(query, ignoreCase = true))

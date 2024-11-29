@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.overview
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,6 +33,7 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
+import com.android.shelfLife.ui.utils.CustomSearchBar
 import kotlinx.coroutines.launch
 
 /**
@@ -81,6 +83,7 @@ fun OverviewScreen(
             CircularProgressIndicator()
           }
         } else if (selectedHousehold == null && userHouseholds.isEmpty()) {
+          Log.d("OverviewScreen", userHouseholds.toString())
           FirstTimeWelcomeScreen(navigationActions, householdViewModel)
         } else {
           Scaffold(
@@ -120,10 +123,11 @@ fun OverviewScreen(
             Column(
                 modifier = Modifier.padding(paddingValues),
             ) {
-              FoodSearchBar(
+              CustomSearchBar(
                   query = searchQuery,
-                  onQueryChange = { searchQuery = it } // Update the query state when the user types
-                  )
+                  onQueryChange = { searchQuery = it },
+                  placeholder = "Search food item",
+                  searchBarTestTag = "foodSearchBar")
               ListFoodItems(
                   foodItems = filteredFoodItems,
                   householdViewModel = householdViewModel,
