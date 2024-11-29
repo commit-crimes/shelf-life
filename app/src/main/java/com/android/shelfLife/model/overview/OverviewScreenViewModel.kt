@@ -14,7 +14,7 @@ class OverviewScreenViewModel() : ViewModel() {
   private val _drawerState = MutableStateFlow(DrawerState(DrawerValue.Closed))
   val drawerState = _drawerState.asStateFlow()
 
-  val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
+  val filters = listOf("Fruit", "Vegetable", "Meat", "Fish", "Dairy", "Grain", "Beverage", "Snack", "Other")
 
   /**
    * Toggles the filter on or off
