@@ -251,7 +251,7 @@ class EndToEndM1Test {
         .performTextInput("Paella")
     composeTestRule.onAllNodesWithTag("recipesCards").assertCountEquals(1)
     composeTestRule
-        .onNode(hasText("Paella") and hasAnyAncestor(hasTestTag("recipeSearchBar")))
+        .onNode(hasText("Paella") and hasAnyAncestor(hasTestTag("searchBar")))
         .assertIsDisplayed()
   }
 

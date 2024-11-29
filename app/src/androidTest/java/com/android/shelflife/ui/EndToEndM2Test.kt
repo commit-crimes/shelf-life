@@ -328,7 +328,7 @@ class EndToEndM2Test {
         .performTextInput(formatTimestampToDate(Timestamp.now()))
     composeTestRule.onNodeWithTag("editFoodItemScreen").performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").performClick()
-    composeTestRule.onNodeWithTag("IndividualTestScreenGoBack").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("goBackArrow").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
   }
 
