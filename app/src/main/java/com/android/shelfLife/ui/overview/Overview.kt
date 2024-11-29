@@ -76,9 +76,9 @@ fun OverviewScreen(
       navigationActions = navigationActions) {
         val filteredFoodItemsByFilters =
             if (selectedFilters.isEmpty()) {
-              foodItems.value
+              foodItems
             } else {
-              foodItems.value.filter { foodItem ->
+              foodItems.filter { foodItem ->
                 selectedFilters.any { filter ->
                   foodItem.foodFacts.category == stringToCategory(filter)
                 }
@@ -87,9 +87,9 @@ fun OverviewScreen(
 
         val filteredFoodItemsByQuery = {
           if (searchQuery.isEmpty()) {
-            foodItems.value
+            foodItems
           } else {
-            foodItems.value.filter { item ->
+            foodItems.filter { item ->
               item.foodFacts.name.contains(searchQuery, ignoreCase = true)
             }
           }
