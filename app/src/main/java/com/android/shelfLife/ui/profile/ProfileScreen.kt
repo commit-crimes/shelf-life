@@ -7,11 +7,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -43,10 +46,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 fun ProfileScreen(
     navigationActions: NavigationActions,
     account: GoogleSignInAccount? = null,
-    signOutUser: () -> Unit = {}
+    signOutUser: () -> Unit = {},
+    invitationViewModel: InvitationViewModel
 ) {
   val context = LocalContext.current
   val currentAccount = remember { account ?: getGoogleAccount(context) }
+
+  val invitations by invitationViewModel.invitations.collectAsState()
 
   var expanded by remember { mutableStateOf(false) }
 
@@ -135,16 +141,25 @@ fun ProfileScreen(
                         modifier = Modifier.padding(horizontal = 16.dp))
                   }
 
-              //
+              Spacer(modifier = Modifier.height(16.dp))
+
+              if (invitations.isNotEmpty()) {
+                Text(
+                    text = "Pending Invitations",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.align(Alignment.Start))
+                Button(
+                    onClick = { navigationActions.navigateTo(Route.INVITATIONS) },
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                      Text("You have ${invitations.size} pending invitations")
+                    }
+              }
 
               Spacer(modifier = Modifier.weight(1f))
 
               // Logout button
               OutlinedButton(
-                  onClick = {
-                    // Sign out the user
-                    signOutUser()
-                  },
+                  onClick = { signOutUser() },
                   modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
                   border = BorderStroke(1.dp, Color.Red) // Outline color matches the current status
                   ) {

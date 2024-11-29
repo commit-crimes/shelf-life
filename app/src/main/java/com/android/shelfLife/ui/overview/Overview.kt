@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.overview
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -82,6 +83,7 @@ fun OverviewScreen(
             CircularProgressIndicator()
           }
         } else if (selectedHousehold == null && userHouseholds.isEmpty()) {
+          Log.d("OverviewScreen", userHouseholds.toString())
           FirstTimeWelcomeScreen(navigationActions, householdViewModel)
         } else {
           Scaffold(
