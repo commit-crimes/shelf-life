@@ -3,7 +3,6 @@ package com.android.shelfLife.ui.overview
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -182,9 +181,7 @@ fun HouseHoldCreationScreen(
                               if (email != FirebaseAuth.getInstance().currentUser?.email ||
                                   householdToEdit != null) {
                                 IconButton(
-                                    onClick = {
-                                      creationScreenViewModel.removeEmail(email)
-                                    },
+                                    onClick = { creationScreenViewModel.removeEmail(email) },
                                     modifier = Modifier.testTag("RemoveEmailButton")) {
                                       Icon(
                                           imageVector = Icons.Default.Delete,
@@ -238,35 +235,28 @@ fun HouseHoldCreationScreen(
                   button1TestTag = "CancelButton",
                   button1Text = stringResource(R.string.cancel_button),
                   button2OnClick = {
-                      if (houseHoldName.isBlank() ||
-                          householdViewModel.checkIfHouseholdNameExists(houseHoldName) &&
-                          (householdToEdit == null ||
-                                  houseHoldName != householdToEdit!!.name)) {
-                          isError = true
-                      } else {
-                          if (householdToEdit != null) {
-                              (householdViewModel.householdToEdit.value?.members!! - memberEmails.keys).forEach { uid ->
-                                  val email =
-                                      memberEmails.entries.find { it.key == uid }?.value!!
-                                  if (email != null) {
-                                      Log.d(
-                                          "HouseHoldCreationScreen",
-                                          "Email: $email, UiD: $uid"
-                                      )
-                                      householdViewModel.deleteMember(uid)
-                                      creationScreenViewModel.removeEmail(email)
-                                  } else {
-                                      Log.e(
-                                          "HouseHoldCreationScreen",
-                                          "UID not found for email: $email"
-                                      )
-                                  }
+                    if (houseHoldName.isBlank() ||
+                        householdViewModel.checkIfHouseholdNameExists(houseHoldName) &&
+                            (householdToEdit == null || houseHoldName != householdToEdit!!.name)) {
+                      isError = true
+                    } else {
+                      if (householdToEdit != null) {
+                        (householdViewModel.householdToEdit.value?.members!! - memberEmails.keys)
+                            .forEach { uid ->
+                              val email = memberEmails.entries.find { it.key == uid }?.value!!
+                              if (email != null) {
+                                Log.d("HouseHoldCreationScreen", "Email: $email, UiD: $uid")
+                                householdViewModel.deleteMember(uid)
+                                creationScreenViewModel.removeEmail(email)
+                              } else {
+                                Log.e("HouseHoldCreationScreen", "UID not found for email: $email")
                               }
-                          } else {
-                              householdViewModel.addNewHousehold(houseHoldName, memberEmailList)
-                          }
-                          navigationActions.navigateTo(Screen.OVERVIEW)
+                            }
+                      } else {
+                        householdViewModel.addNewHousehold(houseHoldName, memberEmailList)
                       }
+                      navigationActions.navigateTo(Screen.OVERVIEW)
+                    }
                   },
                   button2TestTag = "ConfirmButton",
                   button2Text = stringResource(R.string.save_button))

@@ -87,7 +87,7 @@ class EndToEndM1Test {
     foodItemRepository = mock(FoodItemRepository::class.java)
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
     dataStore = org.mockito.kotlin.mock<DataStore<Preferences>>()
-    
+
     recipeRepository = mock(RecipeRepository::class.java)
     recipeGeneratorRepository = mock(RecipeGeneratorRepository::class.java)
     listRecipesViewModel = ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)

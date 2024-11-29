@@ -224,18 +224,18 @@ fun AddRecipeScreen(
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(R.string.cancel_button),
                     button2OnClick = {
-                        validateInstructions()
-                        error =
-                            title.isEmpty() ||
-                                    time.isEmpty() ||
-                                    servings.isEmpty() ||
-                                    ingredients.isEmpty() ||
-                                    instructions.isEmpty() ||
-                                    instructionsError
-                        if (!error) {
-                            navigationActions.goBack()
-                            listRecipesViewModel.saveRecipe(
-                                recipe =
+                      validateInstructions()
+                      error =
+                          title.isEmpty() ||
+                              time.isEmpty() ||
+                              servings.isEmpty() ||
+                              ingredients.isEmpty() ||
+                              instructions.isEmpty() ||
+                              instructionsError
+                      if (!error) {
+                        navigationActions.goBack()
+                        listRecipesViewModel.saveRecipe(
+                            recipe =
                                 Recipe(
                                     uid = "",
                                     name = title,
@@ -243,14 +243,14 @@ fun AddRecipeScreen(
                                     servings = servings.toFloat(),
                                     time = (time.toDouble() * 60.0).seconds,
                                     ingredients = ingredients.toList()))
-                        } else {
-                            // if not a Toast appears
-                            Toast.makeText(
+                      } else {
+                        // if not a Toast appears
+                        Toast.makeText(
                                 context,
                                 "Please correct the errors before submitting.",
                                 Toast.LENGTH_SHORT)
-                                .show()
-                        }
+                            .show()
+                      }
                     },
                     button2TestTag = "addButton",
                     button2Text = stringResource(R.string.add_button))

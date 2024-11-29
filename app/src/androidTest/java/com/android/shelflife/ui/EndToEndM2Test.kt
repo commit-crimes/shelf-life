@@ -103,7 +103,6 @@ class EndToEndM2Test {
     foodItemRepository = mock(FoodItemRepository::class.java)
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
 
-    
     recipeRepository = mock(RecipeRepository::class.java)
     recipeGeneratorRepository = mock(RecipeGeneratorRepository::class.java)
     listRecipesViewModel = ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
@@ -119,7 +118,6 @@ class EndToEndM2Test {
             invitationRepository = invitationRepository,
             dataStore)
     invitationViewModel = InvitationViewModel(invitationRepository)
-
 
     foodFactsRepository = FakeFoodFactsRepository()
     foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)
