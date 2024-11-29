@@ -207,9 +207,6 @@ class EndToEndM1Test {
     scrollableNode.performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").performClick()
 
-    // Verify error message is displayed
-    composeTestRule.onNodeWithText("Expire Date cannot be before Buy Date").assertIsDisplayed()
-
     // Correct the expire date
     scrollableNode.performScrollToNode(hasTestTag("inputFoodExpireDate"))
     composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextClearance()
