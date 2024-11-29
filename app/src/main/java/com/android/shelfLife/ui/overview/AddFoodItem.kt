@@ -215,75 +215,73 @@ fun AddFoodItemScreen(
                 Spacer(modifier = Modifier.height(32.dp))
               }
 
-            if (foodFacts.isNotEmpty()) {
+              if (foodFacts.isNotEmpty()) {
                 item(key = "selectImage") {
-                    Text(
-                        text = stringResource(id = R.string.select_image_label),
-                        modifier = Modifier.testTag("selectImage"))
-                    Spacer(modifier = Modifier.height(8.dp))
+                  Text(
+                      text = stringResource(id = R.string.select_image_label),
+                      modifier = Modifier.testTag("selectImage"))
+                  Spacer(modifier = Modifier.height(8.dp))
 
-                    LazyRow(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                  LazyRow(
+                      modifier = Modifier.fillMaxWidth(),
+                      horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(foodFacts.take(10)) { foodFact ->
-                            Box(
-                                modifier =
-                                Modifier.fillMaxWidth(0.3f)
-                                    .aspectRatio(1f)
-                                    .border(
-                                        width = if (selectedImage == foodFact) 2.dp else 1.dp,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        shape = RoundedCornerShape(8.dp)
-                                    )
-                                    .clickable { selectedImage = foodFact }
-                                    .testTag("foodImage")) {
+                          Box(
+                              modifier =
+                                  Modifier.fillMaxWidth(0.3f)
+                                      .aspectRatio(1f)
+                                      .border(
+                                          width = if (selectedImage == foodFact) 2.dp else 1.dp,
+                                          color = MaterialTheme.colorScheme.primary,
+                                          shape = RoundedCornerShape(8.dp))
+                                      .clickable { selectedImage = foodFact }
+                                      .testTag("foodImage")) {
                                 Image(
                                     painter = rememberAsyncImagePainter(foodFact.imageUrl),
                                     contentDescription = foodFact.name,
                                     modifier = Modifier.fillMaxSize())
-                            }
+                              }
                         }
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
+                      }
+                  Spacer(modifier = Modifier.height(16.dp))
                 }
-            }
+              }
 
-            // Add a "No Image" option
-            item("noImage") {
+              // Add a "No Image" option
+              item("noImage") {
                 Box(
                     modifier =
-                    Modifier.size(100.dp)
-                        .border(
-                            width = if (selectedImage == null) 4.dp else 1.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .clickable {
-                            selectedImage = null // Indicate no image selected
-                        }
-                        .testTag("noImage"),
+                        Modifier.size(100.dp)
+                            .border(
+                                width = if (selectedImage == null) 4.dp else 1.dp,
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = RoundedCornerShape(8.dp))
+                            .clickable {
+                              selectedImage = null // Indicate no image selected
+                            }
+                            .testTag("noImage"),
                     contentAlignment = Alignment.Center) {
-                    Text(
-                        stringResource(id = R.string.no_image_option),
-                        modifier = Modifier.testTag("noImageText"))
-                }
+                      Text(
+                          stringResource(id = R.string.no_image_option),
+                          modifier = Modifier.testTag("noImageText"))
+                    }
                 Spacer(modifier = Modifier.height(16.dp))
-            }
+              }
 
-            // Display Selected Image
-            selectedImage?.let {
+              // Display Selected Image
+              selectedImage?.let {
                 item {
-                    Text(
-                        stringResource(id = R.string.selected_image_label),
-                        modifier = Modifier.testTag("selectedImageText"))
-                    Image(
-                        painter = rememberAsyncImagePainter(it.imageUrl),
-                        contentDescription = null,
-                        modifier = Modifier.size(150.dp).padding(8.dp).testTag("selectedImage"))
-                    Spacer(modifier = Modifier.height(16.dp))
+                  Text(
+                      stringResource(id = R.string.selected_image_label),
+                      modifier = Modifier.testTag("selectedImageText"))
+                  Image(
+                      painter = rememberAsyncImagePainter(it.imageUrl),
+                      contentDescription = null,
+                      modifier = Modifier.size(150.dp).padding(8.dp).testTag("selectedImage"))
+                  Spacer(modifier = Modifier.height(16.dp))
                 }
-            }
-                ?: item {
+              }
+                  ?: item {
                     Text(
                         stringResource(id = R.string.default_image_label),
                         modifier = Modifier.testTag("defaultImageText"))
@@ -292,7 +290,7 @@ fun AddFoodItemScreen(
                         contentDescription = null,
                         modifier = Modifier.size(150.dp).padding(8.dp).testTag("defaultImage"))
                     Spacer(modifier = Modifier.height(16.dp))
-                }
+                  }
 
               item(key = "buttons") {
                 CustomButtons(
@@ -300,51 +298,51 @@ fun AddFoodItemScreen(
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(R.string.cancel_button),
                     button2OnClick = {
-                        validateAllFieldsWhenSubmitButton()
-                        val isExpireDateValid =
-                            expireDateErrorResId == null && expireDate.isNotEmpty()
-                        val isOpenDateValid = openDateErrorResId == null
-                        val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
-                        val isFoodNameValid = foodNameErrorResId == null
-                        val isAmountValid = amountErrorResId == null
+                      validateAllFieldsWhenSubmitButton()
+                      val isExpireDateValid =
+                          expireDateErrorResId == null && expireDate.isNotEmpty()
+                      val isOpenDateValid = openDateErrorResId == null
+                      val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
+                      val isFoodNameValid = foodNameErrorResId == null
+                      val isAmountValid = amountErrorResId == null
 
-                        val expiryTimestamp = formatDateToTimestamp(expireDate)
-                        val openTimestamp =
-                            if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
-                        val buyTimestamp = formatDateToTimestamp(buyDate)
+                      val expiryTimestamp = formatDateToTimestamp(expireDate)
+                      val openTimestamp =
+                          if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
+                      val buyTimestamp = formatDateToTimestamp(buyDate)
 
-                        if (isExpireDateValid &&
-                            isOpenDateValid &&
-                            isBuyDateValid &&
-                            isFoodNameValid &&
-                            isAmountValid &&
-                            expiryTimestamp != null &&
-                            buyTimestamp != null) {
-                            val foodFacts =
-                                FoodFacts(
-                                    name = foodName,
-                                    barcode = selectedImage?.barcode ?: "",
-                                    quantity = Quantity(amount.toDouble(), unit),
-                                    category = category,
-                                    nutritionFacts = selectedImage?.nutritionFacts ?: NutritionFacts(),
-                                    imageUrl = selectedImage?.imageUrl ?: FoodFacts.DEFAULT_IMAGE_URL)
-                            val newFoodItem =
-                                FoodItem(
-                                    uid = foodItemViewModel.getUID(),
-                                    foodFacts = foodFacts,
-                                    location = location,
-                                    expiryDate = expiryTimestamp,
-                                    openDate = openTimestamp,
-                                    buyDate = buyTimestamp,
-                                    status = FoodStatus.CLOSED)
-                            houseHoldViewModel.addFoodItem(newFoodItem)
-                            foodFactsViewModel.clearFoodFactsSuggestions()
-                            navigationActions.goBack()
-                        } else {
-                            Toast.makeText(
+                      if (isExpireDateValid &&
+                          isOpenDateValid &&
+                          isBuyDateValid &&
+                          isFoodNameValid &&
+                          isAmountValid &&
+                          expiryTimestamp != null &&
+                          buyTimestamp != null) {
+                        val foodFacts =
+                            FoodFacts(
+                                name = foodName,
+                                barcode = selectedImage?.barcode ?: "",
+                                quantity = Quantity(amount.toDouble(), unit),
+                                category = category,
+                                nutritionFacts = selectedImage?.nutritionFacts ?: NutritionFacts(),
+                                imageUrl = selectedImage?.imageUrl ?: FoodFacts.DEFAULT_IMAGE_URL)
+                        val newFoodItem =
+                            FoodItem(
+                                uid = foodItemViewModel.getUID(),
+                                foodFacts = foodFacts,
+                                location = location,
+                                expiryDate = expiryTimestamp,
+                                openDate = openTimestamp,
+                                buyDate = buyTimestamp,
+                                status = FoodStatus.CLOSED)
+                        houseHoldViewModel.addFoodItem(newFoodItem)
+                        foodFactsViewModel.clearFoodFactsSuggestions()
+                        navigationActions.goBack()
+                      } else {
+                        Toast.makeText(
                                 context, R.string.submission_error_message, Toast.LENGTH_SHORT)
-                                .show()
-                        }
+                            .show()
+                      }
                     },
                     button2TestTag = "foodSave",
                     button2Text = stringResource(R.string.submit_button_text))
