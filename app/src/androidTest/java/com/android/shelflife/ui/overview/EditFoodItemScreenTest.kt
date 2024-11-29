@@ -24,6 +24,7 @@ import com.android.shelfLife.model.foodItem.FoodStorageLocation
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.overview.EditFoodItemScreen
 import com.android.shelfLife.ui.utils.formatTimestampToDate
 import com.google.firebase.Timestamp
@@ -33,6 +34,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -139,20 +141,20 @@ class EditFoodItemScreenTest {
     // Enter invalid amount (letters)
     composeTestRule.onNodeWithTag("editFoodAmount").performTextInput("abc")
     // Verify error message is displayed
-    composeTestRule.onNodeWithText("Amount must be a number.").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Amount must be a number").assertIsDisplayed()
 
     // Enter invalid amount (negative number)
     composeTestRule.onNodeWithTag("editFoodAmount").performTextClearance()
     composeTestRule.onNodeWithTag("editFoodAmount").performTextInput("-5")
     // Verify error message is displayed
-    composeTestRule.onNodeWithText("Amount must be positive.").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Amount must be positive").assertIsDisplayed()
 
     // Enter valid amount
     composeTestRule.onNodeWithTag("editFoodAmount").performTextClearance()
     composeTestRule.onNodeWithTag("editFoodAmount").performTextInput("10")
     // Verify error messages are gone
-    composeTestRule.onNodeWithText("Amount must be a number.").assertDoesNotExist()
-    composeTestRule.onNodeWithText("Amount must be positive.").assertDoesNotExist()
+    composeTestRule.onNodeWithText("Amount must be a number").assertDoesNotExist()
+    composeTestRule.onNodeWithText("Amount must be positive").assertDoesNotExist()
   }
 
   @Test
@@ -215,7 +217,7 @@ class EditFoodItemScreenTest {
     composeTestRule
         .onNodeWithTag("editFoodItemScreen")
         .performScrollToNode(hasTestTag("editFoodAmount"))
-    composeTestRule.onNodeWithText("Amount cannot be empty.").assertIsDisplayed()
+    composeTestRule.onNodeWithText("Amount cannot be empty").assertIsDisplayed()
     composeTestRule
         .onNodeWithTag("editFoodItemScreen")
         .performScrollToNode(hasTestTag("editFoodExpireDate"))
@@ -323,5 +325,24 @@ class EditFoodItemScreenTest {
 
     // Verify that the navigation action was called
     verify { navigationActions.goBack() }
+  }
+
+  @Test
+  fun testDeleteFoodItem() = runTest {
+    composeTestRule.setContent {
+      EditFoodItemScreen(
+          navigationActions = navigationActions,
+          houseHoldViewModel = houseHoldViewModel,
+          foodItemViewModel = foodItemViewModel)
+    }
+
+    // Perform click on the delete icon
+    composeTestRule.onNodeWithTag("deleteFoodItem").performClick()
+
+    // Verify that the deleteFoodItem function was called
+    io.mockk.verify { houseHoldViewModel.deleteFoodItem(foodItem) }
+
+    // Verify that the navigation action was triggered
+    io.mockk.verify { navigationActions.navigateTo(Route.OVERVIEW) }
   }
 }

@@ -8,6 +8,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
@@ -16,12 +18,14 @@ import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
-import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.recipes.AddRecipeScreen
 import com.google.firebase.Timestamp
+import io.mockk.mockk
 import java.util.Date
 import org.junit.Before
 import org.junit.Rule
@@ -38,7 +42,7 @@ class AddRecipesTest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var listFoodItemsViewModel: ListFoodItemsViewModel
   private lateinit var listRecipesViewModel: ListRecipesViewModel
-  private lateinit var houseHoldRepository: HouseHoldRepository
+  private lateinit var houseHoldRepository: HouseholdRepositoryFirestore
   private lateinit var householdViewModel: HouseholdViewModel
 
   private lateinit var houseHold: HouseHold
@@ -52,7 +56,12 @@ class AddRecipesTest {
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
     listRecipesViewModel = ListRecipesViewModel()
     houseHoldRepository = mock()
-    householdViewModel = HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel)
+    householdViewModel =
+        HouseholdViewModel(
+            houseHoldRepository,
+            listFoodItemsViewModel,
+            mockk<InvitationRepositoryFirestore>(relaxed = true),
+            mock<DataStore<Preferences>>())
 
     val foodFacts =
         FoodFacts(

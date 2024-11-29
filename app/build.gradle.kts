@@ -48,6 +48,17 @@ android {
             isIncludeAndroidResources = true
         }
     }
+    signingConfigs{
+        val isCI = System.getenv("GITHUB_ACTIONS")?.toBoolean() ?: false
+        if(isCI && System.getenv("GITHUB_WORKFLOW") == "Build Android APK"){
+            named("debug"){
+                storeFile = file("../keystore.jks")
+                storePassword = System.getenv("DEBUG_KEYSTORE_PASSWORD")
+                keyAlias  = System.getenv("DEBUG_KEY_ALIAS")
+                keyPassword  = System.getenv("DEBUG_KEY_PASSWORD")
+            }
+        }
+    }
 
     buildTypes {
         release {
@@ -110,6 +121,7 @@ android {
         res.setSrcDirs(emptyList<File>())
         resources.setSrcDirs(emptyList<File>())
     }
+
 }
 
 // Jacoco test configuration
@@ -119,6 +131,8 @@ tasks.withType<Test> {
         excludes = listOf("jdk.internal.*")
     }
 }
+
+
 
 sonar {
     properties {
@@ -236,6 +250,8 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.navigation.testing)
+    implementation(libs.androidx.datastore.core.android)
+    implementation(libs.androidx.datastore.preferences)
     testImplementation(libs.test.core.ktx)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)

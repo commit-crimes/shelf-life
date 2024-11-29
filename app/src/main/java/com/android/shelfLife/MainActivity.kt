@@ -1,5 +1,6 @@
 package com.android.shelfLife
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,6 +9,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,10 +24,13 @@ import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
+import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
+import com.android.shelfLife.ui.invitations.InvitationScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
@@ -42,8 +49,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.OkHttpClient
 
+val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
+
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
     setContent { ShelfLifeTheme { Surface { ShelfLifeApp() } } }
@@ -59,6 +69,8 @@ fun ShelfLifeApp() {
   val firebaseFirestore = FirebaseFirestore.getInstance()
   val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
   val listFoodItemViewModel = viewModel { ListFoodItemsViewModel(foodItemRepository) }
+  val invitationRepositoryFirestore = InvitationRepositoryFirestore(firebaseFirestore)
+  val invitationViewModel = viewModel { InvitationViewModel(invitationRepositoryFirestore) }
   val foodFactsRepository = OpenFoodFactsRepository(OkHttpClient())
   val foodFactsViewModel = viewModel { FoodFactsViewModel(foodFactsRepository) }
   val context = LocalContext.current
@@ -76,7 +88,11 @@ fun ShelfLifeApp() {
 
   // Initialize HouseholdViewModel only if the user is logged in
   val householdViewModel = viewModel {
-    HouseholdViewModel(HouseholdRepositoryFirestore(firebaseFirestore), listFoodItemViewModel)
+    HouseholdViewModel(
+        houseHoldRepository = HouseholdRepositoryFirestore(firebaseFirestore),
+        listFoodItemsViewModel = listFoodItemViewModel,
+        invitationRepository = invitationRepositoryFirestore,
+        context.dataStore)
   }
 
   NavHost(navController = navController, startDestination = startingRoute) {
@@ -137,11 +153,13 @@ fun ShelfLifeApp() {
         ProfileScreen(
             navigationActions,
             signOutUser = {
-              signOutUser(context) {
-                // Navigate to the authentication screen
-                navigationActions.navigateToAndClearBackStack(Route.AUTH)
-              }
-            })
+              signOutUser(context) { navigationActions.navigateToAndClearBackStack(Route.AUTH) }
+            },
+            invitationViewModel = invitationViewModel)
+      }
+      composable(Route.INVITATIONS) {
+        InvitationScreen(
+            invitationViewModel = invitationViewModel, navigationActions = navigationActions)
       }
     }
   }

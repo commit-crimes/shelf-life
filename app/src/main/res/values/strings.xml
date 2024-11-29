@@ -1,8 +1,15 @@
 <resources>
+    <!-- App Name -->
     <string name="app_name">Shelf Life</string>
+
+    <!-- Default Web Client ID -->
     <string name="default_web_client_id">1096875383271-iltoi30htgc5bhsh7jfafq0213f65cd4.apps.googleusercontent.com</string>
+
+    <!-- Screen Titles -->
     <string name="add_food_item_title">Add Food Item</string>
     <string name="edit_food_item_title">Edit Food Item</string>
+
+    <!-- Input Field Hints -->
     <string name="food_name_hint">Enter food name</string>
     <string name="amount_hint">Enter amount</string>
     <string name="unit_label">Select unit</string>
@@ -12,6 +19,47 @@
     <string name="open_date_hint">Enter open date</string>
     <string name="buy_date_hint">Enter purchase date</string>
 
+    <!-- Date Placeholder -->
+    <string name="date_placeholder">dd/mm/yyyy</string>
+
+    <!-- Buttons -->
+    <string name="submit_button_text">Submit</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="add_button">Add</string>
+
+    <!-- Error Messages -->
+    <string name="submission_error_message">Please correct the errors before submitting</string>
+    <string name="open_date_before_buy_date_error">Open Date cannot be before Buy Date</string>
+    <string name="expire_date_before_buy_date_error">Expire Date cannot be before Buy Date</string>
+    <string name="expire_date_in_past_error">Expire Date cannot be in the past</string>
+    <string name="open_date_after_expire_date_error">Open Date cannot be after Expire Date</string>
+    <string name="amount_empty_error">Amount cannot be empty</string>
+    <string name="amount_not_number_error">Amount must be a number</string>
+    <string name="amount_negative_error">Amount must be positive</string>
+    <string name="food_name_empty_error">Food name cannot be empty</string>
+    <string name="food_name_invalid_error">Food name contains invalid characters</string>
+    <string name="date_empty_error">Date cannot be empty</string>
+    <string name="date_invalid_format_error">Date must be in ddMMyyyy format</string>
+    <string name="date_invalid_error">Invalid date</string>
+    <string name="date_incomplete_error">Incomplete date</string>
+
+    <!-- Toast Messages -->
+    <string name="food_added_message">Food item added.</string>
+
+    <!-- Accessibility Descriptions -->
+    <string name="go_back_button_description">Go Back</string>
+    <string name="add_recipe_button_description">Add Recipe</string>
+    <string name="generate_recipe_button_description">Generate Recipe</string>
+    <string name="food_image_description">Food Image</string>
+
+    <!-- Miscellaneous -->
+    <string name="no_recipes_available">No recipes available</string>
+    <string name="search_recipes_placeholder">Search recipes</string>
+    <string name="icon_for_recipes_search_bar">Icon for recipes search bar</string>
+
+    <!-- Food Item Details -->
+    <string name="food_item_no_expiry_date">No Expiry Date</string>
+    <string name="food_item_not_opened">Not Opened</string>
     <string name="food_item_category_label">Category: %1$s</string>
     <string name="food_item_location_label">Location: %1$s</string>
     <string name="food_item_status_label">Status: %1$s</string>
@@ -21,6 +69,22 @@
     <string name="food_item_energy_label">Energy: %1$d Kcal</string>
     <string name="food_item_proteins_label">Proteins: %1$s g</string>
     <string name="food_item_quantity_label">Quantity: %1$s %2$s</string>
-    <string name="food_item_no_expiry_date">No Expiry Date</string>
-    <string name="food_item_not_opened">Not Opened</string>
+
+    <string name="title_of_AddRecipeScreen">Add your own recipe</string>
+    <string name="title_of_recipe">Recipe title</string>
+    <string name="error_message_title_of_recipe">Incomplete title</string>
+    <string name="servings">Servings</string>
+    <string name="error_message_servings">Incomplete serving number</string>
+    <string name="time">Time in minutes</string>
+    <string name="error_message_time">Incomplete time</string>
+    <string name="ingredients">Ingredients</string>
+    <string name="instructions">Instructions</string>
+    <string name="error_message_instructions">Incomplete instruction</string>
+    <string name="instruction_step">Step %1$s</string>
+    <string name="ingredient_item">Ingredient%1$s : %2$s</string>
+    <string name="ingredient_name">Ingredient Name</string>
+    <string name="error_message_ingredient_name">Incomplete name</string>
+    <string name="ingredient_quantity">Quantity</string>
+    <string name="error_message_ingredient_quantity">Incomplete quantity</string>
+    <string name="add_ingredient">Add Ingredient</string>
 </resources>

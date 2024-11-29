@@ -3,6 +3,8 @@ package com.android.shelflife.ui
 import android.content.Context
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
@@ -23,7 +25,9 @@ import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -52,6 +56,7 @@ class EndToEndM1Test {
   private lateinit var foodItemRepository: FoodItemRepository
   private lateinit var navigationActions: NavigationActions
   private lateinit var listFoodItemsViewModel: ListFoodItemsViewModel
+  private lateinit var dataStore: DataStore<Preferences>
   private lateinit var houseHoldRepository: HouseHoldRepository
   private lateinit var householdViewModel: HouseholdViewModel
   private lateinit var foodFactsViewModel: FoodFactsViewModel
@@ -77,8 +82,14 @@ class EndToEndM1Test {
     barcodeScannerViewModel = mockk(relaxed = true)
     foodItemRepository = mock(FoodItemRepository::class.java)
     listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
-    houseHoldRepository = mock(HouseHoldRepository::class.java)
-    householdViewModel = HouseholdViewModel(houseHoldRepository, listFoodItemsViewModel)
+    dataStore = org.mockito.kotlin.mock<DataStore<Preferences>>()
+    houseHoldRepository = mock(HouseholdRepositoryFirestore::class.java)
+    householdViewModel =
+        HouseholdViewModel(
+            houseHoldRepository as HouseholdRepositoryFirestore,
+            listFoodItemsViewModel,
+            invitationRepository = mockk<InvitationRepositoryFirestore>(),
+            dataStore)
     listRecipesViewModel = ListRecipesViewModel()
 
     foodFactsRepository = FakeFoodFactsRepository()

@@ -7,9 +7,9 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 
-class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHoldRepository {
+open class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHoldRepository {
 
-  private val collectionPath = "households"
+  private val houseHoldsCollectionPath = "households"
   var auth = FirebaseAuth.getInstance()
   var foodItemRepository = FoodItemRepositoryFirestore(db)
 
@@ -19,7 +19,7 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
    * @return A new unique ID.
    */
   override fun getNewUid(): String {
-    return db.collection(collectionPath).document().id
+    return db.collection(houseHoldsCollectionPath).document().id
   }
 
   /**
@@ -31,7 +31,7 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
   override fun getHouseholds(onSuccess: (List<HouseHold>) -> Unit, onFailure: (Exception) -> Unit) {
     val currentUser = auth.currentUser
     if (currentUser != null) {
-      db.collection(collectionPath)
+      db.collection(houseHoldsCollectionPath)
           .whereArrayContains("members", currentUser.uid)
           .get()
           .addOnSuccessListener { result ->
@@ -71,7 +71,7 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
                   household.foodItems.map { foodItem ->
                     foodItemRepository.convertFoodItemToMap(foodItem)
                   })
-      db.collection(collectionPath)
+      db.collection(houseHoldsCollectionPath)
           .document(household.uid)
           .set(householdData)
           .addOnSuccessListener { onSuccess() }
@@ -109,7 +109,7 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
                   household.foodItems.map { foodItem ->
                     foodItemRepository.convertFoodItemToMap(foodItem)
                   })
-      db.collection(collectionPath)
+      db.collection(houseHoldsCollectionPath)
           .document(household.uid)
           .update(householdData)
           .addOnCompleteListener { task ->
@@ -140,7 +140,7 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
   ) {
     val currentUser = auth.currentUser
     if (currentUser != null) {
-      db.collection(collectionPath)
+      db.collection(houseHoldsCollectionPath)
           .document(id)
           .delete()
           .addOnSuccessListener { onSuccess() }
@@ -154,12 +154,11 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
     }
   }
 
-  override fun getUserIds(users: List<String>, callback: (Map<String, String>) -> Unit) {
+  override fun getUserIds(users: Set<String?>, callback: (Map<String, String>) -> Unit) {
     if (users.isEmpty()) {
       callback(emptyMap())
       return
     }
-
     val emailBatches = users.chunked(10) // Firestore allows up to 10 values in 'whereIn'
     val emailToUserId = mutableMapOf<String, String>()
     var batchesProcessed = 0

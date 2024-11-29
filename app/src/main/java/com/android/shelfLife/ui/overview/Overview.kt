@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.overview
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,13 +21,16 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import com.android.shelfLife.model.foodFacts.FoodCategory
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.overview.OverviewScreenViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -48,15 +52,18 @@ fun OverviewScreen(
     householdViewModel: HouseholdViewModel,
     listFoodItemsViewModel: ListFoodItemsViewModel
 ) {
-  val selectedHousehold = householdViewModel.selectedHousehold.collectAsState()
-  var searchQuery by remember { mutableStateOf("") }
-  val foodItems = listFoodItemsViewModel.foodItems.collectAsState()
-  val userHouseholds = householdViewModel.households.collectAsState().value
-  val householdViewModelIsLoaded = householdViewModel.finishedLoading.collectAsState().value
-  val selectedFilters = remember { mutableStateListOf<String>() }
+  val overviewScreenViewModel = viewModel<OverviewScreenViewModel>()
+
+  val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
+  val foodItems by listFoodItemsViewModel.foodItems.collectAsState()
+  val userHouseholds by householdViewModel.households.collectAsState()
+  val householdViewModelIsLoaded by householdViewModel.finishedLoading.collectAsState()
+  val selectedFilters by overviewScreenViewModel.selectedFilters.collectAsState()
   val multipleSelectedFoodItems = listFoodItemsViewModel.multipleSelectedFoodItems.collectAsState()
 
-  val drawerState = rememberDrawerState(DrawerValue.Closed)
+  var searchQuery by rememberSaveable { mutableStateOf("") }
+
+  val drawerState by overviewScreenViewModel.drawerState.collectAsState()
   val scope = rememberCoroutineScope()
 
   val filters =
@@ -99,24 +106,21 @@ fun OverviewScreen(
           ) {
             CircularProgressIndicator()
           }
-        } else if (selectedHousehold.value == null && userHouseholds.isEmpty()) {
+        } else if (selectedHousehold == null && userHouseholds.isEmpty()) {
+          Log.d("OverviewScreen", userHouseholds.toString())
           FirstTimeWelcomeScreen(navigationActions, householdViewModel)
         } else {
           Scaffold(
               modifier = Modifier.testTag("overviewScreen"),
               topBar = {
-                selectedHousehold.value?.let {
+                selectedHousehold?.let {
                   TopNavigationBar(
                       houseHold = it,
                       onHamburgerClick = { scope.launch { drawerState.open() } },
-                      filters = filters,
+                      filters = overviewScreenViewModel.filters,
                       selectedFilters = selectedFilters,
-                      onFilterChange = { filter, isSelected ->
-                        if (isSelected) {
-                          selectedFilters.add(filter)
-                        } else {
-                          selectedFilters.remove(filter)
-                        }
+                      onFilterChange = { filter, _ ->
+                        overviewScreenViewModel.toggleFilter(filter)
                       },
                       showDeleteOption = multipleSelectedFoodItems.value.isNotEmpty(),
                       onDeleteClick = {
@@ -149,6 +153,7 @@ fun OverviewScreen(
                   )
               ListFoodItems(
                   foodItems = filteredFoodItems,
+                  householdViewModel = householdViewModel,
                   listFoodItemsViewModel = listFoodItemsViewModel,
                   onFoodItemClick = { selectedFoodItem ->
                     listFoodItemsViewModel.selectFoodItem(selectedFoodItem)
