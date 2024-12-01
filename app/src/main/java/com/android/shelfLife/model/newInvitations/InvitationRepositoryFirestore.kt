@@ -15,7 +15,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 
-open class InvitationRepositoryFirestore(private val db: FirebaseFirestore) : InvitationRepository {
+open class InvitationRepositoryFirestore(
+    private val db: FirebaseFirestore,
+    private val auth: FirebaseAuth) : InvitationRepository {
 
   internal var listenerRegistration: ListenerRegistration? = null
   private val _invitations = MutableStateFlow<List<Invitation>>(emptyList())
@@ -35,17 +37,19 @@ open class InvitationRepositoryFirestore(private val db: FirebaseFirestore) : In
    * @param household The household to invite the user to.
    */
   override fun sendInvitation(household: HouseHold, invitedUser: User) {
-    val invitedUserId = invitedUser.uid
-    val invitationId = db.collection(invitationPath).document().id
-    val invitationData = Invitation(
-        invitationId = invitationId,
-        householdId = household.uid,
-        householdName = household.name,
-        invitedUserId = invitedUserId,
-        inviterUserId = FirebaseAuth.getInstance().currentUser?.uid!!,
-        timestamp = Timestamp.now()
-    ).toMap()
-    db.collection("invitations").document(invitationId).set(invitationData)
+      val invitedUserId = invitedUser.uid
+      val inviterUserId = auth.currentUser?.uid ?: throw IllegalStateException("User not authenticated")
+      val invitationId = db.collection(invitationPath).document().id
+      val invitationData =
+          Invitation(
+              invitationId = invitationId,
+              householdId = household.uid,
+              householdName = household.name,
+              invitedUserId = invitedUserId,
+              inviterUserId = inviterUserId,
+              timestamp = Timestamp.now()
+          ).toMap()
+      db.collection("invitations").document(invitationId).set(invitationData)
   }
 
   /**
@@ -116,13 +120,13 @@ open class InvitationRepositoryFirestore(private val db: FirebaseFirestore) : In
     }
   }
 
-    private fun Invitation.toMap(): Map<String, Any?> {
-        return mapOf(
-            "invitationId" to invitationId,
-            "householdId" to householdId,
-            "householdName" to householdName,
-            "invitedUserId" to invitedUserId,
-            "inviterUserId" to inviterUserId,
-            "timestamp" to timestamp)
-    }
+  private fun Invitation.toMap(): Map<String, Any?> {
+    return mapOf(
+        "invitationId" to invitationId,
+        "householdId" to householdId,
+        "householdName" to householdName,
+        "invitedUserId" to invitedUserId,
+        "inviterUserId" to inviterUserId,
+        "timestamp" to timestamp)
+  }
 }

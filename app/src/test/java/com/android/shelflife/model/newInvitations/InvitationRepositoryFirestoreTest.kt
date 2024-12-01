@@ -9,6 +9,8 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.*
 import junit.framework.TestCase.*
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +31,7 @@ class InvitationRepositoryFirestoreTest {
   @Mock private lateinit var mockDocument: DocumentReference
   @Mock private lateinit var mockQuerySnapshot: QuerySnapshot
   @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
+  @Mock private lateinit var firebaseAuth: FirebaseAuth
 
   private lateinit var invitationRepository: InvitationRepositoryFirestore
 
@@ -36,20 +39,26 @@ class InvitationRepositoryFirestoreTest {
   fun setUp() {
     MockitoAnnotations.openMocks(this)
 
-    // Initialize Firebase if necessary
-    if (FirebaseApp.getApps(ApplicationProvider.getApplicationContext()).isEmpty()) {
-      FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
-    }
+      // Initialize Firebase if necessary
+      if (FirebaseApp.getApps(ApplicationProvider.getApplicationContext()).isEmpty()) {
+          FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
+      }
 
-    // Mock Firestore collection and document references
-    `when`(mockFirestore.collection("invitations")).thenReturn(mockCollection)
-    `when`(mockCollection.document(anyString())).thenReturn(mockDocument)
+      // Mock FirebaseAuth and FirebaseUser
+      firebaseAuth = mock(FirebaseAuth::class.java)
+      val mockUser = mock(FirebaseUser::class.java)
+      `when`(firebaseAuth.currentUser).thenReturn(mockUser)
+      `when`(mockUser.uid).thenReturn("testInviterUserId")
 
-    // Initialize the InvitationRepositoryFirestore with mocks
-    invitationRepository = InvitationRepositoryFirestore(mockFirestore)
+      // Mock Firestore collection and document references
+      `when`(mockFirestore.collection("invitations")).thenReturn(mockCollection)
+      `when`(mockCollection.document(anyString())).thenReturn(mockDocument)
 
-    // Set the Dispatchers to use the TestCoroutineDispatcher
-    Dispatchers.setMain(StandardTestDispatcher())
+      // Initialize the InvitationRepositoryFirestore with mocks
+      invitationRepository = InvitationRepositoryFirestore(mockFirestore, firebaseAuth)
+
+      // Set the Dispatchers to use the TestCoroutineDispatcher
+      Dispatchers.setMain(StandardTestDispatcher())
   }
 
   @After
