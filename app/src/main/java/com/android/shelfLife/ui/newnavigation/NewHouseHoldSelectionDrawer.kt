@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.navigation
+package com.android.shelfLife.ui.newnavigation
 
 import android.util.Log
 import androidx.activity.compose.BackHandler
@@ -31,8 +31,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import com.android.shelfLife.model.household.HouseholdViewModel
-import com.android.shelfLife.ui.utils.DeletionConfirmationPopUp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.android.shelfLife.model.newhousehold.HouseHoldRepository
+import com.android.shelfLife.model.overview.HouseholdSelectionDrawerViewModel
+import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.newutils.DeletionConfirmationPopUp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -41,11 +45,14 @@ fun HouseHoldSelectionDrawer(
     scope: CoroutineScope,
     drawerState: DrawerState,
     navigationActions: NavigationActions,
-    householdViewModel: HouseholdViewModel,
+    houseHoldRepository: HouseHoldRepository,
     content: @Composable () -> Unit
 ) {
-  val userHouseholds by householdViewModel.households.collectAsState()
-  val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
+  val householdSelectionDrawerViewModel = viewModel {
+    HouseholdSelectionDrawerViewModel(houseHoldRepository)
+  }
+  val userHouseholds by householdSelectionDrawerViewModel.households.collectAsState()
+  val selectedHousehold by householdSelectionDrawerViewModel.selectedHousehold.collectAsState()
   var editMode by remember { mutableStateOf(false) }
 
   // State for confirmation dialog
@@ -87,17 +94,17 @@ fun HouseHoldSelectionDrawer(
                     onHouseholdSelected = { household ->
                       if (household != selectedHousehold) {
                         Log.d("HouseHoldSelectionDrawer", "Called selectHousehold")
-                        householdViewModel.selectHousehold(household)
+                        householdSelectionDrawerViewModel.selectHousehold(household)
                       }
                       scope.launch { drawerState.close() }
                     },
                     onHouseholdEditSelected = { household ->
                       Log.d("HouseHoldSelectionDrawer", "Called selectedHouseholdToEdit")
-                      householdViewModel.selectHouseholdToEdit(household)
+                      householdSelectionDrawerViewModel.selectHouseholdToEdit(household)
                       navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
                     },
                     onHouseholdDeleteSelected = { household ->
-                      householdViewModel.selectHouseholdToEdit(household)
+                      householdSelectionDrawerViewModel.selectHouseholdToEdit(household)
                       showDeleteDialog = true
                     },
                     modifier = Modifier.testTag("householdElement_$index"),
@@ -112,7 +119,7 @@ fun HouseHoldSelectionDrawer(
                   IconButton(
                       modifier = Modifier.testTag("addHouseholdIcon"),
                       onClick = {
-                        householdViewModel.selectHouseholdToEdit(null)
+                        householdSelectionDrawerViewModel.selectHouseholdToEdit(null)
                         navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
                       }) {
                         Icon(
@@ -140,5 +147,6 @@ fun HouseHoldSelectionDrawer(
       showDeleteDialog = showDeleteDialog,
       onDismiss = { showDeleteDialog = false },
       onConfirm = { showDeleteDialog = false },
-      householdViewModel = householdViewModel)
+      houseHoldRepository = houseHoldRepository,
+  )
 }

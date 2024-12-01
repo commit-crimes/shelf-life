@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.overview
+package com.android.shelfLife.ui.newoverview
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -23,16 +23,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
+import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.overview.OverviewScreenViewModel
+import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
-import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
+import com.android.shelfLife.ui.newnavigation.HouseHoldSelectionDrawer
+import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
+import com.android.shelfLife.ui.overview.ListFoodItems
 import com.android.shelfLife.ui.utils.CustomSearchBar
 import kotlinx.coroutines.launch
 
@@ -40,22 +43,29 @@ import kotlinx.coroutines.launch
  * Composable function to display the overview screen
  *
  * @param navigationActions The actions to handle navigation
- * @param householdViewModel The ViewModel for the households the user has access to
+ * @param houseHoldRepository The repository to handle household data
  */
 @Composable
 fun OverviewScreen(
     navigationActions: NavigationActions,
-    householdViewModel: HouseholdViewModel,
-    listFoodItemsViewModel: ListFoodItemsViewModel
+    houseHoldRepository: HouseHoldRepository,
+    listFoodItemRepository: FoodItemRepository,
+    userRepository: UserRepositoryFirestore
 ) {
-  val overviewScreenViewModel = viewModel<OverviewScreenViewModel>()
+  val overviewScreenViewModel = viewModel {
+    OverviewScreenViewModel(
+        houseHoldRepository = houseHoldRepository,
+        listFoodItemsRepository = listFoodItemRepository,
+        userRepository = userRepository)
+  }
 
-  val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
-  val foodItems by listFoodItemsViewModel.foodItems.collectAsState()
-  val userHouseholds by householdViewModel.households.collectAsState()
-  val householdViewModelIsLoaded by householdViewModel.finishedLoading.collectAsState()
+  val selectedHousehold by overviewScreenViewModel.selectedHousehold.collectAsState()
+  val foodItems by overviewScreenViewModel.foodItems.collectAsState()
+  val households by overviewScreenViewModel.households.collectAsState()
+  val householdViewModelIsLoaded by overviewScreenViewModel.finishedLoading.collectAsState()
   val selectedFilters by overviewScreenViewModel.selectedFilters.collectAsState()
-  val multipleSelectedFoodItems = listFoodItemsViewModel.multipleSelectedFoodItems.collectAsState()
+  val multipleSelectedFoodItems by
+      overviewScreenViewModel.multipleSelectedFoodItems.collectAsState()
 
   var searchQuery by rememberSaveable { mutableStateOf("") }
 
@@ -65,8 +75,8 @@ fun OverviewScreen(
   HouseHoldSelectionDrawer(
       scope = scope,
       drawerState = drawerState,
-      householdViewModel = householdViewModel,
-      navigationActions = navigationActions) {
+      navigationActions = navigationActions,
+      houseHoldRepository = houseHoldRepository) {
         val filteredFoodItems =
             foodItems.filter { item ->
               item.foodFacts.name.contains(searchQuery, ignoreCase = true) &&
@@ -82,9 +92,9 @@ fun OverviewScreen(
           ) {
             CircularProgressIndicator()
           }
-        } else if (selectedHousehold == null && userHouseholds.isEmpty()) {
-          Log.d("OverviewScreen", userHouseholds.toString())
-          FirstTimeWelcomeScreen(navigationActions, householdViewModel)
+        } else if (selectedHousehold == null && households.isEmpty()) {
+          Log.d("OverviewScreen", households.toString())
+          FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel)
         } else {
           Scaffold(
               modifier = Modifier.testTag("overviewScreen"),
@@ -98,10 +108,10 @@ fun OverviewScreen(
                       onFilterChange = { filter, _ ->
                         overviewScreenViewModel.toggleFilter(filter)
                       },
-                      showDeleteOption = multipleSelectedFoodItems.value.isNotEmpty(),
+                      showDeleteOption = multipleSelectedFoodItems.isNotEmpty(),
                       onDeleteClick = {
-                        householdViewModel.deleteMultipleFoodItems(multipleSelectedFoodItems.value)
-                        listFoodItemsViewModel.clearMultipleSelectedFoodItems()
+                        overviewScreenViewModel.deleteMultipleFoodItems(multipleSelectedFoodItems)
+                        overviewScreenViewModel.clearMultipleSelectedFoodItems()
                       })
                 }
               },
@@ -130,14 +140,13 @@ fun OverviewScreen(
                   searchBarTestTag = "foodSearchBar")
               ListFoodItems(
                   foodItems = filteredFoodItems,
-                  householdViewModel = householdViewModel,
-                  listFoodItemsViewModel = listFoodItemsViewModel,
+                  overviewScreenViewModel = overviewScreenViewModel,
                   onFoodItemClick = { selectedFoodItem ->
-                    listFoodItemsViewModel.selectFoodItem(selectedFoodItem)
+                    overviewScreenViewModel.selectFoodItem(selectedFoodItem)
                     navigationActions.navigateTo(Screen.INDIVIDUAL_FOOD_ITEM)
                   },
                   onFoodItemLongHold = { selectedFoodItem ->
-                    listFoodItemsViewModel.selectMultipleFoodItems(selectedFoodItem)
+                    overviewScreenViewModel.selectMultipleFoodItems(selectedFoodItem)
                   })
             }
           }

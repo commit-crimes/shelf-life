@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.navigation
+package com.android.shelfLife.ui.newnavigation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -37,7 +37,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.android.shelfLife.model.household.HouseHold
+import com.android.shelfLife.model.newhousehold.HouseHold
 
 /**
  * Composable function for the top navigation bar of the app
