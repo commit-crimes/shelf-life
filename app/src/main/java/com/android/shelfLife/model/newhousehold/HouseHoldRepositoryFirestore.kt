@@ -39,7 +39,6 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
     if (listOfHouseHoldUid.isEmpty()) {
       return emptyList()
     }
-
     return try {
       val querySnapshot =
           db.collection(collectionPath)
@@ -65,7 +64,6 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
       _households.value = emptyList()
       return
     }
-
     try {
       // Fetch households from Firestore
       val querySnapshot =
@@ -95,7 +93,6 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
           .document(household.uid) // Use the household UID as the document ID
           .set(householdData)
           .await()
-
       // Update local cache
       val currentHouseholds = _households.value.toMutableList()
       currentHouseholds.add(household)

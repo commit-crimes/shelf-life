@@ -421,13 +421,13 @@ class AddFoodItemScreenTest {
           foodFactsViewModel = foodFactsViewModel)
     }
 
-      composeTestRule
-          .onNodeWithTag("addFoodItemScreen")
-          .performScrollToNode(hasTestTag("cancelButton"))
+    composeTestRule
+        .onNodeWithTag("addFoodItemScreen")
+        .performScrollToNode(hasTestTag("cancelButton"))
 
-      composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
 
-      composeTestRule.onNodeWithTag("cancelButton").performClick()
+    composeTestRule.onNodeWithTag("cancelButton").performClick()
 
     verify { navigationActions.goBack() }
   }
