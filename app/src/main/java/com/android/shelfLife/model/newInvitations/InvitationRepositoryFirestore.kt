@@ -20,6 +20,7 @@ open class InvitationRepositoryFirestore(private val db: FirebaseFirestore) : In
   internal var listenerRegistration: ListenerRegistration? = null
   private val _invitations = MutableStateFlow<List<Invitation>>(emptyList())
   val invitations: StateFlow<List<Invitation>> = _invitations.asStateFlow()
+
   private val invitationPath = "invitations"
 
   /** Removes the real-time listener for invitations. */
@@ -36,14 +37,14 @@ open class InvitationRepositoryFirestore(private val db: FirebaseFirestore) : In
   override fun sendInvitation(household: HouseHold, invitedUser: User) {
     val invitedUserId = invitedUser.uid
     val invitationId = db.collection(invitationPath).document().id
-    val invitationData =
-        mapOf(
-            "invitationId" to invitationId,
-            "householdId" to household.uid,
-            "householdName" to household.name,
-            "invitedUserId" to invitedUserId,
-            "inviterUserId" to FirebaseAuth.getInstance().currentUser?.uid,
-            "timestamp" to Timestamp.now())
+    val invitationData = Invitation(
+        invitationId = invitationId,
+        householdId = household.uid,
+        householdName = household.name,
+        invitedUserId = invitedUserId,
+        inviterUserId = FirebaseAuth.getInstance().currentUser?.uid!!,
+        timestamp = Timestamp.now()
+    ).toMap()
     db.collection("invitations").document(invitationId).set(invitationData)
   }
 
