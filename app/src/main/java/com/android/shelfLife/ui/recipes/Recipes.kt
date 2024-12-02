@@ -134,6 +134,7 @@ fun RecipesScreen(
                   CustomSearchBar(
                       query = query,
                       onQueryChange = { query = it },
+                      onDeleteTextClicked = { query = "" },
                       placeholder = "Search recipe",
                       searchBarTestTag = "searchBar")
 

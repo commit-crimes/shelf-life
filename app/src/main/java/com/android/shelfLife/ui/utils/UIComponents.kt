@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -93,6 +94,7 @@ fun CustomTopAppBar(
 fun CustomSearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
+    onDeleteTextClicked: () -> Unit,
     placeholder: String,
     searchBarTestTag: String
 ) {
@@ -114,8 +116,14 @@ fun CustomSearchBar(
             onActiveChange = {},
             leadingIcon = {},
             trailingIcon = {
-              IconButton(onClick = {}) {
-                Icon(Icons.Default.Search, contentDescription = "Search Icon")
+              if (query.isBlank()) {
+                IconButton(onClick = {}) {
+                  Icon(Icons.Default.Search, contentDescription = "Search Icon")
+                }
+              } else {
+                IconButton(onClick = onDeleteTextClicked) {
+                  Icon(Icons.Default.Close, contentDescription = "Delete text Icon")
+                }
               }
             },
             modifier =
