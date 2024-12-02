@@ -20,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -102,36 +103,51 @@ fun CustomSearchBar(
       modifier = Modifier.fillMaxWidth().padding(16.dp), // Outer padding for spacing
       contentAlignment = Alignment.Center // Center the SearchBar within the Box
       ) {
-        androidx.compose.material3.SearchBar(
-            colors =
-                SearchBarDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                ),
-            shadowElevation = 3.dp,
-            query = query,
-            onQueryChange = onQueryChange,
-            placeholder = { Text(placeholder) },
-            onSearch = {},
-            active = false,
-            onActiveChange = {},
-            leadingIcon = {},
-            trailingIcon = {
-              if (query.isBlank()) {
-                IconButton(onClick = {}) {
-                  Icon(Icons.Default.Search, contentDescription = "Search Icon")
-                }
-              } else {
-                IconButton(onClick = onDeleteTextClicked) {
-                  Icon(Icons.Default.Close, contentDescription = "Delete text Icon")
-                }
-              }
+        val colors1 =
+            SearchBarDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+            )
+        SearchBar(
+            inputField = {
+              SearchBarDefaults.InputField(
+                  query = query,
+                  onQueryChange = onQueryChange,
+                  onSearch = {},
+                  expanded = false,
+                  onExpandedChange = {},
+                  enabled = true,
+                  placeholder = { Text(placeholder) },
+                  leadingIcon = {},
+                  trailingIcon = {
+                    if (query.isBlank()) {
+                      IconButton(onClick = {}) {
+                        Icon(Icons.Default.Search, contentDescription = "Search Icon")
+                      }
+                    } else {
+                      IconButton(onClick = onDeleteTextClicked) {
+                        Icon(Icons.Default.Close, contentDescription = "Delete text Icon")
+                      }
+                    }
+                  },
+                  colors = colors1.inputFieldColors,
+                  interactionSource = null,
+              )
             },
+            expanded = false,
+            onExpandedChange = {},
             modifier =
                 Modifier.widthIn(
                         max = 600.dp) // Restrict max width to prevent over-stretching on large
                     // screens
                     .fillMaxWidth(0.9f) // Make it responsive and occupy 90% of available width
-                    .testTag(searchBarTestTag)) {}
+                    .testTag(searchBarTestTag),
+            shape = SearchBarDefaults.inputFieldShape,
+            colors = colors1,
+            tonalElevation = SearchBarDefaults.TonalElevation,
+            shadowElevation = 3.dp,
+            windowInsets = SearchBarDefaults.windowInsets,
+            content = {},
+        )
       }
 }
 
