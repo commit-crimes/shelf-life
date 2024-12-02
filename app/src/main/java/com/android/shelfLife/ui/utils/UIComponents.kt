@@ -110,6 +110,7 @@ fun CustomSearchBar(
         SearchBar(
             inputField = {
               SearchBarDefaults.InputField(
+                  modifier = Modifier.testTag("searchBarInputField"),
                   query = query,
                   onQueryChange = onQueryChange,
                   onSearch = {},
@@ -124,9 +125,11 @@ fun CustomSearchBar(
                         Icon(Icons.Default.Search, contentDescription = "Search Icon")
                       }
                     } else {
-                      IconButton(onClick = onDeleteTextClicked) {
-                        Icon(Icons.Default.Close, contentDescription = "Delete text Icon")
-                      }
+                      IconButton(
+                          modifier = Modifier.testTag("deleteTextButton"),
+                          onClick = onDeleteTextClicked) {
+                            Icon(Icons.Default.Close, contentDescription = "Delete text Icon")
+                          }
                     }
                   },
                   colors = colors1.inputFieldColors,
