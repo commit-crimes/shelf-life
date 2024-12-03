@@ -96,6 +96,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
         when (fieldName) {
           "username" -> currentUserData.copy(username = value as String)
           "email" -> currentUserData.copy(email = value as String)
+          "selectedHouseholdUID" -> currentUserData.copy(selectedHouseholdUID = value as String)
           else -> currentUserData
         }
     _user.value = updatedUserData
@@ -155,6 +156,10 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
 
   override suspend fun deleteHouseholdUID(uid: String) {
     updateArrayField("householdUIDs", uid, ArrayOperation.REMOVE)
+  }
+
+  override suspend fun updateSelectedHouseholdUID(householdUID: String) {
+    updateUserField("selectedHouseholdUID", householdUID)
   }
 
   override suspend fun addRecipeUID(recipeUID: String) {
