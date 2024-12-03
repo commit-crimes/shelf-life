@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.core.DataStore
+import androidx.datastore.dataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -29,6 +30,7 @@ import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.RecipeGeneratorOpenAIRepository
 import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
+import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
@@ -93,6 +95,14 @@ fun ShelfLifeApp() {
         Route.OVERVIEW
       }
 
+  val newHouseHoldRepositoryFirestore =
+      com.android.shelfLife.model.newhousehold.HouseholdRepositoryFirestore(
+          firebaseFirestore,
+          dataStore = context.dataStore,
+          listFoodItemRepository =
+              com.android.shelfLife.model.newFoodItem.FoodItemRepositoryFirestore(
+                  firebaseFirestore))
+
   // Initialize HouseholdViewModel only if the user is logged in
   val householdViewModel = viewModel {
     HouseholdViewModel(
@@ -112,7 +122,11 @@ fun ShelfLifeApp() {
     }
     navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
       composable(Screen.OVERVIEW) {
-        OverviewScreen(navigationActions, householdViewModel, listFoodItemViewModel)
+        OverviewScreen(
+            navigationActions,
+            householdViewModel,
+            listFoodItemViewModel,
+            newHouseHoldRepositoryFirestore)
       }
       composable(Screen.ADD_FOOD) {
         AddFoodItemScreen(
@@ -122,7 +136,13 @@ fun ShelfLifeApp() {
         EditFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
       }
       composable(Screen.HOUSEHOLD_CREATION) {
-        HouseHoldCreationScreen(navigationActions, householdViewModel = householdViewModel)
+        HouseHoldCreationScreen(
+            navigationActions,
+            houseHoldRepository = newHouseHoldRepositoryFirestore,
+            invitationRepository =
+                com.android.shelfLife.model.newInvitations.InvitationRepositoryFirestore(
+                    firebaseFirestore, FirebaseAuth.getInstance()),
+            userRepository = UserRepositoryFirestore(firebaseFirestore))
       }
       composable(Screen.INDIVIDUAL_FOOD_ITEM) {
         IndividualFoodItemScreen(
@@ -147,7 +167,11 @@ fun ShelfLifeApp() {
         route = Route.RECIPES,
     ) {
       composable(Screen.RECIPES) {
-        RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
+        RecipesScreen(
+            navigationActions,
+            listRecipesViewModel,
+            householdViewModel,
+            newHouseHoldRepositoryFirestore)
       }
       composable(Screen.INDIVIDUAL_RECIPE) {
         IndividualRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)

@@ -1,24 +1,55 @@
 package com.android.shelfLife.model.newhousehold
 
 import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 
-class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHoldRepository {
+class HouseholdRepositoryFirestore(
+    private val db: FirebaseFirestore,
+    private val dataStore: DataStore<Preferences>,
+    private val listFoodItemRepository: FoodItemRepository
+) : HouseHoldRepository {
 
   private val auth = FirebaseAuth.getInstance()
   private val collectionPath = "households"
 
   // Local cache for households
   private val _households = MutableStateFlow<List<HouseHold>>(emptyList())
-  val households: StateFlow<List<HouseHold>> = _households.asStateFlow()
+  override val households: StateFlow<List<HouseHold>> = _households.asStateFlow()
+
+  private val _householdToEdit = MutableStateFlow<HouseHold?>(null)
+  override val householdToEdit: StateFlow<HouseHold?> = _householdToEdit.asStateFlow()
+
+  private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
+  var selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
 
   // Listener registration for real-time updates
   private var householdsListenerRegistration: ListenerRegistration? = null
+
+  private val KEY = stringPreferencesKey("household_uid")
+
+  /** Save the selected household UID to DataStore. */
+  private suspend fun saveSelectedHouseholdUid(uid: String?) {
+    Log.d("HouseholdViewModel", "Saving selected household UID: $uid")
+    dataStore.edit { preferences -> preferences[KEY] = uid ?: "" }
+  }
+
+  /** Load the selected household UID from DataStore. */
+  private suspend fun loadSelectedHouseholdUid(callback: (String?) -> Unit) {
+    val uid = dataStore.data.map { preferences -> preferences[KEY] }.first()
+    callback(uid)
+  }
 
   /**
    * Generates a new unique ID for a household.
@@ -30,11 +61,18 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
   }
 
   /**
-   * Fetches households from Firestore based on the provided list of household IDs.
+   * Selects a household to edit
    *
-   * @param listOfHouseHoldUid List of household IDs to fetch.
-   * @return List of fetched HouseHold objects.
+   * @param household - The household to edit.
    */
+  fun selectHouseholdToEdit(household: HouseHold?) {
+    _householdToEdit.value = household
+  }
+
+  override fun checkIfHouseholdNameExists(houseHoldName: String): Boolean {
+    return _households.value.any { it.name == houseHoldName }
+  }
+
   override suspend fun getHouseholds(listOfHouseHoldUid: List<String>): List<HouseHold> {
     if (listOfHouseHoldUid.isEmpty()) {
       return emptyList()
@@ -130,11 +168,6 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
     }
   }
 
-  /**
-   * Deletes a household by its unique ID and updates the local cache.
-   *
-   * @param id The unique ID of the household to delete.
-   */
   override suspend fun deleteHouseholdById(id: String) {
     try {
       db.collection(collectionPath).document(id).delete().await()
@@ -142,17 +175,25 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
       // Update local cache
       val currentHouseholds = _households.value.filterNot { it.uid == id }
       _households.value = currentHouseholds
+
+      if (_selectedHousehold.value == null || id == _selectedHousehold.value!!.uid) {
+        // If the deleted household was selected, deselect it
+        selectHousehold(_households.value.firstOrNull())
+      }
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error deleting household", e)
     }
   }
 
-  /**
-   * Retrieves the members of a household.
-   *
-   * @param householdId The ID of the household.
-   * @return List of member IDs.
-   */
+  override suspend fun selectHousehold(household: HouseHold?) {
+    // Save the selected household UID to DataStore
+    if (_selectedHousehold.value == null || _selectedHousehold.value!!.uid != household?.uid) {
+      saveSelectedHouseholdUid(household?.uid)
+    }
+    _selectedHousehold.value = household
+    household?.let { listFoodItemRepository.getFoodItems(it.uid) }
+  }
+
   override suspend fun getHouseholdMembers(householdId: String): List<String> {
     val household = _households.value.find { it.uid == householdId }
     return household?.members ?: emptyList()

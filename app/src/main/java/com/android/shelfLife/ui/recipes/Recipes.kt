@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipeType
@@ -68,6 +69,7 @@ fun RecipesScreen(
     navigationActions: NavigationActions,
     listRecipesViewModel: ListRecipesViewModel,
     householdViewModel: HouseholdViewModel,
+    houseHoldRepository: HouseHoldRepository
 ) {
   // Collect the recipes StateFlow as a composable state
   val recipeList by listRecipesViewModel.recipes.collectAsState()
@@ -89,7 +91,8 @@ fun RecipesScreen(
       scope = scope,
       drawerState = drawerState,
       householdViewModel = householdViewModel,
-      navigationActions = navigationActions) {
+      navigationActions = navigationActions,
+      houseHoldRepository = houseHoldRepository) {
 
         // filtering recipeList using the filter and the query from the searchBar
         val filteredRecipes = filterRecipes(recipeList, selectedFilters, query)

@@ -1,6 +1,11 @@
 package com.android.shelfLife.model.newhousehold
 
+import kotlinx.coroutines.flow.StateFlow
+
 interface HouseHoldRepository {
+
+  val householdToEdit: StateFlow<HouseHold?>
+  val households: StateFlow<List<HouseHold>>
 
   /** Generates a new unique ID for a household. */
   fun getNewUid(): String
@@ -29,4 +34,19 @@ interface HouseHoldRepository {
    * @return List of member UIDs in the household.
    */
   suspend fun getHouseholdMembers(householdId: String): List<String>
+
+  /**
+   * Checks if a household name already exists in the list of households.
+   *
+   * @param houseHoldName - The name of the household to check.
+   * @return True if the household name already exists, false otherwise.
+   */
+  fun checkIfHouseholdNameExists(houseHoldName: String): Boolean
+
+  /**
+   * Selects a household and updates the selected household and the list of food items.
+   *
+   * @param household - The household to select.
+   */
+  suspend fun selectHousehold(household: HouseHold?)
 }

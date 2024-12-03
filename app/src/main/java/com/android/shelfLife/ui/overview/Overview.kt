@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.overview.OverviewScreenViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
@@ -46,7 +47,8 @@ import kotlinx.coroutines.launch
 fun OverviewScreen(
     navigationActions: NavigationActions,
     householdViewModel: HouseholdViewModel,
-    listFoodItemsViewModel: ListFoodItemsViewModel
+    listFoodItemsViewModel: ListFoodItemsViewModel,
+    houseHoldRepository: HouseHoldRepository
 ) {
   val overviewScreenViewModel = viewModel<OverviewScreenViewModel>()
 
@@ -66,7 +68,8 @@ fun OverviewScreen(
       scope = scope,
       drawerState = drawerState,
       householdViewModel = householdViewModel,
-      navigationActions = navigationActions) {
+      navigationActions = navigationActions,
+      houseHoldRepository = houseHoldRepository) {
         val filteredFoodItems =
             foodItems.filter { item ->
               item.foodFacts.name.contains(searchQuery, ignoreCase = true) &&

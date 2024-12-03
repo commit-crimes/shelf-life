@@ -159,7 +159,7 @@ class HouseholdViewModel(
   }
 
   /**
-   * Selects a household to edit and loads the list of member emails.
+   * Selects a household to edit
    *
    * @param household - The household to edit.
    */
