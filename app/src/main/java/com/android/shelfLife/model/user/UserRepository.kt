@@ -43,4 +43,6 @@ interface UserRepository {
   suspend fun updateEmail(email: String)
 
   fun getUserIds(users: Set<String?>, callback: (Map<String, String>) -> Unit)
+
+  fun getUserEmails(userIds: List<String>, callback: (Map<String, String>) -> Unit)
 }

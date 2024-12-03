@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.R
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
@@ -58,10 +59,8 @@ import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.navigation.TopNavigationBar
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
 import com.android.shelfLife.ui.utils.CustomSearchBar
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,7 +89,6 @@ fun RecipesScreen(
   HouseHoldSelectionDrawer(
       scope = scope,
       drawerState = drawerState,
-      householdViewModel = householdViewModel,
       navigationActions = navigationActions,
       houseHoldRepository = houseHoldRepository) {
 
@@ -98,12 +96,13 @@ fun RecipesScreen(
         val filteredRecipes = filterRecipes(recipeList, selectedFilters, query)
 
         if (selectedHousehold == null) {
-          FirstTimeWelcomeScreen(navigationActions, householdViewModel)
+          FirstTimeWelcomeScreen(navigationActions, viewModel())
         } else {
           Scaffold(
               modifier = Modifier.testTag("recipesScreen"),
               topBar = {
                 selectedHousehold?.let {
+                  /*
                   TopNavigationBar(
                       houseHold = it,
                       onHamburgerClick = { scope.launch { drawerState.open() } },
@@ -116,6 +115,8 @@ fun RecipesScreen(
                           selectedFilters.remove(filter)
                         }
                       })
+
+                     */
                 }
               },
               bottomBar = {

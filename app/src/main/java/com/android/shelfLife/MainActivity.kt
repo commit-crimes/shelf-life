@@ -94,14 +94,17 @@ fun ShelfLifeApp() {
       } else {
         Route.OVERVIEW
       }
-
+  val userRepositoryFirestore = UserRepositoryFirestore(firebaseFirestore)
   val newHouseHoldRepositoryFirestore =
       com.android.shelfLife.model.newhousehold.HouseholdRepositoryFirestore(
           firebaseFirestore,
           dataStore = context.dataStore,
+          userRepository = userRepositoryFirestore,
           listFoodItemRepository =
               com.android.shelfLife.model.newFoodItem.FoodItemRepositoryFirestore(
                   firebaseFirestore))
+  val newListFoodItemRepositoryFirestore =
+      com.android.shelfLife.model.newFoodItem.FoodItemRepositoryFirestore(firebaseFirestore)
 
   // Initialize HouseholdViewModel only if the user is logged in
   val householdViewModel = viewModel {
@@ -124,9 +127,9 @@ fun ShelfLifeApp() {
       composable(Screen.OVERVIEW) {
         OverviewScreen(
             navigationActions,
-            householdViewModel,
-            listFoodItemViewModel,
-            newHouseHoldRepositoryFirestore)
+            houseHoldRepository = newHouseHoldRepositoryFirestore,
+            listFoodItemRepository = newListFoodItemRepositoryFirestore,
+            userRepository = userRepositoryFirestore)
       }
       composable(Screen.ADD_FOOD) {
         AddFoodItemScreen(

@@ -31,7 +31,9 @@ class CreationScreenViewModel(
   init {
     viewModelScope.launch {
       val members = houseHoldRepository.getHouseholdMembers(householdToEdit.value?.uid ?: "")
-      _emailList.value = members.toSet()
+      userRepository.getUserEmails(members) { uidToEmail ->
+        _emailList.value = uidToEmail.values.toSet()
+      }
       finishedLoading.value = true
     }
   }

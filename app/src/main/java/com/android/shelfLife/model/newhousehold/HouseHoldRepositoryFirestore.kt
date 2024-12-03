@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
+import com.android.shelfLife.model.user.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +19,8 @@ import kotlinx.coroutines.tasks.await
 class HouseholdRepositoryFirestore(
     private val db: FirebaseFirestore,
     private val dataStore: DataStore<Preferences>,
-    private val listFoodItemRepository: FoodItemRepository
+    private val listFoodItemRepository: FoodItemRepository,
+    private val userRepository: UserRepository
 ) : HouseHoldRepository {
 
   private val auth = FirebaseAuth.getInstance()
@@ -32,7 +34,7 @@ class HouseholdRepositoryFirestore(
   override val householdToEdit: StateFlow<HouseHold?> = _householdToEdit.asStateFlow()
 
   private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
-  var selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
+  override var selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
 
   // Listener registration for real-time updates
   private var householdsListenerRegistration: ListenerRegistration? = null
@@ -46,26 +48,15 @@ class HouseholdRepositoryFirestore(
   }
 
   /** Load the selected household UID from DataStore. */
-  private suspend fun loadSelectedHouseholdUid(callback: (String?) -> Unit) {
-    val uid = dataStore.data.map { preferences -> preferences[KEY] }.first()
-    callback(uid)
+  private suspend fun loadSelectedHouseholdUid(): String? {
+    return dataStore.data.map { preferences -> preferences[KEY] }.first()
   }
 
-  /**
-   * Generates a new unique ID for a household.
-   *
-   * @return A new unique ID.
-   */
   override fun getNewUid(): String {
     return db.collection(collectionPath).document().id
   }
 
-  /**
-   * Selects a household to edit
-   *
-   * @param household - The household to edit.
-   */
-  fun selectHouseholdToEdit(household: HouseHold?) {
+  override fun selectHouseholdToEdit(household: HouseHold?) {
     _householdToEdit.value = household
   }
 
@@ -97,8 +88,9 @@ class HouseholdRepositoryFirestore(
    *
    * @param householdIds List of household IDs to fetch.
    */
-  suspend fun initializeHouseholds(householdIds: List<String>) {
+  override suspend fun initializeHouseholds(householdIds: List<String>) {
     if (householdIds.isEmpty()) {
+      Log.d("HouseholdRepository", "No household IDs provided")
       _households.value = emptyList()
       return
     }
@@ -107,11 +99,33 @@ class HouseholdRepositoryFirestore(
       val querySnapshot =
           db.collection(collectionPath).whereIn(FieldPath.documentId(), householdIds).get().await()
 
+      Log.d("HouseholdRepository", "Fetched households: ${querySnapshot.documents}")
       val fetchedHouseholds = querySnapshot.documents.mapNotNull { convertToHousehold(it) }
       _households.value = fetchedHouseholds
+      Log.d("HouseholdRepository", "Households: ${_households.value}")
+
+      val uid = loadSelectedHouseholdUid()
+      if (uid != null) {
+        Log.d("HouseholdRepositoryFirestore", "Selected household UID: $uid")
+        selectHousehold(_households.value.find { it.uid == uid } ?: _households.value.firstOrNull())
+      } else {
+        selectHousehold(_households.value.firstOrNull())
+      }
+      updateSelectedHousehold()
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error initializing households", e)
       _households.value = emptyList()
+    }
+  }
+
+  /**
+   * Updates the selected household with the latest data from the list of households using the uid.
+   */
+  private suspend fun updateSelectedHousehold() {
+    Log.d("HouseholdViewModel", "Updating selected household")
+    _selectedHousehold.value?.let { selectedHousehold ->
+      val updatedHousehold = _households.value.find { it.uid == selectedHousehold.uid }
+      selectHousehold(updatedHousehold)
     }
   }
 
@@ -131,10 +145,22 @@ class HouseholdRepositoryFirestore(
           .document(household.uid) // Use the household UID as the document ID
           .set(householdData)
           .await()
+      // Add the household UID to the user's list of household UIDs
+      userRepository.addHouseholdUID(household.uid)
       // Update local cache
+      Log.d("HouseholdRepository", "Added household: $household")
       val currentHouseholds = _households.value.toMutableList()
       currentHouseholds.add(household)
       _households.value = currentHouseholds
+
+      // Update the selected household if necessary
+      if (_selectedHousehold.value == null) {
+        Log.d("HouseholdViewModel", "Selected household is null")
+        selectHousehold(_households.value.firstOrNull()) // Default to the first household
+      } else {
+        updateSelectedHousehold()
+      }
+      Log.d("HouseholdRepository", "Households: ${_households.value}")
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error adding household", e)
     }
@@ -162,6 +188,7 @@ class HouseholdRepositoryFirestore(
       } else {
         currentHouseholds.add(household)
       }
+      Log.d("HouseholdRepository", "Updated household: $household")
       _households.value = currentHouseholds
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error updating household", e)
@@ -171,6 +198,9 @@ class HouseholdRepositoryFirestore(
   override suspend fun deleteHouseholdById(id: String) {
     try {
       db.collection(collectionPath).document(id).delete().await()
+
+      // Remove the household UID from the user's list of household UIDs
+      userRepository.deleteHouseholdUID(id)
 
       // Update local cache
       val currentHouseholds = _households.value.filterNot { it.uid == id }

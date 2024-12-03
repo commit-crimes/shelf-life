@@ -15,7 +15,11 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
 
   // Local cache for food items per household
   private val _foodItems = MutableStateFlow<List<FoodItem>>(emptyList())
-  val foodItems: StateFlow<List<FoodItem>> = _foodItems.asStateFlow()
+  override val foodItems: StateFlow<List<FoodItem>> = _foodItems.asStateFlow()
+
+  // Selected food item for detail view
+  private val _selectedFoodItem = MutableStateFlow<FoodItem?>(null)
+  val selectedFoodItem: StateFlow<FoodItem?> = _selectedFoodItem.asStateFlow()
 
   // Listener registration
   private var foodItemsListenerRegistration: ListenerRegistration? = null
@@ -50,6 +54,10 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
       Log.e("FoodItemRepository", "Error fetching food items", e)
       emptyList()
     }
+  }
+
+  override fun selectFoodItem(foodItem: FoodItem?) {
+    _selectedFoodItem.value = foodItem
   }
 
   override suspend fun updateFoodItem(householdId: String, foodItem: FoodItem) {

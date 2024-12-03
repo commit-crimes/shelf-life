@@ -2,6 +2,8 @@ package com.android.shelfLife.model.user
 
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -36,7 +38,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
       // Fetch user data from Firestore
       val snapshot = userCollection.document(currentUser.uid).get().await()
       if (snapshot.exists()) {
-        val userData = snapshot.toObject(User::class.java)
+        val userData = convertToUser(snapshot)
         _user.value = userData
         _invitations.value = userData?.invitationUIDs ?: emptyList()
       } else {
@@ -216,6 +218,59 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
               callback(emailToUserId)
             }
           }
+    }
+  }
+
+  override fun getUserEmails(userIds: List<String>, callback: (Map<String, String>) -> Unit) {
+    if (userIds.isEmpty()) {
+      callback(emptyMap())
+      return
+    }
+
+    val uidBatches = userIds.chunked(10) // Firestore allows up to 10 values in 'whereIn'
+    val uidToEmail = mutableMapOf<String, String>()
+    var batchesProcessed = 0
+
+    for (uidBatch in uidBatches) {
+      db.collection("users")
+          .whereIn(FieldPath.documentId(), uidBatch)
+          .get()
+          .addOnSuccessListener { querySnapshot ->
+            for (doc in querySnapshot.documents) {
+              val email = doc.getString("email")
+              val userId = doc.id
+              if (email != null) {
+                uidToEmail[userId] = email
+              }
+            }
+            batchesProcessed++
+            if (batchesProcessed == uidBatches.size) {
+              callback(uidToEmail)
+            }
+          }
+          .addOnFailureListener { exception ->
+            Log.e("HouseholdRepository", "Error fetching emails by user IDs", exception)
+            batchesProcessed++
+            if (batchesProcessed == uidBatches.size) {
+              callback(uidToEmail)
+            }
+          }
+    }
+  }
+
+  private fun convertToUser(doc: DocumentSnapshot): User? {
+    return try {
+      val uid = doc.id
+      val username = doc.getString("username") ?: ""
+      val email = doc.getString("email") ?: ""
+      val householdUIDs = doc.get("householdUIDs") as? List<String> ?: emptyList()
+      val recipeUIDs = doc.get("recipeUIDs") as? List<String> ?: emptyList()
+      val invitationUIDs = doc.get("invitationUIDs") as? List<String> ?: emptyList()
+
+      User(uid, username, email, householdUIDs, recipeUIDs, invitationUIDs)
+    } catch (e: Exception) {
+      Log.e("HouseholdRepository", "Error converting document to HouseHold", e)
+      null
     }
   }
 }

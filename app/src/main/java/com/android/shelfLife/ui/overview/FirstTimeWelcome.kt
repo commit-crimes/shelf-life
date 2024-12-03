@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.overview.OverviewScreenViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
@@ -34,7 +34,7 @@ import com.android.shelfLife.ui.utils.signOutUser
 @Composable
 fun FirstTimeWelcomeScreen(
     navigationActions: NavigationActions,
-    householdViewModel: HouseholdViewModel
+    overviewScreenViewModel: OverviewScreenViewModel
 ) {
   val currentContext = LocalContext.current
   Column(
@@ -63,7 +63,7 @@ fun FirstTimeWelcomeScreen(
         // Create Household Button
         Button(
             onClick = {
-              householdViewModel.selectHouseholdToEdit(null)
+              overviewScreenViewModel.selectHouseholdToEdit(null)
               navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
             },
             modifier = Modifier.fillMaxWidth(0.6f).height(48.dp).testTag("householdNameSaveButton"),
