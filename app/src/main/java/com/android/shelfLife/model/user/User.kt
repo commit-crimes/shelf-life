@@ -4,6 +4,7 @@ data class User(
     val uid: String,
     val username: String,
     val email: String,
+    val photoUrl: String? = null,
     val householdUIDs: List<String> = emptyList(),
     val recipeUIDs: List<String> = emptyList(),
     val invitationUIDs: List<String> = emptyList()

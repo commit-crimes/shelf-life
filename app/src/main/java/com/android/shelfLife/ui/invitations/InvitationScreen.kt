@@ -34,7 +34,7 @@ fun InvitationScreen(
       // Show list of invitations
       LazyColumn(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
         items(invitations) { invitation ->
-          InvitationCard(invitation, invitationViewModel, navigationActions)
+          InvitationCard(invitation, invitationViewModel)
           Spacer(modifier = Modifier.height(8.dp))
         }
       }
@@ -46,7 +46,6 @@ fun InvitationScreen(
 fun InvitationCard(
     invitation: Invitation,
     invitationViewModel: InvitationViewModel,
-    navigationActions: NavigationActions
 ) {
   val context = LocalContext.current
   Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation()) {
