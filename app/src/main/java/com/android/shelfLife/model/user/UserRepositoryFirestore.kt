@@ -95,6 +95,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     val updatedUserData =
         when (fieldName) {
           "username" -> currentUserData.copy(username = value as String)
+          "imageURL" -> currentUserData.copy(photoUrl = value as String)
           "email" -> currentUserData.copy(email = value as String)
           else -> currentUserData
         }
@@ -173,6 +174,10 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
 
   override suspend fun updateUsername(username: String) {
     updateUserField("username", username)
+  }
+
+  override suspend fun updateImage(url: String) {
+    updateUserField("imageURL", url)
   }
 
   override suspend fun updateEmail(email: String) {
