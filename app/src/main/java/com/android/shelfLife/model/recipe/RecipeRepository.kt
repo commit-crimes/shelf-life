@@ -1,6 +1,13 @@
 package com.android.shelfLife.model.recipe
 
+import kotlinx.coroutines.flow.StateFlow
+import java.lang.Thread.State
+
 interface RecipeRepository {
+
+  val recipes : StateFlow<List<Recipe>>
+  val selectedRecipe: StateFlow<Recipe?>
+
   /** Generates a new unique ID for a recipe. */
   fun getUid(): String
 
@@ -54,4 +61,6 @@ interface RecipeRepository {
    * @param onFailure - Called when there is an error deleting the recipe.
    */
   fun deleteRecipe(recipeId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+
+  fun selectRecipe(recipe: Recipe)
 }
