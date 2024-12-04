@@ -52,7 +52,8 @@ interface UserRepository {
   fun getUserEmails(userIds: List<String>, callback: (Map<String, String>) -> Unit)
 
   /**
-   * Selects a household and saves it to the user's data.
+   * Selects a household and saves it to the user's data. VIEW MODELS NEED TO MANUALLY SELECT THE
+   * LIST OF FOOD ITEMS!!!
    *
    * @param household - The household to select.
    */

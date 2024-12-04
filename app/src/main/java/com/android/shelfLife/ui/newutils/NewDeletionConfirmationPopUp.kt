@@ -12,16 +12,19 @@ import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.deletionConfirmation.DeletionConfirmationViewModel
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
+import com.android.shelfLife.model.user.UserRepository
 
 @Composable
 fun DeletionConfirmationPopUp(
     showDeleteDialog: Boolean,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    houseHoldRepository: HouseHoldRepository
+    houseHoldRepository: HouseHoldRepository,
+    userRepository: UserRepository
 ) {
   val deletionConfirmationViewModel: DeletionConfirmationViewModel = viewModel {
-    DeletionConfirmationViewModel(houseHoldRepository = houseHoldRepository)
+    DeletionConfirmationViewModel(
+        houseHoldRepository = houseHoldRepository, userRepository = userRepository)
   }
   val householdToDelete by deletionConfirmationViewModel.householdToEdit.collectAsState()
 

@@ -276,7 +276,8 @@ fun HouseHoldCreationScreen(
                     navigationActions.goBack()
                     showConfirmationDialog = false
                   },
-                  houseHoldRepository = houseHoldRepository)
+                  houseHoldRepository = houseHoldRepository,
+                  userRepository = userRepository)
             }
       }
 }

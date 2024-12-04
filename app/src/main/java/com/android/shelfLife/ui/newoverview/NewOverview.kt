@@ -76,80 +76,79 @@ fun OverviewScreen(
       scope = scope,
       drawerState = drawerState,
       navigationActions = navigationActions,
-      houseHoldRepository = houseHoldRepository) {
-        val filteredFoodItems =
-            foodItems.filter { item ->
-              item.foodFacts.name.contains(searchQuery, ignoreCase = true) &&
-                  (selectedFilters.isEmpty() ||
-                      selectedFilters.contains(item.foodFacts.category.name))
-            }
+      houseHoldRepository = houseHoldRepository,
+      userRepository = userRepository,
+  ) {
+    val filteredFoodItems =
+        foodItems.filter { item ->
+          item.foodFacts.name.contains(searchQuery, ignoreCase = true) &&
+              (selectedFilters.isEmpty() || selectedFilters.contains(item.foodFacts.category.name))
+        }
 
-        if (!householdViewModelIsLoaded) {
-          Column(
-              modifier = Modifier.fillMaxSize(),
-              horizontalAlignment = Alignment.CenterHorizontally,
-              verticalArrangement = Arrangement.Center,
-          ) {
-            CircularProgressIndicator()
-          }
-        } else if (selectedHousehold == null && households.isEmpty()) {
-          Log.d("OverviewScreen", households.toString())
-          FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel)
-        } else {
-          Scaffold(
-              modifier = Modifier.testTag("overviewScreen"),
-              topBar = {
-                selectedHousehold?.let {
-                  TopNavigationBar(
-                      houseHold = it,
-                      onHamburgerClick = { scope.launch { drawerState.open() } },
-                      filters = overviewScreenViewModel.filters,
-                      selectedFilters = selectedFilters,
-                      onFilterChange = { filter, _ ->
-                        overviewScreenViewModel.toggleFilter(filter)
-                      },
-                      showDeleteOption = multipleSelectedFoodItems.isNotEmpty(),
-                      onDeleteClick = {
-                        overviewScreenViewModel.deleteMultipleFoodItems(multipleSelectedFoodItems)
-                        overviewScreenViewModel.clearMultipleSelectedFoodItems()
-                      })
-                }
-              },
-              bottomBar = {
-                BottomNavigationMenu(
-                    onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                    tabList = LIST_TOP_LEVEL_DESTINATION,
-                    selectedItem = Route.OVERVIEW)
-              },
-              // Floating Action Button to add a new food item
-              floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
-                    content = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                    modifier = Modifier.testTag("addFoodFab"),
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer)
-              },
-          ) { paddingValues ->
-            Column(
-                modifier = Modifier.padding(paddingValues),
-            ) {
-              CustomSearchBar(
-                  query = searchQuery,
-                  onQueryChange = { searchQuery = it },
-                  placeholder = "Search food item",
-                  searchBarTestTag = "foodSearchBar")
-              ListFoodItems(
-                  foodItems = filteredFoodItems,
-                  overviewScreenViewModel = overviewScreenViewModel,
-                  onFoodItemClick = { selectedFoodItem ->
-                    overviewScreenViewModel.selectFoodItem(selectedFoodItem)
-                    navigationActions.navigateTo(Screen.INDIVIDUAL_FOOD_ITEM)
-                  },
-                  onFoodItemLongHold = { selectedFoodItem ->
-                    overviewScreenViewModel.selectMultipleFoodItems(selectedFoodItem)
+    if (!householdViewModelIsLoaded) {
+      Column(
+          modifier = Modifier.fillMaxSize(),
+          horizontalAlignment = Alignment.CenterHorizontally,
+          verticalArrangement = Arrangement.Center,
+      ) {
+        CircularProgressIndicator()
+      }
+    } else if (selectedHousehold == null && households.isEmpty()) {
+      Log.d("OverviewScreen", households.toString())
+      FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel)
+    } else {
+      Scaffold(
+          modifier = Modifier.testTag("overviewScreen"),
+          topBar = {
+            selectedHousehold?.let {
+              TopNavigationBar(
+                  houseHold = it,
+                  onHamburgerClick = { scope.launch { drawerState.open() } },
+                  filters = overviewScreenViewModel.filters,
+                  selectedFilters = selectedFilters,
+                  onFilterChange = { filter, _ -> overviewScreenViewModel.toggleFilter(filter) },
+                  showDeleteOption = multipleSelectedFoodItems.isNotEmpty(),
+                  onDeleteClick = {
+                    overviewScreenViewModel.deleteMultipleFoodItems(multipleSelectedFoodItems)
+                    overviewScreenViewModel.clearMultipleSelectedFoodItems()
                   })
             }
-          }
+          },
+          bottomBar = {
+            BottomNavigationMenu(
+                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                tabList = LIST_TOP_LEVEL_DESTINATION,
+                selectedItem = Route.OVERVIEW)
+          },
+          // Floating Action Button to add a new food item
+          floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
+                content = { Icon(Icons.Default.Add, contentDescription = "Add") },
+                modifier = Modifier.testTag("addFoodFab"),
+                containerColor = MaterialTheme.colorScheme.secondaryContainer)
+          },
+      ) { paddingValues ->
+        Column(
+            modifier = Modifier.padding(paddingValues),
+        ) {
+          CustomSearchBar(
+              query = searchQuery,
+              onQueryChange = { searchQuery = it },
+              placeholder = "Search food item",
+              searchBarTestTag = "foodSearchBar")
+          ListFoodItems(
+              foodItems = filteredFoodItems,
+              overviewScreenViewModel = overviewScreenViewModel,
+              onFoodItemClick = { selectedFoodItem ->
+                overviewScreenViewModel.selectFoodItem(selectedFoodItem)
+                navigationActions.navigateTo(Screen.INDIVIDUAL_FOOD_ITEM)
+              },
+              onFoodItemLongHold = { selectedFoodItem ->
+                overviewScreenViewModel.selectMultipleFoodItems(selectedFoodItem)
+              })
         }
       }
+    }
+  }
 }

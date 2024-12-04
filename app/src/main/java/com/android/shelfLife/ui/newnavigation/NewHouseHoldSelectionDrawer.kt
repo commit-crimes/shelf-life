@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.overview.HouseholdSelectionDrawerViewModel
+import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.newutils.DeletionConfirmationPopUp
@@ -46,10 +47,11 @@ fun HouseHoldSelectionDrawer(
     drawerState: DrawerState,
     navigationActions: NavigationActions,
     houseHoldRepository: HouseHoldRepository,
+    userRepository: UserRepository,
     content: @Composable () -> Unit
 ) {
   val householdSelectionDrawerViewModel = viewModel {
-    HouseholdSelectionDrawerViewModel(houseHoldRepository)
+    HouseholdSelectionDrawerViewModel(houseHoldRepository, userRepository)
   }
   val userHouseholds by householdSelectionDrawerViewModel.households.collectAsState()
   val selectedHousehold by householdSelectionDrawerViewModel.selectedHousehold.collectAsState()
@@ -148,5 +150,5 @@ fun HouseHoldSelectionDrawer(
       onDismiss = { showDeleteDialog = false },
       onConfirm = { showDeleteDialog = false },
       houseHoldRepository = houseHoldRepository,
-  )
+      userRepository = userRepository)
 }
