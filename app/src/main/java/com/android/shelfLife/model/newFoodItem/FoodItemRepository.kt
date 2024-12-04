@@ -1,6 +1,11 @@
 package com.android.shelfLife.model.newFoodItem
 
+import kotlinx.coroutines.flow.StateFlow
+
 interface FoodItemRepository {
+
+    val foodItems: StateFlow<List<FoodItem>>
+    val selectedFoodItem: StateFlow<FoodItem?>
 
   /** Generates a new unique ID for a food item. */
   fun getNewUid(): String
@@ -36,4 +41,7 @@ interface FoodItemRepository {
    * @param foodItemId The ID of the food item to delete.
    */
   suspend fun deleteFoodItem(householdId: String, foodItemId: String)
+
+  fun selectFoodItem(foodItem: FoodItem?)
 }
+
