@@ -46,6 +46,7 @@ import com.android.shelfLife.ui.recipes.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.utils.signOutUser
+import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
 import com.example.compose.ShelfLifeTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -79,6 +80,9 @@ fun ShelfLifeApp() {
   val listRecipesViewModel = viewModel {
     ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
   }
+    val individualRecipeViewModel = viewModel{
+        IndividualRecipeViewModel(recipeRepository)
+    }
 
   val context = LocalContext.current
 
@@ -150,7 +154,7 @@ fun ShelfLifeApp() {
         RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
       }
       composable(Screen.INDIVIDUAL_RECIPE) {
-        IndividualRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)
+        IndividualRecipeScreen(navigationActions, individualRecipeViewModel)
       }
       composable(Screen.ADD_RECIPE) { AddRecipeScreen(navigationActions, listRecipesViewModel) }
       composable(Screen.ADD_RECIPE) {

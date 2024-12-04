@@ -6,6 +6,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.NavHost
@@ -48,6 +49,7 @@ import com.android.shelfLife.ui.recipes.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.utils.formatTimestampToDate
+import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.Timestamp
 import io.mockk.Runs
@@ -81,6 +83,7 @@ class EndToEndM2Test {
   private lateinit var listRecipesViewModel: ListRecipesViewModel
   private lateinit var invitationViewModel: InvitationViewModel
   private lateinit var invitationRepository: InvitationRepositoryFirestore
+  private lateinit var individualRecipeViewModel : IndividualRecipeViewModel
 
   private lateinit var navController: NavHostController
   private lateinit var houseHold: HouseHold
@@ -121,6 +124,7 @@ class EndToEndM2Test {
 
     foodFactsRepository = FakeFoodFactsRepository()
     foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)
+      individualRecipeViewModel = IndividualRecipeViewModel(recipeRepository)
 
     `when`(foodItemRepository.getNewUid()).thenReturn("mockedUid")
     every { barcodeScannerViewModel.permissionGranted } returns true
@@ -206,7 +210,7 @@ class EndToEndM2Test {
           RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
         }
         composable(Screen.INDIVIDUAL_RECIPE) {
-          IndividualRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)
+          IndividualRecipeScreen(navigationActions, individualRecipeViewModel)
         }
         composable(Screen.ADD_RECIPE) { AddRecipeScreen(navigationActions, listRecipesViewModel) }
         composable(Screen.EDIT_FOOD) {
