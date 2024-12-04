@@ -43,126 +43,121 @@ import kotlin.math.floor
 /**
  * Composable function to display the screen for an individual recipe.
  *
- * The screen provides detailed information about a selected recipe, including its image,
- * servings, cooking time, ingredients, and instructions. If no recipe is selected, an
- * error message is displayed.
+ * The screen provides detailed information about a selected recipe, including its image, servings,
+ * cooking time, ingredients, and instructions. If no recipe is selected, an error message is
+ * displayed.
  *
- * @param navigationActions The navigation actions for handling navigation events, such as going back.
- * @param individualRecipeViewModel The ViewModel for managing and providing data related to the selected recipe.
+ * @param navigationActions The navigation actions for handling navigation events, such as going
+ *   back.
+ * @param individualRecipeViewModel The ViewModel for managing and providing data related to the
+ *   selected recipe.
  *
  * Structure:
  * - Displays a top bar with the recipe name and a back button.
  * - Shows a bottom navigation bar for switching between main destinations in the app.
  * - If a recipe is selected:
- *   - Displays the recipe image, servings, cooking time, ingredients, and instructions in a scrollable layout.
+ *     - Displays the recipe image, servings, cooking time, ingredients, and instructions in a
+ *       scrollable layout.
  * - If no recipe is selected:
- *   - Shows an error message and an easter egg image.
+ *     - Shows an error message and an easter egg image.
  */
 fun IndividualRecipeScreen(
     navigationActions: NavigationActions,
     individualRecipeViewModel: IndividualRecipeViewModel,
 ) {
 
-    if(individualRecipeViewModel.selectedRecipeIsNonEmpty){
-        // Scaffold that provides the structure for the screen, including top and bottom bars.
-        Scaffold(
-            modifier = Modifier.testTag("individualRecipesScreen"),
-            topBar = {
-                CustomTopAppBar(
-                    onClick = { navigationActions.goBack() },
-                    title = individualRecipeViewModel.getRecipeName(),
-                    titleTestTag = "individualRecipeTitle")
-            },
-            bottomBar = {
-                // Bottom navigation bar for switching between main app destinations.
-                BottomNavigationMenu(
-                    onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                    tabList = LIST_TOP_LEVEL_DESTINATION,
-                    selectedItem = Route.RECIPES)
-            },
-            content = { paddingValues ->
-                Column(modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()
-                    .testTag("recipe")) {
+  if (individualRecipeViewModel.selectedRecipeIsNonEmpty) {
+    // Scaffold that provides the structure for the screen, including top and bottom bars.
+    Scaffold(
+        modifier = Modifier.testTag("individualRecipesScreen"),
+        topBar = {
+          CustomTopAppBar(
+              onClick = { navigationActions.goBack() },
+              title = individualRecipeViewModel.getRecipeName(),
+              titleTestTag = "individualRecipeTitle")
+        },
+        bottomBar = {
+          // Bottom navigation bar for switching between main app destinations.
+          BottomNavigationMenu(
+              onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+              tabList = LIST_TOP_LEVEL_DESTINATION,
+              selectedItem = Route.RECIPES)
+        },
+        content = { paddingValues ->
+          Column(modifier = Modifier.padding(paddingValues).fillMaxSize().testTag("recipe")) {
 
-                    // Recipe content: image, servings, time, and instructions
-                    Column(
-                        modifier =
-                        Modifier
-                            .padding(8.dp)
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState()) // Enable vertical scrolling
-                    ) {
-                        // Display the recipe image (placeholder for now)
-                        Image(
-                            painter = painterResource(R.drawable.google_logo),
-                            contentDescription = "Recipe Image",
-                            modifier = Modifier
-                                .width(537.dp)
-                                .height(159.dp)
-                                .testTag("recipeImage"),
-                            contentScale = ContentScale.FillWidth)
-
-                        // Row displaying servings and time information
-                        Row(modifier = Modifier.fillMaxWidth()) {
-                            Text(
-                                text = "Servings: ${individualRecipeViewModel.getRecipeServing()}",
-                                modifier = Modifier.testTag("recipeServings"))
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Text(
-                                text = "Time: ${individualRecipeViewModel.getRecipeTime()} min",
-                                modifier = Modifier.testTag("recipeTime"))
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Column(modifier = Modifier.testTag("recipeIngredients")) {
-                            individualRecipeViewModel.getRecipeIngredients().forEach { ingredient -> DisplayIngredient(ingredient) }
-                        }
-
-                        Column(modifier = Modifier.testTag("recipeInstructions")) {
-                            individualRecipeViewModel.getRecipeInstruction().forEach { instruction ->
-                                DisplayInstruction(instruction)
-                            }
-                        }
-                    }
-                }
-            })
-    }else{
-        // If no recipe is selected, display an error message.
-        Scaffold(
-            modifier = Modifier.fillMaxSize(), // Ensure Scaffold takes up the full size
-            content = { paddingValues ->
-                // Column for the content inside the Scaffold
-                Column(
-                    modifier = Modifier
+            // Recipe content: image, servings, time, and instructions
+            Column(
+                modifier =
+                    Modifier.padding(8.dp)
                         .fillMaxSize()
-                        .padding(paddingValues), // Apply padding values from Scaffold
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center // Center content vertically
+                        .verticalScroll(rememberScrollState()) // Enable vertical scrolling
                 ) {
-                    // Easter egg image
-                    Image(
-                        painter = painterResource(id = R.drawable.how_did_we_get_here),
-                        contentDescription = "How did we get here?",
-                        modifier = Modifier.fillMaxWidth(),
-                        contentScale = ContentScale.Fit
-                    )
+                  // Display the recipe image (placeholder for now)
+                  Image(
+                      painter = painterResource(R.drawable.google_logo),
+                      contentDescription = "Recipe Image",
+                      modifier = Modifier.width(537.dp).height(159.dp).testTag("recipeImage"),
+                      contentScale = ContentScale.FillWidth)
 
-                    // Spacer for some space between the image and the text
-                    Spacer(modifier = Modifier.size(16.dp))
-
-                    // Error message text
+                  // Row displaying servings and time information
+                  Row(modifier = Modifier.fillMaxWidth()) {
                     Text(
-                        text = "No recipe selected. Should not happen",
-                        modifier = Modifier.testTag("noRecipeSelectedMessage"),
-                        color = Color.Red
-                    )
+                        text = "Servings: ${individualRecipeViewModel.getRecipeServing()}",
+                        modifier = Modifier.testTag("recipeServings"))
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text(
+                        text = "Time: ${individualRecipeViewModel.getRecipeTime()} min",
+                        modifier = Modifier.testTag("recipeTime"))
+                  }
+
+                  Spacer(modifier = Modifier.height(16.dp))
+
+                  Column(modifier = Modifier.testTag("recipeIngredients")) {
+                    individualRecipeViewModel.getRecipeIngredients().forEach { ingredient ->
+                      DisplayIngredient(ingredient)
+                    }
+                  }
+
+                  Column(modifier = Modifier.testTag("recipeInstructions")) {
+                    individualRecipeViewModel.getRecipeInstruction().forEach { instruction ->
+                      DisplayInstruction(instruction)
+                    }
+                  }
                 }
-            }
-        )
-    }
+          }
+        })
+  } else {
+    // If no recipe is selected, display an error message.
+    Scaffold(
+        modifier = Modifier.fillMaxSize(), // Ensure Scaffold takes up the full size
+        content = { paddingValues ->
+          // Column for the content inside the Scaffold
+          Column(
+              modifier =
+                  Modifier.fillMaxSize()
+                      .padding(paddingValues), // Apply padding values from Scaffold
+              horizontalAlignment = Alignment.CenterHorizontally,
+              verticalArrangement = Arrangement.Center // Center content vertically
+              ) {
+                // Easter egg image
+                Image(
+                    painter = painterResource(id = R.drawable.how_did_we_get_here),
+                    contentDescription = "How did we get here?",
+                    modifier = Modifier.fillMaxWidth(),
+                    contentScale = ContentScale.Fit)
+
+                // Spacer for some space between the image and the text
+                Spacer(modifier = Modifier.size(16.dp))
+
+                // Error message text
+                Text(
+                    text = "No recipe selected. Should not happen",
+                    modifier = Modifier.testTag("noRecipeSelectedMessage"),
+                    color = Color.Red)
+              }
+        })
+  }
 }
 
 @Composable
@@ -186,27 +181,20 @@ fun DisplayIngredient(ingredient: Ingredient) {
 fun DisplayInstruction(instruction: String) {
   // Display recipe instructions, scrollable if long
   Text(
-      text = instruction, modifier = Modifier
-          .padding(vertical = 8.dp)
-          .testTag("recipeInstruction"))
+      text = instruction, modifier = Modifier.padding(vertical = 8.dp).testTag("recipeInstruction"))
 }
 
-
-//this preview function allows us to see the easter egg screen
+// this preview function allows us to see the easter egg screen
 @Preview()
 @Composable
 fun IndividualRecipeScreenPreview() {
-    val navController = rememberNavController()
-    val navigationActions = NavigationActions(navController)
-    val firebaseFirestore = FirebaseFirestore.getInstance()
-    val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
-    val individualRecipeViewModel = viewModel{
-        IndividualRecipeViewModel(recipeRepository)
-    }
+  val navController = rememberNavController()
+  val navigationActions = NavigationActions(navController)
+  val firebaseFirestore = FirebaseFirestore.getInstance()
+  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
+  val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
 
-    // Render the IndividualRecipeScreen with a null selectedRecipe
-    IndividualRecipeScreen(
-        navigationActions = navigationActions,
-        individualRecipeViewModel = individualRecipeViewModel
-    )
+  // Render the IndividualRecipeScreen with a null selectedRecipe
+  IndividualRecipeScreen(
+      navigationActions = navigationActions, individualRecipeViewModel = individualRecipeViewModel)
 }

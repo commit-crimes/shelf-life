@@ -102,9 +102,7 @@ class IndividualRecipeTest {
     selectedRecipeIndex?.let {
       listRecipesViewModel.selectRecipe(listRecipesViewModel.recipes.value[it])
     }
-      val individualRecipeViewModel = viewModel{
-          IndividualRecipeViewModel(recipeRepository)
-      }
+    val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
     composeTestRule.setContent {
       IndividualRecipeScreen(
           navigationActions = navigationActions,
@@ -142,9 +140,7 @@ class IndividualRecipeTest {
 
     householdViewModel.setHouseholds(listOf(emptyHousehold))
     householdViewModel.selectHousehold(emptyHousehold)
-      val individualRecipeViewModel = viewModel{
-          IndividualRecipeViewModel(recipeRepository)
-      }
+    val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
     composeTestRule.setContent {
       IndividualRecipeScreen(
           navigationActions = navigationActions,

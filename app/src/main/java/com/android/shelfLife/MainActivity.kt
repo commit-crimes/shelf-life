@@ -80,9 +80,7 @@ fun ShelfLifeApp() {
   val listRecipesViewModel = viewModel {
     ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
   }
-    val individualRecipeViewModel = viewModel{
-        IndividualRecipeViewModel(recipeRepository)
-    }
+  val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
 
   val context = LocalContext.current
 
