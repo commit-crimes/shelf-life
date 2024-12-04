@@ -14,9 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,7 +40,7 @@ fun ProfileScreen(
     navigationActions: NavigationActions,
     profileViewModel: ProfileScreenViewModel,
 ) {
-  var expanded by remember { mutableStateOf(false) }
+
   val currentUser = profileViewModel.currentUser.collectAsState()
   val invitations by profileViewModel.invitations.collectAsState()
   // Get the current theme mode and the theme toggler from ShelfLifeTheme
@@ -118,8 +115,8 @@ fun ProfileScreen(
                           themeToggler.toggleTheme(selectedOption)
                           navigationActions.navigateToAndClearBackStack(Route.PROFILE)
                         },
-                        expanded = expanded,
-                        onExpandedChange = { expanded = it },
+                        expanded = profileViewModel.changeThemeMenuState.value,
+                        onExpandedChange = { profileViewModel.changeThemeMenuState.value = it },
                         optionLabel = { option ->
                           (optionLabels[option] ?: "System Default") + " Mode"
                         },

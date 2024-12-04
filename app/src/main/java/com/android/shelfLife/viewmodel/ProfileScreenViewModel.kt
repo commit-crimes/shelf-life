@@ -2,6 +2,7 @@ package com.android.shelfLife.viewmodel
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.runtime.mutableStateOf
 import com.android.shelfLife.model.newInvitations.Invitation
 import com.android.shelfLife.model.newInvitations.InvitationRepository
 import com.android.shelfLife.model.user.UserRepository
@@ -17,7 +18,7 @@ class ProfileScreenViewModel(
     private val userRepository: UserRepository,
     private val context: Context
 ) {
-
+    var changeThemeMenuState = mutableStateOf(false)
   val invitations: StateFlow<List<Invitation>> = invitationRepository.invitations
   val currentUser = userRepository.user
 
