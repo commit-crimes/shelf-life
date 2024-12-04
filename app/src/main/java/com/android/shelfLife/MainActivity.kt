@@ -20,7 +20,6 @@ import androidx.navigation.navigation
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.android.shelfLife.model.foodFacts.OpenFoodFactsRepository
-import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
@@ -29,6 +28,7 @@ import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.RecipeGeneratorOpenAIRepository
 import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
+import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
@@ -46,6 +46,7 @@ import com.android.shelfLife.ui.recipes.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.utils.signOutUser
+import com.android.shelfLife.viewmodel.foodItem.FoodItemViewModel
 import com.example.compose.ShelfLifeTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -68,7 +69,7 @@ fun ShelfLifeApp() {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
   val firebaseFirestore = FirebaseFirestore.getInstance()
-  val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
+  val foodItemRepository = com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore(firebaseFirestore)
   val listFoodItemViewModel = viewModel { ListFoodItemsViewModel(foodItemRepository) }
   val invitationRepositoryFirestore = InvitationRepositoryFirestore(firebaseFirestore)
   val invitationViewModel = viewModel { InvitationViewModel(invitationRepositoryFirestore) }
@@ -79,6 +80,9 @@ fun ShelfLifeApp() {
   val listRecipesViewModel = viewModel {
     ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
   }
+    val newFoodItemRepository = com.android.shelfLife.model.newFoodItem.FoodItemRepositoryFirestore(firebaseFirestore)
+    val userRepository = UserRepositoryFirestore(firebaseFirestore)
+    val foodItemViewModel = viewModel { FoodItemViewModel(newFoodItemRepository, userRepository) }
 
   val context = LocalContext.current
 
@@ -116,10 +120,10 @@ fun ShelfLifeApp() {
       }
       composable(Screen.ADD_FOOD) {
         AddFoodItemScreen(
-            navigationActions, householdViewModel, listFoodItemViewModel, foodFactsViewModel)
+            navigationActions, foodItemViewModel)
       }
       composable(Screen.EDIT_FOOD) {
-        EditFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
+        EditFoodItemScreen(navigationActions, foodItemViewModel)
       }
       composable(Screen.HOUSEHOLD_CREATION) {
         HouseHoldCreationScreen(navigationActions, householdViewModel = householdViewModel)

@@ -1,11 +1,15 @@
 package com.android.shelfLife.model.newFoodItem
 
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 interface FoodItemRepository {
 
     val foodItems: StateFlow<List<FoodItem>>
     val selectedFoodItem: StateFlow<FoodItem?>
+    val errorMessage: StateFlow<String?>
+
 
   /** Generates a new unique ID for a food item. */
   fun getNewUid(): String

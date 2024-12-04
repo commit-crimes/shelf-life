@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,11 +20,9 @@ import coil3.compose.rememberAsyncImagePainter
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.*
-import com.android.shelfLife.viewmodel.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.utils.*
-import com.android.shelfLife.viewmodel.AddFoodItem.AddFoodItemViewModel
-import com.google.firebase.Timestamp
+import com.android.shelfLife.viewmodel.foodItem.FoodItemViewModel
 import kotlinx.coroutines.launch
 
 /**
@@ -40,16 +37,22 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddFoodItemScreen(
     navigationActions: NavigationActions,
-    addFoodItemViewModel: AddFoodItemViewModel,
+    foodItemViewModel: FoodItemViewModel,
     paddingValues: PaddingValues = PaddingValues(16.dp)
 ) {
-  val foodFacts by foodFactsViewModel.foodFactsSuggestions.collectAsState()
+  //val foodFacts by foodFactsViewModel.foodFactsSuggestions.collectAsState()
 
   val coroutineScope = rememberCoroutineScope()
 
   val context = LocalContext.current
 
-  DisposableEffect(Unit) { onDispose { foodFactsViewModel.clearFoodFactsSuggestions() } }
+  LaunchedEffect(Unit) {
+      if (!foodItemViewModel.isSelected) {
+          foodItemViewModel.reset()
+      }
+  }
+
+  //DisposableEffect(Unit) { onDispose { foodFactsViewModel.clearFoodFactsSuggestions() } }
 
   Scaffold(
       modifier = Modifier.fillMaxSize(),
@@ -69,12 +72,12 @@ fun AddFoodItemScreen(
             verticalArrangement = Arrangement.Top) {
               item(key = "foodName") {
                 FoodNameField(
-                    foodName = addFoodItemViewModel.foodName,
+                    foodName = foodItemViewModel.foodName,
                     onFoodNameChange = { newValue ->
-                      addFoodItemViewModel.changeFoodName(newValue)
-                      foodFactsViewModel.searchByQuery(foodName) // TODO ask kevin
+                      foodItemViewModel.changeFoodName(newValue)
+                      //foodFactsViewModel.searchByQuery(foodName) // TODO ask kevin
                     },
-                    foodNameErrorResId = addFoodItemViewModel.foodNameErrorResId)
+                    foodNameErrorResId = foodItemViewModel.foodNameErrorResId)
                 Spacer(modifier = Modifier.height(16.dp))
               }
 
@@ -83,19 +86,19 @@ fun AddFoodItemScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically) {
                       AmountField(
-                          amount = addFoodItemViewModel.amount,
+                          amount = foodItemViewModel.amount,
                           onAmountChange = { newValue ->
-                            addFoodItemViewModel.changeAmount(newValue)
+                            foodItemViewModel.changeAmount(newValue)
                           },
-                          amountErrorResId = addFoodItemViewModel.amountErrorResId,
+                          amountErrorResId = foodItemViewModel.amountErrorResId,
                           modifier = Modifier.weight(1f),
                           testTag = "inputFoodAmount")
                       Spacer(modifier = Modifier.width(8.dp))
                       UnitDropdownField(
-                          unit = addFoodItemViewModel.unit,
-                          onUnitChange = { addFoodItemViewModel.unit = it },
-                          unitExpanded = addFoodItemViewModel.unitExpanded,
-                          onUnitExpandedChange = { addFoodItemViewModel.unitExpanded = it },
+                          unit = foodItemViewModel.unit,
+                          onUnitChange = { foodItemViewModel.unit = it },
+                          unitExpanded = foodItemViewModel.unitExpanded,
+                          onUnitExpandedChange = { foodItemViewModel.unitExpanded = it },
                           modifier = Modifier.weight(1f),
                           testTag = "inputFoodUnit")
                     }
@@ -104,30 +107,30 @@ fun AddFoodItemScreen(
 
               item(key = "category") {
                 CategoryDropdownField(
-                    category = addFoodItemViewModel.category,
-                    onCategoryChange = { addFoodItemViewModel.category = it },
-                    categoryExpanded = addFoodItemViewModel.categoryExpanded,
-                    onCategoryExpandedChange = { addFoodItemViewModel.categoryExpanded = it })
+                    category = foodItemViewModel.category,
+                    onCategoryChange = { foodItemViewModel.category = it },
+                    categoryExpanded = foodItemViewModel.categoryExpanded,
+                    onCategoryExpandedChange = { foodItemViewModel.categoryExpanded = it })
                 Spacer(modifier = Modifier.height(16.dp))
               }
 
               item(key = "location") {
-                LocationDropdownField(
-                    location = addFoodItemViewModel.location,
-                    onLocationChange = { addFoodItemViewModel.location = it },
-                    locationExpanded = addFoodItemViewModel.locationExpanded,
-                    onExpandedChange = { addFoodItemViewModel.locationExpanded = it },
+                NewLocationDropdownField(
+                    location = foodItemViewModel.location,
+                    onLocationChange = { foodItemViewModel.location = it },
+                    locationExpanded = foodItemViewModel.locationExpanded,
+                    onExpandedChange = { foodItemViewModel.locationExpanded = it },
                     testTag = "inputFoodLocation")
                 Spacer(modifier = Modifier.height(16.dp))
               }
 
               item(key = "expireDate") {
                 DateField(
-                    date = addFoodItemViewModel.expireDate,
+                    date = foodItemViewModel.expireDate,
                     onDateChange = { newValue ->
-                        addFoodItemViewModel.changeExpiryDate(newValue)
+                        foodItemViewModel.changeExpiryDate(newValue)
                     },
-                    dateErrorResId = addFoodItemViewModel.expireDateErrorResId,
+                    dateErrorResId = foodItemViewModel.expireDateErrorResId,
                     labelResId = R.string.expire_date_hint,
                     testTag = "inputFoodExpireDate")
                 Spacer(modifier = Modifier.height(16.dp))
@@ -135,11 +138,11 @@ fun AddFoodItemScreen(
 
               item(key = "openDate") {
                 DateField(
-                    date = addFoodItemViewModel.openDate,
+                    date = foodItemViewModel.openDate,
                     onDateChange = { newValue ->
-                      addFoodItemViewModel.changeOpenDate(newValue)
+                      foodItemViewModel.changeOpenDate(newValue)
                     },
-                    dateErrorResId = addFoodItemViewModel.openDateErrorResId,
+                    dateErrorResId = foodItemViewModel.openDateErrorResId,
                     labelResId = R.string.open_date_hint,
                     testTag = "inputFoodOpenDate")
                 Spacer(modifier = Modifier.height(16.dp))
@@ -147,92 +150,92 @@ fun AddFoodItemScreen(
 
               item(key = "buyDate") {
                 DateField(
-                    date = addFoodItemViewModel.buyDate,
+                    date = foodItemViewModel.buyDate,
                     onDateChange = { newValue ->
-                      addFoodItemViewModel.changeBuyDate(newValue)
+                      foodItemViewModel.changeBuyDate(newValue)
                     },
-                    dateErrorResId = addFoodItemViewModel.buyDateErrorResId,
+                    dateErrorResId = foodItemViewModel.buyDateErrorResId,
                     labelResId = R.string.buy_date_hint,
                     testTag = "inputFoodBuyDate")
                 Spacer(modifier = Modifier.height(32.dp))
               }
 
-              if (foodFacts.isNotEmpty()) {
-                item(key = "selectImage") {
-                  Text(
-                      text = stringResource(id = R.string.select_image_label),
-                      modifier = Modifier.testTag("selectImage"))
-                  Spacer(modifier = Modifier.height(8.dp))
-
-                  LazyRow(
-                      modifier = Modifier.fillMaxWidth(),
-                      horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        items(foodFacts.take(10)) { foodFact ->
-                          Box(
-                              modifier =
-                                  Modifier.fillMaxWidth(0.3f)
-                                      .aspectRatio(1f)
-                                      .border(
-                                          width = if (selectedImage == foodFact) 2.dp else 1.dp,
-                                          color = MaterialTheme.colorScheme.primary,
-                                          shape = RoundedCornerShape(8.dp))
-                                      .clickable { selectedImage = foodFact }
-                                      .testTag("foodImage")) {
-                                Image(
-                                    painter = rememberAsyncImagePainter(foodFact.imageUrl),
-                                    contentDescription = foodFact.name,
-                                    modifier = Modifier.fillMaxSize())
-                              }
-                        }
-                      }
-                  Spacer(modifier = Modifier.height(16.dp))
-                }
-              }
+//              if (foodFacts.isNotEmpty()) {
+//                item(key = "selectImage") {
+//                  Text(
+//                      text = stringResource(id = R.string.select_image_label),
+//                      modifier = Modifier.testTag("selectImage"))
+//                  Spacer(modifier = Modifier.height(8.dp))
+//
+//                  LazyRow(
+//                      modifier = Modifier.fillMaxWidth(),
+//                      horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+//                        items(foodFacts.take(10)) { foodFact ->
+//                          Box(
+//                              modifier =
+//                                  Modifier.fillMaxWidth(0.3f)
+//                                      .aspectRatio(1f)
+//                                      .border(
+//                                          width = if (selectedImage == foodFact) 2.dp else 1.dp,
+//                                          color = MaterialTheme.colorScheme.primary,
+//                                          shape = RoundedCornerShape(8.dp))
+//                                      .clickable { selectedImage = foodFact }
+//                                      .testTag("foodImage")) {
+//                                Image(
+//                                    painter = rememberAsyncImagePainter(foodFact.imageUrl),
+//                                    contentDescription = foodFact.name,
+//                                    modifier = Modifier.fillMaxSize())
+//                              }
+//                        }
+//                      }
+//                  Spacer(modifier = Modifier.height(16.dp))
+//                }
+//              }
 
               // Add a "No Image" option
-              item("noImage") {
-                Box(
-                    modifier =
-                        Modifier.size(100.dp)
-                            .border(
-                                width = if (selectedImage == null) 4.dp else 1.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                                shape = RoundedCornerShape(8.dp))
-                            .clickable {
-                              selectedImage = null // Indicate no image selected
-                            }
-                            .testTag("noImage"),
-                    contentAlignment = Alignment.Center) {
-                      Text(
-                          stringResource(id = R.string.no_image_option),
-                          modifier = Modifier.testTag("noImageText"))
-                    }
-                Spacer(modifier = Modifier.height(16.dp))
-              }
+//              item("noImage") {
+//                Box(
+//                    modifier =
+//                        Modifier.size(100.dp)
+//                            .border(
+//                                width = if (selectedImage == null) 4.dp else 1.dp,
+//                                color = MaterialTheme.colorScheme.primary,
+//                                shape = RoundedCornerShape(8.dp))
+//                            .clickable {
+//                              selectedImage = null // Indicate no image selected
+//                            }
+//                            .testTag("noImage"),
+//                    contentAlignment = Alignment.Center) {
+//                      Text(
+//                          stringResource(id = R.string.no_image_option),
+//                          modifier = Modifier.testTag("noImageText"))
+//                    }
+//                Spacer(modifier = Modifier.height(16.dp))
+//              }
 
               // Display Selected Image
-              selectedImage?.let {
-                item {
-                  Text(
-                      stringResource(id = R.string.selected_image_label),
-                      modifier = Modifier.testTag("selectedImageText"))
-                  Image(
-                      painter = rememberAsyncImagePainter(it.imageUrl),
-                      contentDescription = null,
-                      modifier = Modifier.size(150.dp).padding(8.dp).testTag("selectedImage"))
-                  Spacer(modifier = Modifier.height(16.dp))
-                }
-              }
-                  ?: item {
-                    Text(
-                        stringResource(id = R.string.default_image_label),
-                        modifier = Modifier.testTag("defaultImageText"))
-                    Image(
-                        painter = rememberAsyncImagePainter(FoodFacts.DEFAULT_IMAGE_URL),
-                        contentDescription = null,
-                        modifier = Modifier.size(150.dp).padding(8.dp).testTag("defaultImage"))
-                    Spacer(modifier = Modifier.height(16.dp))
-                  }
+//              selectedImage?.let {
+//                item {
+//                  Text(
+//                      stringResource(id = R.string.selected_image_label),
+//                      modifier = Modifier.testTag("selectedImageText"))
+//                  Image(
+//                      painter = rememberAsyncImagePainter(it.imageUrl),
+//                      contentDescription = null,
+//                      modifier = Modifier.size(150.dp).padding(8.dp).testTag("selectedImage"))
+//                  Spacer(modifier = Modifier.height(16.dp))
+//                }
+//              }
+//                  ?: item {
+//                    Text(
+//                        stringResource(id = R.string.default_image_label),
+//                        modifier = Modifier.testTag("defaultImageText"))
+//                    Image(
+//                        painter = rememberAsyncImagePainter(FoodFacts.DEFAULT_IMAGE_URL),
+//                        contentDescription = null,
+//                        modifier = Modifier.size(150.dp).padding(8.dp).testTag("defaultImage"))
+//                    Spacer(modifier = Modifier.height(16.dp))
+//                  }
 
               item(key = "buttons") {
                 CustomButtons(
@@ -241,9 +244,9 @@ fun AddFoodItemScreen(
                     button1Text = stringResource(R.string.cancel_button),
                     button2OnClick = {
                         coroutineScope.launch {
-                            val success = addFoodItemViewModel.submitFoodItem()
+                            val success = foodItemViewModel.submitFoodItem()
                             if (success) {
-                                foodFactsViewModel.clearFoodFactsSuggestions()
+                                //foodFactsViewModel.clearFoodFactsSuggestions()
                                 navigationActions.goBack()
                             } else {
                                 Toast.makeText(
