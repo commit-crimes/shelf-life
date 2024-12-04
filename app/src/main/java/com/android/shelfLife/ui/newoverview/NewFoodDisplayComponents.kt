@@ -38,7 +38,7 @@ import coil3.compose.AsyncImage
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.model.newFoodItem.FoodStatus
-import com.android.shelfLife.model.overview.OverviewScreenViewModel
+import com.android.shelfLife.model.newOverview.OverviewScreenViewModel
 import com.android.shelfLife.ui.utils.getExpiryMessageBasedOnDays
 import com.android.shelfLife.ui.utils.getProgressBarState
 import com.google.firebase.Timestamp

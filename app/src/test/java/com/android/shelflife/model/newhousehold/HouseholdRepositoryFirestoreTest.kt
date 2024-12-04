@@ -1,6 +1,10 @@
 package com.android.shelfLife.model.newhousehold
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.test.core.app.ApplicationProvider
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
+import com.android.shelfLife.model.user.UserRepository
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
@@ -27,6 +31,9 @@ class HouseholdRepositoryFirestoreTest {
   @Mock private lateinit var mockDocument: DocumentReference
   @Mock private lateinit var mockQuerySnapshot: QuerySnapshot
   @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
+  @Mock private lateinit var dataStore: DataStore<Preferences>
+  @Mock private lateinit var listFoodItemRepository: FoodItemRepository
+  @Mock private lateinit var userRepository: UserRepository
 
   private lateinit var householdRepository: HouseholdRepositoryFirestore
 
@@ -44,7 +51,9 @@ class HouseholdRepositoryFirestoreTest {
     `when`(mockCollection.document(anyString())).thenReturn(mockDocument)
 
     // Initialize the HouseholdRepositoryFirestore with mocks
-    householdRepository = HouseholdRepositoryFirestore(mockFirestore)
+    householdRepository =
+        HouseholdRepositoryFirestore(
+            mockFirestore, dataStore, listFoodItemRepository, userRepository)
 
     // Set the Dispatchers to use the TestCoroutineDispatcher
     Dispatchers.setMain(StandardTestDispatcher())

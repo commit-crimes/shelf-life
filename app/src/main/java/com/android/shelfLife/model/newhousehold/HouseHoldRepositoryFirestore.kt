@@ -114,7 +114,6 @@ class HouseholdRepositoryFirestore(
       updateSelectedHousehold()
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error initializing households", e)
-      _households.value = emptyList()
     }
   }
 

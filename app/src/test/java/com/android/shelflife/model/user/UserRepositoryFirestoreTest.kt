@@ -91,7 +91,12 @@ class UserRepositoryFirestoreTest {
     val mockTask: Task<DocumentSnapshot> = Tasks.forResult(mockDocumentSnapshot)
     `when`(mockUserDocument.get()).thenReturn(mockTask)
     `when`(mockDocumentSnapshot.exists()).thenReturn(true)
-    `when`(mockDocumentSnapshot.toObject(User::class.java)).thenReturn(testUser)
+    `when`(mockDocumentSnapshot.id).thenReturn("testUserId")
+    `when`(mockDocumentSnapshot.getString("username")).thenReturn("TestUser")
+    `when`(mockDocumentSnapshot.getString("email")).thenReturn("test@example.com")
+    `when`(mockDocumentSnapshot.get("householdUIDs")).thenReturn(listOf("house1", "house2"))
+    `when`(mockDocumentSnapshot.get("recipeUIDs")).thenReturn(listOf("recipe1"))
+    `when`(mockDocumentSnapshot.get("invitationUIDs")).thenReturn(listOf("invite1"))
 
     userRepository.initializeUserData()
 

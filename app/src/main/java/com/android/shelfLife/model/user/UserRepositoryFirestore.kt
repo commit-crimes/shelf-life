@@ -258,7 +258,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     }
   }
 
-  private fun convertToUser(doc: DocumentSnapshot): User? {
+  fun convertToUser(doc: DocumentSnapshot): User? {
     return try {
       val uid = doc.id
       val username = doc.getString("username") ?: ""
