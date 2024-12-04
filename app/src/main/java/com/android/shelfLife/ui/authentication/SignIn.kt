@@ -1,160 +1,142 @@
 package com.android.shelfLife.ui.authentication
 
-import android.content.Intent
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.TopLevelDestinations
+import com.android.shelfLife.viewmodel.authentication.SignInState
+import com.android.shelfLife.viewmodel.authentication.SignInViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
-import com.google.firebase.Firebase
-import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.auth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
-/**
- * Composable function for the sign-in screen.
- *
- * @param navigationActions The navigation actions to be used in the screen
- */
 @Composable
-fun SignInScreen(navigationActions: NavigationActions) {
-  val context = LocalContext.current
+fun SignInScreen(
+    navigationActions: NavigationActions,
+    signInViewModel: SignInViewModel = SignInViewModel()
+) {
+    val context = LocalContext.current
+    val signInState by signInViewModel.signInState.collectAsState()
 
-  val launcher =
-      rememberFirebaseAuthLauncher(
-          onAuthComplete = { result ->
-            Log.d("SignInScreen", "User signed in: ${result.user?.displayName}")
-            val currentUser = Firebase.auth.currentUser
-            if (currentUser != null) {
-              val db = FirebaseFirestore.getInstance()
-              val userDoc = db.collection("users").document(currentUser.uid)
-              val userData = mapOf("email" to currentUser.email, "name" to currentUser.displayName)
-              userDoc.set(userData, SetOptions.merge())
-            } else {
-              Log.e("SignInScreen", "Current user is null after sign-in")
+    val launcher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(Exception::class.java)
+                account?.idToken?.let { idToken ->
+                    signInViewModel.signInWithGoogle(idToken)
+                } ?: run {
+                    Toast.makeText(context, "Failed to get ID Token!", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                Log.e("SignInScreen", "Google sign-in failed", e)
+                Toast.makeText(context, "Google sign-in failed!", Toast.LENGTH_LONG).show()
             }
-            Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-            navigationActions.navigateTo(TopLevelDestinations.OVERVIEW)
-          },
-          onAuthError = {
-            Log.e("SignInScreen", "Failed to sign in: ${it.statusCode}")
-            Toast.makeText(context, "Login Failed!", Toast.LENGTH_LONG).show()
-          })
+        }
 
-  val token = stringResource(R.string.default_web_client_id)
+    val token = stringResource(R.string.default_web_client_id)
 
-  Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
-    Column(
-        modifier = Modifier.fillMaxSize().padding(padding).padding(20.dp).testTag("signInScreen"),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center) {
-          Image(
-              painter = painterResource(id = R.drawable.shelf_life_logo),
-              contentDescription = "App Logo",
-              modifier = Modifier.size(250.dp))
+    // Handle sign-in states
+    LaunchedEffect(signInState) {
+        when (signInState) {
+            is SignInState.Success -> {
+                Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
+                //Navigation is handled in ShelfLifeApp based on isUserLoggedIn
+            }
+            is SignInState.Error -> {
+                val message = (signInState as SignInState.Error).message
+                Toast.makeText(context, "Login failed: $message", Toast.LENGTH_LONG).show()
+            }
+            else -> { /* No action needed */ }
+        }
+    }
 
-          Spacer(modifier = Modifier.height(16.dp))
+    Scaffold(modifier = Modifier.fillMaxSize()) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.shelf_life_logo),
+                contentDescription = "App Logo",
+                modifier = Modifier.size(250.dp)
+            )
 
-          Text(
-              modifier = Modifier.testTag("loginTitle"),
-              text = stringResource(R.string.app_name),
-              style =
-                  MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
-              fontWeight = FontWeight.Bold,
-              textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.height(16.dp))
 
-          Spacer(modifier = Modifier.height(48.dp))
+            Text(
+                text = stringResource(R.string.app_name),
+                style = MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp),
+                fontWeight = FontWeight.Bold
+            )
 
-          GoogleSignInButton {
-            val gso =
-                GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            Spacer(modifier = Modifier.height(48.dp))
+
+            GoogleSignInButton {
+                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestIdToken(token)
                     .requestEmail()
                     .build()
-            val googleSignInClient = GoogleSignIn.getClient(context, gso)
-            launcher.launch(googleSignInClient.signInIntent)
-          }
+                val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                launcher.launch(googleSignInClient.signInIntent)
+            }
+
+            if (signInState is SignInState.Loading) {
+                Spacer(modifier = Modifier.height(16.dp))
+                CircularProgressIndicator()
+            }
         }
-  }
+    }
 }
 
 @Composable
 fun GoogleSignInButton(onSignInClick: () -> Unit) {
-  Button(
-      onClick = onSignInClick,
-      shape = RoundedCornerShape(50),
-      border = BorderStroke(1.dp, Color.LightGray),
-      modifier = Modifier.padding(8.dp).height(48.dp).testTag("loginButton")) {
+    Button(
+        onClick = onSignInClick,
+        shape = RoundedCornerShape(50),
+        border = BorderStroke(1.dp, Color.LightGray),
+        modifier = Modifier
+            .padding(8.dp)
+            .height(48.dp)
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()) {
-              Image(
-                  painter = painterResource(id = R.drawable.google_logo),
-                  contentDescription = "Google Logo",
-                  modifier = Modifier.size(30.dp).padding(end = 8.dp))
-
-              Text(text = "Sign in with Google", fontSize = 16.sp, fontWeight = FontWeight.Medium)
-            }
-      }
-}
-
-/**
- * Creates a [ManagedActivityResultLauncher] for Firebase authentication.
- *
- * @param onAuthComplete The lambda to be called when authentication is successful.
- * @param onAuthError The lambda to be called when authentication fails.
- */
-@Composable
-fun rememberFirebaseAuthLauncher(
-    onAuthComplete: (AuthResult) -> Unit,
-    onAuthError: (ApiException) -> Unit
-): ManagedActivityResultLauncher<Intent, ActivityResult> {
-  val scope = rememberCoroutineScope()
-  return rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-      result ->
-    val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-    try {
-      val account = task.getResult(ApiException::class.java)!!
-      val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
-      scope.launch {
-        val authResult = Firebase.auth.signInWithCredential(credential).await()
-        onAuthComplete(authResult)
-      }
-    } catch (e: ApiException) {
-      onAuthError(e)
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.google_logo),
+                contentDescription = "Google Logo",
+                modifier = Modifier
+                    .size(30.dp)
+                    .padding(end = 8.dp)
+            )
+            Text(
+                text = "Sign in with Google",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
     }
-  }
 }

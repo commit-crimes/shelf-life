@@ -10,14 +10,14 @@ import com.google.firebase.auth.FirebaseAuth
 
 fun signOutUser(context: Context, onSignOutComplete: () -> Unit) {
   val googleSignInClient: GoogleSignInClient =
-      GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN)
-  FirebaseAuth.getInstance().signOut()
+    GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN)
 
-  googleSignInClient.signOut().addOnCompleteListener { task: Task<Void> ->
+  googleSignInClient.revokeAccess().addOnCompleteListener { task ->
     if (task.isSuccessful) {
-      onSignOutComplete() // Callback after sign-out is successful
+      FirebaseAuth.getInstance().signOut()
+      onSignOutComplete()
     } else {
-      Toast.makeText(context, "Sign-out failed : ${task.exception}", Toast.LENGTH_SHORT).show()
+      Toast.makeText(context, "Sign-out failed: ${task.exception}", Toast.LENGTH_SHORT).show()
     }
   }
 }
