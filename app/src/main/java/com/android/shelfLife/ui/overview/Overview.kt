@@ -114,7 +114,7 @@ fun OverviewScreen(
               // Floating Action Button to add a new food item
               floatingActionButton = {
                 FloatingActionButton(
-                    onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
+                    onClick = { navigationActions.navigateTo(Screen.FIRST_FOOD_ITEM) },
                     content = { Icon(Icons.Default.Add, contentDescription = "Add") },
                     modifier = Modifier.testTag("addFoodFab"),
                     containerColor = MaterialTheme.colorScheme.secondaryContainer)

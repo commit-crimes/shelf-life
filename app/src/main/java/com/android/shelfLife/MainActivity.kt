@@ -37,7 +37,9 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.overview.AddFoodItemScreen
+import com.android.shelfLife.ui.overview.ChooseFoodItem
 import com.android.shelfLife.ui.overview.EditFoodItemScreen
+import com.android.shelfLife.ui.overview.FirstFoodItem
 import com.android.shelfLife.ui.overview.HouseHoldCreationScreen
 import com.android.shelfLife.ui.overview.IndividualFoodItemScreen
 import com.android.shelfLife.ui.overview.OverviewScreen
@@ -114,6 +116,12 @@ fun ShelfLifeApp() {
       composable(Screen.OVERVIEW) {
         OverviewScreen(navigationActions, householdViewModel, listFoodItemViewModel)
       }
+        composable(Screen.FIRST_FOOD_ITEM){
+            FirstFoodItem(navigationActions, listFoodItemViewModel, foodFactsViewModel)
+        }
+        composable(Screen.CHOOSE_FOOD_ITEM){
+            ChooseFoodItem(navigationActions, householdViewModel, listFoodItemViewModel, foodFactsViewModel)
+        }
       composable(Screen.ADD_FOOD) {
         AddFoodItemScreen(
             navigationActions, householdViewModel, listFoodItemViewModel, foodFactsViewModel)
