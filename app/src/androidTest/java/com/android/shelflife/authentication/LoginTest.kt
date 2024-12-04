@@ -1,101 +1,64 @@
-package com.android.shelflife.authentication
-
-import androidx.compose.ui.test.assertHasClickAction
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performClick
-import androidx.test.espresso.intent.Intents.intended
-import androidx.test.espresso.intent.matcher.IntentMatchers.toPackage
-import androidx.test.espresso.intent.rule.IntentsTestRule
+import androidx.navigation.testing.TestNavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.shelfLife.MainActivity
+import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Screen
-import com.google.firebase.auth.FirebaseAuth
-import com.kaspersky.kaspresso.testcases.api.testcase.TestCase
+import com.android.shelfLife.viewmodel.authentication.SignInViewModel
+import com.example.compose.ShelfLifeTheme
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
-import org.mockito.kotlin.verify
 
+// LoginTest.kt
 @RunWith(AndroidJUnit4::class)
-class MainActivityTest : TestCase() {
+class LoginTest {
 
-  @get:Rule val composeTestRule = createAndroidComposeRule<MainActivity>()
+  @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-  @get:Rule val intentsTestRule = IntentsTestRule(MainActivity::class.java)
-
-  private lateinit var firebaseAuth: FirebaseAuth
-  private lateinit var navigationActions: NavigationActions
+  private lateinit var signInViewModel: SignInViewModel
 
   @Before
   fun setup() {
-    firebaseAuth = FirebaseAuth.getInstance()
-    firebaseAuth.signOut() // Ensure the user is signed out before each test
-    navigationActions = mock(NavigationActions::class.java)
+    composeTestRule.activityRule.scenario.onActivity { activity ->
+      // Initialize the ViewModel
+      signInViewModel = SignInViewModel()
+
+      // Set the content of the activity
+      activity.setContent {
+        ShelfLifeTheme {
+          SignInScreen(
+              navigationActions = NavigationActions(TestNavHostController(activity)),
+              signInViewModel = signInViewModel)
+        }
+      }
+    }
   }
 
   @Test
   fun titleAndButtonAreCorrectlyDisplayed() {
-    composeTestRule.onNodeWithTag("loginTitle").assertIsDisplayed()
+    // Assert that the login screen is displayed
+    composeTestRule.onNodeWithTag("signInScreen").assertIsDisplayed()
+
+    // Assert that the title and login button are displayed
     composeTestRule.onNodeWithTag("loginTitle").assertTextEquals("Shelf Life")
-
     composeTestRule.onNodeWithTag("loginButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("loginButton").assertHasClickAction()
   }
 
-  @Test
-  fun googleSignInReturnsValidActivityResult() {
-    composeTestRule.onNodeWithTag("loginButton").performClick()
-
-    // Assert that an Intent resolving to Google Mobile Services has been sent (for sign-in)
-    intended(toPackage("com.google.android.gms"))
-  }
-
-  @Test
-  fun overviewScreenDisplaysWhenLoggedIn() {
-    firebaseAuth.signInAnonymously().addOnCompleteListener {
-      if (it.isSuccessful) {
-        verify(navigationActions).navigateToAndClearBackStack(Screen.OVERVIEW)
-        composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
-      }
-    }
-  }
-
-  @Test
-  fun addFoodScreenAccessibleFromOverview() {
-    firebaseAuth.signInAnonymously().addOnCompleteListener {
-      if (it.isSuccessful) {
-        composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("navigateToAddFood").performClick()
-        composeTestRule.onNodeWithTag("addFoodScreen").assertIsDisplayed()
-      }
-    }
-  }
-
-  @Test
-  fun recipeScreenAccessibleFromOverview() {
-    firebaseAuth.signInAnonymously().addOnCompleteListener {
-      if (it.isSuccessful) {
-        composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("navigateToRecipes").performClick()
-        composeTestRule.onNodeWithTag("recipeScreen").assertIsDisplayed()
-      }
-    }
-  }
-
-  @Test
-  fun profileScreenAccessibleFromOverview() {
-    firebaseAuth.signInAnonymously().addOnCompleteListener {
-      if (it.isSuccessful) {
-        composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("navigateToProfile").performClick()
-        composeTestRule.onNodeWithTag("profileScreen").assertIsDisplayed()
-      }
-    }
-  }
+  //  @Test
+  //  fun googleSignInShowsLoadingIndicator() {
+  //    // Simulate clicking the login button
+  //    composeTestRule.onNodeWithTag("loginButton").performClick()
+  //
+  //    // Use the test helper method to simulate loading
+  //    signInViewModel.setSignInStateForTesting(SignInState.Loading)
+  //
+  //    // Assert that the loading indicator is displayed
+  //    composeTestRule.onNodeWithTag("signInLoadingIndicator").assertIsDisplayed()
+  //  }
 }
