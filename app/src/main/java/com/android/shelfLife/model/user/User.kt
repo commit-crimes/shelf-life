@@ -16,8 +16,7 @@ data class User(
         "Username: ${username}\n" +
         "Email: ${email}\n" +
         "Household UIDs: ${householdUIDs.toString()}\n" +
-        "Selected Household UID: ${selectedHouseholdUID}\n"
-        "Recipe UIDs: ${recipeUIDs.toString()}\n" +
-        "Invitation UIDs: ${invitationUIDs.toString()}\n)"
+        "Selected Household UID: ${selectedHouseholdUID}\n" +
+        "Recipe UIDs: ${recipeUIDs.toString()}\n" + "Invitation UIDs: ${invitationUIDs.toString()}\n)"
   }
 }

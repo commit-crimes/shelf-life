@@ -69,7 +69,8 @@ fun ShelfLifeApp() {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
   val firebaseFirestore = FirebaseFirestore.getInstance()
-  val foodItemRepository = com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore(firebaseFirestore)
+  val foodItemRepository =
+      com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore(firebaseFirestore)
   val listFoodItemViewModel = viewModel { ListFoodItemsViewModel(foodItemRepository) }
   val invitationRepositoryFirestore = InvitationRepositoryFirestore(firebaseFirestore)
   val invitationViewModel = viewModel { InvitationViewModel(invitationRepositoryFirestore) }
@@ -80,9 +81,10 @@ fun ShelfLifeApp() {
   val listRecipesViewModel = viewModel {
     ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
   }
-    val newFoodItemRepository = com.android.shelfLife.model.newFoodItem.FoodItemRepositoryFirestore(firebaseFirestore)
-    val userRepository = UserRepositoryFirestore(firebaseFirestore)
-    val foodItemViewModel = viewModel { FoodItemViewModel(newFoodItemRepository, userRepository) }
+  val newFoodItemRepository =
+      com.android.shelfLife.model.newFoodItem.FoodItemRepositoryFirestore(firebaseFirestore)
+  val userRepository = UserRepositoryFirestore(firebaseFirestore)
+  val foodItemViewModel = viewModel { FoodItemViewModel(newFoodItemRepository, userRepository) }
 
   val context = LocalContext.current
 
@@ -118,13 +120,8 @@ fun ShelfLifeApp() {
       composable(Screen.OVERVIEW) {
         OverviewScreen(navigationActions, householdViewModel, listFoodItemViewModel)
       }
-      composable(Screen.ADD_FOOD) {
-        AddFoodItemScreen(
-            navigationActions, foodItemViewModel)
-      }
-      composable(Screen.EDIT_FOOD) {
-        EditFoodItemScreen(navigationActions, foodItemViewModel)
-      }
+      composable(Screen.ADD_FOOD) { AddFoodItemScreen(navigationActions, foodItemViewModel) }
+      composable(Screen.EDIT_FOOD) { EditFoodItemScreen(navigationActions, foodItemViewModel) }
       composable(Screen.HOUSEHOLD_CREATION) {
         HouseHoldCreationScreen(navigationActions, householdViewModel = householdViewModel)
       }

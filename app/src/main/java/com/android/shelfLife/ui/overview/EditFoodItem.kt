@@ -14,10 +14,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.android.shelfLife.R
-import com.android.shelfLife.model.foodFacts.FoodFacts
-import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodItem.*
-import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.utils.*
@@ -40,11 +37,10 @@ fun EditFoodItemScreen(
     paddingValues: PaddingValues = PaddingValues(16.dp)
 ) {
 
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
+  val context = LocalContext.current
+  val coroutineScope = rememberCoroutineScope()
 
-
-    Scaffold(
+  Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {
         CustomTopAppBar(
@@ -54,10 +50,10 @@ fun EditFoodItemScreen(
             actions = {
               IconButton(
                   onClick = {
-                      coroutineScope.launch {
-                          foodItemViewModel.deleteFoodItem()
-                          navigationActions.navigateTo(Route.OVERVIEW)
-                      }
+                    coroutineScope.launch {
+                      foodItemViewModel.deleteFoodItem()
+                      navigationActions.navigateTo(Route.OVERVIEW)
+                    }
                   },
                   modifier = Modifier.testTag("deleteFoodItem")) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
@@ -78,9 +74,7 @@ fun EditFoodItemScreen(
                     verticalAlignment = Alignment.CenterVertically) {
                       AmountField(
                           amount = foodItemViewModel.amount,
-                          onAmountChange = { newValue ->
-                            foodItemViewModel.changeAmount(newValue)
-                          },
+                          onAmountChange = { newValue -> foodItemViewModel.changeAmount(newValue) },
                           amountErrorResId = foodItemViewModel.amountErrorResId,
                           modifier = Modifier.weight(1f),
                           testTag = "editFoodAmount")
@@ -111,9 +105,7 @@ fun EditFoodItemScreen(
               item(key = "expireDate") {
                 DateField(
                     date = foodItemViewModel.expireDate,
-                    onDateChange = { newValue ->
-                        foodItemViewModel.changeExpiryDate(newValue)
-                    },
+                    onDateChange = { newValue -> foodItemViewModel.changeExpiryDate(newValue) },
                     dateErrorResId = foodItemViewModel.expireDateErrorResId,
                     labelResId = R.string.expire_date_hint,
                     testTag = "editFoodExpireDate")
@@ -123,9 +115,7 @@ fun EditFoodItemScreen(
               item(key = "openDate") {
                 DateField(
                     date = foodItemViewModel.openDate,
-                    onDateChange = { newValue ->
-                        foodItemViewModel.changeOpenDate(newValue)
-                    },
+                    onDateChange = { newValue -> foodItemViewModel.changeOpenDate(newValue) },
                     dateErrorResId = foodItemViewModel.openDateErrorResId,
                     labelResId = R.string.open_date_hint,
                     testTag = "editFoodOpenDate")
@@ -135,9 +125,7 @@ fun EditFoodItemScreen(
               item(key = "buyDate") {
                 DateField(
                     date = foodItemViewModel.buyDate,
-                    onDateChange = { newValue ->
-                        foodItemViewModel.changeBuyDate(newValue)
-                    },
+                    onDateChange = { newValue -> foodItemViewModel.changeBuyDate(newValue) },
                     dateErrorResId = foodItemViewModel.buyDateErrorResId,
                     labelResId = R.string.buy_date_hint,
                     testTag = "editFoodBuyDate")
@@ -150,16 +138,16 @@ fun EditFoodItemScreen(
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(R.string.cancel_button),
                     button2OnClick = {
-                        coroutineScope.launch {
-                            val success = foodItemViewModel.submitFoodItem()
-                            if (success) {
-                                navigationActions.goBack()
-                            } else {
-                                Toast.makeText(
-                                    context, R.string.submission_error_message, Toast.LENGTH_SHORT
-                                ).show()
-                            }
+                      coroutineScope.launch {
+                        val success = foodItemViewModel.submitFoodItem()
+                        if (success) {
+                          navigationActions.goBack()
+                        } else {
+                          Toast.makeText(
+                                  context, R.string.submission_error_message, Toast.LENGTH_SHORT)
+                              .show()
                         }
+                      }
                     },
                     button2TestTag = "foodSave",
                     button2Text = stringResource(R.string.submit_button_text))
