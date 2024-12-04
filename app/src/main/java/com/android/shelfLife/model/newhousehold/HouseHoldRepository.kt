@@ -6,7 +6,6 @@ interface HouseHoldRepository {
 
   val householdToEdit: StateFlow<HouseHold?>
   val households: StateFlow<List<HouseHold>>
-  var selectedHousehold: StateFlow<HouseHold?>
 
   /** Generates a new unique ID for a household. */
   fun getNewUid(): String
@@ -47,8 +46,9 @@ interface HouseHoldRepository {
    * Initializes households by fetching them from Firestore and updating the local cache.
    *
    * @param householdIds List of household IDs to fetch.
+   * @param selectedHouseholdId The ID of the selected household.
    */
-  suspend fun initializeHouseholds(householdIds: List<String>)
+  suspend fun initializeHouseholds(householdIds: List<String>, selectedHouseholdUid: String)
 
   /**
    * Checks if a household name already exists in the list of households.
@@ -57,11 +57,4 @@ interface HouseHoldRepository {
    * @return True if the household name already exists, false otherwise.
    */
   fun checkIfHouseholdNameExists(houseHoldName: String): Boolean
-
-  /**
-   * Selects a household and updates the selected household and the list of food items.
-   *
-   * @param household - The household to select.
-   */
-  suspend fun selectHousehold(household: HouseHold?)
 }

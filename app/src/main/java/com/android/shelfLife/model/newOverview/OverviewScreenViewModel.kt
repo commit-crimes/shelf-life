@@ -34,7 +34,7 @@ class OverviewScreenViewModel(
 
   val finishedLoading = MutableStateFlow(false)
 
-  val selectedHousehold = houseHoldRepository.selectedHousehold
+  val selectedHousehold = userRepository.selectedHousehold
   val households = houseHoldRepository.households
   val foodItems = listFoodItemsRepository.foodItems
 
@@ -58,7 +58,12 @@ class OverviewScreenViewModel(
     viewModelScope.launch {
       // Maybe this should be done elsewhere?
       userRepository.initializeUserData()
-      userRepository.user.value?.let { houseHoldRepository.initializeHouseholds(it.householdUIDs) }
+      userRepository.user.value?.let { user ->
+        houseHoldRepository.initializeHouseholds(user.householdUIDs, user.selectedHouseholdUID)
+        userRepository.selectHousehold(
+            households.value.find { it.uid == user.selectedHouseholdUID }
+                ?: households.value.firstOrNull())
+      }
       Log.d("OverviewScreenViewModel", "Households loaded")
       finishedLoading.value = true
     }

@@ -23,6 +23,8 @@ class CreationScreenViewModel(
   val emailList: StateFlow<Set<String>> = _emailList.asStateFlow()
 
   val householdToEdit = houseHoldRepository.householdToEdit
+  val selectedHousehold = userRepository.selectedHousehold
+  val households = houseHoldRepository.households
 
   var finishedLoading = MutableStateFlow(false)
 
@@ -89,15 +91,29 @@ class CreationScreenViewModel(
           }
           viewModelScope.launch {
             houseHoldRepository.addHousehold(household)
+            userRepository.addHouseholdUID(household.uid)
             for (user in friendEmails.filter { it != currentUser.email }) {
               invitationRepository.sendInvitation(household = household, invitedUserID = user!!)
+            }
+            if (selectedHousehold.value == null) {
+              Log.d("HouseholdViewModel", "Selected household is null")
+              userRepository.selectHousehold(
+                  households.value.firstOrNull()) // Default to the first household
             }
           }
         }
       } else {
         // No friend emails, add household with current user only
         household = household.copy(members = listOf(currentUser.uid))
-        viewModelScope.launch { houseHoldRepository.addHousehold(household) }
+        viewModelScope.launch {
+          houseHoldRepository.addHousehold(household)
+          userRepository.addHouseholdUID(household.uid)
+          if (selectedHousehold.value == null) {
+            Log.d("HouseholdViewModel", "Selected household is null")
+            userRepository.selectHousehold(
+                households.value.firstOrNull()) // Default to the first household
+          }
+        }
       }
     } else {
       Log.e("HouseholdViewModel", "User not logged in")
@@ -125,7 +141,12 @@ class CreationScreenViewModel(
       }
     }
     if (shouldUpdateRepo) {
-      viewModelScope.launch { houseHoldRepository.updateHousehold(household) }
+      viewModelScope.launch {
+        houseHoldRepository.updateHousehold(household)
+        if (selectedHousehold.value == null || household.uid == selectedHousehold.value!!.uid) {
+          userRepository.selectHousehold(household)
+        }
+      }
     }
   }
 }

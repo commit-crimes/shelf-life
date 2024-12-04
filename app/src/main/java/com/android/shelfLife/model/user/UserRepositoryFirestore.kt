@@ -1,6 +1,7 @@
 package com.android.shelfLife.model.user
 
 import android.util.Log
+import com.android.shelfLife.model.newhousehold.HouseHold
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
@@ -24,6 +25,9 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   // Invitations StateFlow
   private val _invitations = MutableStateFlow<List<String>>(emptyList())
   override val invitations: StateFlow<List<String>> = _invitations.asStateFlow()
+
+  private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
+  override var selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
 
   // Listener for invitations
   private var invitationsListenerRegistration: ListenerRegistration? = null
@@ -71,7 +75,12 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
 
               // Optionally update the invitations in the local _user variable
               val currentUserData =
-                  _user.value ?: User(uid = currentUser.uid, username = "", email = "")
+                  _user.value
+                      ?: User(
+                          uid = currentUser.uid,
+                          username = "",
+                          email = "",
+                          selectedHouseholdUID = "")
               _user.value = currentUserData.copy(invitationUIDs = invitationsList)
             } else {
               _invitations.value = emptyList()
@@ -93,11 +102,14 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     userCollection.document(currentUser.uid).update(fieldName, value).await()
 
     // Update local _user variable
-    val currentUserData = _user.value ?: User(uid = currentUser.uid, username = "", email = "")
+    val currentUserData =
+        _user.value
+            ?: User(uid = currentUser.uid, username = "", email = "", selectedHouseholdUID = "")
     val updatedUserData =
         when (fieldName) {
           "username" -> currentUserData.copy(username = value as String)
           "email" -> currentUserData.copy(email = value as String)
+          "selectedHouseholdUID" -> currentUserData.copy(selectedHouseholdUID = value as String)
           else -> currentUserData
         }
     _user.value = updatedUserData
@@ -118,7 +130,9 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     userCollection.document(currentUser.uid).update(fieldName, updateValue).await()
 
     // Update local _user variable
-    val currentUserData = _user.value ?: User(uid = currentUser.uid, username = "", email = "")
+    val currentUserData =
+        _user.value
+            ?: User(uid = currentUser.uid, username = "", email = "", selectedHouseholdUID = "")
     val updatedArray =
         when (fieldName) {
           "householdUIDs" -> {
@@ -183,6 +197,10 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     currentUser.updateEmail(email).await()
     // Update email in Firestore
     updateUserField("email", email)
+  }
+
+  override suspend fun updateSelectedHousehold(selectedHouseholdUID: String) {
+    updateUserField("selectedHouseholdUID", selectedHouseholdUID)
   }
 
   override fun getUserIds(users: Set<String?>, callback: (Map<String, String>) -> Unit) {
@@ -258,16 +276,22 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     }
   }
 
+  override suspend fun selectHousehold(household: HouseHold?) {
+    _selectedHousehold.value = household
+    household?.let { updateSelectedHousehold(it.uid) }
+  }
+
   fun convertToUser(doc: DocumentSnapshot): User? {
     return try {
       val uid = doc.id
       val username = doc.getString("username") ?: ""
       val email = doc.getString("email") ?: ""
+      val selectedHouseholdUID = doc.getString("selectedHouseholdUID") ?: ""
       val householdUIDs = doc.get("householdUIDs") as? List<String> ?: emptyList()
       val recipeUIDs = doc.get("recipeUIDs") as? List<String> ?: emptyList()
       val invitationUIDs = doc.get("invitationUIDs") as? List<String> ?: emptyList()
 
-      User(uid, username, email, householdUIDs, recipeUIDs, invitationUIDs)
+      User(uid, username, email, selectedHouseholdUID, householdUIDs, recipeUIDs, invitationUIDs)
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error converting document to HouseHold", e)
       null

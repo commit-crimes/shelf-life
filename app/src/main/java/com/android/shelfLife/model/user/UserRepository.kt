@@ -1,5 +1,6 @@
 package com.android.shelfLife.model.user
 
+import com.android.shelfLife.model.newhousehold.HouseHold
 import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {
@@ -8,6 +9,8 @@ interface UserRepository {
 
   /** Exposes the invitations list as a StateFlow. */
   val invitations: StateFlow<List<String>>
+
+  val selectedHousehold: StateFlow<HouseHold?>
 
   /** Generates a new unique ID for a user. */
   fun getNewUid(): String
@@ -42,7 +45,16 @@ interface UserRepository {
 
   suspend fun updateEmail(email: String)
 
+  suspend fun updateSelectedHousehold(selectedHouseholdUID: String)
+
   fun getUserIds(users: Set<String?>, callback: (Map<String, String>) -> Unit)
 
   fun getUserEmails(userIds: List<String>, callback: (Map<String, String>) -> Unit)
+
+  /**
+   * Selects a household and saves it to the user's data.
+   *
+   * @param household - The household to select.
+   */
+  suspend fun selectHousehold(household: HouseHold?)
 }
