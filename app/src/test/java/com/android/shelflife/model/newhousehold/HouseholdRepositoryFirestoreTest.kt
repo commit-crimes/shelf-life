@@ -51,9 +51,7 @@ class HouseholdRepositoryFirestoreTest {
     `when`(mockCollection.document(anyString())).thenReturn(mockDocument)
 
     // Initialize the HouseholdRepositoryFirestore with mocks
-    householdRepository =
-        HouseholdRepositoryFirestore(
-            mockFirestore, dataStore, listFoodItemRepository, userRepository)
+    householdRepository = HouseholdRepositoryFirestore(mockFirestore)
 
     // Set the Dispatchers to use the TestCoroutineDispatcher
     Dispatchers.setMain(StandardTestDispatcher())
@@ -216,7 +214,7 @@ class HouseholdRepositoryFirestoreTest {
     val _households = householdsField.get(householdRepository) as MutableStateFlow<List<HouseHold>>
     _households.value = emptyList()
 
-    householdRepository.initializeHouseholds(householdIds)
+    householdRepository.initializeHouseholds(householdIds, "user1")
 
     val households = householdRepository.households.value
 

@@ -84,6 +84,7 @@ class UserRepositoryFirestoreTest {
             uid = "testUserId",
             username = "TestUser",
             email = "test@example.com",
+            selectedHouseholdUID = "house1",
             householdUIDs = listOf("house1", "house2"),
             recipeUIDs = listOf("recipe1"),
             invitationUIDs = listOf("invite1"))
@@ -94,6 +95,7 @@ class UserRepositoryFirestoreTest {
     `when`(mockDocumentSnapshot.id).thenReturn("testUserId")
     `when`(mockDocumentSnapshot.getString("username")).thenReturn("TestUser")
     `when`(mockDocumentSnapshot.getString("email")).thenReturn("test@example.com")
+    `when`(mockDocumentSnapshot.getString("selectedHouseholdUID")).thenReturn("house1")
     `when`(mockDocumentSnapshot.get("householdUIDs")).thenReturn(listOf("house1", "house2"))
     `when`(mockDocumentSnapshot.get("recipeUIDs")).thenReturn(listOf("recipe1"))
     `when`(mockDocumentSnapshot.get("invitationUIDs")).thenReturn(listOf("invite1"))
@@ -133,6 +135,7 @@ class UserRepositoryFirestoreTest {
             uid = "testUserId",
             username = "TestUser",
             email = "test@example.com",
+            selectedHouseholdUID = "house1",
             householdUIDs = mutableListOf("house1"))
     // Access the private _user variable via reflection or adjust visibility
     val userField = userRepository.javaClass.getDeclaredField("_user")
@@ -159,6 +162,7 @@ class UserRepositoryFirestoreTest {
             uid = "testUserId",
             username = "TestUser",
             email = "test@example.com",
+            selectedHouseholdUID = "house1",
             householdUIDs = mutableListOf("house1", "house2"))
     // Access the private _user variable via reflection or adjust visibility
     val userField = userRepository.javaClass.getDeclaredField("_user")
@@ -180,7 +184,12 @@ class UserRepositoryFirestoreTest {
 
   @Test
   fun `updateUsername updates username in Firestore and local user`() = runTest {
-    val initialUser = User(uid = "testUserId", username = "OldUsername", email = "test@example.com")
+    val initialUser =
+        User(
+            uid = "testUserId",
+            username = "OldUsername",
+            email = "test@example.com",
+            selectedHouseholdUID = "")
     // Access the private _user variable via reflection or adjust visibility
     val userField = userRepository.javaClass.getDeclaredField("_user")
     userField.isAccessible = true
@@ -200,7 +209,12 @@ class UserRepositoryFirestoreTest {
 
   @Test
   fun `updateEmail updates email in FirebaseAuth and Firestore and local user`() = runTest {
-    val initialUser = User(uid = "testUserId", username = "TestUser", email = "old@example.com")
+    val initialUser =
+        User(
+            uid = "testUserId",
+            username = "TestUser",
+            email = "old@example.com",
+            selectedHouseholdUID = "")
     // Access the private _user variable via reflection or adjust visibility
     val userField = userRepository.javaClass.getDeclaredField("_user")
     userField.isAccessible = true

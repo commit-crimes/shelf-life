@@ -79,6 +79,7 @@ class InvitationRepositoryFirestoreTest {
             uid = "invitedUserId",
             username = "InvitedUser",
             email = "inviteduser@example.com",
+            selectedHouseholdUID = "householdId",
             householdUIDs = listOf(),
             recipeUIDs = listOf(),
             invitationUIDs = listOf())
