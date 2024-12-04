@@ -32,11 +32,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
-import com.android.shelfLife.model.newInvitations.InvitationRepositoryFirestore
 import com.android.shelfLife.model.newInvitations.Invitation
+import com.android.shelfLife.model.newInvitations.InvitationRepositoryFirestore
 import com.android.shelfLife.model.user.UserRepositoryFirestore
-import com.android.shelfLife.viewmodel.InvitationViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.viewmodel.InvitationViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
@@ -44,25 +44,24 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InvitationScreen(viewModel: InvitationViewModel, navigationActions: NavigationActions) {
-    val invitations by viewModel.invitations.collectAsState()
-    Scaffold(topBar = { TopAppBar(title = { Text("Invitations") }) }) { paddingValues ->
-        if (invitations.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize().padding(paddingValues),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("No pending invitations")
-            }
-        } else {
-            // Show list of invitations
-            LazyColumn(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
-                items(invitations) { invitation ->
-                    InvitationCard(invitation, viewModel)
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-            }
+  val invitations by viewModel.invitations.collectAsState()
+  Scaffold(topBar = { TopAppBar(title = { Text("Invitations") }) }) { paddingValues ->
+    if (invitations.isEmpty()) {
+      Box(
+          modifier = Modifier.fillMaxSize().padding(paddingValues),
+          contentAlignment = Alignment.Center) {
+            Text("No pending invitations")
+          }
+    } else {
+      // Show list of invitations
+      LazyColumn(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
+        items(invitations) { invitation ->
+          InvitationCard(invitation, viewModel)
+          Spacer(modifier = Modifier.height(8.dp))
         }
+      }
     }
+  }
 }
 
 @Composable
@@ -70,56 +69,50 @@ fun InvitationCard(
     invitation: Invitation,
     invitationViewModel: InvitationViewModel,
 ) {
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation()) {
-        Column(modifier = Modifier.padding(16.dp).testTag("invitationCard")) {
-            Text(
-                text = "You have been invited to join household: ${invitation.householdName}",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Row {
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            invitationViewModel.acceptInvitation(invitation)
-                            Toast.makeText(context, "Invitation accepted", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Accept")
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            invitationViewModel.declineInvitation(invitation)
-                            Toast.makeText(context, "Invitation declined", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Decline")
-                }
+  val context = LocalContext.current
+  val coroutineScope = rememberCoroutineScope()
+  Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation()) {
+    Column(modifier = Modifier.padding(16.dp).testTag("invitationCard")) {
+      Text(
+          text = "You have been invited to join household: ${invitation.householdName}",
+          style = MaterialTheme.typography.titleMedium)
+      Spacer(modifier = Modifier.height(8.dp))
+      Row {
+        Button(
+            onClick = {
+              coroutineScope.launch {
+                invitationViewModel.acceptInvitation(invitation)
+                Toast.makeText(context, "Invitation accepted", Toast.LENGTH_SHORT).show()
+              }
+            },
+            modifier = Modifier.weight(1f)) {
+              Text("Accept")
             }
-        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Button(
+            onClick = {
+              coroutineScope.launch {
+                invitationViewModel.declineInvitation(invitation)
+                Toast.makeText(context, "Invitation declined", Toast.LENGTH_SHORT).show()
+              }
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+            modifier = Modifier.weight(1f)) {
+              Text("Decline")
+            }
+      }
     }
+  }
 }
 
 @Preview
 @Composable
 fun PreviewInvitationScreen() {
-    val db = FirebaseFirestore.getInstance()
-    val auth = FirebaseAuth.getInstance()
-    val userRepo = UserRepositoryFirestore(db)
-    val invitationRepo = InvitationRepositoryFirestore(db, auth)
-    InvitationScreen(
-        viewModel = InvitationViewModel(invitationRepo, userRepo),
-        navigationActions = NavigationActions(rememberNavController())
-    )
+  val db = FirebaseFirestore.getInstance()
+  val auth = FirebaseAuth.getInstance()
+  val userRepo = UserRepositoryFirestore(db)
+  val invitationRepo = InvitationRepositoryFirestore(db, auth)
+  InvitationScreen(
+      viewModel = InvitationViewModel(invitationRepo, userRepo),
+      navigationActions = NavigationActions(rememberNavController()))
 }

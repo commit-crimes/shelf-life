@@ -17,10 +17,11 @@ import kotlinx.coroutines.tasks.await
 
 open class InvitationRepositoryFirestore(
     private val db: FirebaseFirestore,
-    private val auth: FirebaseAuth) : InvitationRepository {
+    private val auth: FirebaseAuth
+) : InvitationRepository {
 
   internal var listenerRegistration: ListenerRegistration? = null
-  private val _invitations : MutableStateFlow<List<Invitation>> = MutableStateFlow(emptyList())
+  private val _invitations: MutableStateFlow<List<Invitation>> = MutableStateFlow(emptyList())
   override val invitations: StateFlow<List<Invitation>> = _invitations.asStateFlow()
   private val invitationPath = "invitations"
 
@@ -36,19 +37,20 @@ open class InvitationRepositoryFirestore(
    * @param household The household to invite the user to.
    */
   override fun sendInvitation(household: HouseHold, invitedUser: User) {
-      val invitedUserId = invitedUser.uid
-      val inviterUserId = auth.currentUser?.uid ?: throw IllegalStateException("User not authenticated")
-      val invitationId = db.collection(invitationPath).document().id
-      val invitationData =
-          Invitation(
-              invitationId = invitationId,
-              householdId = household.uid,
-              householdName = household.name,
-              invitedUserId = invitedUserId,
-              inviterUserId = inviterUserId,
-              timestamp = Timestamp.now()
-          ).toMap()
-      db.collection("invitations").document(invitationId).set(invitationData)
+    val invitedUserId = invitedUser.uid
+    val inviterUserId =
+        auth.currentUser?.uid ?: throw IllegalStateException("User not authenticated")
+    val invitationId = db.collection(invitationPath).document().id
+    val invitationData =
+        Invitation(
+                invitationId = invitationId,
+                householdId = household.uid,
+                householdName = household.name,
+                invitedUserId = invitedUserId,
+                inviterUserId = inviterUserId,
+                timestamp = Timestamp.now())
+            .toMap()
+    db.collection("invitations").document(invitationId).set(invitationData)
   }
 
   /**
