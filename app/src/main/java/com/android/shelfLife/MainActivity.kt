@@ -48,10 +48,8 @@ import com.android.shelfLife.ui.profile.ProfileScreen
 import com.android.shelfLife.ui.recipes.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
-import com.android.shelfLife.ui.utils.signOutUser
 import com.android.shelfLife.viewmodel.authentication.SignInViewModel
 import com.example.compose.ShelfLifeTheme
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.OkHttpClient
 
@@ -83,32 +81,25 @@ fun ShelfLifeApp() {
   val listRecipesViewModel = viewModel {
     ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
   }
-  val signInViewModel = viewModel{ SignInViewModel(firestore = firebaseFirestore)}
+  val signInViewModel = viewModel { SignInViewModel(firestore = firebaseFirestore) }
 
   val context = LocalContext.current
 
   val barcodeScannerViewModel: BarcodeScannerViewModel = viewModel()
 
+  val isUserLoggedIn by signInViewModel.isUserLoggedIn.collectAsState()
+  val signInState by signInViewModel.signInState.collectAsState()
 
-    val isUserLoggedIn by signInViewModel.isUserLoggedIn.collectAsState()
-    val signInState by signInViewModel.signInState.collectAsState()
-
-    // Observe authentication state changes
-    LaunchedEffect(isUserLoggedIn) {
-        if (isUserLoggedIn) {
-            navController.navigate(Route.OVERVIEW) {
-                popUpTo(Route.AUTH) { inclusive = true }
-            }
-        } else {
-            navController.navigate(Route.AUTH) {
-                popUpTo(Route.OVERVIEW) { inclusive = true }
-            }
-        }
+  // Observe authentication state changes
+  LaunchedEffect(isUserLoggedIn) {
+    if (isUserLoggedIn) {
+      navController.navigate(Route.OVERVIEW) { popUpTo(Route.AUTH) { inclusive = true } }
+    } else {
+      navController.navigate(Route.AUTH) { popUpTo(Route.OVERVIEW) { inclusive = true } }
     }
+  }
 
-
-
-   // Initialize HouseholdViewModel only if the user is logged in
+  // Initialize HouseholdViewModel only if the user is logged in
   val householdViewModel = viewModel {
     HouseholdViewModel(
         houseHoldRepository = HouseholdRepositoryFirestore(firebaseFirestore),
@@ -176,10 +167,7 @@ fun ShelfLifeApp() {
     }
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
       composable(Screen.PROFILE) {
-        ProfileScreen(
-            navigationActions,
-            signInViewModel,
-            invitationViewModel = invitationViewModel)
+        ProfileScreen(navigationActions, signInViewModel, invitationViewModel = invitationViewModel)
       }
       composable(Route.INVITATIONS) {
         InvitationScreen(

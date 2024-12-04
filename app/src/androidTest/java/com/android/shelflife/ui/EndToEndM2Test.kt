@@ -188,10 +188,7 @@ class EndToEndM2Test {
         }
         composable(Route.PROFILE) {
           ProfileScreen(
-              navigationActions = navigationActions,
-              account = account,
-              signOutUser = signOutUser,
-              invitationViewModel = invitationViewModel)
+              navigationActions = navigationActions, invitationViewModel = invitationViewModel)
         }
         composable(Screen.HOUSEHOLD_CREATION) {
           HouseHoldCreationScreen(navigationActions, householdViewModel = householdViewModel)

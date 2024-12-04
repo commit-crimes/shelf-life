@@ -54,7 +54,7 @@ fun ProfileScreen(
   val context = LocalContext.current
   val currentAccount = GoogleSignIn.getLastSignedInAccount(context)
 
-    val invitations by invitationViewModel.invitations.collectAsState()
+  val invitations by invitationViewModel.invitations.collectAsState()
 
   var expanded by remember { mutableStateOf(false) }
 
@@ -159,19 +159,16 @@ fun ProfileScreen(
 
               Spacer(modifier = Modifier.weight(1f))
 
-            OutlinedButton(
-                onClick = {
+              OutlinedButton(
+                  onClick = {
                     signInViewModel.signOutUser(context) {
-                        // The navigation will be handled by observing isUserLoggedIn
+                      // The navigation will be handled by observing isUserLoggedIn
                     }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("logoutButton"),
-                border = BorderStroke(1.dp, Color.Red)
-            ) {
-                Text(text = "Log out", color = Color.Red)
-            }
+                  },
+                  modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
+                  border = BorderStroke(1.dp, Color.Red)) {
+                    Text(text = "Log out", color = Color.Red)
+                  }
             }
       }
 }
