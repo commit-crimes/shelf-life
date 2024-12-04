@@ -15,9 +15,12 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
 
   // Local cache for food items per household
   private val _foodItems = MutableStateFlow<List<FoodItem>>(emptyList())
-  val foodItems: StateFlow<List<FoodItem>> = _foodItems.asStateFlow()
+  override val foodItems: StateFlow<List<FoodItem>> = _foodItems.asStateFlow()
 
-  // Listener registration
+  private val _selectedFoodItem = MutableStateFlow<FoodItem?>(null)
+  override val selectedFoodItem: StateFlow<FoodItem?> = _selectedFoodItem.asStateFlow()
+
+    // Listener registration
   private var foodItemsListenerRegistration: ListenerRegistration? = null
 
   override suspend fun addFoodItem(householdId: String, foodItem: FoodItem) {
@@ -92,7 +95,11 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
     }
   }
 
-  /**
+    override fun selectFoodItem(foodItem: FoodItem?) {
+        _selectedFoodItem.value = foodItem
+    }
+
+    /**
    * Starts listening for real-time updates to the food items collection.
    *
    * @param householdId The ID of the household.
