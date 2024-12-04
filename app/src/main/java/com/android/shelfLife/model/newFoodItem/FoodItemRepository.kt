@@ -2,6 +2,9 @@ package com.android.shelfLife.model.newFoodItem
 
 interface FoodItemRepository {
 
+  /** Generates a new unique ID for a food item. */
+  fun getNewUid(): String
+
   /**
    * Adds a new food item to a household.
    *

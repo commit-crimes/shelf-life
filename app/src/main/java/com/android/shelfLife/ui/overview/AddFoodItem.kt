@@ -21,10 +21,12 @@ import coil3.compose.rememberAsyncImagePainter
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.*
-import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.viewmodel.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.utils.*
+import com.android.shelfLife.viewmodel.AddFoodItem.AddFoodItemViewModel
 import com.google.firebase.Timestamp
+import kotlinx.coroutines.launch
 
 /**
  * Composable function to display the Add Food Item screen.
@@ -38,46 +40,16 @@ import com.google.firebase.Timestamp
 @Composable
 fun AddFoodItemScreen(
     navigationActions: NavigationActions,
-    houseHoldViewModel: HouseholdViewModel,
-    foodItemViewModel: ListFoodItemsViewModel,
-    foodFactsViewModel: FoodFactsViewModel,
+    addFoodItemViewModel: AddFoodItemViewModel,
     paddingValues: PaddingValues = PaddingValues(16.dp)
 ) {
-
-  var foodName by remember { mutableStateOf("") }
-  var amount by remember { mutableStateOf("") }
-  var unit by remember { mutableStateOf(FoodUnit.GRAM) }
-  var category by remember { mutableStateOf(FoodCategory.OTHER) }
-  var location by remember { mutableStateOf(FoodStorageLocation.PANTRY) }
-  var expireDate by remember { mutableStateOf("") }
-  var openDate by remember { mutableStateOf("") }
-  var buyDate by remember { mutableStateOf(formatTimestampToDate(Timestamp.now())) }
-
-  var foodNameErrorResId by remember { mutableStateOf<Int?>(null) }
-  var amountErrorResId by remember { mutableStateOf<Int?>(null) }
-  var expireDateErrorResId by remember { mutableStateOf<Int?>(null) }
-  var openDateErrorResId by remember { mutableStateOf<Int?>(null) }
-  var buyDateErrorResId by remember { mutableStateOf<Int?>(null) }
-
-  var unitExpanded by remember { mutableStateOf(false) }
-  var categoryExpanded by remember { mutableStateOf(false) }
-  var locationExpanded by remember { mutableStateOf(false) }
-  var selectedImage by remember { mutableStateOf<FoodFacts?>(null) }
   val foodFacts by foodFactsViewModel.foodFactsSuggestions.collectAsState()
+
+  val coroutineScope = rememberCoroutineScope()
 
   val context = LocalContext.current
 
   DisposableEffect(Unit) { onDispose { foodFactsViewModel.clearFoodFactsSuggestions() } }
-
-  /** Validates all fields when the submit button is clicked. */
-  fun validateAllFieldsWhenSubmitButton() {
-    foodNameErrorResId = validateFoodName(foodName)
-    amountErrorResId = validateAmount(amount)
-    buyDateErrorResId = validateBuyDate(buyDate)
-    expireDateErrorResId = validateExpireDate(expireDate, buyDate, buyDateErrorResId)
-    openDateErrorResId =
-        validateOpenDate(openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
-  }
 
   Scaffold(
       modifier = Modifier.fillMaxSize(),
@@ -97,13 +69,12 @@ fun AddFoodItemScreen(
             verticalArrangement = Arrangement.Top) {
               item(key = "foodName") {
                 FoodNameField(
-                    foodName = foodName,
+                    foodName = addFoodItemViewModel.foodName,
                     onFoodNameChange = { newValue ->
-                      foodName = newValue
-                      foodNameErrorResId = validateFoodName(foodName)
-                      foodFactsViewModel.searchByQuery(foodName)
+                      addFoodItemViewModel.changeFoodName(newValue)
+                      foodFactsViewModel.searchByQuery(foodName) // TODO ask kevin
                     },
-                    foodNameErrorResId = foodNameErrorResId)
+                    foodNameErrorResId = addFoodItemViewModel.foodNameErrorResId)
                 Spacer(modifier = Modifier.height(16.dp))
               }
 
@@ -112,20 +83,19 @@ fun AddFoodItemScreen(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically) {
                       AmountField(
-                          amount = amount,
+                          amount = addFoodItemViewModel.amount,
                           onAmountChange = { newValue ->
-                            amount = newValue
-                            amountErrorResId = validateAmount(amount)
+                            addFoodItemViewModel.changeAmount(newValue)
                           },
-                          amountErrorResId = amountErrorResId,
+                          amountErrorResId = addFoodItemViewModel.amountErrorResId,
                           modifier = Modifier.weight(1f),
                           testTag = "inputFoodAmount")
                       Spacer(modifier = Modifier.width(8.dp))
                       UnitDropdownField(
-                          unit = unit,
-                          onUnitChange = { unit = it },
-                          unitExpanded = unitExpanded,
-                          onUnitExpandedChange = { unitExpanded = it },
+                          unit = addFoodItemViewModel.unit,
+                          onUnitChange = { addFoodItemViewModel.unit = it },
+                          unitExpanded = addFoodItemViewModel.unitExpanded,
+                          onUnitExpandedChange = { addFoodItemViewModel.unitExpanded = it },
                           modifier = Modifier.weight(1f),
                           testTag = "inputFoodUnit")
                     }
@@ -134,40 +104,30 @@ fun AddFoodItemScreen(
 
               item(key = "category") {
                 CategoryDropdownField(
-                    category = category,
-                    onCategoryChange = { category = it },
-                    categoryExpanded = categoryExpanded,
-                    onCategoryExpandedChange = { categoryExpanded = it })
+                    category = addFoodItemViewModel.category,
+                    onCategoryChange = { addFoodItemViewModel.category = it },
+                    categoryExpanded = addFoodItemViewModel.categoryExpanded,
+                    onCategoryExpandedChange = { addFoodItemViewModel.categoryExpanded = it })
                 Spacer(modifier = Modifier.height(16.dp))
               }
 
               item(key = "location") {
                 LocationDropdownField(
-                    location = location,
-                    onLocationChange = { location = it },
-                    locationExpanded = locationExpanded,
-                    onExpandedChange = { locationExpanded = it },
+                    location = addFoodItemViewModel.location,
+                    onLocationChange = { addFoodItemViewModel.location = it },
+                    locationExpanded = addFoodItemViewModel.locationExpanded,
+                    onExpandedChange = { addFoodItemViewModel.locationExpanded = it },
                     testTag = "inputFoodLocation")
                 Spacer(modifier = Modifier.height(16.dp))
               }
 
               item(key = "expireDate") {
                 DateField(
-                    date = expireDate,
+                    date = addFoodItemViewModel.expireDate,
                     onDateChange = { newValue ->
-                      expireDate = newValue.filter { it.isDigit() }
-                      expireDateErrorResId =
-                          validateExpireDate(expireDate, buyDate, buyDateErrorResId)
-                      // Re-validate Open Date since it depends on Expire Date
-                      openDateErrorResId =
-                          validateOpenDate(
-                              openDate,
-                              buyDate,
-                              buyDateErrorResId,
-                              expireDate,
-                              expireDateErrorResId)
+                        addFoodItemViewModel.changeExpiryDate(newValue)
                     },
-                    dateErrorResId = expireDateErrorResId,
+                    dateErrorResId = addFoodItemViewModel.expireDateErrorResId,
                     labelResId = R.string.expire_date_hint,
                     testTag = "inputFoodExpireDate")
                 Spacer(modifier = Modifier.height(16.dp))
@@ -175,18 +135,11 @@ fun AddFoodItemScreen(
 
               item(key = "openDate") {
                 DateField(
-                    date = openDate,
+                    date = addFoodItemViewModel.openDate,
                     onDateChange = { newValue ->
-                      openDate = newValue.filter { it.isDigit() }
-                      openDateErrorResId =
-                          validateOpenDate(
-                              openDate,
-                              buyDate,
-                              buyDateErrorResId,
-                              expireDate,
-                              expireDateErrorResId)
+                      addFoodItemViewModel.changeOpenDate(newValue)
                     },
-                    dateErrorResId = openDateErrorResId,
+                    dateErrorResId = addFoodItemViewModel.openDateErrorResId,
                     labelResId = R.string.open_date_hint,
                     testTag = "inputFoodOpenDate")
                 Spacer(modifier = Modifier.height(16.dp))
@@ -194,22 +147,11 @@ fun AddFoodItemScreen(
 
               item(key = "buyDate") {
                 DateField(
-                    date = buyDate,
+                    date = addFoodItemViewModel.buyDate,
                     onDateChange = { newValue ->
-                      buyDate = newValue.filter { it.isDigit() }
-                      buyDateErrorResId = validateBuyDate(buyDate)
-                      // Re-validate Expire Date and Open Date since they depend on Buy Date
-                      expireDateErrorResId =
-                          validateExpireDate(expireDate, buyDate, buyDateErrorResId)
-                      openDateErrorResId =
-                          validateOpenDate(
-                              openDate,
-                              buyDate,
-                              buyDateErrorResId,
-                              expireDate,
-                              expireDateErrorResId)
+                      addFoodItemViewModel.changeBuyDate(newValue)
                     },
-                    dateErrorResId = buyDateErrorResId,
+                    dateErrorResId = addFoodItemViewModel.buyDateErrorResId,
                     labelResId = R.string.buy_date_hint,
                     testTag = "inputFoodBuyDate")
                 Spacer(modifier = Modifier.height(32.dp))
@@ -298,51 +240,17 @@ fun AddFoodItemScreen(
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(R.string.cancel_button),
                     button2OnClick = {
-                      validateAllFieldsWhenSubmitButton()
-                      val isExpireDateValid =
-                          expireDateErrorResId == null && expireDate.isNotEmpty()
-                      val isOpenDateValid = openDateErrorResId == null
-                      val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
-                      val isFoodNameValid = foodNameErrorResId == null
-                      val isAmountValid = amountErrorResId == null
-
-                      val expiryTimestamp = formatDateToTimestamp(expireDate)
-                      val openTimestamp =
-                          if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
-                      val buyTimestamp = formatDateToTimestamp(buyDate)
-
-                      if (isExpireDateValid &&
-                          isOpenDateValid &&
-                          isBuyDateValid &&
-                          isFoodNameValid &&
-                          isAmountValid &&
-                          expiryTimestamp != null &&
-                          buyTimestamp != null) {
-                        val foodFacts =
-                            FoodFacts(
-                                name = foodName,
-                                barcode = selectedImage?.barcode ?: "",
-                                quantity = Quantity(amount.toDouble(), unit),
-                                category = category,
-                                nutritionFacts = selectedImage?.nutritionFacts ?: NutritionFacts(),
-                                imageUrl = selectedImage?.imageUrl ?: FoodFacts.DEFAULT_IMAGE_URL)
-                        val newFoodItem =
-                            FoodItem(
-                                uid = foodItemViewModel.getUID(),
-                                foodFacts = foodFacts,
-                                location = location,
-                                expiryDate = expiryTimestamp,
-                                openDate = openTimestamp,
-                                buyDate = buyTimestamp,
-                                status = FoodStatus.CLOSED)
-                        houseHoldViewModel.addFoodItem(newFoodItem)
-                        foodFactsViewModel.clearFoodFactsSuggestions()
-                        navigationActions.goBack()
-                      } else {
-                        Toast.makeText(
-                                context, R.string.submission_error_message, Toast.LENGTH_SHORT)
-                            .show()
-                      }
+                        coroutineScope.launch {
+                            val success = addFoodItemViewModel.submitFoodItem()
+                            if (success) {
+                                foodFactsViewModel.clearFoodFactsSuggestions()
+                                navigationActions.goBack()
+                            } else {
+                                Toast.makeText(
+                                    context, R.string.submission_error_message, Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
                     },
                     button2TestTag = "foodSave",
                     button2Text = stringResource(R.string.submit_button_text))

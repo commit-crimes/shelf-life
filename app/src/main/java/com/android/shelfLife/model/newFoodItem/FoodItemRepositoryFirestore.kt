@@ -20,7 +20,11 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
   // Listener registration
   private var foodItemsListenerRegistration: ListenerRegistration? = null
 
-  override suspend fun addFoodItem(householdId: String, foodItem: FoodItem) {
+    override fun getNewUid(): String {
+        return db.collection(collectionPath).document().id
+    }
+
+    override suspend fun addFoodItem(householdId: String, foodItem: FoodItem) {
     try {
       db.collection(collectionPath)
           .document(householdId)
