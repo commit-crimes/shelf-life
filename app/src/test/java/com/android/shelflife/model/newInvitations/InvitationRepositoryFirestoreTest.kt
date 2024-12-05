@@ -39,26 +39,26 @@ class InvitationRepositoryFirestoreTest {
   fun setUp() {
     MockitoAnnotations.openMocks(this)
 
-      // Initialize Firebase if necessary
-      if (FirebaseApp.getApps(ApplicationProvider.getApplicationContext()).isEmpty()) {
-          FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
-      }
+    // Initialize Firebase if necessary
+    if (FirebaseApp.getApps(ApplicationProvider.getApplicationContext()).isEmpty()) {
+      FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
+    }
 
-      // Mock FirebaseAuth and FirebaseUser
-      firebaseAuth = mock(FirebaseAuth::class.java)
-      val mockUser = mock(FirebaseUser::class.java)
-      `when`(firebaseAuth.currentUser).thenReturn(mockUser)
-      `when`(mockUser.uid).thenReturn("testInviterUserId")
+    // Mock FirebaseAuth and FirebaseUser
+    firebaseAuth = mock(FirebaseAuth::class.java)
+    val mockUser = mock(FirebaseUser::class.java)
+    `when`(firebaseAuth.currentUser).thenReturn(mockUser)
+    `when`(mockUser.uid).thenReturn("testInviterUserId")
 
-      // Mock Firestore collection and document references
-      `when`(mockFirestore.collection("invitations")).thenReturn(mockCollection)
-      `when`(mockCollection.document(anyString())).thenReturn(mockDocument)
+    // Mock Firestore collection and document references
+    `when`(mockFirestore.collection("invitations")).thenReturn(mockCollection)
+    `when`(mockCollection.document(anyString())).thenReturn(mockDocument)
 
-      // Initialize the InvitationRepositoryFirestore with mocks
-      invitationRepository = InvitationRepositoryFirestore(mockFirestore, firebaseAuth)
+    // Initialize the InvitationRepositoryFirestore with mocks
+    invitationRepository = InvitationRepositoryFirestore(mockFirestore, firebaseAuth)
 
-      // Set the Dispatchers to use the TestCoroutineDispatcher
-      Dispatchers.setMain(StandardTestDispatcher())
+    // Set the Dispatchers to use the TestCoroutineDispatcher
+    Dispatchers.setMain(StandardTestDispatcher())
   }
 
   @After
@@ -79,6 +79,7 @@ class InvitationRepositoryFirestoreTest {
             uid = "invitedUserId",
             username = "InvitedUser",
             email = "inviteduser@example.com",
+            selectedHouseholdUID = "householdId",
             householdUIDs = listOf(),
             recipeUIDs = listOf(),
             invitationUIDs = listOf())
@@ -90,7 +91,7 @@ class InvitationRepositoryFirestoreTest {
     `when`(mockDocument.id).thenReturn(invitationId)
     `when`(mockDocument.set(any<Map<String, Any>>())).thenReturn(mockTask)
 
-    invitationRepository.sendInvitation(household, invitedUser)
+    invitationRepository.sendInvitation(household, invitedUser.uid)
 
     val invitationDataCaptor = ArgumentCaptor.forClass(Map::class.java)
     verify(mockDocument).set(invitationDataCaptor.capture())

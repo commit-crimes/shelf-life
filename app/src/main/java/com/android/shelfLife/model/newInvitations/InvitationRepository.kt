@@ -1,7 +1,6 @@
 package com.android.shelfLife.model.newInvitations
 
 import com.android.shelfLife.model.newhousehold.HouseHold
-import com.android.shelfLife.model.user.User
 
 interface InvitationRepository {
 
@@ -36,5 +35,5 @@ interface InvitationRepository {
    * @param household The household to invite the user to.
    * @param user The user to invite.
    */
-  fun sendInvitation(household: HouseHold, invitedUser: User)
+  fun sendInvitation(household: HouseHold, invitedUserID: String)
 }
