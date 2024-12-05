@@ -1,5 +1,6 @@
 package com.android.shelfLife.viewmodel.recipes
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -168,7 +169,9 @@ class AddRecipeViewModel(
 
   fun createNewIngredient() {
     showIngredientDialog = true
-    newIngredient = Ingredient(name = "", quantity = Quantity(0.0))
+    ingredientName = ""
+      ingredientQuantityAmount = ""
+      ingredientQuantityUnit = FoodUnit.GRAM
   }
 
   fun closeIngredientDialog() {
@@ -177,11 +180,12 @@ class AddRecipeViewModel(
 
   fun addNewIngredient(): Boolean {
     validateAllIngredientFieldsWhenAddButton()
-    if (errorIngredient) {
+    if (!errorIngredient) {
       newIngredient =
           Ingredient(
               name = ingredientName,
               quantity = Quantity(ingredientQuantityAmount.toDouble(), ingredientQuantityUnit))
+        ingredients.add(newIngredient)
       return true
     }
     return false
@@ -213,18 +217,20 @@ class AddRecipeViewModel(
 
   suspend fun addNewRecipe(): Pair<Boolean, Boolean> {
     validateAllFieldsWhenSubmitButton()
-    if (error) {
-      val recipeAdded = false
-      val newRecipeUid = recipeRepository.getUid()
-      val newRecipe =
+    if (!error) {
+        val recipeAdded = false
+        val newRecipeUid = recipeRepository.getUid()
+
+        val newRecipe =
           Recipe(
-              uid = recipeRepository.getUid(),
+              uid = newRecipeUid,
               name = title,
               instructions = instructions.toList(),
               servings = servings.toFloat(),
               time = time.toDouble().minutes,
               ingredients = ingredients.toList())
-      recipeRepository.addRecipe(
+
+        recipeRepository.addRecipe(
           newRecipe, onSuccess = { recipeAdded == true }, onFailure = { recipeAdded == false })
       userRepository.addRecipeUID(newRecipeUid)
       return Pair(true, recipeAdded)

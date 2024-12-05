@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.recipes
+package com.android.shelfLife.ui.recipes.addRecipe
 
 import android.annotation.SuppressLint
 import android.widget.Toast
@@ -31,10 +31,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.recipe.Ingredient
+import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
+import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.theme.onSecondaryDark
 import com.android.shelfLife.ui.theme.primaryContainerDark
@@ -44,6 +49,7 @@ import com.android.shelfLife.ui.theme.secondaryContainerLight
 import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.recipes.AddRecipeViewModel
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -125,7 +131,7 @@ fun AddRecipeScreen(
               }
 
               itemsIndexed(addRecipeViewModel.ingredients) { index, ingredient ->
-                IngredientItem(
+                IngredientItemNEW(
                     index = index,
                     ingredient = ingredient,
                     onRemoveClick = { addRecipeViewModel.removeIngredient(index) })
@@ -270,7 +276,7 @@ fun InstructionItem(
  *   remove the ingredient.
  */
 @Composable
-fun IngredientItem(index: Int, ingredient: Ingredient, onRemoveClick: () -> Unit) {
+fun IngredientItemNEW(index: Int, ingredient: Ingredient, onRemoveClick: () -> Unit) {
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
     // title of ingredient
     Text(
@@ -314,7 +320,7 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
           // ingredient quantity (it is a string but will be transformed later on)
           OutlinedTextField(
               value = addRecipeViewModel.ingredientQuantityAmount,
-              onValueChange = { addRecipeViewModel.ingredientQuantityAmount },
+              onValueChange = {newAmount-> addRecipeViewModel.changeIngredientQuantityAmount(newAmount) },
               label = { Text(stringResource(R.string.ingredient_quantity)) },
               keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
               modifier = Modifier.fillMaxWidth().testTag("inputIngredientQuantity"))
@@ -406,3 +412,24 @@ fun ErrorTextBox(errorMessageId: Int?, testTag: String) {
     )
   }
 }
+
+@Preview(showBackground = true)
+@Composable
+fun AddRecipeScreenPreview() {
+    // Mock navigation actions
+    val navController = rememberNavController()
+    val navigationActions = NavigationActions(navController)
+    val firebaseFirestore = FirebaseFirestore.getInstance()
+    val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
+
+    val viewModel = AddRecipeViewModel(recipeRepository, UserRepositoryFirestore(firebaseFirestore))
+
+
+    // Call the AddRecipeScreen with mocked data
+    AddRecipeScreen(
+        navigationActions = navigationActions,
+        addRecipeViewModel = viewModel,
+    )
+}
+
+
