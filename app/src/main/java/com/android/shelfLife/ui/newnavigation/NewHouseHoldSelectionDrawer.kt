@@ -33,11 +33,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
-import com.android.shelfLife.model.overview.HouseholdSelectionDrawerViewModel
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.newutils.DeletionConfirmationPopUp
+import com.android.shelfLife.viewmodel.navigation.HouseholdSelectionDrawerViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

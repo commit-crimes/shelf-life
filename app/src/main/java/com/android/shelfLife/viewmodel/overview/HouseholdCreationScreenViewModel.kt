@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.newCreationScreen
+package com.android.shelfLife.viewmodel.overview
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -7,24 +7,23 @@ import com.android.shelfLife.model.newInvitations.InvitationRepository
 import com.android.shelfLife.model.newhousehold.HouseHold
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class CreationScreenViewModel(
-    initialEmails: Set<String> = emptySet(),
+class HouseholdCreationScreenViewModel(
     private val houseHoldRepository: HouseHoldRepository,
     private val invitationRepository: InvitationRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
-  private val _emailList = MutableStateFlow<Set<String>>(initialEmails)
+  private val _emailList = MutableStateFlow<Set<String>>(emptySet())
   val emailList: StateFlow<Set<String>> = _emailList.asStateFlow()
 
   val householdToEdit = houseHoldRepository.householdToEdit
   val selectedHousehold = userRepository.selectedHousehold
   val households = houseHoldRepository.households
+  val currentUser = userRepository.user
 
   var finishedLoading = MutableStateFlow(false)
 
@@ -78,10 +77,10 @@ class CreationScreenViewModel(
    * @param householdName - The name of the household to be added.
    */
   fun addNewHousehold(householdName: String, friendEmails: Set<String?> = emptySet()) {
-    val currentUser = FirebaseAuth.getInstance().currentUser
-    if (currentUser != null) {
+    if (currentUser.value != null) {
       val householdUid = houseHoldRepository.getNewUid()
-      var household = HouseHold(householdUid, householdName, listOf(currentUser.uid), emptyList())
+      var household =
+          HouseHold(householdUid, householdName, listOf(currentUser.value!!.uid), emptyList())
 
       if (friendEmails.isNotEmpty()) { // Corrected condition
         userRepository.getUserIds(friendEmails) { emailToUserId ->
@@ -92,7 +91,7 @@ class CreationScreenViewModel(
           viewModelScope.launch {
             houseHoldRepository.addHousehold(household)
             userRepository.addHouseholdUID(household.uid)
-            for (user in friendEmails.filter { it != currentUser.email }) {
+            for (user in friendEmails.filter { it != currentUser.value!!.email }) {
               invitationRepository.sendInvitation(household = household, invitedUserID = user!!)
             }
             if (selectedHousehold.value == null) {
@@ -104,7 +103,7 @@ class CreationScreenViewModel(
         }
       } else {
         // No friend emails, add household with current user only
-        household = household.copy(members = listOf(currentUser.uid))
+        household = household.copy(members = listOf(currentUser.value!!.uid))
         viewModelScope.launch {
           houseHoldRepository.addHousehold(household)
           userRepository.addHouseholdUID(household.uid)

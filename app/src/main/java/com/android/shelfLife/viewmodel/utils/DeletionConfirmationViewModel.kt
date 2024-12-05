@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.deletionConfirmation
+package com.android.shelfLife.viewmodel.utils
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,11 +23,29 @@ class DeletionConfirmationViewModel(
   fun deleteHouseholdById(householdId: String) {
     viewModelScope.launch {
       houseHoldRepository.deleteHouseholdById(householdId)
-      // Remove the household UID from the user's list of household UIDs
+
+      // Find the position of the deleted household in the list
+      var currentPosition = 0
+      households.value.forEachIndexed { index, household ->
+        if (household.uid == householdId) {
+          currentPosition = index
+          return@forEachIndexed
+        }
+      }
+
       userRepository.deleteHouseholdUID(householdId)
       if (selectedHousehold.value == null || householdId == selectedHousehold.value!!.uid) {
         // If the deleted household was selected, deselect it
-        userRepository.selectHousehold(households.value.firstOrNull())
+        userRepository.selectHousehold(
+            if (households.value.isEmpty()) {
+              null
+            } else {
+              if (currentPosition < households.value.size) {
+                households.value[currentPosition]
+              } else {
+                households.value[households.value.size - 1]
+              }
+            })
       }
     }
   }

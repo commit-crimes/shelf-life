@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.overview
+package com.android.shelfLife.viewmodel.navigation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

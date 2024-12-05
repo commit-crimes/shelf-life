@@ -24,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,9 +37,9 @@ import coil3.compose.AsyncImage
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.model.newFoodItem.FoodStatus
-import com.android.shelfLife.model.newOverview.OverviewScreenViewModel
 import com.android.shelfLife.ui.utils.getExpiryMessageBasedOnDays
 import com.android.shelfLife.ui.utils.getProgressBarState
+import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale

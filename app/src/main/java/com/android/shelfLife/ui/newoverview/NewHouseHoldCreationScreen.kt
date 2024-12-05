@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.R
-import com.android.shelfLife.model.newCreationScreen.CreationScreenViewModel
 import com.android.shelfLife.model.newInvitations.InvitationRepository
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
@@ -41,6 +40,7 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.newutils.DeletionConfirmationPopUp
 import com.android.shelfLife.ui.utils.CustomButtons
+import com.android.shelfLife.viewmodel.overview.HouseholdCreationScreenViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
@@ -52,13 +52,13 @@ fun HouseHoldCreationScreen(
     invitationRepository: InvitationRepository,
     userRepository: UserRepository
 ) {
-  val creationScreenViewModel: CreationScreenViewModel = viewModel {
-    CreationScreenViewModel(
+  val householdCreationScreenViewModel: HouseholdCreationScreenViewModel = viewModel {
+    HouseholdCreationScreenViewModel(
         houseHoldRepository = houseHoldRepository,
         invitationRepository = invitationRepository,
         userRepository = userRepository)
   }
-  val householdToEdit by creationScreenViewModel.householdToEdit.collectAsState()
+  val householdToEdit by householdCreationScreenViewModel.householdToEdit.collectAsState()
 
   var isError by rememberSaveable { mutableStateOf(false) }
   var houseHoldName by rememberSaveable { mutableStateOf(householdToEdit?.name ?: "") }
@@ -66,7 +66,7 @@ fun HouseHoldCreationScreen(
   var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
 
   // Mutable state list to hold member emails
-  val memberEmailList by creationScreenViewModel.emailList.collectAsState()
+  val memberEmailList by householdCreationScreenViewModel.emailList.collectAsState()
   var emailInput by rememberSaveable { mutableStateOf("") }
   var showEmailTextField by rememberSaveable { mutableStateOf(false) }
 
@@ -86,7 +86,7 @@ fun HouseHoldCreationScreen(
   // Function to add email card to the list and scroll to the bottom
   fun addEmailCard() {
     if (emailInput.isNotBlank() && emailInput.trim() !in memberEmailList) {
-      creationScreenViewModel.addEmail(emailInput.trim())
+      householdCreationScreenViewModel.addEmail(emailInput.trim())
       emailInput = ""
     }
     showEmailTextField = false
@@ -179,7 +179,9 @@ fun HouseHoldCreationScreen(
                               if (email != FirebaseAuth.getInstance().currentUser?.email ||
                                   householdToEdit != null) {
                                 IconButton(
-                                    onClick = { creationScreenViewModel.removeEmail(email) },
+                                    onClick = {
+                                      householdCreationScreenViewModel.removeEmail(email)
+                                    },
                                     modifier = Modifier.testTag("RemoveEmailButton")) {
                                       Icon(
                                           imageVector = Icons.Default.Delete,
@@ -233,33 +235,34 @@ fun HouseHoldCreationScreen(
                   button1TestTag = "CancelButton",
                   button1Text = stringResource(R.string.cancel_button),
                   button2OnClick = {
-                    if (creationScreenViewModel.newHouseholdNameIsInvalid(houseHoldName)) {
+                    if (householdCreationScreenViewModel.newHouseholdNameIsInvalid(houseHoldName)) {
                       isError = true
                     } else {
                       if (householdToEdit != null) {
                         val updatedHouseHold = householdToEdit!!.copy(name = houseHoldName)
-                        creationScreenViewModel.getUserIdsByEmails(
+                        householdCreationScreenViewModel.getUserIdsByEmails(
                             memberEmailList,
                             callback = { emailToUserIds ->
                               if (emailToUserIds.isNotEmpty()) {
                                 val oldUidList = updatedHouseHold.members
                                 val uidList = memberEmailList.map { emailToUserIds[it]!! }
                                 if (oldUidList.size < uidList.size) {
-                                  creationScreenViewModel.updateHousehold(
+                                  householdCreationScreenViewModel.updateHousehold(
                                       householdToEdit!!.copy(
                                           name = houseHoldName, members = uidList),
                                       false)
                                 } else if (oldUidList.size > uidList.size) {
-                                  creationScreenViewModel.updateHousehold(
+                                  householdCreationScreenViewModel.updateHousehold(
                                       householdToEdit!!.copy(
                                           name = houseHoldName, members = uidList),
                                       true)
                                 }
-                                creationScreenViewModel.updateHousehold(updatedHouseHold)
+                                householdCreationScreenViewModel.updateHousehold(updatedHouseHold)
                               }
                             })
                       } else {
-                        creationScreenViewModel.addNewHousehold(houseHoldName, memberEmailList)
+                        householdCreationScreenViewModel.addNewHousehold(
+                            houseHoldName, memberEmailList)
                         Log.d("HouseHoldCreationScreen", "Added new household")
                       }
                       navigationActions.navigateTo(Screen.OVERVIEW)

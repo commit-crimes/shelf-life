@@ -47,8 +47,10 @@ interface UserRepository {
 
   suspend fun updateSelectedHousehold(selectedHouseholdUID: String)
 
-  fun getUserIds(users: Set<String?>, callback: (Map<String, String>) -> Unit)
+  /** @param userEmails - The set of user emails to get the user IDs for. */
+  fun getUserIds(userEmails: Set<String?>, callback: (Map<String, String>) -> Unit)
 
+  /** @param userIds - The list of user IDs to get the emails for. */
   fun getUserEmails(userIds: List<String>, callback: (Map<String, String>) -> Unit)
 
   /**

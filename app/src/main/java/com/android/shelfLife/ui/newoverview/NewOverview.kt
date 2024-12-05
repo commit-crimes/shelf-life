@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
-import com.android.shelfLife.model.newOverview.OverviewScreenViewModel
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
@@ -34,9 +33,8 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.newnavigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.newnavigation.TopNavigationBar
-import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
-import com.android.shelfLife.ui.overview.ListFoodItems
 import com.android.shelfLife.ui.utils.CustomSearchBar
+import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import kotlinx.coroutines.launch
 
 /**

@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.newOverview
+package com.android.shelfLife.viewmodel.overview
 
 import android.util.Log
 import androidx.compose.material3.DrawerState
@@ -81,8 +81,9 @@ class OverviewScreenViewModel(
   fun deleteMultipleFoodItems(foodItems: List<FoodItem>) {
     val selectedHousehold = selectedHousehold.value
     if (selectedHousehold != null) {
-      foodItems.forEach {
-        viewModelScope.launch { listFoodItemsRepository.updateFoodItem(selectedHousehold.uid, it) }
+
+      viewModelScope.launch {
+        foodItems.forEach { listFoodItemsRepository.updateFoodItem(selectedHousehold.uid, it) }
       }
     }
   }

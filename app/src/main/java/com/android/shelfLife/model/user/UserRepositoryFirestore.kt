@@ -203,12 +203,12 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     updateUserField("selectedHouseholdUID", selectedHouseholdUID)
   }
 
-  override fun getUserIds(users: Set<String?>, callback: (Map<String, String>) -> Unit) {
-    if (users.isEmpty()) {
+  override fun getUserIds(userEmails: Set<String?>, callback: (Map<String, String>) -> Unit) {
+    if (userEmails.isEmpty()) {
       callback(emptyMap())
       return
     }
-    val emailBatches = users.chunked(10) // Firestore allows up to 10 values in 'whereIn'
+    val emailBatches = userEmails.chunked(10) // Firestore allows up to 10 values in 'whereIn'
     val emailToUserId = mutableMapOf<String, String>()
     var batchesProcessed = 0
 
