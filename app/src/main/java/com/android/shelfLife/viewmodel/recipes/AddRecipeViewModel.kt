@@ -15,6 +15,9 @@ import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.utils.validateNumber
 import com.android.shelfLife.ui.utils.validateString
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.minutes
 
 class AddRecipeViewModel(
@@ -215,26 +218,33 @@ class AddRecipeViewModel(
     }
   }
 
-  suspend fun addNewRecipe(): Pair<Boolean, Boolean> {
+  @OptIn(DelicateCoroutinesApi::class)
+  suspend fun addNewRecipe(onSuccess: () -> Unit, showToast: (Int) -> Unit) {
     validateAllFieldsWhenSubmitButton()
-    if (!error) {
-        val recipeAdded = false
-        val newRecipeUid = recipeRepository.getUid()
+    if (error) return showToast(0)
+    val newRecipeUid = recipeRepository.getUid()
 
-        val newRecipe =
-          Recipe(
-              uid = newRecipeUid,
-              name = title,
-              instructions = instructions.toList(),
-              servings = servings.toFloat(),
-              time = time.toDouble().minutes,
-              ingredients = ingredients.toList())
+    val newRecipe =
+      Recipe(
+          uid = newRecipeUid,
+          name = title,
+          instructions = instructions.toList(),
+          servings = servings.toFloat(),
+          time = time.toDouble().minutes,
+          ingredients = ingredients.toList())
 
-        recipeRepository.addRecipe(
-          newRecipe, onSuccess = { recipeAdded == true }, onFailure = { recipeAdded == false })
-      userRepository.addRecipeUID(newRecipeUid)
-      return Pair(true, recipeAdded)
-    }
-    return Pair(false, false)
+    recipeRepository.addRecipe(
+      recipe = newRecipe.copy(uid = recipeRepository.getUid()), // Assign a UID during save
+      onSuccess = {
+        GlobalScope.launch { // uses a delicate coroutine api
+          userRepository.addRecipeUID(newRecipeUid)
+          onSuccess()
+        }
+      },
+      onFailure = {
+        showToast(1)
+      }
+    )
+
   }
 }
