@@ -12,13 +12,11 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.android.shelfLife.R
-import com.android.shelfLife.model.foodFacts.*
-import com.android.shelfLife.model.foodItem.*
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.utils.*
-import com.android.shelfLife.viewmodel.foodItem.FoodItemViewModel
+import com.android.shelfLife.viewmodel.FoodItemViewModel
 import kotlinx.coroutines.launch
 
 /**

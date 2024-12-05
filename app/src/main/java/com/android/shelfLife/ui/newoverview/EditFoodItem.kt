@@ -19,7 +19,7 @@ import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.utils.*
-import com.android.shelfLife.viewmodel.foodItem.FoodItemViewModel
+import com.android.shelfLife.viewmodel.FoodItemViewModel
 import kotlinx.coroutines.launch
 
 /**

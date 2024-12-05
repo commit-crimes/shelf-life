@@ -1,4 +1,4 @@
-package com.android.shelfLife.viewmodel.foodItem
+package com.android.shelfLife.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -96,7 +96,7 @@ class FoodItemViewModel(
 
   /** Validates all fields when the submit button is clicked. */
   fun validateAllFieldsWhenSubmitButton() {
-    if (isSelected) {
+    if (!isSelected) {
       foodNameErrorResId = validateFoodName(foodName)
     }
     amountErrorResId = validateAmount(amount)
