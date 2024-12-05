@@ -14,7 +14,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.android.shelfLife.R
-import com.android.shelfLife.model.foodItem.*
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
+import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.utils.*
@@ -25,19 +26,21 @@ import kotlinx.coroutines.launch
  * Composable function to display the Edit Food Item screen.
  *
  * @param navigationActions The navigation actions to be used in the screen.
- * @param houseHoldViewModel The ViewModel for the household.
- * @param foodItemViewModel The ViewModel for the food items.
+ * @param foodItemRepository The food item model.
+ * @param userRepository The user model.
  * @param paddingValues The padding values to be applied to the screen.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditFoodItemScreen(
     navigationActions: NavigationActions,
-    foodItemViewModel: FoodItemViewModel,
+    foodItemRepository: FoodItemRepository,
+    userRepository: UserRepository,
     paddingValues: PaddingValues = PaddingValues(16.dp)
 ) {
 
   val context = LocalContext.current
+  val foodItemViewModel = FoodItemViewModel(foodItemRepository, userRepository)
   val coroutineScope = rememberCoroutineScope()
 
   Scaffold(
