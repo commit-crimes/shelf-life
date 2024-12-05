@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.newProfile
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -24,7 +25,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.android.shelfLife.model.newInvitations.InvitationRepository
+import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -38,9 +42,13 @@ import com.example.compose.ThemeMode
 @Composable
 fun ProfileScreen(
     navigationActions: NavigationActions,
-    profileViewModel: ProfileScreenViewModel,
+    invitationRepository: InvitationRepository,
+    userRepository: UserRepository,
+    context: Context,
 ) {
-
+    val profileViewModel = viewModel{
+        ProfileScreenViewModel(invitationRepository, userRepository)
+    }
   val currentUser = profileViewModel.currentUser.collectAsState()
   val invitations by profileViewModel.invitations.collectAsState()
   // Get the current theme mode and the theme toggler from ShelfLifeTheme
@@ -140,7 +148,7 @@ fun ProfileScreen(
 
               // Logout button
               OutlinedButton(
-                  onClick = { profileViewModel.signOut() },
+                  onClick = { profileViewModel.signOut(context) },
                   modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
                   border = BorderStroke(1.dp, Color.Red) // Outline color matches the current status
                   ) {
