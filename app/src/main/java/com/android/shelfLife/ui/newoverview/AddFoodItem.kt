@@ -42,12 +42,6 @@ fun AddFoodItemScreen(
 
   val context = LocalContext.current
 
-  LaunchedEffect(Unit) {
-    if (!foodItemViewModel.isSelected) {
-      foodItemViewModel.reset()
-    }
-  }
-
   // DisposableEffect(Unit) { onDispose { foodFactsViewModel.clearFoodFactsSuggestions() } }
 
   Scaffold(

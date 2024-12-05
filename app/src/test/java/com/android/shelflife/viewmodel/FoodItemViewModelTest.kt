@@ -360,29 +360,4 @@ class FoodItemViewModelTest {
     verify(mockFoodItemRepository, never()).deleteFoodItem(any(), any())
     verify(mockFoodItemRepository, never()).selectFoodItem(any())
   }
-
-  @Test
-  fun `reset clears all fields and resets state`() {
-    foodItemViewModel.foodName = "Apple"
-    foodItemViewModel.amount = "100"
-    foodItemViewModel.unit = FoodUnit.GRAM
-    foodItemViewModel.category = FoodCategory.FRUIT
-    foodItemViewModel.location = FoodStorageLocation.FRIDGE
-    foodItemViewModel.expireDate = "02012023"
-    foodItemViewModel.openDate = "01012023"
-    foodItemViewModel.buyDate = "01012023"
-    foodItemViewModel.isSelected = true
-
-    foodItemViewModel.reset()
-
-    assertEquals("", foodItemViewModel.foodName)
-    assertEquals("", foodItemViewModel.amount)
-    assertEquals(FoodUnit.GRAM, foodItemViewModel.unit)
-    assertEquals(FoodCategory.OTHER, foodItemViewModel.category)
-    assertEquals(FoodStorageLocation.PANTRY, foodItemViewModel.location)
-    assertEquals("", foodItemViewModel.expireDate)
-    assertEquals("", foodItemViewModel.openDate)
-    assertNotNull(foodItemViewModel.buyDate)
-    assertFalse(foodItemViewModel.isSelected)
-  }
 }

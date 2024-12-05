@@ -66,32 +66,7 @@ class FoodItemViewModel(
       buyDate = selectedFood!!.buyDate?.let { formatTimestampToDate(it) } ?: ""
     } else {
       isSelected = false
-      reset()
     }
-  }
-
-  fun reset() {
-    foodName = ""
-    amount = ""
-    unit = FoodUnit.GRAM
-    category = FoodCategory.OTHER
-    location = FoodStorageLocation.PANTRY
-    expireDate = ""
-    openDate = ""
-    buyDate = formatTimestampToDate(Timestamp.now())
-
-    foodNameErrorResId = null
-    amountErrorResId = null
-    expireDateErrorResId = null
-    openDateErrorResId = null
-    buyDateErrorResId = null
-
-    unitExpanded = false
-    categoryExpanded = false
-    locationExpanded = false
-    selectedImage = null
-
-    isSelected = false
   }
 
   /** Validates all fields when the submit button is clicked. */
@@ -209,7 +184,6 @@ class FoodItemViewModel(
         editFoodItem(newFoodItem)
       } else {
         addFoodItem(newFoodItem)
-        reset()
       }
       return true
     } else {
