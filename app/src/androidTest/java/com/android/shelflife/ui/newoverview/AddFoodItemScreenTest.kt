@@ -441,9 +441,7 @@ class AddFoodItemScreenTest {
     composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextInput("31122025")
 
     // Submit
-    composeTestRule
-        .onNodeWithTag("addFoodItemScreen")
-        .performScrollToNode(hasTestTag("foodSave"))
+    composeTestRule.onNodeWithTag("addFoodItemScreen").performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").performClick()
     composeTestRule
         .onNodeWithText(
