@@ -1,7 +1,9 @@
 package com.android.shelfLife.model.user
 
-import com.android.shelfLife.model.newhousehold.HouseHold
+import android.content.Context
 import kotlinx.coroutines.flow.StateFlow
+import com.android.shelfLife.model.newhousehold.HouseHold
+
 
 interface UserRepository {
   /** Exposes the user data as a StateFlow. */
@@ -19,7 +21,7 @@ interface UserRepository {
    * Fetches the user information from Firestore and initializes local data. This can be called once
    * at startup to load initial data.
    */
-  suspend fun initializeUserData()
+  suspend fun initializeUserData(context: Context)
 
   /** Starts listening for changes to the invitations field. */
   fun startListeningForInvitations()

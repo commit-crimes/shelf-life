@@ -1,5 +1,6 @@
 package com.android.shelfLife.viewmodel.overview
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -48,7 +49,6 @@ class OverviewScreenViewModel(
     FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
       if (firebaseAuth.currentUser != null) {
         Log.d("OverviewScreenViewModel", "User logged in, loading....")
-        loadHouseholds()
       }
     }
   }
@@ -56,8 +56,6 @@ class OverviewScreenViewModel(
   /** Loads the list of households from the repository and updates the [_households] flow. */
   private fun loadHouseholds() {
     viewModelScope.launch {
-      // Maybe this should be done elsewhere?
-      userRepository.initializeUserData()
       userRepository.user.value?.let { user ->
         houseHoldRepository.initializeHouseholds(user.householdUIDs, user.selectedHouseholdUID)
         userRepository.selectHousehold(

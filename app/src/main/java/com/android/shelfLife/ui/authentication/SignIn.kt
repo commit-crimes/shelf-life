@@ -41,7 +41,7 @@ fun SignInScreen(
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
           val account = task.getResult(Exception::class.java)
-          account?.idToken?.let { idToken -> signInViewModel.signInWithGoogle(idToken) }
+          account?.idToken?.let { idToken -> signInViewModel.signInWithGoogle(idToken, context) }
               ?: run {
                 Toast.makeText(context, "Failed to get ID Token!", Toast.LENGTH_LONG).show()
               }

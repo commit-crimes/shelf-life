@@ -40,15 +40,14 @@ class SignInViewModel(
     firebaseAuth.removeAuthStateListener(authStateListener)
   }
 
-  fun signInWithGoogle(idToken: String) {
+  fun signInWithGoogle(idToken: String, context: Context) {
     val credential = GoogleAuthProvider.getCredential(idToken, null)
     viewModelScope.launch {
       _signInState.value = SignInState.Loading
       try {
         val authResult = firebaseAuth.signInWithCredential(credential).await()
-        // TODO : Could cause sign in issues if auth.currentUser is null
         val user = authResult.user
-        userRepository.initializeUserData()
+        userRepository.initializeUserData(context)
         _signInState.value = SignInState.Success(authResult)
       } catch (e: Exception) {
         _signInState.value = SignInState.Error(e.message ?: "Unknown error occurred.")

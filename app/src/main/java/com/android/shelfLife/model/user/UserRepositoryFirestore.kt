@@ -1,6 +1,8 @@
 package com.android.shelfLife.model.user
 
+import android.content.Context
 import android.util.Log
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.android.shelfLife.model.newhousehold.HouseHold
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -8,6 +10,7 @@ import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +18,8 @@ import kotlinx.coroutines.tasks.await
 
 class UserRepositoryFirestore(
   private val db: FirebaseFirestore,
-  private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()) : UserRepository {
+  private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
+  ) : UserRepository {
 
   private val auth = FirebaseAuth.getInstance()
   private val userCollection = db.collection("users")
@@ -41,7 +45,7 @@ class UserRepositoryFirestore(
     return userCollection.document().id
   }
 
-  override suspend fun initializeUserData() {
+  override suspend fun initializeUserData(context: Context) {
     val currentUser = auth.currentUser ?: throw Exception("User not logged in")
     try {
       // Fetch user data from Firestore
@@ -51,8 +55,22 @@ class UserRepositoryFirestore(
         _user.value = userData
         _invitations.value = userData?.invitationUIDs ?: emptyList()
       } else {
-        _user.value = null
-        _invitations.value = emptyList()
+        val currentAccount = GoogleSignIn.getLastSignedInAccount(context)
+        val name = currentAccount?.displayName ?: "Guest"
+        val email = currentAccount?.email ?: ""
+        val photoUrl = currentAccount?.photoUrl.toString()
+        _user.value = User(uid = currentUser.uid, username = name, email = email, photoUrl = photoUrl, selectedHouseholdUID = "")
+        val userDoc = db.collection("users").document(currentUser.uid)
+        val userData = mapOf(
+            "username" to name,
+            "email" to email,
+            "photoURL" to photoUrl,
+            "selectedHouseholdUID" to "",
+            "householdUIDs" to emptyList<String>(),
+            "recipeUIDs" to emptyList<String>(),
+            "invitationUIDs" to emptyList<String>()
+        )
+        userDoc.set(userData, SetOptions.merge())
       }
     } catch (e: Exception) {
       Log.e("UserRepository", "Error initializing user data", e)
@@ -295,12 +313,13 @@ class UserRepositoryFirestore(
       val uid = doc.id
       val username = doc.getString("username") ?: ""
       val email = doc.getString("email") ?: ""
+      val photoURL = doc.getString("photoURL") ?: ""
       val selectedHouseholdUID = doc.getString("selectedHouseholdUID") ?: ""
       val householdUIDs = doc.get("householdUIDs") as? List<String> ?: emptyList()
       val recipeUIDs = doc.get("recipeUIDs") as? List<String> ?: emptyList()
       val invitationUIDs = doc.get("invitationUIDs") as? List<String> ?: emptyList()
 
-      User(uid, username, email, selectedHouseholdUID, householdUIDs, recipeUIDs, invitationUIDs)
+      User(uid, username, email, photoURL, selectedHouseholdUID, householdUIDs, recipeUIDs, invitationUIDs)
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error converting document to HouseHold", e)
       null
