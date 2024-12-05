@@ -1,6 +1,8 @@
-package com.android.shelfLife.model.user
+package com.android.shelflife.model.user
 
 import androidx.test.core.app.ApplicationProvider
+import com.android.shelfLife.model.user.User
+import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
@@ -84,6 +86,7 @@ class UserRepositoryFirestoreTest {
             uid = "testUserId",
             username = "TestUser",
             email = "test@example.com",
+            photoUrl = "",
             selectedHouseholdUID = "house1",
             householdUIDs = listOf("house1", "house2"),
             recipeUIDs = listOf("recipe1"),
