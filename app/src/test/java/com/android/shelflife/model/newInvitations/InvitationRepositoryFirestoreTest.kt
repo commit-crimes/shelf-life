@@ -79,6 +79,7 @@ class InvitationRepositoryFirestoreTest {
             uid = "invitedUserId",
             username = "InvitedUser",
             email = "inviteduser@example.com",
+            selectedHouseholdUID = "householdId",
             householdUIDs = listOf(),
             recipeUIDs = listOf(),
             invitationUIDs = listOf())
@@ -90,7 +91,7 @@ class InvitationRepositoryFirestoreTest {
     `when`(mockDocument.id).thenReturn(invitationId)
     `when`(mockDocument.set(any<Map<String, Any>>())).thenReturn(mockTask)
 
-    invitationRepository.sendInvitation(household, invitedUser)
+    invitationRepository.sendInvitation(household, invitedUser.uid)
 
     val invitationDataCaptor = ArgumentCaptor.forClass(Map::class.java)
     verify(mockDocument).set(invitationDataCaptor.capture())
