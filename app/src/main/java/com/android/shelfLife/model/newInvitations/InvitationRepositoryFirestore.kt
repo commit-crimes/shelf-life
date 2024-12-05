@@ -17,8 +17,7 @@ import kotlinx.coroutines.tasks.await
 
 open class InvitationRepositoryFirestore(
     private val db: FirebaseFirestore,
-    private val auth: FirebaseAuth
-) : InvitationRepository {
+    private val auth: FirebaseAuth) : InvitationRepository {
 
   internal var listenerRegistration: ListenerRegistration? = null
   private val _invitations = MutableStateFlow<List<Invitation>>(emptyList())
@@ -37,8 +36,7 @@ open class InvitationRepositoryFirestore(
    *
    * @param household The household to invite the user to.
    */
-  override fun sendInvitation(household: HouseHold, invitedUser: User) {
-    val invitedUserId = invitedUser.uid
+  override fun sendInvitation(household: HouseHold, invitedUserID: String) {
     val inviterUserId =
         auth.currentUser?.uid ?: throw IllegalStateException("User not authenticated")
     val invitationId = db.collection(invitationPath).document().id
@@ -47,7 +45,7 @@ open class InvitationRepositoryFirestore(
                 invitationId = invitationId,
                 householdId = household.uid,
                 householdName = household.name,
-                invitedUserId = invitedUserId,
+                invitedUserId = invitedUserID,
                 inviterUserId = inviterUserId,
                 timestamp = Timestamp.now())
             .toMap()
