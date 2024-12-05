@@ -23,11 +23,12 @@ import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.RecipePrompt
 import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.viewmodel.recipe.RecipeGenerationViewModel
 
 @Composable
 fun GenerateRecipeScreen(
   navigationActions: NavigationActions,
-  listRecipesViewModel: ListRecipesViewModel,
+  generationViewModel: RecipeGenerationViewModel
 ) {
   val context = LocalContext.current
 
@@ -126,20 +127,22 @@ fun GenerateRecipeScreen(
                 uid = index.toString(), foodFacts = FoodFacts(name, quantity = Quantity(1.0)))
             }
           navigationActions.goBack()
-          listRecipesViewModel.generateRecipe(
-            recipePrompt =
+          generationViewModel.updateRecipePrompt(
             RecipePrompt(
               name = recipeName,
               ingredients = testIngredients,
-              recipeType = RecipeType.HIGH_PROTEIN),
-            onSuccess = { recipe ->
-              Log.d("GenerateRecipe", "Recipe generated successfully: $recipe")
-              listRecipesViewModel.saveRecipe(recipe)
-            },
-            onFailure = { error ->
-              Log.e("GenerateRecipe", "Error generating recipe: $error")
-              Toast.makeText(context, "Failed to generate recipe.", Toast.LENGTH_SHORT).show()
-            })
+              recipeType = RecipeType.HIGH_PROTEIN)
+          )
+          generationViewModel.generateRecipe(onSuccess = { recipe ->
+            generationViewModel.acceptGeneratedRecipe{
+              Toast.makeText(context, "Recipe generated successfully.", Toast.LENGTH_SHORT).show()
+              navigationActions.goBack()
+            }
+          },
+          onFailure = { error ->
+            Log.e("GenerateRecipe", "Error generating recipe: $error")
+            Toast.makeText(context, "Failed to generate recipe.", Toast.LENGTH_SHORT).show()
+          })
         } else {
           recipeNameError = if (recipeName.isBlank()) "Please enter a recipe name" else null
           if (foodItems.isEmpty()) {
