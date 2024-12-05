@@ -5,14 +5,18 @@ import com.android.shelfLife.R
 /**
  * Validates the food name.
  *
- * @param foodName The food name to validate.
+ * @param string The food name to validate.
  * @return The resource ID of the error message if the food name is invalid, null otherwise.
  */
-fun validateFoodName(foodName: String): Int? {
+fun validateString(
+    string: String,
+    errorMessage1: Int = R.string.food_name_empty_error,
+    errorMessage2: Int = R.string.food_name_invalid_error
+): Int? {
   val namePattern = Regex("^[a-zA-Z0-9\\s\\-,'()]+\$")
   return when {
-    foodName.isBlank() -> R.string.food_name_empty_error
-    !namePattern.matches(foodName) -> R.string.food_name_invalid_error
+    string.isBlank() -> errorMessage1
+    !namePattern.matches(string) -> errorMessage2
     else -> null
   }
 }
@@ -23,11 +27,16 @@ fun validateFoodName(foodName: String): Int? {
  * @param amount The amount to validate.
  * @return The resource ID of the error message if the amount is invalid, null otherwise.
  */
-fun validateAmount(amount: String): Int? {
+fun validateNumber(
+    amount: String,
+    errorMessage1: Int = R.string.amount_empty_error,
+    errorMessage2: Int = R.string.amount_not_number_error,
+    errorMessage3: Int = R.string.amount_negative_error
+): Int? {
   return when {
-    amount.isBlank() -> R.string.amount_empty_error
-    amount.toDoubleOrNull() == null -> R.string.amount_not_number_error
-    amount.toDouble() <= 0 -> R.string.amount_negative_error
+    amount.isBlank() -> errorMessage1
+    amount.toDoubleOrNull() == null -> errorMessage2
+    amount.toDouble() <= 0 -> errorMessage3
     else -> null
   }
 }

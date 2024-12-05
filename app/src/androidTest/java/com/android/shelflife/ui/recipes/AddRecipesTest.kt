@@ -25,7 +25,7 @@ import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.recipes.AddRecipeScreen
+import com.android.shelfLife.ui.recipes.addRecipe.AddRecipeScreen
 import com.google.firebase.Timestamp
 import io.mockk.mockk
 import java.util.Date
