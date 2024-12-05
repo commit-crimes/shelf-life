@@ -18,42 +18,40 @@ import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 
-
 @Composable
 fun InvitationScreen(
     navigationActions: NavigationActions,
     invitationRepository: InvitationRepository
 ) {
 
-    val invitationViewModel = viewModel{
-        InvitationViewModel(invitationRepository = invitationRepository)
-    }
+  val invitationViewModel = viewModel {
+    InvitationViewModel(invitationRepository = invitationRepository)
+  }
   val invitations by invitationViewModel.invitations.collectAsState()
 
   Scaffold(
       topBar = {
-          CustomTopAppBar(
-              onClick = {navigationActions.goBack()},
-              title = "Invitations",
-              titleTestTag = "invitationsTitle")
-      }
-  ) { paddingValues ->
-    if (invitations.isEmpty()) {
-      Box(
-          modifier = Modifier.fillMaxSize().padding(paddingValues),
-          contentAlignment = Alignment.Center) {
-            Text("No pending invitations")
+        CustomTopAppBar(
+            onClick = { navigationActions.goBack() },
+            title = "Invitations",
+            titleTestTag = "invitationsTitle")
+      }) { paddingValues ->
+        if (invitations.isEmpty()) {
+          Box(
+              modifier = Modifier.fillMaxSize().padding(paddingValues),
+              contentAlignment = Alignment.Center) {
+                Text("No pending invitations")
+              }
+        } else {
+          // Show list of invitations
+          LazyColumn(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
+            items(invitations) { invitation ->
+              InvitationCard(invitation, invitationViewModel)
+              Spacer(modifier = Modifier.height(8.dp))
+            }
           }
-    } else {
-      // Show list of invitations
-      LazyColumn(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
-        items(invitations) { invitation ->
-          InvitationCard(invitation, invitationViewModel)
-          Spacer(modifier = Modifier.height(8.dp))
         }
       }
-    }
-  }
 }
 
 @Composable

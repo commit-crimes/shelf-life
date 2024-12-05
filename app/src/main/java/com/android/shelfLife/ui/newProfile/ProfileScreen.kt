@@ -46,9 +46,7 @@ fun ProfileScreen(
     userRepository: UserRepository,
     context: Context,
 ) {
-    val profileViewModel = viewModel{
-        ProfileScreenViewModel(invitationRepository, userRepository)
-    }
+  val profileViewModel = viewModel { ProfileScreenViewModel(invitationRepository, userRepository) }
   val currentUser = profileViewModel.currentUser.collectAsState()
   val invitations by profileViewModel.invitations.collectAsState()
   // Get the current theme mode and the theme toggler from ShelfLifeTheme

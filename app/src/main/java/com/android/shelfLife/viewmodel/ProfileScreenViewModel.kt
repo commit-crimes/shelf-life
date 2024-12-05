@@ -18,7 +18,7 @@ class ProfileScreenViewModel(
     private val invitationRepository: InvitationRepository,
     private val userRepository: UserRepository,
 ) : ViewModel() {
-    var changeThemeMenuState = mutableStateOf(false)
+  var changeThemeMenuState = mutableStateOf(false)
   val invitations: StateFlow<List<Invitation>> = invitationRepository.invitations
   val currentUser = userRepository.user
 

@@ -1,7 +1,6 @@
 package com.android.shelfLife.model.newInvitations
 
 import com.android.shelfLife.model.newhousehold.HouseHold
-import com.android.shelfLife.model.user.User
 import kotlinx.coroutines.flow.StateFlow
 
 interface InvitationRepository {
