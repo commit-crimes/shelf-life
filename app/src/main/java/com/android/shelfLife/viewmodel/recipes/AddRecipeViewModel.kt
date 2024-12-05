@@ -170,8 +170,8 @@ class AddRecipeViewModel(
   fun createNewIngredient() {
     showIngredientDialog = true
     ingredientName = ""
-      ingredientQuantityAmount = ""
-      ingredientQuantityUnit = FoodUnit.GRAM
+    ingredientQuantityAmount = ""
+    ingredientQuantityUnit = FoodUnit.GRAM
   }
 
   fun closeIngredientDialog() {
@@ -185,7 +185,7 @@ class AddRecipeViewModel(
           Ingredient(
               name = ingredientName,
               quantity = Quantity(ingredientQuantityAmount.toDouble(), ingredientQuantityUnit))
-        ingredients.add(newIngredient)
+      ingredients.add(newIngredient)
       return true
     }
     return false
@@ -218,10 +218,10 @@ class AddRecipeViewModel(
   suspend fun addNewRecipe(): Pair<Boolean, Boolean> {
     validateAllFieldsWhenSubmitButton()
     if (!error) {
-        val recipeAdded = false
-        val newRecipeUid = recipeRepository.getUid()
+      var recipeAdded = false
+      val newRecipeUid = recipeRepository.getUid()
 
-        val newRecipe =
+      val newRecipe =
           Recipe(
               uid = newRecipeUid,
               name = title,
@@ -230,8 +230,9 @@ class AddRecipeViewModel(
               time = time.toDouble().minutes,
               ingredients = ingredients.toList())
 
-        recipeRepository.addRecipe(
-          newRecipe, onSuccess = { recipeAdded == true }, onFailure = { recipeAdded == false })
+      recipeRepository.addRecipe(
+          newRecipe, onSuccess = { recipeAdded = true }, onFailure = { recipeAdded = false })
+        Log.i("AAAAAAA", recipeAdded.toString())
       userRepository.addRecipeUID(newRecipeUid)
       return Pair(true, recipeAdded)
     }

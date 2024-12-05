@@ -42,9 +42,9 @@ import com.android.shelfLife.ui.overview.HouseHoldCreationScreen
 import com.android.shelfLife.ui.overview.IndividualFoodItemScreen
 import com.android.shelfLife.ui.overview.OverviewScreen
 import com.android.shelfLife.ui.profile.ProfileScreen
-import com.android.shelfLife.ui.recipes.addRecipe.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
+import com.android.shelfLife.ui.recipes.addRecipe.AddRecipeScreen
 import com.android.shelfLife.ui.utils.signOutUser
 import com.example.compose.ShelfLifeTheme
 import com.google.firebase.auth.FirebaseAuth
