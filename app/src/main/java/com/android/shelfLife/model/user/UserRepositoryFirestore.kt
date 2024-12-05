@@ -295,7 +295,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
       val recipeUIDs = doc.get("recipeUIDs") as? List<String> ?: emptyList()
       val invitationUIDs = doc.get("invitationUIDs") as? List<String> ?: emptyList()
 
-      User(uid, username, email, selectedHouseholdUID, householdUIDs, recipeUIDs, invitationUIDs)
+      User(uid, username, email, householdUIDs, selectedHouseholdUID, recipeUIDs, invitationUIDs)
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error converting document to HouseHold", e)
       null
