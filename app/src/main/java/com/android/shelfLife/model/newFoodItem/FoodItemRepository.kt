@@ -43,5 +43,6 @@ interface FoodItemRepository {
    */
   suspend fun deleteFoodItem(householdId: String, foodItemId: String)
 
+  /** Selects a FoodItem document for individual view */
   fun selectFoodItem(foodItem: FoodItem?)
 }

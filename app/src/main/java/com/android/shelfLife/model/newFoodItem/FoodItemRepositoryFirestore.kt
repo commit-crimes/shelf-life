@@ -66,6 +66,10 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
     }
   }
 
+  override fun selectFoodItem(foodItem: FoodItem?) {
+    _selectedFoodItem.value = foodItem
+  }
+
   override suspend fun updateFoodItem(householdId: String, foodItem: FoodItem) {
     var originalItem: FoodItem? = null
     try {
@@ -138,10 +142,6 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
       // Notify the user about the error
       _errorMessage.value = "Failed to delete item. Please try again."
     }
-  }
-
-  override fun selectFoodItem(foodItem: FoodItem?) {
-    _selectedFoodItem.value = foodItem
   }
 
   /**
