@@ -1,6 +1,7 @@
 package com.android.shelfLife.ui.recipes.addRecipe
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -70,10 +71,7 @@ fun AddRecipeScreen(
       },
       content = { paddingValues -> // New content parameter
         LazyColumn(
-            modifier = Modifier
-              .padding(paddingValues)
-              .padding(horizontal = 20.dp)
-              .fillMaxSize()) {
+            modifier = Modifier.padding(paddingValues).padding(horizontal = 20.dp).fillMaxSize()) {
               // Recipe title
               item {
                 OutlinedTextField(
@@ -81,10 +79,9 @@ fun AddRecipeScreen(
                     onValueChange = { newTitle -> addRecipeViewModel.changeTitle(newTitle) },
                     label = { Text(stringResource(R.string.title_of_recipe)) },
                     modifier =
-                    Modifier
-                      .fillMaxWidth()
-                      .padding(vertical = 10.dp)
-                      .testTag("inputRecipeTitle"))
+                        Modifier.fillMaxWidth()
+                            .padding(vertical = 10.dp)
+                            .testTag("inputRecipeTitle"))
               }
 
               // Error message for title
@@ -100,10 +97,9 @@ fun AddRecipeScreen(
                     label = { Text(stringResource(R.string.servings)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier =
-                    Modifier
-                      .fillMaxWidth()
-                      .padding(vertical = 10.dp)
-                      .testTag("inputRecipeServings"))
+                        Modifier.fillMaxWidth()
+                            .padding(vertical = 10.dp)
+                            .testTag("inputRecipeServings"))
               }
 
               // Error message for servings
@@ -117,10 +113,9 @@ fun AddRecipeScreen(
                     label = { Text(stringResource(R.string.time)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier =
-                    Modifier
-                      .fillMaxWidth()
-                      .padding(vertical = 10.dp)
-                      .testTag("inputRecipeTime"))
+                        Modifier.fillMaxWidth()
+                            .padding(vertical = 10.dp)
+                            .testTag("inputRecipeTime"))
               }
 
               // Error message for time
@@ -147,9 +142,7 @@ fun AddRecipeScreen(
                 Spacer(modifier = Modifier.height(4.dp))
                 Button(
                     onClick = { addRecipeViewModel.createNewIngredient() },
-                    modifier = Modifier
-                      .height(40.dp)
-                      .testTag("addIngredientButton"),
+                    modifier = Modifier.height(40.dp).testTag("addIngredientButton"),
                     content = {
                       Icon(imageVector = Icons.Default.Add, contentDescription = "Add Ingredient")
                     })
@@ -173,9 +166,7 @@ fun AddRecipeScreen(
                 Spacer(modifier = Modifier.height(4.dp))
                 Button(
                     onClick = { addRecipeViewModel.createNewInstruction() },
-                    modifier = Modifier
-                      .height(40.dp)
-                      .testTag("addInstructionButton"),
+                    modifier = Modifier.height(40.dp).testTag("addInstructionButton"),
                     content = {
                       Icon(imageVector = Icons.Default.Add, contentDescription = "Add Instruction")
                     })
@@ -190,23 +181,22 @@ fun AddRecipeScreen(
                     button2OnClick = {
                       coroutineScope.launch {
                         addRecipeViewModel.addNewRecipe(
-                          onSuccess = {navigationActions.goBack()},
-                          showToast = {messageId ->
+                            onSuccess = {
+                              navigationActions.goBack()
+                              Log.i("AAAAAAAAAA", "Aofklkrk")
+                            },
+                            showToast = { messageId ->
                               val message =
-                                if (messageId == 0) {
-                                  R.string.submission_error_message
-                                } else {
-                                  R.string.error_uploading_recipe_message
-                                }
+                                  if (messageId == 0) {
+                                    R.string.submission_error_message
+                                  } else {
+                                    R.string.error_uploading_recipe_message
+                                  }
 
                               Toast.makeText(
-                                context,
-                                context.getString(message),
-                                Toast.LENGTH_SHORT
-                              ).show()
-
-                          })
-
+                                      context, context.getString(message), Toast.LENGTH_SHORT)
+                                  .show()
+                            })
                       }
                     },
                     button2TestTag = "addButton",
@@ -253,9 +243,7 @@ fun InstructionItem(
           addRecipeViewModel.changeInstruction(index, newInstruction)
         },
         label = { Text(stringResource(R.string.instruction_step, index + 1)) },
-        modifier = Modifier
-          .weight(1f)
-          .testTag("inputRecipeInstruction"))
+        modifier = Modifier.weight(1f).testTag("inputRecipeInstruction"))
     IconButton(
         onClick = { addRecipeViewModel.removeInstruction(index) },
         modifier = Modifier.testTag("deleteInstructionButton")) {
@@ -263,7 +251,7 @@ fun InstructionItem(
         }
   }
   // Display error message if needed
-  ErrorTextBox(addRecipeViewModel.instructionError, "instructionErrorMessage")
+  ErrorTextBox(addRecipeViewModel.instructionError[index], "instructionErrorMessage")
 }
 
 /**
@@ -323,9 +311,7 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
               value = addRecipeViewModel.ingredientName,
               onValueChange = { newName -> addRecipeViewModel.changeIngredientName(newName) },
               label = { Text(stringResource(R.string.ingredient_name)) },
-              modifier = Modifier
-                .fillMaxWidth()
-                .testTag("inputIngredientName"))
+              modifier = Modifier.fillMaxWidth().testTag("inputIngredientName"))
           // error message if ingredient name is empty
           ErrorTextBox(addRecipeViewModel.ingredientNameError, "ingredientNameErrorMessage")
 
@@ -337,9 +323,7 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
               },
               label = { Text(stringResource(R.string.ingredient_quantity)) },
               keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-              modifier = Modifier
-                .fillMaxWidth()
-                .testTag("inputIngredientQuantity"))
+              modifier = Modifier.fillMaxWidth().testTag("inputIngredientQuantity"))
 
           // error message if the ingredient quantity is empty
           ErrorTextBox(

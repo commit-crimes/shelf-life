@@ -1,6 +1,5 @@
 package com.android.shelfLife.viewmodel.recipes
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -15,10 +14,10 @@ import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.utils.validateNumber
 import com.android.shelfLife.ui.utils.validateString
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.minutes
 
 class AddRecipeViewModel(
     private val recipeRepository: RecipeRepository,
@@ -38,18 +37,30 @@ class AddRecipeViewModel(
 
   var showIngredientDialog by mutableStateOf(false)
 
-  var error by mutableStateOf<Boolean>(false)
-  var errorIngredient by mutableStateOf<Boolean>(false)
+  var error by
+      mutableStateOf<Boolean>(
+          false) // represent a general error (if there is a single error on the screen then this is
+  // true)
+  var errorIngredient by
+      mutableStateOf<Boolean>(false) // represent a general error in the ingredient popUp
   var titleError by mutableStateOf<Int?>(null)
   var servingsError by mutableStateOf<Int?>(null)
   var timeError by mutableStateOf<Int?>(null)
-  var instructionError by mutableStateOf<Int?>(null)
-  var instructionsError by mutableStateOf(false)
-  var ingredientsError by mutableStateOf(false)
+  var instructionError =
+      mutableStateListOf<
+          Int?>() // a list that the error of each instruction. Their indexes are the same. ex: if
+  // there is an error on the instruction at index 1, the value in this list will be
+  // non-null at index 1
+  var instructionsError by
+      mutableStateOf(
+          false) // a general look at the whole error list, i.e. if there is a single error on the
+  // list, this will be true
+  var ingredientsError by mutableStateOf(false) // a general error for the list of ingredients
   var ingredientNameError by mutableStateOf<Int?>(null)
   var ingredientQuantityAmountError by mutableStateOf<Int?>(null)
 
   init {
+    // we make sure we set the values to their initial values
     title = ""
     servings = ""
     time = ""
@@ -173,8 +184,8 @@ class AddRecipeViewModel(
   fun createNewIngredient() {
     showIngredientDialog = true
     ingredientName = ""
-      ingredientQuantityAmount = ""
-      ingredientQuantityUnit = FoodUnit.GRAM
+    ingredientQuantityAmount = ""
+    ingredientQuantityUnit = FoodUnit.GRAM
   }
 
   fun closeIngredientDialog() {
@@ -188,7 +199,7 @@ class AddRecipeViewModel(
           Ingredient(
               name = ingredientName,
               quantity = Quantity(ingredientQuantityAmount.toDouble(), ingredientQuantityUnit))
-        ingredients.add(newIngredient)
+      ingredients.add(newIngredient)
       return true
     }
     return false
@@ -202,11 +213,12 @@ class AddRecipeViewModel(
 
   fun createNewInstruction() {
     instructions.add("")
+    instructionError.add(null)
   }
 
   fun changeInstruction(index: Int, newInstruction: String) {
     instructions[index] = newInstruction
-    instructionError =
+    instructionError[index] =
         validateString(
             newInstruction, R.string.instruction_empty_error, R.string.instructions_invalid_error)
     validateInstructions()
@@ -215,6 +227,7 @@ class AddRecipeViewModel(
   fun removeInstruction(index: Int) {
     if (instructions.size > 0 && instructions.size > index) {
       instructions.removeAt(index)
+      instructionError.removeAt(index)
     }
   }
 
@@ -225,26 +238,22 @@ class AddRecipeViewModel(
     val newRecipeUid = recipeRepository.getUid()
 
     val newRecipe =
-      Recipe(
-          uid = newRecipeUid,
-          name = title,
-          instructions = instructions.toList(),
-          servings = servings.toFloat(),
-          time = time.toDouble().minutes,
-          ingredients = ingredients.toList())
+        Recipe(
+            uid = newRecipeUid,
+            name = title,
+            instructions = instructions.toList(),
+            servings = servings.toFloat(),
+            time = time.toDouble().minutes,
+            ingredients = ingredients.toList())
 
     recipeRepository.addRecipe(
-      recipe = newRecipe.copy(uid = recipeRepository.getUid()), // Assign a UID during save
-      onSuccess = {
-        GlobalScope.launch { // uses a delicate coroutine api
-          userRepository.addRecipeUID(newRecipeUid)
-          onSuccess()
-        }
-      },
-      onFailure = {
-        showToast(1)
-      }
-    )
-
+        recipe = newRecipe.copy(uid = recipeRepository.getUid()), // Assign a UID during save
+        onSuccess = {
+          GlobalScope.launch { // uses a delicate coroutine api
+            userRepository.addRecipeUID(newRecipeUid)
+            onSuccess()
+          }
+        },
+        onFailure = { showToast(1) })
   }
 }
