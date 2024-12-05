@@ -1,5 +1,6 @@
-package com.android.shelfLife.ui.recipes
+package com.android.shelfLife.ui.recipes.IndividualRecipe
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,7 +29,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.recipe.Ingredient
+import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -38,6 +41,8 @@ import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.math.floor
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 @Composable
 /**
@@ -115,13 +120,13 @@ fun IndividualRecipeScreen(
 
                   Column(modifier = Modifier.testTag("recipeIngredients")) {
                     individualRecipeViewModel.getRecipeIngredients().forEach { ingredient ->
-                      DisplayIngredient(ingredient)
+                      DisplayIngredientNew(ingredient)
                     }
                   }
 
                   Column(modifier = Modifier.testTag("recipeInstructions")) {
                     individualRecipeViewModel.getRecipeInstruction().forEach { instruction ->
-                      DisplayInstruction(instruction)
+                      DisplayInstructionNew(instruction)
                     }
                   }
                 }
@@ -161,7 +166,7 @@ fun IndividualRecipeScreen(
 }
 
 @Composable
-fun DisplayIngredient(ingredient: Ingredient) {
+fun DisplayIngredientNew(ingredient: Ingredient) {
   val unit =
       when (ingredient.quantity.unit) {
         FoodUnit.GRAM -> "gr"
@@ -178,7 +183,7 @@ fun DisplayIngredient(ingredient: Ingredient) {
 }
 
 @Composable
-fun DisplayInstruction(instruction: String) {
+fun DisplayInstructionNew(instruction: String) {
   // Display recipe instructions, scrollable if long
   Text(
       text = instruction, modifier = Modifier.padding(vertical = 8.dp).testTag("recipeInstruction"))
@@ -187,7 +192,7 @@ fun DisplayInstruction(instruction: String) {
 // this preview function allows us to see the easter egg screen
 @Preview()
 @Composable
-fun IndividualRecipeScreenPreview() {
+fun IndividualRecipeScreenPreviewEasterEgg() {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
   val firebaseFirestore = FirebaseFirestore.getInstance()
@@ -197,4 +202,57 @@ fun IndividualRecipeScreenPreview() {
   // Render the IndividualRecipeScreen with a null selectedRecipe
   IndividualRecipeScreen(
       navigationActions = navigationActions, individualRecipeViewModel = individualRecipeViewModel)
+}
+//this preview shows the example where we do have a selected recipe
+@Preview()
+@Composable
+fun IndividualRecipeScreenPreview() {
+    val navController = rememberNavController()
+    val navigationActions = NavigationActions(navController)
+    val firebaseFirestore = FirebaseFirestore.getInstance()
+    val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
+    Log.i("AAAAAAAAA","1")
+    val recipe = Recipe(
+        uid = "21",
+        name = "Roast chicken",
+        instructions = listOf(
+            "Preheat your oven to 425°F (220°C). Position a rack in the center.",
+            "Remove the chicken giblets (if present) and pat the chicken dry with paper towels. Dry skin crisps better during roasting.",
+            "In a small bowl, mix the salt, pepper, garlic powder, onion powder, paprika, and dried thyme.",
+            "Rub the olive oil or melted butter all over the chicken, including under the skin if possible.",
+            "Generously sprinkle the seasoning mixture over the chicken, rubbing it into the skin and inside the cavity.",
+            "Stuff the cavity with the lemon halves, smashed garlic cloves, and optional fresh herb sprigs.",
+            "Tie the chicken legs together with kitchen twine to ensure even cooking.",
+            "Place the chicken breast-side up in a roasting pan or oven-safe skillet.",
+            "Roast for 75–90 minutes (approximately 40 minutes per kg), or until a meat thermometer inserted into the thickest part of the thigh (without touching the bone) reads 75°C.",
+            "For extra crispy skin, baste the chicken with pan drippings every 30 minutes.",
+            "Remove the chicken from the oven and let it rest for 10–15 minutes to allow the juices to redistribute.",
+            "Carve the chicken and serve with your favorite sides, such as roasted vegetables, mashed potatoes, or a fresh salad."),
+        servings = 5.0F,
+        time = 120.minutes,
+        ingredients = listOf(
+            Ingredient("whole chicken", Quantity(1.0, FoodUnit.COUNT)),
+            Ingredient("olive oil", Quantity(30.0, FoodUnit.ML)),
+            Ingredient("salt", Quantity(5.0)),
+            Ingredient("balck peppet", Quantity(2.0)),
+            Ingredient("garlic powder", Quantity(3.0)),
+            Ingredient("onion powder", Quantity(3.0)),
+            Ingredient("paprika", Quantity(3.0)),
+            Ingredient("dried thyme", Quantity(3.0)),
+            Ingredient("lemon", Quantity(1.0, FoodUnit.COUNT)),
+            Ingredient("garlic cloves", Quantity(4.0, FoodUnit.COUNT)),
+        )
+    )
+    Log.i("AAAAAAAAA","2")
+
+
+    recipeRepository.addRecipe(recipe,{},{})
+    recipeRepository.selectRecipe(recipe)
+    Log.i("AAAAAAAAA","3")
+
+    val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
+    Log.i("AAAAAAAAA","4")
+
+    // Render the IndividualRecipeScreen with a null selectedRecipe
+    IndividualRecipeScreen(navigationActions = navigationActions, individualRecipeViewModel = individualRecipeViewModel)
 }
