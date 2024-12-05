@@ -1,40 +1,40 @@
 package com.android.shelfLife.model.newhousehold
 
 import android.util.Log
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 
-class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHoldRepository {
+class HouseholdRepositoryFirestore(
+    private val db: FirebaseFirestore,
+) : HouseHoldRepository {
 
-  private val auth = FirebaseAuth.getInstance()
   private val collectionPath = "households"
 
   // Local cache for households
   private val _households = MutableStateFlow<List<HouseHold>>(emptyList())
-  val households: StateFlow<List<HouseHold>> = _households.asStateFlow()
+  override val households: StateFlow<List<HouseHold>> = _households.asStateFlow()
+
+  private val _householdToEdit = MutableStateFlow<HouseHold?>(null)
+  override val householdToEdit: StateFlow<HouseHold?> = _householdToEdit.asStateFlow()
 
   // Listener registration for real-time updates
   private var householdsListenerRegistration: ListenerRegistration? = null
 
-  /**
-   * Generates a new unique ID for a household.
-   *
-   * @return A new unique ID.
-   */
   override fun getNewUid(): String {
     return db.collection(collectionPath).document().id
   }
 
-  /**
-   * Fetches households from Firestore based on the provided list of household IDs.
-   *
-   * @param listOfHouseHoldUid List of household IDs to fetch.
-   * @return List of fetched HouseHold objects.
-   */
+  override fun selectHouseholdToEdit(household: HouseHold?) {
+    _householdToEdit.value = household
+  }
+
+  override fun checkIfHouseholdNameExists(houseHoldName: String): Boolean {
+    return _households.value.any { it.name == houseHoldName }
+  }
+
   override suspend fun getHouseholds(listOfHouseHoldUid: List<String>): List<HouseHold> {
     if (listOfHouseHoldUid.isEmpty()) {
       return emptyList()
@@ -54,13 +54,12 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
     }
   }
 
-  /**
-   * Initializes households by fetching them from Firestore and updating the local cache.
-   *
-   * @param householdIds List of household IDs to fetch.
-   */
-  suspend fun initializeHouseholds(householdIds: List<String>) {
+  override suspend fun initializeHouseholds(
+      householdIds: List<String>,
+      selectedHouseholdUid: String
+  ) {
     if (householdIds.isEmpty()) {
+      Log.d("HouseholdRepository", "No household IDs provided")
       _households.value = emptyList()
       return
     }
@@ -69,11 +68,14 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
       val querySnapshot =
           db.collection(collectionPath).whereIn(FieldPath.documentId(), householdIds).get().await()
 
+      Log.d("HouseholdRepository", "Fetched households: ${querySnapshot.documents}")
       val fetchedHouseholds = querySnapshot.documents.mapNotNull { convertToHousehold(it) }
       _households.value = fetchedHouseholds
+      Log.d("HouseholdRepository", "Households: ${_households.value}")
+
+      Log.d("HouseholdRepositoryFirestore", "Selected household UID: $selectedHouseholdUid")
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error initializing households", e)
-      _households.value = emptyList()
     }
   }
 
@@ -94,6 +96,7 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
           .set(householdData)
           .await()
       // Update local cache
+      Log.d("HouseholdRepository", "Added household: $household")
       val currentHouseholds = _households.value.toMutableList()
       currentHouseholds.add(household)
       _households.value = currentHouseholds
@@ -124,17 +127,13 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
       } else {
         currentHouseholds.add(household)
       }
+      Log.d("HouseholdRepository", "Updated household: $household")
       _households.value = currentHouseholds
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error updating household", e)
     }
   }
 
-  /**
-   * Deletes a household by its unique ID and updates the local cache.
-   *
-   * @param id The unique ID of the household to delete.
-   */
   override suspend fun deleteHouseholdById(id: String) {
     try {
       db.collection(collectionPath).document(id).delete().await()
@@ -147,12 +146,6 @@ class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHol
     }
   }
 
-  /**
-   * Retrieves the members of a household.
-   *
-   * @param householdId The ID of the household.
-   * @return List of member IDs.
-   */
   override suspend fun getHouseholdMembers(householdId: String): List<String> {
     val household = _households.value.find { it.uid == householdId }
     return household?.members ?: emptyList()
