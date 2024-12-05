@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,11 +24,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -39,10 +34,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
-import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.recipe.Ingredient
-import com.android.shelfLife.model.recipe.ListRecipesViewModel
-import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.theme.onSecondaryDark
 import com.android.shelfLife.ui.theme.primaryContainerDark
@@ -51,35 +43,17 @@ import com.android.shelfLife.ui.theme.secondaryContainerDark
 import com.android.shelfLife.ui.theme.secondaryContainerLight
 import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
-import kotlin.time.Duration.Companion.seconds
+import com.android.shelfLife.viewmodel.recipes.AddRecipeViewModel
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddRecipeScreen(
     navigationActions: NavigationActions,
-    listRecipesViewModel: ListRecipesViewModel,
+    addRecipeViewModel: AddRecipeViewModel,
 ) {
   val context = LocalContext.current
-
-  var title by remember { mutableStateOf("") }
-  var servings by remember { mutableStateOf("") }
-  var time by remember { mutableStateOf("") }
-  val ingredients = remember { mutableStateListOf<Ingredient>() }
-  val instructions = remember { mutableStateListOf<String>() }
-
-  var showIngredientDialog by remember { mutableStateOf(false) }
-
-  var error = false
-  var titleError by remember { mutableStateOf<String?>(null) }
-  var servingsError by remember { mutableStateOf<String?>(null) }
-  var timeError by remember { mutableStateOf<String?>(null) }
-  var instructionsError by remember { mutableStateOf(false) }
-
-  // Helper function to validate if any instruction is empty
-  fun validateInstructions() {
-    instructionsError = instructions.any { it.isBlank() }
-  }
+  val coroutineScope = rememberCoroutineScope()
 
   Scaffold(
       modifier = Modifier.testTag("addRecipeScreen"),
@@ -95,14 +69,8 @@ fun AddRecipeScreen(
               // Recipe title
               item {
                 OutlinedTextField(
-                    value = title,
-                    onValueChange = {
-                      title = it
-                      titleError =
-                          if (title.isEmpty())
-                              context.getString(R.string.error_message_title_of_recipe)
-                          else null
-                    },
+                    value = addRecipeViewModel.title,
+                    onValueChange = { newTitle -> addRecipeViewModel.changeTitle(newTitle) },
                     label = { Text(stringResource(R.string.title_of_recipe)) },
                     modifier =
                         Modifier.fillMaxWidth()
@@ -111,17 +79,14 @@ fun AddRecipeScreen(
               }
 
               // Error message for title
-              item { ErrorTextBox(titleError, "titleErrorMessage") }
+              item { ErrorTextBox(addRecipeViewModel.titleError, "titleErrorMessage") }
 
               // Recipe servings
               item {
                 OutlinedTextField(
-                    value = servings,
-                    onValueChange = {
-                      servings = it
-                      servingsError =
-                          if (servings.isEmpty()) context.getString(R.string.error_message_servings)
-                          else null
+                    value = addRecipeViewModel.servings,
+                    onValueChange = { newServings ->
+                      addRecipeViewModel.changeServings(newServings)
                     },
                     label = { Text(stringResource(R.string.servings)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -132,18 +97,13 @@ fun AddRecipeScreen(
               }
 
               // Error message for servings
-              item { ErrorTextBox(servingsError, "servingsErrorMessage") }
+              item { ErrorTextBox(addRecipeViewModel.servingsError, "servingsErrorMessage") }
 
               // Recipe time
               item {
                 OutlinedTextField(
-                    value = time,
-                    onValueChange = {
-                      time = it
-                      timeError =
-                          if (time.isEmpty()) context.getString(R.string.error_message_time)
-                          else null
-                    },
+                    value = addRecipeViewModel.time,
+                    onValueChange = { newTime -> addRecipeViewModel.changeTime(newTime) },
                     label = { Text(stringResource(R.string.time)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier =
@@ -153,7 +113,7 @@ fun AddRecipeScreen(
               }
 
               // Error message for time
-              item { ErrorTextBox(timeError, "timeErrorMessage") }
+              item { ErrorTextBox(addRecipeViewModel.timeError, "timeErrorMessage") }
 
               // Recipe Ingredients Section
               item {
@@ -164,22 +124,18 @@ fun AddRecipeScreen(
                 }
               }
 
-              itemsIndexed(ingredients) { index, ingredient ->
+              itemsIndexed(addRecipeViewModel.ingredients) { index, ingredient ->
                 IngredientItem(
                     index = index,
                     ingredient = ingredient,
-                    onRemoveClick = {
-                      if (ingredients.size > 0) {
-                        ingredients.removeAt(index)
-                      }
-                    })
+                    onRemoveClick = { addRecipeViewModel.removeIngredient(index) })
               }
 
               // Add Ingredient Button
               item {
                 Spacer(modifier = Modifier.height(4.dp))
                 Button(
-                    onClick = { showIngredientDialog = true },
+                    onClick = { addRecipeViewModel.createNewIngredient() },
                     modifier = Modifier.height(40.dp).testTag("addIngredientButton"),
                     content = {
                       Icon(imageVector = Icons.Default.Add, contentDescription = "Add Ingredient")
@@ -195,22 +151,15 @@ fun AddRecipeScreen(
                 }
               }
 
-              itemsIndexed(instructions) { index, instruction ->
-                InstructionItem(
-                    index = index,
-                    instruction = instruction,
-                    onInstructionChange = { newInstruction ->
-                      instructions[index] = newInstruction
-                      validateInstructions()
-                    },
-                    onRemoveClick = { instructions.removeAt(index) })
+              itemsIndexed(addRecipeViewModel.instructions) { index, instruction ->
+                InstructionItem(index = index, addRecipeViewModel = addRecipeViewModel)
               }
 
               // Add Instruction Button
               item {
                 Spacer(modifier = Modifier.height(4.dp))
                 Button(
-                    onClick = { instructions.add("") },
+                    onClick = { addRecipeViewModel.createNewInstruction() },
                     modifier = Modifier.height(40.dp).testTag("addInstructionButton"),
                     content = {
                       Icon(imageVector = Icons.Default.Add, contentDescription = "Add Instruction")
@@ -224,32 +173,26 @@ fun AddRecipeScreen(
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(R.string.cancel_button),
                     button2OnClick = {
-                      validateInstructions()
-                      error =
-                          title.isEmpty() ||
-                              time.isEmpty() ||
-                              servings.isEmpty() ||
-                              ingredients.isEmpty() ||
-                              instructions.isEmpty() ||
-                              instructionsError
-                      if (!error) {
-                        navigationActions.goBack()
-                        listRecipesViewModel.saveRecipe(
-                            recipe =
-                                Recipe(
-                                    uid = "",
-                                    name = title,
-                                    instructions = instructions.toList(),
-                                    servings = servings.toFloat(),
-                                    time = (time.toDouble() * 60.0).seconds,
-                                    ingredients = ingredients.toList()))
-                      } else {
-                        // if not a Toast appears
-                        Toast.makeText(
-                                context,
-                                "Please correct the errors before submitting.",
-                                Toast.LENGTH_SHORT)
-                            .show()
+                      coroutineScope.launch {
+                        val recipeAdded = addRecipeViewModel.addNewRecipe()
+                        if (recipeAdded == Pair(true, true)) {
+                          navigationActions.goBack()
+                        } else {
+                          if (recipeAdded == Pair(true, false)) {
+                            Toast.makeText(
+                                    context,
+                                    context.getString(R.string.error_uploading_recipe_message),
+                                    Toast.LENGTH_SHORT)
+                                .show()
+                          } else {
+                            // if not a Toast appears
+                            Toast.makeText(
+                                    context,
+                                    context.getString(R.string.submission_error_message),
+                                    Toast.LENGTH_SHORT)
+                                .show()
+                          }
+                        }
                       }
                     },
                     button2TestTag = "addButton",
@@ -258,11 +201,8 @@ fun AddRecipeScreen(
             }
 
         // Ingredient Dialog, inside the composable block
-        if (showIngredientDialog) {
-          IngredientDialog(
-              ingredients = ingredients,
-              onDismiss = { showIngredientDialog = false },
-              onAddIngredient = { showIngredientDialog = false })
+        if (addRecipeViewModel.showIngredientDialog) {
+          IngredientDialog(addRecipeViewModel)
         }
       })
 }
@@ -289,30 +229,25 @@ fun AddRecipeScreen(
 @Composable
 fun InstructionItem(
     index: Int,
-    instruction: String,
-    onInstructionChange: (String) -> Unit,
-    onRemoveClick: () -> Unit
+    addRecipeViewModel: AddRecipeViewModel,
 ) {
-  val context = LocalContext.current
 
-  var instructionError by remember { mutableStateOf<String?>(null) }
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
     OutlinedTextField(
-        value = instruction,
+        value = addRecipeViewModel.instructions[index],
         onValueChange = { newInstruction ->
-          onInstructionChange(newInstruction)
-          instructionError =
-              if (newInstruction.isEmpty()) context.getString(R.string.error_message_instructions)
-              else null
+          addRecipeViewModel.changeInstruction(index, newInstruction)
         },
         label = { Text(stringResource(R.string.instruction_step, index + 1)) },
         modifier = Modifier.weight(1f).testTag("inputRecipeInstruction"))
-    IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteInstructionButton")) {
-      Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Step")
-    }
+    IconButton(
+        onClick = { addRecipeViewModel.removeInstruction(index) },
+        modifier = Modifier.testTag("deleteInstructionButton")) {
+          Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Step")
+        }
   }
   // Display error message if needed
-  ErrorTextBox(instructionError, "instructionErrorMessage")
+  ErrorTextBox(addRecipeViewModel.instructionError, "instructionErrorMessage")
 }
 
 /**
@@ -358,79 +293,52 @@ fun IngredientItem(index: Int, ingredient: Ingredient, onRemoveClick: () -> Unit
  *   added.
  */
 @Composable
-fun IngredientDialog(
-    ingredients: MutableList<Ingredient>,
-    onDismiss: () -> Unit,
-    onAddIngredient: () -> Unit
-) {
+fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
   val context = LocalContext.current
-
-  var ingredientName by remember { mutableStateOf("") }
-  var ingredientQuantity by remember { mutableStateOf("") }
-  var ingredientUnit by remember { mutableStateOf(FoodUnit.COUNT) } // default value is COUNT
-
-  var selectedUnit by remember {
-    mutableStateOf(FoodUnit.COUNT)
-  } // We store this so that the colour of the button can change depending on its status
-
-  var ingredientNameError by remember { mutableStateOf<String?>("") }
-  var quantityError by remember { mutableStateOf<String?>("") }
-  var error = false
+  val coroutineScope = rememberCoroutineScope()
 
   androidx.compose.material3.AlertDialog(
-      onDismissRequest = onDismiss,
+      onDismissRequest = { addRecipeViewModel.createNewIngredient() },
       title = { Text(stringResource(R.string.add_ingredient)) },
       text = {
         Column(modifier = Modifier.testTag("addIngredientPopUp")) {
           // ingredient name
           OutlinedTextField(
-              value = ingredientName,
-              onValueChange = {
-                ingredientName = it
-                ingredientNameError =
-                    if (ingredientName.isEmpty())
-                        context.getString(R.string.error_message_ingredient_name)
-                    else null
-              },
+              value = addRecipeViewModel.ingredientName,
+              onValueChange = { newName -> addRecipeViewModel.changeIngredientName(newName) },
               label = { Text(stringResource(R.string.ingredient_name)) },
               modifier = Modifier.fillMaxWidth().testTag("inputIngredientName"))
           // error message if ingredient name is empty
-          ErrorTextBox(ingredientNameError, "ingredientNameErrorMessage")
+          ErrorTextBox(addRecipeViewModel.ingredientNameError, "ingredientNameErrorMessage")
 
           // ingredient quantity (it is a string but will be transformed later on)
           OutlinedTextField(
-              value = ingredientQuantity,
-              onValueChange = {
-                ingredientQuantity = it
-                quantityError =
-                    if (ingredientQuantity.isEmpty())
-                        context.getString(R.string.error_message_ingredient_quantity)
-                    else null
-              },
+              value = addRecipeViewModel.ingredientQuantityAmount,
+              onValueChange = { addRecipeViewModel.ingredientQuantityAmount },
               label = { Text(stringResource(R.string.ingredient_quantity)) },
               keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
               modifier = Modifier.fillMaxWidth().testTag("inputIngredientQuantity"))
 
           // error message if the ingredient quantity is empty
-          ErrorTextBox(quantityError, "ingredientQuantityErrorMessage")
+          ErrorTextBox(
+              addRecipeViewModel.ingredientQuantityAmountError, "ingredientQuantityErrorMessage")
 
           // Quantity Unit Dropdown
           Row {
             FoodUnit.values().forEach { unit ->
               Button(
-                  onClick = {
-                    ingredientUnit = unit
-                    selectedUnit = unit
-                  },
+                  onClick = { addRecipeViewModel.changeIngredientQuantityUnit(unit) },
                   modifier = Modifier.testTag("ingredientUnitButton"),
                   // colour of button changes if selected
                   colors =
                       ButtonDefaults.buttonColors(
                           containerColor =
-                              if (selectedUnit == unit) primaryContainerDark
+                              if (addRecipeViewModel.ingredientQuantityUnit == unit)
+                                  primaryContainerDark
                               else primaryContainerLight,
                           contentColor =
-                              if (selectedUnit == unit) secondaryContainerLight
+                              if (addRecipeViewModel.ingredientQuantityUnit == unit)
+                                  secondaryContainerLight
                               else secondaryContainerDark),
               ) {
                 Text(text = unit.name)
@@ -444,20 +352,17 @@ fun IngredientDialog(
       confirmButton = {
         Button(
             onClick = {
-              error = ingredientName.isEmpty() || ingredientQuantity.isEmpty()
-              if (!error) {
-                // turn quantity into double
-                val quantity = ingredientQuantity.toDouble()
-                // create the new ingredient
-                val newIngredient =
-                    Ingredient(name = ingredientName, quantity = Quantity(quantity, ingredientUnit))
-                // adding it into our list of ingredients
-                ingredients.add(newIngredient)
-                onAddIngredient()
-              } else {
-                Toast.makeText(
-                        context, "Please correct the errors before submitting.", Toast.LENGTH_SHORT)
-                    .show()
+              coroutineScope.launch {
+                var ingredientAdded = addRecipeViewModel.addNewIngredient()
+                if (ingredientAdded) {
+                  addRecipeViewModel.closeIngredientDialog()
+                } else {
+                  Toast.makeText(
+                          context,
+                          "Please correct the errors before submitting.",
+                          Toast.LENGTH_SHORT)
+                      .show()
+                }
               }
             },
             modifier = Modifier.testTag("addIngredientButton2"),
@@ -471,7 +376,7 @@ fun IngredientDialog(
       // Cancel button
       dismissButton = {
         Button(
-            onClick = onDismiss,
+            onClick = { addRecipeViewModel.closeIngredientDialog() },
             modifier = Modifier.testTag("cancelIngredientButton"),
             colors =
                 ButtonDefaults.buttonColors(
@@ -488,13 +393,13 @@ fun IngredientDialog(
  * displays the message in the color defined in the Material Theme's error color and uses a smaller
  * body text style to distinguish it as an error.
  *
- * @param errorMessage The error message to display. If null or empty, no text is shown.
+ * @param errorMessageId The error message to display. If null or empty, no text is shown.
  */
 @Composable
-fun ErrorTextBox(errorMessage: String?, testTag: String) {
-  if (errorMessage != null) {
+fun ErrorTextBox(errorMessageId: Int?, testTag: String) {
+  if (errorMessageId != null) {
     Text(
-        text = errorMessage,
+        text = stringResource(errorMessageId),
         modifier = Modifier.testTag(testTag),
         color = MaterialTheme.colorScheme.error,
         style = MaterialTheme.typography.bodySmall,

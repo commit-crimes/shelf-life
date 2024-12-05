@@ -39,26 +39,26 @@ class InvitationRepositoryFirestoreTest {
   fun setUp() {
     MockitoAnnotations.openMocks(this)
 
-      // Initialize Firebase if necessary
-      if (FirebaseApp.getApps(ApplicationProvider.getApplicationContext()).isEmpty()) {
-          FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
-      }
+    // Initialize Firebase if necessary
+    if (FirebaseApp.getApps(ApplicationProvider.getApplicationContext()).isEmpty()) {
+      FirebaseApp.initializeApp(ApplicationProvider.getApplicationContext())
+    }
 
-      // Mock FirebaseAuth and FirebaseUser
-      firebaseAuth = mock(FirebaseAuth::class.java)
-      val mockUser = mock(FirebaseUser::class.java)
-      `when`(firebaseAuth.currentUser).thenReturn(mockUser)
-      `when`(mockUser.uid).thenReturn("testInviterUserId")
+    // Mock FirebaseAuth and FirebaseUser
+    firebaseAuth = mock(FirebaseAuth::class.java)
+    val mockUser = mock(FirebaseUser::class.java)
+    `when`(firebaseAuth.currentUser).thenReturn(mockUser)
+    `when`(mockUser.uid).thenReturn("testInviterUserId")
 
-      // Mock Firestore collection and document references
-      `when`(mockFirestore.collection("invitations")).thenReturn(mockCollection)
-      `when`(mockCollection.document(anyString())).thenReturn(mockDocument)
+    // Mock Firestore collection and document references
+    `when`(mockFirestore.collection("invitations")).thenReturn(mockCollection)
+    `when`(mockCollection.document(anyString())).thenReturn(mockDocument)
 
-      // Initialize the InvitationRepositoryFirestore with mocks
-      invitationRepository = InvitationRepositoryFirestore(mockFirestore, firebaseAuth)
+    // Initialize the InvitationRepositoryFirestore with mocks
+    invitationRepository = InvitationRepositoryFirestore(mockFirestore, firebaseAuth)
 
-      // Set the Dispatchers to use the TestCoroutineDispatcher
-      Dispatchers.setMain(StandardTestDispatcher())
+    // Set the Dispatchers to use the TestCoroutineDispatcher
+    Dispatchers.setMain(StandardTestDispatcher())
   }
 
   @After
