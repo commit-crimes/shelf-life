@@ -45,6 +45,8 @@ interface UserRepository {
 
   suspend fun updateUsername(username: String)
 
+  suspend fun updateImage(url: String)
+
   suspend fun updateEmail(email: String)
 
   suspend fun updateSelectedHousehold(selectedHouseholdUID: String)

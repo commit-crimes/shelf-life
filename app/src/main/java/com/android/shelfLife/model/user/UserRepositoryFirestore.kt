@@ -108,6 +108,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     val updatedUserData =
         when (fieldName) {
           "username" -> currentUserData.copy(username = value as String)
+          "imageURL" -> currentUserData.copy(photoUrl = value as String)
           "email" -> currentUserData.copy(email = value as String)
           "selectedHouseholdUID" -> currentUserData.copy(selectedHouseholdUID = value as String)
           else -> currentUserData
@@ -193,6 +194,10 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
 
   override suspend fun updateUsername(username: String) {
     updateUserField("username", username)
+  }
+
+  override suspend fun updateImage(url: String) {
+    updateUserField("imageURL", url)
   }
 
   override suspend fun updateEmail(email: String) {
@@ -285,17 +290,26 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     household?.let { updateSelectedHousehold(it.uid) }
   }
 
-  fun convertToUser(doc: DocumentSnapshot): User? {
+  private fun convertToUser(doc: DocumentSnapshot): User? {
     return try {
       val uid = doc.id
       val username = doc.getString("username") ?: ""
       val email = doc.getString("email") ?: ""
+      val imageURL = doc.getString("imageURL") ?: ""
       val selectedHouseholdUID = doc.getString("selectedHouseholdUID") ?: ""
       val householdUIDs = doc.get("householdUIDs") as? List<String> ?: emptyList()
       val recipeUIDs = doc.get("recipeUIDs") as? List<String> ?: emptyList()
       val invitationUIDs = doc.get("invitationUIDs") as? List<String> ?: emptyList()
 
-      User(uid, username, email, householdUIDs, selectedHouseholdUID, recipeUIDs, invitationUIDs)
+      User(
+          uid,
+          username,
+          email,
+          imageURL,
+          householdUIDs,
+          selectedHouseholdUID,
+          recipeUIDs,
+          invitationUIDs)
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error converting document to HouseHold", e)
       null
