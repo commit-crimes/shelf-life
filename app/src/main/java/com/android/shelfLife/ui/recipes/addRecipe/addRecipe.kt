@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
-import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
 import com.android.shelfLife.model.user.UserRepositoryFirestore
@@ -333,7 +332,9 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
           // ingredient quantity (it is a string but will be transformed later on)
           OutlinedTextField(
               value = addRecipeViewModel.ingredientQuantityAmount,
-              onValueChange = {newAmount-> addRecipeViewModel.changeIngredientQuantityAmount(newAmount) },
+              onValueChange = { newAmount ->
+                addRecipeViewModel.changeIngredientQuantityAmount(newAmount)
+              },
               label = { Text(stringResource(R.string.ingredient_quantity)) },
               keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
               modifier = Modifier
@@ -431,20 +432,17 @@ fun ErrorTextBox(errorMessageId: Int?, testTag: String) {
 @Preview(showBackground = true)
 @Composable
 fun AddRecipeScreenPreview() {
-    // Mock navigation actions
-    val navController = rememberNavController()
-    val navigationActions = NavigationActions(navController)
-    val firebaseFirestore = FirebaseFirestore.getInstance()
-    val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
+  // Mock navigation actions
+  val navController = rememberNavController()
+  val navigationActions = NavigationActions(navController)
+  val firebaseFirestore = FirebaseFirestore.getInstance()
+  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
 
-    val viewModel = AddRecipeViewModel(recipeRepository, UserRepositoryFirestore(firebaseFirestore))
+  val viewModel = AddRecipeViewModel(recipeRepository, UserRepositoryFirestore(firebaseFirestore))
 
-
-    // Call the AddRecipeScreen with mocked data
-    AddRecipeScreen(
-        navigationActions = navigationActions,
-        addRecipeViewModel = viewModel,
-    )
+  // Call the AddRecipeScreen with mocked data
+  AddRecipeScreen(
+      navigationActions = navigationActions,
+      addRecipeViewModel = viewModel,
+  )
 }
-
-
