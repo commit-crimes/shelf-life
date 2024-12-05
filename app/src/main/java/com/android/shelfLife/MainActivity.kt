@@ -32,6 +32,7 @@ import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.RecipeGeneratorOpenAIRepository
 import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
+import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
@@ -81,7 +82,10 @@ fun ShelfLifeApp() {
   val listRecipesViewModel = viewModel {
     ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
   }
-  val signInViewModel = viewModel { SignInViewModel(firestore = firebaseFirestore) }
+    val userRepository = UserRepositoryFirestore(firebaseFirestore)
+  val signInViewModel = viewModel {
+      SignInViewModel(firestore = firebaseFirestore, userRepository = userRepository)
+  }
 
   val context = LocalContext.current
 

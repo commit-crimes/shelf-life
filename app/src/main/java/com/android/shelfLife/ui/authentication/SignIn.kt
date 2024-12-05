@@ -30,7 +30,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 @Composable
 fun SignInScreen(
     navigationActions: NavigationActions,
-    signInViewModel: SignInViewModel = SignInViewModel()
+    signInViewModel: SignInViewModel
 ) {
   val context = LocalContext.current
   val signInState by signInViewModel.signInState.collectAsState()

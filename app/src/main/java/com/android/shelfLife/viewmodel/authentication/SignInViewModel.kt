@@ -1,4 +1,3 @@
-// SignInViewModel.kt
 package com.android.shelfLife.viewmodel.authentication
 
 import android.content.Context
@@ -6,6 +5,8 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.R
+import com.android.shelfLife.model.user.UserRepository
+import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.*
@@ -17,17 +18,18 @@ import kotlinx.coroutines.tasks.await
 
 class SignInViewModel(
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance(),
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
+    private val userRepository: UserRepositoryFirestore
 ) : ViewModel() {
 
   private val _signInState = MutableStateFlow<SignInState>(SignInState.Idle)
   val signInState: StateFlow<SignInState> = _signInState
 
-  private val _isUserLoggedIn = MutableStateFlow(firebaseAuth.currentUser != null)
-  val isUserLoggedIn: StateFlow<Boolean> = _isUserLoggedIn
+  val isUserLoggedIn: StateFlow<Boolean> = userRepository.isUserLoggedIn
 
   private val authStateListener =
-      FirebaseAuth.AuthStateListener { auth -> _isUserLoggedIn.value = auth.currentUser != null }
+      FirebaseAuth.AuthStateListener { auth ->
+        userRepository.setUserLoggedInStatus(auth.currentUser != null) }
 
   init {
     firebaseAuth.addAuthStateListener(authStateListener)
@@ -44,13 +46,10 @@ class SignInViewModel(
       _signInState.value = SignInState.Loading
       try {
         val authResult = firebaseAuth.signInWithCredential(credential).await()
+        // TODO : Could cause sign in issues if auth.currentUser is null
         val user = authResult.user
-        user?.let {
-          val userDoc = firestore.collection("users").document(it.uid)
-          val userData = mapOf("email" to it.email, "name" to it.displayName)
-          userDoc.set(userData, SetOptions.merge()).await()
-          _signInState.value = SignInState.Success(authResult)
-        } ?: run { _signInState.value = SignInState.Error("User is null after sign-in.") }
+        userRepository.initializeUserData()
+        _signInState.value = SignInState.Success(authResult)
       } catch (e: Exception) {
         _signInState.value = SignInState.Error(e.message ?: "Unknown error occurred.")
       }

@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 
-class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepository {
+class UserRepositoryFirestore(
+  private val db: FirebaseFirestore,
+  private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()) : UserRepository {
 
   private val auth = FirebaseAuth.getInstance()
   private val userCollection = db.collection("users")
@@ -18,6 +20,9 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   // Local variable to store user data
   private val _user = MutableStateFlow<User?>(null)
   override val user: StateFlow<User?> = _user.asStateFlow()
+
+  private val _isUserLoggedIn = MutableStateFlow(firebaseAuth.currentUser != null)
+  val isUserLoggedIn: StateFlow<Boolean> = _isUserLoggedIn
 
   // Invitations StateFlow
   private val _invitations = MutableStateFlow<List<String>>(emptyList())
@@ -142,6 +147,10 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
           else -> currentUserData
         }
     _user.value = updatedUserData
+  }
+
+  fun setUserLoggedInStatus(isLoggedIn: Boolean) {
+    _isUserLoggedIn.value = isLoggedIn
   }
 
   private enum class ArrayOperation {
