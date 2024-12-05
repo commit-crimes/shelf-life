@@ -36,6 +36,7 @@ open class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : Hou
           .get()
           .addOnSuccessListener { result ->
             val householdList = result.documents.mapNotNull { convertToHousehold(it) }
+            Log.d("HouseholdRepository", "Households fetched successfully${householdList}")
             onSuccess(householdList)
           }
           .addOnFailureListener { exception ->

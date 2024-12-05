@@ -1,9 +1,11 @@
 package com.android.shelfLife.model.newInvitations
 
 import com.android.shelfLife.model.newhousehold.HouseHold
-import com.android.shelfLife.model.user.User
+import kotlinx.coroutines.flow.StateFlow
 
 interface InvitationRepository {
+
+  val invitations: StateFlow<List<Invitation>>
 
   /** Removes the real-time listener for invitations. */
   fun removeInvitationListener()
@@ -36,5 +38,5 @@ interface InvitationRepository {
    * @param household The household to invite the user to.
    * @param user The user to invite.
    */
-  fun sendInvitation(household: HouseHold, invitedUser: User)
+  fun sendInvitation(household: HouseHold, invitedUserID: String)
 }
