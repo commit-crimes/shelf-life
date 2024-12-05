@@ -28,7 +28,7 @@ class ProfileScreenViewModel(
         GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN)
     FirebaseAuth.getInstance().signOut()
 
-    googleSignInClient.signOut().addOnCompleteListener { task: Task<Void> ->
+    googleSignInClient.revokeAccess().addOnCompleteListener { task: Task<Void> ->
       if (task.isSuccessful) {
         Toast.makeText(context, "Sign-out successful", Toast.LENGTH_SHORT).show()
       } else {
