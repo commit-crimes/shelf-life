@@ -1,11 +1,9 @@
 package com.android.shelflife.ui.recipes
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
@@ -22,7 +20,6 @@ import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
-import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
 import com.google.firebase.Timestamp
 import io.mockk.mockk
 import java.util.Date
@@ -95,18 +92,17 @@ class IndividualRecipeTest {
   }
 
   // Helper function to set up the IndividualRecipeScreen
-  @Composable
   private fun setUpIndividualRecipeScreen(selectedRecipeIndex: Int? = null) {
     householdViewModel.setHouseholds(listOf(houseHold))
     householdViewModel.selectHousehold(houseHold)
     selectedRecipeIndex?.let {
       listRecipesViewModel.selectRecipe(listRecipesViewModel.recipes.value[it])
     }
-    val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
     composeTestRule.setContent {
       IndividualRecipeScreen(
           navigationActions = navigationActions,
-          individualRecipeViewModel = individualRecipeViewModel)
+          listRecipesViewModel = listRecipesViewModel,
+          householdViewModel = householdViewModel)
     }
   }
 
@@ -125,14 +121,12 @@ class IndividualRecipeTest {
     composeTestRule.onAllNodesWithTag("recipeInstruction").onFirst().assertExists()
   }
 
-  @Composable
   @Test
   fun foodItemListIsDisplayedWhenFoodItemsExist() {
     setUpIndividualRecipeScreen(selectedRecipeIndex = 0)
     verifyCommonUIElements()
   }
 
-  @Composable
   @Test
   fun noRecipeSelectedMessageIsDisplayedWhenNoSelectedRecipe() {
     val emptyHousehold = houseHold.copy(foodItems = emptyList())
@@ -140,18 +134,17 @@ class IndividualRecipeTest {
 
     householdViewModel.setHouseholds(listOf(emptyHousehold))
     householdViewModel.selectHousehold(emptyHousehold)
-    val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
     composeTestRule.setContent {
       IndividualRecipeScreen(
           navigationActions = navigationActions,
-          individualRecipeViewModel = individualRecipeViewModel)
+          listRecipesViewModel = listRecipesViewModel,
+          householdViewModel = householdViewModel)
     }
 
     composeTestRule.onNodeWithTag("noRecipeSelectedMessage").assertIsDisplayed()
     composeTestRule.onNodeWithText("No recipe selected. Should not happen").assertIsDisplayed()
   }
 
-  @Composable
   @Test
   fun clickGoBackArrowNavigatesBack() {
     setUpIndividualRecipeScreen(selectedRecipeIndex = 0)
