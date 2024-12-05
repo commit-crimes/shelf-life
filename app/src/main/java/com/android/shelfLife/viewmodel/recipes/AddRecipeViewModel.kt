@@ -85,10 +85,12 @@ class AddRecipeViewModel(
         }
   }
 
+    // checks that the no ingredient inside the list of ingredients is empty
   fun validateIngredients() {
     instructionsError = instructions.any { it.isBlank() }
   }
 
+    //function that allows us to change the title
   fun changeTitle(newRecipeTitle: String) {
     title = newRecipeTitle
     titleError =
@@ -96,6 +98,7 @@ class AddRecipeViewModel(
             newRecipeTitle, R.string.recipe_title_empty_error, R.string.recipe_title_invalid_error)
   }
 
+    //function that allows us to change the number of servings
   fun changeServings(newServings: String) {
     servings = newServings
     servingsError =
@@ -106,6 +109,7 @@ class AddRecipeViewModel(
             R.string.amount_negative_error)
   }
 
+    //function that allows us to change the time
   fun changeTime(newTime: String) {
     time = newTime
     timeError =
@@ -116,6 +120,7 @@ class AddRecipeViewModel(
             R.string.time_negative_error)
   }
 
+    // function that allows us to change the ingredient name
   fun changeIngredientName(newIngredientName: String) {
     ingredientName = newIngredientName
     ingredientNameError =
@@ -125,6 +130,7 @@ class AddRecipeViewModel(
             R.string.ingredient_name_invalid_error)
   }
 
+    //function that allows us to change the amount of an ingredient
   fun changeIngredientQuantityAmount(newIngredientQuantityAmount: String) {
     ingredientQuantityAmount = newIngredientQuantityAmount
     ingredientQuantityAmountError =
@@ -135,10 +141,12 @@ class AddRecipeViewModel(
             R.string.ingredient_quantity_negative_error)
   }
 
+    // function that allows us to change the unit of the ingredient
   fun changeIngredientQuantityUnit(newUnit: FoodUnit) {
     ingredientQuantityUnit = newUnit
   }
 
+    // this function is called when we click the add Ingredient button. This function checks that there are no errors with the ingredient information
   fun validateAllIngredientFieldsWhenAddButton() {
     ingredientNameError =
         validateString(
@@ -154,6 +162,7 @@ class AddRecipeViewModel(
     errorIngredient = (ingredientNameError != null) || (ingredientQuantityAmountError != null)
   }
 
+    //this function is called when the submit the recipe. It check that there are no error in the whole screen
   fun validateAllFieldsWhenSubmitButton() {
     titleError =
         validateString(
@@ -181,6 +190,8 @@ class AddRecipeViewModel(
             ingredientsError
   }
 
+    //this function is used to create a new ingredient
+    //we need to show the popUp and make sure the ingredient info is back at to the initials values
   fun createNewIngredient() {
     showIngredientDialog = true
     ingredientName = ""
@@ -188,10 +199,12 @@ class AddRecipeViewModel(
     ingredientQuantityUnit = FoodUnit.GRAM
   }
 
+    //function to close the popUp
   fun closeIngredientDialog() {
     showIngredientDialog = false
   }
 
+    //This function is to add an ingredient into our list
   fun addNewIngredient(): Boolean {
     validateAllIngredientFieldsWhenAddButton()
     if (!errorIngredient) {
@@ -205,17 +218,20 @@ class AddRecipeViewModel(
     return false
   }
 
+    //This function is to remove an ingredient from the list
   fun removeIngredient(index: Int) {
     if (ingredients.size > 0 && index < ingredients.size) {
       ingredients.removeAt(index)
     }
   }
 
+    //This function is to create a new instruction
   fun createNewInstruction() {
     instructions.add("")
     instructionError.add(null)
   }
 
+    //This function is used to modify an instruction
   fun changeInstruction(index: Int, newInstruction: String) {
     instructions[index] = newInstruction
     instructionError[index] =
@@ -224,6 +240,7 @@ class AddRecipeViewModel(
     validateInstructions()
   }
 
+    //This function is used to remove an instruction
   fun removeInstruction(index: Int) {
     if (instructions.size > 0 && instructions.size > index) {
       instructions.removeAt(index)
@@ -231,6 +248,7 @@ class AddRecipeViewModel(
     }
   }
 
+    // this function adds the new recipe into our database. It will check there are no errors by calling the validateAllFieldsWhenSubmitButton()
   @OptIn(DelicateCoroutinesApi::class)
   suspend fun addNewRecipe(onSuccess: () -> Unit, showToast: (Int) -> Unit) {
     validateAllFieldsWhenSubmitButton()
