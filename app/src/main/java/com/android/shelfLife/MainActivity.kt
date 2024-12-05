@@ -20,6 +20,7 @@ import androidx.navigation.navigation
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.android.shelfLife.model.foodFacts.OpenFoodFactsRepository
+import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
@@ -28,7 +29,6 @@ import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.RecipeGeneratorOpenAIRepository
 import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
-import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
@@ -46,7 +46,6 @@ import com.android.shelfLife.ui.recipes.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.utils.signOutUser
-import com.android.shelfLife.viewmodel.foodItem.FoodItemViewModel
 import com.example.compose.ShelfLifeTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -55,124 +54,124 @@ import okhttp3.OkHttpClient
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 class MainActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
 
-    super.onCreate(savedInstanceState)
-    enableEdgeToEdge()
-    setContent { ShelfLifeTheme { Surface { ShelfLifeApp() } } }
-  }
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent { ShelfLifeTheme { Surface { ShelfLifeApp() } } }
+    }
 }
 
 @Preview
 @Composable
 fun ShelfLifeApp() {
-  val navController = rememberNavController()
-  val navigationActions = NavigationActions(navController)
-  val firebaseFirestore = FirebaseFirestore.getInstance()
-  val foodItemRepository =
-      com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore(firebaseFirestore)
-  val listFoodItemViewModel = viewModel { ListFoodItemsViewModel(foodItemRepository) }
-  val invitationRepositoryFirestore = InvitationRepositoryFirestore(firebaseFirestore)
-  val invitationViewModel = viewModel { InvitationViewModel(invitationRepositoryFirestore) }
-  val foodFactsRepository = OpenFoodFactsRepository(OkHttpClient())
-  val foodFactsViewModel = viewModel { FoodFactsViewModel(foodFactsRepository) }
-  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
-  val recipeGeneratorRepository = RecipeGeneratorOpenAIRepository()
-  val listRecipesViewModel = viewModel {
-    ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
-  }
-  val newFoodItemRepository =
-      com.android.shelfLife.model.newFoodItem.FoodItemRepositoryFirestore(firebaseFirestore)
-  val userRepository = UserRepositoryFirestore(firebaseFirestore)
-  val foodItemViewModel = viewModel { FoodItemViewModel(newFoodItemRepository, userRepository) }
-
-  val context = LocalContext.current
-
-  val barcodeScannerViewModel: BarcodeScannerViewModel = viewModel()
-
-  // Checks if user is logged in and selects correct screen
-  val firebaseUser = FirebaseAuth.getInstance().currentUser
-  val startingRoute =
-      if (firebaseUser == null) {
-        Route.AUTH
-      } else {
-        Route.OVERVIEW
-      }
-
-  // Initialize HouseholdViewModel only if the user is logged in
-  val householdViewModel = viewModel {
-    HouseholdViewModel(
-        houseHoldRepository = HouseholdRepositoryFirestore(firebaseFirestore),
-        listFoodItemsViewModel = listFoodItemViewModel,
-        invitationRepository = invitationRepositoryFirestore,
-        context.dataStore)
-  }
-
-  NavHost(navController = navController, startDestination = startingRoute) {
-    // Authentication route
-    navigation(
-        startDestination = Screen.AUTH,
-        route = Route.AUTH,
-    ) {
-      composable(Screen.AUTH) { SignInScreen(navigationActions) }
+    val navController = rememberNavController()
+    val navigationActions = NavigationActions(navController)
+    val firebaseFirestore = FirebaseFirestore.getInstance()
+    val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
+    val listFoodItemViewModel = viewModel { ListFoodItemsViewModel(foodItemRepository) }
+    val invitationRepositoryFirestore = InvitationRepositoryFirestore(firebaseFirestore)
+    val invitationViewModel = viewModel { InvitationViewModel(invitationRepositoryFirestore) }
+    val foodFactsRepository = OpenFoodFactsRepository(OkHttpClient())
+    val foodFactsViewModel = viewModel { FoodFactsViewModel(foodFactsRepository) }
+    val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
+    val recipeGeneratorRepository = RecipeGeneratorOpenAIRepository()
+    val listRecipesViewModel = viewModel {
+        ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
     }
-    navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
-      composable(Screen.OVERVIEW) {
-        OverviewScreen(navigationActions, householdViewModel, listFoodItemViewModel)
-      }
-      composable(Screen.ADD_FOOD) { AddFoodItemScreen(navigationActions, foodItemViewModel) }
-      composable(Screen.EDIT_FOOD) { EditFoodItemScreen(navigationActions, foodItemViewModel) }
-      composable(Screen.HOUSEHOLD_CREATION) {
-        HouseHoldCreationScreen(navigationActions, householdViewModel = householdViewModel)
-      }
-      composable(Screen.INDIVIDUAL_FOOD_ITEM) {
-        IndividualFoodItemScreen(
-            navigationActions = navigationActions, householdViewModel, listFoodItemViewModel)
-      }
+
+    val context = LocalContext.current
+
+    val barcodeScannerViewModel: BarcodeScannerViewModel = viewModel()
+
+    // Checks if user is logged in and selects correct screen
+    val firebaseUser = FirebaseAuth.getInstance().currentUser
+    val startingRoute =
+        if (firebaseUser == null) {
+            Route.AUTH
+        } else {
+            Route.OVERVIEW
+        }
+
+    // Initialize HouseholdViewModel only if the user is logged in
+    val householdViewModel = viewModel {
+        HouseholdViewModel(
+            houseHoldRepository = HouseholdRepositoryFirestore(firebaseFirestore),
+            listFoodItemsViewModel = listFoodItemViewModel,
+            invitationRepository = invitationRepositoryFirestore,
+            context.dataStore)
     }
-    navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
-      composable(Screen.PERMISSION_HANDLER) {
-        CameraPermissionHandler(navigationActions, barcodeScannerViewModel)
-      }
-      composable(Screen.BARCODE_SCANNER) {
-        BarcodeScannerScreen(
-            navigationActions,
-            barcodeScannerViewModel,
-            foodFactsViewModel,
-            householdViewModel,
-            listFoodItemViewModel)
-      }
+
+    NavHost(navController = navController, startDestination = startingRoute) {
+        // Authentication route
+        navigation(
+            startDestination = Screen.AUTH,
+            route = Route.AUTH,
+        ) {
+            composable(Screen.AUTH) { SignInScreen(navigationActions) }
+        }
+        navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
+            composable(Screen.OVERVIEW) {
+                OverviewScreen(navigationActions, householdViewModel, listFoodItemViewModel)
+            }
+            composable(Screen.ADD_FOOD) {
+                AddFoodItemScreen(
+                    navigationActions, householdViewModel, listFoodItemViewModel, foodFactsViewModel)
+            }
+            composable(Screen.EDIT_FOOD) {
+                EditFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
+            }
+            composable(Screen.HOUSEHOLD_CREATION) {
+                HouseHoldCreationScreen(navigationActions, householdViewModel = householdViewModel)
+            }
+            composable(Screen.INDIVIDUAL_FOOD_ITEM) {
+                IndividualFoodItemScreen(
+                    navigationActions = navigationActions, householdViewModel, listFoodItemViewModel)
+            }
+        }
+        navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
+            composable(Screen.PERMISSION_HANDLER) {
+                CameraPermissionHandler(navigationActions, barcodeScannerViewModel)
+            }
+            composable(Screen.BARCODE_SCANNER) {
+                BarcodeScannerScreen(
+                    navigationActions,
+                    barcodeScannerViewModel,
+                    foodFactsViewModel,
+                    householdViewModel,
+                    listFoodItemViewModel)
+            }
+        }
+        navigation(
+            startDestination = Screen.RECIPES,
+            route = Route.RECIPES,
+        ) {
+            composable(Screen.RECIPES) {
+                RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
+            }
+            composable(Screen.INDIVIDUAL_RECIPE) {
+                IndividualRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)
+            }
+            composable(Screen.ADD_RECIPE) { AddRecipeScreen(navigationActions, listRecipesViewModel) }
+            composable(Screen.ADD_RECIPE) {
+                AddRecipeScreen(navigationActions, listRecipesViewModel)
+                // To test Ai generated recipes: GenerateRecipeScreen(navigationActions,
+                // listRecipesViewModel)
+            }
+        }
+        navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
+            composable(Screen.PROFILE) {
+                ProfileScreen(
+                    navigationActions,
+                    signOutUser = {
+                        signOutUser(context) { navigationActions.navigateToAndClearBackStack(Route.AUTH) }
+                    },
+                    invitationViewModel = invitationViewModel)
+            }
+            composable(Route.INVITATIONS) {
+                InvitationScreen(
+                    invitationViewModel = invitationViewModel, navigationActions = navigationActions)
+            }
+        }
     }
-    navigation(
-        startDestination = Screen.RECIPES,
-        route = Route.RECIPES,
-    ) {
-      composable(Screen.RECIPES) {
-        RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
-      }
-      composable(Screen.INDIVIDUAL_RECIPE) {
-        IndividualRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)
-      }
-      composable(Screen.ADD_RECIPE) { AddRecipeScreen(navigationActions, listRecipesViewModel) }
-      composable(Screen.ADD_RECIPE) {
-        AddRecipeScreen(navigationActions, listRecipesViewModel)
-        // To test Ai generated recipes: GenerateRecipeScreen(navigationActions,
-        // listRecipesViewModel)
-      }
-    }
-    navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
-      composable(Screen.PROFILE) {
-        ProfileScreen(
-            navigationActions,
-            signOutUser = {
-              signOutUser(context) { navigationActions.navigateToAndClearBackStack(Route.AUTH) }
-            },
-            invitationViewModel = invitationViewModel)
-      }
-      composable(Route.INVITATIONS) {
-        InvitationScreen(
-            invitationViewModel = invitationViewModel, navigationActions = navigationActions)
-      }
-    }
-  }
 }
