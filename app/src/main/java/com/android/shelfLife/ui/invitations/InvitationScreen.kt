@@ -11,42 +11,53 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.invitations.Invitation
+import com.android.shelfLife.model.invitations.InvitationRepository
 import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.utils.CustomTopAppBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InvitationScreen(
-    invitationViewModel: InvitationViewModel,
-    navigationActions: NavigationActions
+    navigationActions: NavigationActions,
+    invitationRepository: InvitationRepository
 ) {
+
+  val invitationViewModel = viewModel {
+    InvitationViewModel(invitationRepository = invitationRepository)
+  }
   val invitations by invitationViewModel.invitations.collectAsState()
 
-  Scaffold(topBar = { TopAppBar(title = { Text("Invitations") }) }) { paddingValues ->
-    if (invitations.isEmpty()) {
-      Box(
-          modifier = Modifier.fillMaxSize().padding(paddingValues),
-          contentAlignment = Alignment.Center) {
-            Text("No pending invitations")
+  Scaffold(
+      topBar = {
+        CustomTopAppBar(
+            onClick = { navigationActions.goBack() },
+            title = "Invitations",
+            titleTestTag = "invitationsTitle")
+      }) { paddingValues ->
+        if (invitations.isEmpty()) {
+          Box(
+              modifier = Modifier.fillMaxSize().padding(paddingValues),
+              contentAlignment = Alignment.Center) {
+                Text("No pending invitations")
+              }
+        } else {
+          // Show list of invitations
+          LazyColumn(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
+            items(invitations) { invitation ->
+              InvitationCard(invitation, invitationViewModel)
+              Spacer(modifier = Modifier.height(8.dp))
+            }
           }
-    } else {
-      // Show list of invitations
-      LazyColumn(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
-        items(invitations) { invitation ->
-          InvitationCard(invitation, invitationViewModel, navigationActions)
-          Spacer(modifier = Modifier.height(8.dp))
         }
       }
-    }
-  }
 }
 
 @Composable
 fun InvitationCard(
     invitation: Invitation,
     invitationViewModel: InvitationViewModel,
-    navigationActions: NavigationActions
 ) {
   val context = LocalContext.current
   Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation()) {

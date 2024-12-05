@@ -1,109 +1,24 @@
 package com.android.shelfLife.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.android.shelfLife.model.household.HouseHold
-import com.android.shelfLife.model.invitations.Invitation
-import com.android.shelfLife.model.invitations.InvitationRepository
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.android.shelfLife.model.newInvitations.Invitation
+import com.android.shelfLife.model.newInvitations.InvitationRepository
+import com.android.shelfLife.model.user.UserRepositoryFirestore
 
-class InvitationViewModel(private val invitationRepository: InvitationRepository) : ViewModel() {
+class InvitationViewModel(
+    private val invitationRepository: InvitationRepository,
+    private val userRepo: UserRepositoryFirestore
+) : ViewModel() {
 
-  private val _invitations = MutableStateFlow<List<Invitation>>(emptyList())
-  val invitations: StateFlow<List<Invitation>> = _invitations.asStateFlow()
+  val invitations = invitationRepository.invitations
 
-  init {
-    FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
-      if (firebaseAuth.currentUser != null) {
-        startListeningForInvitations()
-      } else {
-        stopListeningForInvitations()
-      }
-    }
+  suspend fun acceptInvitation(selectedInvitation: Invitation) {
+    userRepo.deleteInvitationUID(selectedInvitation.invitationId)
+    invitationRepository.acceptInvitation(invitation = selectedInvitation)
   }
 
-  /** Starts listening for real-time updates to invitations. */
-  private fun startListeningForInvitations() {
-    invitationRepository.addInvitationListener(
-        onUpdate = { invitationList -> _invitations.value = invitationList },
-        onError = { exception ->
-          Log.e("InvitationViewModel", "Error listening for invitations: $exception")
-        })
-  }
-
-  /** Stops listening for real-time updates to invitations. */
-  private fun stopListeningForInvitations() {
-    invitationRepository.removeInvitationListener()
-  }
-
-  override fun onCleared() {
-    super.onCleared()
-    stopListeningForInvitations()
-  }
-
-  /** Loads the list of invitations from the repository and updates the [_invitations] flow. */
-  private fun loadInvitations() {
-    invitationRepository.getInvitations(
-        onSuccess = { invitationList -> _invitations.value = invitationList },
-        onFailure = { exception ->
-          Log.e("HouseholdViewModel", "Error loading invitations: $exception")
-        })
-  }
-
-  /**
-   * Sends an invitation to a user to join a household.
-   *
-   * @param household The household to invite the user to.
-   * @param invitedUserEmail The email of the user to invite.
-   */
-  private fun sendInvitation(household: HouseHold, invitedUserEmail: String) {
-    invitationRepository.sendInvitation(
-        household = household,
-        invitedUserEmail = invitedUserEmail,
-        onSuccess = { Log.d("HouseholdViewModel", "Invitation sent successfully") },
-        onFailure = { exception ->
-          Log.e("HouseholdViewModel", "Error sending invitation: $exception")
-        })
-  }
-
-  /**
-   * Accepts an invitation.
-   *
-   * @param invitation The invitation to accept.
-   */
-  fun acceptInvitation(invitation: Invitation) {
-    invitationRepository.acceptInvitation(
-        invitation,
-        onSuccess = {
-          Log.d("HouseholdViewModel", "Invitation accepted")
-          invitations.value.minus(invitation)
-          // refresh invitations
-          loadInvitations()
-        },
-        onFailure = { exception ->
-          Log.e("HouseholdViewModel", "Error accepting invitation: $exception")
-        })
-  }
-
-  /**
-   * Declines an invitation.
-   *
-   * @param invitation The invitation to decline.
-   */
-  fun declineInvitation(invitation: Invitation) {
-    invitationRepository.declineInvitation(
-        invitation,
-        onSuccess = {
-          Log.d("HouseholdViewModel", "Invitation declined")
-          // Refresh invitations
-          invitations.value.minus(invitation)
-          loadInvitations()
-        },
-        onFailure = { exception ->
-          Log.e("HouseholdViewModel", "Error declining invitation: $exception")
-        })
+  suspend fun declineInvitation(selectedInvitation: Invitation) {
+    userRepo.deleteInvitationUID(selectedInvitation.invitationId)
+    invitationRepository.declineInvitation(invitation = selectedInvitation)
   }
 }

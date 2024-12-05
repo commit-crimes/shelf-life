@@ -1,5 +1,6 @@
 package com.android.shelfLife.model.user
 
+import com.android.shelfLife.model.newhousehold.HouseHold
 import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {
@@ -8,6 +9,8 @@ interface UserRepository {
 
   /** Exposes the invitations list as a StateFlow. */
   val invitations: StateFlow<List<String>>
+
+  val selectedHousehold: StateFlow<HouseHold?>
 
   /** Generates a new unique ID for a user. */
   fun getNewUid(): String
@@ -40,5 +43,23 @@ interface UserRepository {
 
   suspend fun updateUsername(username: String)
 
+  suspend fun updateImage(url: String)
+
   suspend fun updateEmail(email: String)
+
+  suspend fun updateSelectedHousehold(selectedHouseholdUID: String)
+
+  /** @param userEmails - The set of user emails to get the user IDs for. */
+  fun getUserIds(userEmails: Set<String?>, callback: (Map<String, String>) -> Unit)
+
+  /** @param userIds - The list of user IDs to get the emails for. */
+  fun getUserEmails(userIds: List<String>, callback: (Map<String, String>) -> Unit)
+
+  /**
+   * Selects a household and saves it to the user's data. VIEW MODELS NEED TO MANUALLY SELECT THE
+   * LIST OF FOOD ITEMS!!!
+   *
+   * @param household - The household to select.
+   */
+  suspend fun selectHousehold(household: HouseHold?)
 }

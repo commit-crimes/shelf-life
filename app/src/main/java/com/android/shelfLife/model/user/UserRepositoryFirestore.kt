@@ -1,7 +1,10 @@
 package com.android.shelfLife.model.user
 
 import android.util.Log
+import com.android.shelfLife.model.newhousehold.HouseHold
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -23,6 +26,9 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
   private val _invitations = MutableStateFlow<List<String>>(emptyList())
   override val invitations: StateFlow<List<String>> = _invitations.asStateFlow()
 
+  private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
+  override var selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
+
   // Listener for invitations
   private var invitationsListenerRegistration: ListenerRegistration? = null
 
@@ -36,7 +42,7 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
       // Fetch user data from Firestore
       val snapshot = userCollection.document(currentUser.uid).get().await()
       if (snapshot.exists()) {
-        val userData = snapshot.toObject(User::class.java)
+        val userData = convertToUser(snapshot)
         _user.value = userData
         _invitations.value = userData?.invitationUIDs ?: emptyList()
       } else {
@@ -69,7 +75,12 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
 
               // Optionally update the invitations in the local _user variable
               val currentUserData =
-                  _user.value ?: User(uid = currentUser.uid, username = "", email = "")
+                  _user.value
+                      ?: User(
+                          uid = currentUser.uid,
+                          username = "",
+                          email = "",
+                          selectedHouseholdUID = "")
               _user.value = currentUserData.copy(invitationUIDs = invitationsList)
             } else {
               _invitations.value = emptyList()
@@ -91,11 +102,15 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     userCollection.document(currentUser.uid).update(fieldName, value).await()
 
     // Update local _user variable
-    val currentUserData = _user.value ?: User(uid = currentUser.uid, username = "", email = "")
+    val currentUserData =
+        _user.value
+            ?: User(uid = currentUser.uid, username = "", email = "", selectedHouseholdUID = "")
     val updatedUserData =
         when (fieldName) {
           "username" -> currentUserData.copy(username = value as String)
+          "imageURL" -> currentUserData.copy(photoUrl = value as String)
           "email" -> currentUserData.copy(email = value as String)
+          "selectedHouseholdUID" -> currentUserData.copy(selectedHouseholdUID = value as String)
           else -> currentUserData
         }
     _user.value = updatedUserData
@@ -116,7 +131,9 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     userCollection.document(currentUser.uid).update(fieldName, updateValue).await()
 
     // Update local _user variable
-    val currentUserData = _user.value ?: User(uid = currentUser.uid, username = "", email = "")
+    val currentUserData =
+        _user.value
+            ?: User(uid = currentUser.uid, username = "", email = "", selectedHouseholdUID = "")
     val updatedArray =
         when (fieldName) {
           "householdUIDs" -> {
@@ -175,11 +192,123 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     updateUserField("username", username)
   }
 
+  override suspend fun updateImage(url: String) {
+    updateUserField("imageURL", url)
+  }
+
   override suspend fun updateEmail(email: String) {
     val currentUser = auth.currentUser ?: throw Exception("User not logged in")
     // Update email in FirebaseAuth
     currentUser.updateEmail(email).await()
     // Update email in Firestore
     updateUserField("email", email)
+  }
+
+  override suspend fun updateSelectedHousehold(selectedHouseholdUID: String) {
+    updateUserField("selectedHouseholdUID", selectedHouseholdUID)
+  }
+
+  override fun getUserIds(userEmails: Set<String?>, callback: (Map<String, String>) -> Unit) {
+    if (userEmails.isEmpty()) {
+      callback(emptyMap())
+      return
+    }
+    val emailBatches = userEmails.chunked(10) // Firestore allows up to 10 values in 'whereIn'
+    val emailToUserId = mutableMapOf<String, String>()
+    var batchesProcessed = 0
+
+    for (emailBatch in emailBatches) {
+      db.collection("users")
+          .whereIn("email", emailBatch)
+          .get()
+          .addOnSuccessListener { querySnapshot ->
+            for (doc in querySnapshot.documents) {
+              val email = doc.getString("email")
+              val userId = doc.id
+              if (email != null) {
+                emailToUserId[email] = userId
+              }
+            }
+            batchesProcessed++
+            if (batchesProcessed == emailBatches.size) {
+              callback(emailToUserId)
+            }
+          }
+          .addOnFailureListener { exception ->
+            Log.e("HouseholdRepository", "Error fetching user IDs by emails", exception)
+            batchesProcessed++
+            if (batchesProcessed == emailBatches.size) {
+              callback(emailToUserId)
+            }
+          }
+    }
+  }
+
+  override fun getUserEmails(userIds: List<String>, callback: (Map<String, String>) -> Unit) {
+    if (userIds.isEmpty()) {
+      callback(emptyMap())
+      return
+    }
+
+    val uidBatches = userIds.chunked(10) // Firestore allows up to 10 values in 'whereIn'
+    val uidToEmail = mutableMapOf<String, String>()
+    var batchesProcessed = 0
+
+    for (uidBatch in uidBatches) {
+      db.collection("users")
+          .whereIn(FieldPath.documentId(), uidBatch)
+          .get()
+          .addOnSuccessListener { querySnapshot ->
+            for (doc in querySnapshot.documents) {
+              val email = doc.getString("email")
+              val userId = doc.id
+              if (email != null) {
+                uidToEmail[userId] = email
+              }
+            }
+            batchesProcessed++
+            if (batchesProcessed == uidBatches.size) {
+              callback(uidToEmail)
+            }
+          }
+          .addOnFailureListener { exception ->
+            Log.e("HouseholdRepository", "Error fetching emails by user IDs", exception)
+            batchesProcessed++
+            if (batchesProcessed == uidBatches.size) {
+              callback(uidToEmail)
+            }
+          }
+    }
+  }
+
+  override suspend fun selectHousehold(household: HouseHold?) {
+    _selectedHousehold.value = household
+    household?.let { updateSelectedHousehold(it.uid) }
+  }
+
+  private fun convertToUser(doc: DocumentSnapshot): User? {
+    return try {
+      val uid = doc.id
+      val username = doc.getString("username") ?: ""
+      val email = doc.getString("email") ?: ""
+      val imageURL = doc.getString("imageURL") ?: ""
+      val selectedHouseholdUID = doc.getString("selectedHouseholdUID") ?: ""
+      val householdUIDs = doc.get("householdUIDs") as? List<String> ?: emptyList()
+      val recipeUIDs = doc.get("recipeUIDs") as? List<String> ?: emptyList()
+      val invitationUIDs = doc.get("invitationUIDs") as? List<String> ?: emptyList()
+
+      User(
+          uid,
+          username,
+          email,
+          imageURL,
+          selectedHouseholdUID,
+          householdUIDs,
+          recipeUIDs,
+          invitationUIDs)
+    } catch (e: Exception) {
+      Log.e("HouseholdRepository", "Error converting document to HouseHold", e)
+      null
+    }
   }
 }
