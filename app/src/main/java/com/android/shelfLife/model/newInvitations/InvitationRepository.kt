@@ -39,5 +39,5 @@ interface InvitationRepository {
    * @param household The household to invite the user to.
    * @param user The user to invite.
    */
-  fun sendInvitation(household: HouseHold, invitedUser: User)
+  fun sendInvitation(household: HouseHold, invitedUserID: String)
 }

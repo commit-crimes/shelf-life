@@ -2,7 +2,6 @@ package com.android.shelfLife.model.newInvitations
 
 import android.util.Log
 import com.android.shelfLife.model.newhousehold.HouseHold
-import com.android.shelfLife.model.user.User
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -36,8 +35,7 @@ open class InvitationRepositoryFirestore(
    *
    * @param household The household to invite the user to.
    */
-  override fun sendInvitation(household: HouseHold, invitedUser: User) {
-    val invitedUserId = invitedUser.uid
+  override fun sendInvitation(household: HouseHold, invitedUserID: String) {
     val inviterUserId =
         auth.currentUser?.uid ?: throw IllegalStateException("User not authenticated")
     val invitationId = db.collection(invitationPath).document().id
@@ -46,7 +44,7 @@ open class InvitationRepositoryFirestore(
                 invitationId = invitationId,
                 householdId = household.uid,
                 householdName = household.name,
-                invitedUserId = invitedUserId,
+                invitedUserId = invitedUserID,
                 inviterUserId = inviterUserId,
                 timestamp = Timestamp.now())
             .toMap()
