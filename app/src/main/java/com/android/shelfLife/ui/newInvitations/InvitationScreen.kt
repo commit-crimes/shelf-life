@@ -31,8 +31,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.shelfLife.model.newInvitations.InvitationRepository
 import com.android.shelfLife.model.newInvitations.Invitation
+import com.android.shelfLife.model.newInvitations.InvitationRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.viewmodel.InvitationViewModel
 import kotlinx.coroutines.launch
@@ -40,9 +40,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InvitationScreen(invitationRepository: InvitationRepository, userRepository: UserRepository) {
-    val invitationViewModel = viewModel{
-        InvitationViewModel(invitationRepository, userRepository)
-    }
+  val invitationViewModel = viewModel { InvitationViewModel(invitationRepository, userRepository) }
   val invitations by invitationViewModel.invitations.collectAsState()
   Scaffold(topBar = { TopAppBar(title = { Text("Invitations") }) }) { paddingValues ->
     if (invitations.isEmpty()) {
