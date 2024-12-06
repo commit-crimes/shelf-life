@@ -9,6 +9,9 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepository {
 
@@ -17,6 +20,12 @@ class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepos
   }
 
   private val auth = FirebaseAuth.getInstance()
+
+  private val _recipes = MutableStateFlow<List<Recipe>>(emptyList())
+  override val recipes: StateFlow<List<Recipe>> = _recipes.asStateFlow()
+
+  private val _selectedRecipe = MutableStateFlow<Recipe?>(null)
+  override val selectedRecipe: StateFlow<Recipe?> = _selectedRecipe.asStateFlow()
 
   /**
    * Generates a new unique ID for a recipe.
@@ -155,6 +164,10 @@ class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepos
           Log.e("RecipeRepository", "Error deleting recipe", exception)
           onFailure(exception)
         }
+  }
+
+  override fun selectRecipe(recipe: Recipe) {
+    _selectedRecipe.value = recipe
   }
 
   // Helper function to convert Firestore DocumentSnapshot into a Recipe object
