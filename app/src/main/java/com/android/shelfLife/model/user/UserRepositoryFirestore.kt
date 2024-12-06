@@ -174,6 +174,10 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
     updateArrayField("householdUIDs", uid, ArrayOperation.REMOVE)
   }
 
+  override suspend fun updateSelectedHouseholdUID(householdUID: String) {
+    updateUserField("selectedHouseholdUID", householdUID)
+  }
+
   override suspend fun addRecipeUID(recipeUID: String) {
     updateArrayField("recipeUIDs", recipeUID, ArrayOperation.ADD)
   }
@@ -302,8 +306,8 @@ class UserRepositoryFirestore(private val db: FirebaseFirestore) : UserRepositor
           username,
           email,
           imageURL,
-          selectedHouseholdUID,
           householdUIDs,
+          selectedHouseholdUID,
           recipeUIDs,
           invitationUIDs)
     } catch (e: Exception) {

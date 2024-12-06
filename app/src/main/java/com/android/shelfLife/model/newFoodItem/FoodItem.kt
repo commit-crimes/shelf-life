@@ -18,11 +18,11 @@ import com.google.firebase.Timestamp
 data class FoodItem(
     val uid: String,
     val foodFacts: FoodFacts,
-    val buyDate: Timestamp?,
-    val expiryDate: Timestamp?,
-    val openDate: Timestamp?,
+    val buyDate: Timestamp? = Timestamp.now(),
+    val expiryDate: Timestamp? = null,
+    val openDate: Timestamp? = null,
     val location: FoodStorageLocation,
-    val status: FoodStatus,
+    val status: FoodStatus = FoodStatus.UNOPENED,
     val owner: String
 )
 
