@@ -169,6 +169,27 @@ fun LocationDropdownField(
       modifier = modifier.testTag(testTag))
 }
 
+// TODO Delete this after everything is compatible
+@Composable
+fun NewLocationDropdownField(
+    location: com.android.shelfLife.model.newFoodItem.FoodStorageLocation,
+    onLocationChange: (com.android.shelfLife.model.newFoodItem.FoodStorageLocation) -> Unit,
+    locationExpanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    testTag: String = "",
+) {
+  DropdownFields(
+      label = stringResource(id = R.string.location_label),
+      options = com.android.shelfLife.model.newFoodItem.FoodStorageLocation.entries.toTypedArray(),
+      selectedOption = location,
+      onOptionSelected = onLocationChange,
+      expanded = locationExpanded,
+      onExpandedChange = onExpandedChange,
+      optionLabel = { fromCapitalStringToLowercaseString(it.name) },
+      modifier = modifier.testTag(testTag))
+}
+
 /**
  * Composable function to display a text field for entering a date.
  *

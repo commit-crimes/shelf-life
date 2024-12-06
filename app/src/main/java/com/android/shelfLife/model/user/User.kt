@@ -5,8 +5,8 @@ data class User(
     val username: String,
     val email: String,
     val photoUrl: String? = null,
-    val selectedHouseholdUID: String,
     val householdUIDs: List<String> = emptyList(),
+    val selectedHouseholdUID: String? = null,
     val recipeUIDs: List<String> = emptyList(),
     val invitationUIDs: List<String> = emptyList()
 ) {
