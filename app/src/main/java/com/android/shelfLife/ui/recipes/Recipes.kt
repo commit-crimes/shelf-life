@@ -143,7 +143,7 @@ fun RecipesScreen(
                               navigationActions.navigateTo(Screen.GENERATE_RECIPE)
                             },
                             containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            modifier = Modifier.testTag("manualRecipeFab").width(150.dp))
+                            modifier = Modifier.testTag("generateRecipeFab").width(150.dp))
                       }
 
                       // Primary FAB
