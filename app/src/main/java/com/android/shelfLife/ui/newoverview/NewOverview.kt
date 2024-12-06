@@ -135,8 +135,7 @@ fun OverviewScreen(
               onQueryChange = { searchQuery = it },
               placeholder = "Search food item",
               onDeleteTextClicked = { searchQuery = "" },
-              searchBarTestTag = "foodSearchBar"
-          )
+              searchBarTestTag = "foodSearchBar")
           ListFoodItems(
               foodItems = filteredFoodItems,
               overviewScreenViewModel = overviewScreenViewModel,

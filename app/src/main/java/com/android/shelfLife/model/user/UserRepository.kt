@@ -1,9 +1,12 @@
 package com.android.shelfLife.model.user
 
+import android.content.Context
 import com.android.shelfLife.model.newhousehold.HouseHold
 import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {
+  val isUserLoggedIn: StateFlow<Boolean>
+
   /** Exposes the user data as a StateFlow. */
   val user: StateFlow<User?>
 
@@ -19,7 +22,7 @@ interface UserRepository {
    * Fetches the user information from Firestore and initializes local data. This can be called once
    * at startup to load initial data.
    */
-  suspend fun initializeUserData()
+  suspend fun initializeUserData(context: Context)
 
   /** Starts listening for changes to the invitations field. */
   fun startListeningForInvitations()
@@ -29,6 +32,13 @@ interface UserRepository {
    * needed to avoid memory leaks.
    */
   fun stopListeningForInvitations()
+
+  /**
+   * Sets the user's logged-in status. This is used to determine whether to show the sign-in screen
+   *
+   * @param isLoggedIn - The new logged-in status.
+   */
+  fun setUserLoggedInStatus(isLoggedIn: Boolean)
 
   // Other suspend functions for updating user data
   suspend fun addHouseholdUID(householdUID: String)

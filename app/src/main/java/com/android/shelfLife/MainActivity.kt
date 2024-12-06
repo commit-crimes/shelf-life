@@ -7,6 +7,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.core.DataStore
@@ -29,6 +32,7 @@ import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.RecipeGeneratorOpenAIRepository
 import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
+import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
@@ -45,9 +49,8 @@ import com.android.shelfLife.ui.profile.ProfileScreen
 import com.android.shelfLife.ui.recipes.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
-import com.android.shelfLife.ui.utils.signOutUser
+import com.android.shelfLife.viewmodel.authentication.SignInViewModel
 import com.example.compose.ShelfLifeTheme
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.OkHttpClient
 
@@ -79,19 +82,26 @@ fun ShelfLifeApp() {
   val listRecipesViewModel = viewModel {
     ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
   }
+  val userRepository = UserRepositoryFirestore(firebaseFirestore)
+  val signInViewModel = viewModel {
+    SignInViewModel(firestore = firebaseFirestore, userRepository = userRepository)
+  }
 
   val context = LocalContext.current
 
   val barcodeScannerViewModel: BarcodeScannerViewModel = viewModel()
 
-  // Checks if user is logged in and selects correct screen
-  val firebaseUser = FirebaseAuth.getInstance().currentUser
-  val startingRoute =
-      if (firebaseUser == null) {
-        Route.AUTH
-      } else {
-        Route.OVERVIEW
-      }
+  val isUserLoggedIn by signInViewModel.isUserLoggedIn.collectAsState()
+  val signInState by signInViewModel.signInState.collectAsState()
+
+  // Observe authentication state changes
+  LaunchedEffect(isUserLoggedIn) {
+    if (isUserLoggedIn) {
+      navController.navigate(Route.OVERVIEW) { popUpTo(Route.AUTH) { inclusive = true } }
+    } else {
+      navController.navigate(Route.AUTH) { popUpTo(Route.OVERVIEW) { inclusive = true } }
+    }
+  }
 
   // Initialize HouseholdViewModel only if the user is logged in
   val householdViewModel = viewModel {
@@ -102,13 +112,13 @@ fun ShelfLifeApp() {
         context.dataStore)
   }
 
-  NavHost(navController = navController, startDestination = startingRoute) {
+  NavHost(navController = navController, startDestination = Route.AUTH) {
     // Authentication route
     navigation(
         startDestination = Screen.AUTH,
         route = Route.AUTH,
     ) {
-      composable(Screen.AUTH) { SignInScreen(navigationActions) }
+      composable(Screen.AUTH) { SignInScreen(navigationActions, userRepository) }
     }
     navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
       composable(Screen.OVERVIEW) {
@@ -161,12 +171,7 @@ fun ShelfLifeApp() {
     }
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
       composable(Screen.PROFILE) {
-        ProfileScreen(
-            navigationActions,
-            signOutUser = {
-              signOutUser(context) { navigationActions.navigateToAndClearBackStack(Route.AUTH) }
-            },
-            invitationViewModel = invitationViewModel)
+        ProfileScreen(navigationActions, invitationViewModel = invitationViewModel)
       }
       composable(Route.INVITATIONS) {
         InvitationScreen(
