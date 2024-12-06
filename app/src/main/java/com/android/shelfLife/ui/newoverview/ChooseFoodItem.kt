@@ -1,6 +1,5 @@
-package com.android.shelfLife.ui.overview
+package com.android.shelfLife.ui.newoverview
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -40,8 +39,6 @@ import com.android.shelfLife.ui.utils.CustomTopAppBar
 @Composable
 fun ChooseFoodItem(
     navigationActions: NavigationActions,
-    houseHoldViewModel: HouseholdViewModel,
-    foodItemViewModel: ListFoodItemsViewModel,
     foodFactsViewModel: FoodFactsViewModel,
     paddingValues: PaddingValues = PaddingValues(16.dp)
 ) {
