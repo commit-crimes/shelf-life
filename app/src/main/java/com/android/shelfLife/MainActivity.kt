@@ -23,12 +23,12 @@ import androidx.navigation.navigation
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.android.shelfLife.model.foodFacts.OpenFoodFactsRepository
-import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
-import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
-import com.android.shelfLife.model.household.HouseholdViewModel
-import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
-import com.android.shelfLife.model.invitations.InvitationViewModel
+import com.android.shelfLife.model.newFoodItem.FoodItemRepositoryFirestore
+import com.android.shelfLife.viewmodel.ListFoodItemsViewModel
+import com.android.shelfLife.model.newhousehold.HouseholdRepositoryFirestore
+import com.android.shelfLife.viewmodel.HouseholdViewModel
+import com.android.shelfLife.model.newInvitations.InvitationRepositoryFirestore
+import com.android.shelfLife.viewmodel.InvitationViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.RecipeGeneratorOpenAIRepository
 import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
@@ -36,16 +36,16 @@ import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
-import com.android.shelfLife.ui.invitations.InvitationScreen
+import com.android.shelfLife.ui.newInvitations.InvitationScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.overview.AddFoodItemScreen
-import com.android.shelfLife.ui.overview.EditFoodItemScreen
-import com.android.shelfLife.ui.overview.HouseHoldCreationScreen
+import com.android.shelfLife.ui.newoverview.AddFoodItemScreen
+import com.android.shelfLife.ui.newoverview.EditFoodItemScreen
+import com.android.shelfLife.ui.newoverview.HouseHoldCreationScreen
 import com.android.shelfLife.ui.overview.IndividualFoodItemScreen
-import com.android.shelfLife.ui.overview.OverviewScreen
-import com.android.shelfLife.ui.profile.ProfileScreen
+import com.android.shelfLife.ui.newoverview.OverviewScreen
+import com.android.shelfLife.ui.newProfile.ProfileScreen
 import com.android.shelfLife.ui.recipes.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
@@ -72,9 +72,6 @@ fun ShelfLifeApp() {
   val navigationActions = NavigationActions(navController)
   val firebaseFirestore = FirebaseFirestore.getInstance()
   val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
-  val listFoodItemViewModel = viewModel { ListFoodItemsViewModel(foodItemRepository) }
-  val invitationRepositoryFirestore = InvitationRepositoryFirestore(firebaseFirestore)
-  val invitationViewModel = viewModel { InvitationViewModel(invitationRepositoryFirestore) }
   val foodFactsRepository = OpenFoodFactsRepository(OkHttpClient())
   val foodFactsViewModel = viewModel { FoodFactsViewModel(foodFactsRepository) }
   val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
@@ -86,13 +83,14 @@ fun ShelfLifeApp() {
   val signInViewModel = viewModel {
     SignInViewModel(firestore = firebaseFirestore, userRepository = userRepository)
   }
+    val householdRepository = HouseholdRepositoryFirestore(firebaseFirestore)
+  val invitationRepositoryFirestore = InvitationRepositoryFirestore(firebaseFirestore)
 
   val context = LocalContext.current
 
   val barcodeScannerViewModel: BarcodeScannerViewModel = viewModel()
 
   val isUserLoggedIn by signInViewModel.isUserLoggedIn.collectAsState()
-  val signInState by signInViewModel.signInState.collectAsState()
 
   // Observe authentication state changes
   LaunchedEffect(isUserLoggedIn) {
@@ -101,15 +99,6 @@ fun ShelfLifeApp() {
     } else {
       navController.navigate(Route.AUTH) { popUpTo(Route.OVERVIEW) { inclusive = true } }
     }
-  }
-
-  // Initialize HouseholdViewModel only if the user is logged in
-  val householdViewModel = viewModel {
-    HouseholdViewModel(
-        houseHoldRepository = HouseholdRepositoryFirestore(firebaseFirestore),
-        listFoodItemsViewModel = listFoodItemViewModel,
-        invitationRepository = invitationRepositoryFirestore,
-        context.dataStore)
   }
 
   NavHost(navController = navController, startDestination = Route.AUTH) {
@@ -122,22 +111,26 @@ fun ShelfLifeApp() {
     }
     navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
       composable(Screen.OVERVIEW) {
-        OverviewScreen(navigationActions, householdViewModel, listFoodItemViewModel)
+        OverviewScreen(navigationActions, householdRepository, foodItemRepository, userRepository)
       }
       composable(Screen.ADD_FOOD) {
         AddFoodItemScreen(
-            navigationActions, householdViewModel, listFoodItemViewModel, foodFactsViewModel)
+            navigationActions, foodItemRepository, userRepository)
       }
       composable(Screen.EDIT_FOOD) {
-        EditFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
+        EditFoodItemScreen(navigationActions, foodItemRepository, userRepository)
       }
       composable(Screen.HOUSEHOLD_CREATION) {
-        HouseHoldCreationScreen(navigationActions, householdViewModel = householdViewModel)
+        HouseHoldCreationScreen(
+          navigationActions,
+          householdRepository,
+          invitationRepositoryFirestore,
+          userRepository)
       }
-      composable(Screen.INDIVIDUAL_FOOD_ITEM) {
+      /*composable(Screen.INDIVIDUAL_FOOD_ITEM) {
         IndividualFoodItemScreen(
             navigationActions = navigationActions, householdViewModel, listFoodItemViewModel)
-      }
+      }*/
     }
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
       composable(Screen.PERMISSION_HANDLER) {
@@ -171,12 +164,12 @@ fun ShelfLifeApp() {
     }
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
       composable(Screen.PROFILE) {
-        ProfileScreen(navigationActions, invitationViewModel = invitationViewModel)
+        ProfileScreen(navigationActions, invitationRepositoryFirestore, userRepository, context)
       }
       composable(Route.INVITATIONS) {
         InvitationScreen(
-            navigationActions = navigationActions,
-            invitationRepository = invitationRepositoryFirestore)
+            navigationActions = navigationActions
+        )
       }
     }
   }

@@ -16,7 +16,7 @@ import kotlinx.coroutines.tasks.await
 
 open class InvitationRepositoryFirestore(
     private val db: FirebaseFirestore,
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 ) : InvitationRepository {
 
   internal var listenerRegistration: ListenerRegistration? = null
