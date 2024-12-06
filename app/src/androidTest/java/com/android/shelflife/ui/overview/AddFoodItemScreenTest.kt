@@ -24,6 +24,7 @@ import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.utils.formatTimestampToDate
 import com.google.firebase.Timestamp
 import io.mockk.MockKAnnotations
@@ -62,6 +63,7 @@ class AddFoodItemScreenTest {
     every { foodItemViewModel.getUID() } returns "testUID"
     every { houseHoldViewModel.addFoodItem(any()) } just runs
     every { navigationActions.goBack() } just runs
+      every { navigationActions.navigateTo(Route.OVERVIEW) } just runs
     // Mock getFoodFactsSuggestions() to return a StateFlow
     val sampleFoodFactsList =
         listOf(
@@ -356,7 +358,7 @@ class AddFoodItemScreenTest {
     verify { houseHoldViewModel.addFoodItem(any()) }
 
     // Verify that navigation action was called
-    verify { navigationActions.goBack() }
+    verify {navigationActions.navigateTo(Route.OVERVIEW) }
   }
 
   @Test
@@ -432,46 +434,6 @@ class AddFoodItemScreenTest {
     verify { navigationActions.goBack() }
   }
 
-  @Test
-  fun testImageSelection() {
-
-    composeTestRule.setContent {
-      AddFoodItemScreen(
-          navigationActions = navigationActions,
-          houseHoldViewModel = houseHoldViewModel,
-          foodItemViewModel = foodItemViewModel,
-          foodFactsViewModel = foodFactsViewModel)
-    }
-
-    // Scroll to the image selection section
-    composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Bananas")
-    composeTestRule
-        .onNodeWithTag("addFoodItemScreen")
-        .performScrollToNode(hasTestTag("selectImage"))
-    composeTestRule.onNodeWithTag("selectImage").assertIsDisplayed()
-    // Select the first image
-    composeTestRule.onAllNodesWithTag("foodImage")[0].performClick()
-
-    // Verify that the selected image is displayed
-  }
-
-  @Test
-  fun testNoImageOptionSelection() {
-    composeTestRule.setContent {
-      AddFoodItemScreen(
-          navigationActions = navigationActions,
-          houseHoldViewModel = houseHoldViewModel,
-          foodItemViewModel = foodItemViewModel,
-          foodFactsViewModel = foodFactsViewModel)
-    }
-
-    // Scroll to the "No Image" option
-    composeTestRule.onNodeWithTag("addFoodItemScreen").performScrollToNode(hasTestTag("noImage"))
-
-    // Select the "No Image" option
-    composeTestRule.onNodeWithTag("noImage").performClick()
-    // Verify that the default image is displayed
-  }
 
   fun testDateReValidation() {
     composeTestRule.setContent {

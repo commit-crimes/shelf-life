@@ -23,6 +23,8 @@ object Screen {
   const val AUTH = "Auth Screen"
   const val BARCODE_SCANNER = "Barcode Scanner Screen"
   const val PERMISSION_HANDLER = "Permission Handler Screen"
+    const val FIRST_FOOD_ITEM = "First Add Food Item Screen"
+    const val CHOOSE_FOOD_ITEM = "Choose Image for Food Item Screen"
   const val ADD_FOOD = "Add food Screen"
   const val EDIT_FOOD = "Edit food Screen"
   const val RECIPES = "Recipes Screen"

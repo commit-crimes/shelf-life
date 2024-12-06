@@ -25,6 +25,8 @@ open class ListFoodItemsViewModel(private val repository: FoodItemRepository) : 
   val multipleSelectedFoodItems: StateFlow<List<FoodItem>> =
       _multipleSelectedFoodItems.asStateFlow()
 
+  private val _newFoodItemName = MutableStateFlow<String>("")
+  val newFoodItemName: StateFlow<String> = _newFoodItemName.asStateFlow()
   /**
    * Initializes the ListFoodItemsViewModel by loading the list of FoodItems from the repository.
    */
@@ -79,6 +81,10 @@ open class ListFoodItemsViewModel(private val repository: FoodItemRepository) : 
   /** Selects a FoodItem document for individual view */
   fun selectFoodItem(foodItem: FoodItem?) {
     _selectedFoodItem.value = foodItem
+  }
+
+  fun setNewFoodItemName(name:String){
+    _newFoodItemName.value = name
   }
 
   /** Selects multiple FoodItem documents for bulk actions */
