@@ -215,6 +215,36 @@ class OverviewTest {
     composeTestRule.onNodeWithText("12 in stock").assertIsDisplayed()
   }
 
+  @Test
+  fun clickingDeleteTextInSearchBarDeletesText() {
+    selectHousehold(houseHold)
+    composeTestRule.setContent {
+      OverviewScreen(
+          navigationActions = navigationActions,
+          householdViewModel = householdViewModel,
+          listFoodItemsViewModel)
+    }
+
+    // Click on the search bar
+    composeTestRule.onNodeWithTag("foodSearchBar").performClick()
+    composeTestRule.waitForIdle()
+
+    // Enter search query "Apple"
+    composeTestRule.onNodeWithTag("searchBarInputField").performTextInput("Apple")
+
+    // Check that the search query is "Apple"
+    composeTestRule.onNodeWithTag("searchBarInputField").assertTextEquals("Apple")
+
+    // Click on the delete text icon
+    composeTestRule.onNodeWithTag("deleteTextButton").performClick()
+    composeTestRule.waitForIdle()
+
+    // Check that the search query is empty
+    composeTestRule
+        .onNode(hasSetTextAction() and hasTestTag("searchBarInputField") and hasText(""))
+        .assertExists()
+  }
+
   // Test that the quantity in grams is displayed correctly
   @Test
   fun firstTimeWelcomeScreenDisplayedCorrectly() {

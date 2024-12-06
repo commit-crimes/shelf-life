@@ -178,6 +178,13 @@ fun RecipesScreen(
                           onQueryChange = { query = it },
                           placeholder = "Search recipe",
                           searchBarTestTag = "searchBar")
+                Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+                  CustomSearchBar(
+                      query = query,
+                      onQueryChange = { query = it },
+                      onDeleteTextClicked = { query = "" },
+                      placeholder = "Search recipe",
+                      searchBarTestTag = "searchBar")
 
                       if (filteredRecipes.isEmpty()) {
                         Box(
