@@ -31,11 +31,13 @@ import com.android.shelfLife.viewmodel.recipe.RecipeGenerationViewModel
 
 @Composable
 fun GenerateRecipeScreen(
-  navigationActions: NavigationActions,
-  recipeRepository: RecipeRepository,
-  recipeGeneratorRepository: RecipeGeneratorRepository
+    navigationActions: NavigationActions,
+    recipeRepository: RecipeRepository,
+    recipeGeneratorRepository: RecipeGeneratorRepository
 ) {
   val context = LocalContext.current
+
+  val generationViewModel = RecipeGenerationViewModel(recipeRepository, recipeGeneratorRepository)
 
   // States for recipe name and food items
   var recipeName by rememberSaveable { mutableStateOf("") }

@@ -167,7 +167,9 @@ class RecipesTest {
 
     composeTestRule.onNodeWithTag("addRecipeFab").performClick()
     composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithTag("addRecipeFab").performClick() //click twice to go to add recipe screen
+    composeTestRule
+        .onNodeWithTag("addRecipeFab")
+        .performClick() // click twice to go to add recipe screen
     composeTestRule.waitForIdle()
     verify(navigationActions).navigateTo(com.android.shelfLife.ui.navigation.Screen.ADD_RECIPE)
   }
