@@ -70,7 +70,7 @@ open class ListRecipesViewModel(
   }
 
   fun getRecipes() { // deprecated: clean up in next task. We now have observeRecipes that is only
-                     // called on start
+    // called on start
     return recipeRepository.getRecipes(
         onSuccess = { _recipes.value = listOf(testRecipe) + it }, onFailure = ::_onFail)
   }

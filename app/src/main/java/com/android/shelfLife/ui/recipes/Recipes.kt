@@ -177,29 +177,32 @@ fun RecipesScreen(
                           query = query,
                           onQueryChange = { query = it },
                           placeholder = "Search recipe",
-                          searchBarTestTag = "searchBar")
-                Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-                  CustomSearchBar(
-                      query = query,
-                      onQueryChange = { query = it },
-                      onDeleteTextClicked = { query = "" },
-                      placeholder = "Search recipe",
-                      searchBarTestTag = "searchBar")
+                          searchBarTestTag = "searchBar",
+                          onDeleteTextClicked = { query = "" })
 
-                      if (filteredRecipes.isEmpty()) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            content = {
-                              Text(
-                                  text = "No recipes available",
-                                  modifier = Modifier.testTag("noRecipesAvailableText"))
-                            },
-                            contentAlignment = Alignment.Center)
-                      } else {
-                        // LazyColumn for displaying the list of filtered recipes
-                        LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
-                          items(filteredRecipes) { recipe ->
-                            RecipeItem(recipe, navigationActions, listRecipesViewModel)
+                      Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+                        CustomSearchBar(
+                            query = query,
+                            onQueryChange = { query = it },
+                            onDeleteTextClicked = { query = "" },
+                            placeholder = "Search recipe",
+                            searchBarTestTag = "searchBar")
+
+                        if (filteredRecipes.isEmpty()) {
+                          Box(
+                              modifier = Modifier.fillMaxSize(),
+                              content = {
+                                Text(
+                                    text = "No recipes available",
+                                    modifier = Modifier.testTag("noRecipesAvailableText"))
+                              },
+                              contentAlignment = Alignment.Center)
+                        } else {
+                          // LazyColumn for displaying the list of filtered recipes
+                          LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
+                            items(filteredRecipes) { recipe ->
+                              RecipeItem(recipe, navigationActions, listRecipesViewModel)
+                            }
                           }
                         }
                       }
@@ -207,6 +210,29 @@ fun RecipesScreen(
               })
         }
       }
+}
+/**
+ * Converts a string representation of a recipe type into a corresponding
+ * `RecipesRepository.SearchRecipeType` enumeration value.
+ *
+ * @param string A string describing the type of recipe to search for. Possible values include:
+ *     - "Soon to expire": Recipes with ingredients that are nearing expiration.
+ *     - "Only household items": Recipes using only ingredients available in the household.
+ *     - "High protein": Recipes with a high protein content.
+ *     - "Low calories": Recipes with low caloric content.
+ *
+ * @return The corresponding `RecipesRepository.SearchRecipeType` enum value.
+ * @throws IllegalArgumentException If the input string does not match any known recipe type.
+ */
+fun stringToSearchRecipeType(string: String): RecipeType {
+  return when (string) {
+    "Soon to expire" -> RecipeType.USE_SOON_TO_EXPIRE
+    "Only household items" -> RecipeType.USE_ONLY_HOUSEHOLD_ITEMS
+    "High protein" -> RecipeType.HIGH_PROTEIN
+    "Low calories" -> RecipeType.LOW_CALORIE
+    "Personal" -> RecipeType.PERSONAL
+    else -> throw IllegalArgumentException("Unknown filter: $string")
+  }
 }
 
 @Composable
@@ -316,30 +342,6 @@ fun RecipeItem(
     listRecipesViewModel.selectRecipe(recipe) // Select the clicked recipe in the ViewModel
     navigationActions.navigateTo(
         Screen.INDIVIDUAL_RECIPE) // Navigate to the individual recipe screen
-  }
-}
-
-/**
- * Converts a string representation of a recipe type into a corresponding
- * `RecipesRepository.SearchRecipeType` enumeration value.
- *
- * @param string A string describing the type of recipe to search for. Possible values include:
- *     - "Soon to expire": Recipes with ingredients that are nearing expiration.
- *     - "Only household items": Recipes using only ingredients available in the household.
- *     - "High protein": Recipes with a high protein content.
- *     - "Low calories": Recipes with low caloric content.
- *
- * @return The corresponding `RecipesRepository.SearchRecipeType` enum value.
- * @throws IllegalArgumentException If the input string does not match any known recipe type.
- */
-fun stringToSearchRecipeType(string: String): RecipeType {
-  return when (string) {
-    "Soon to expire" -> RecipeType.USE_SOON_TO_EXPIRE
-    "Only household items" -> RecipeType.USE_ONLY_HOUSEHOLD_ITEMS
-    "High protein" -> RecipeType.HIGH_PROTEIN
-    "Low calories" -> RecipeType.LOW_CALORIE
-    "Personal" -> RecipeType.PERSONAL
-    else -> throw IllegalArgumentException("Unknown filter: $string")
   }
 }
 
