@@ -191,7 +191,7 @@ fun DisplayInstructionNew(instruction: String) {
 // this preview function allows us to see the easter egg screen
 @Preview()
 @Composable
-fun IndividualRecipeScreenPreviewEasterEgg() {
+private fun IndividualRecipeScreenPreviewEasterEgg() {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
   val firebaseFirestore = FirebaseFirestore.getInstance()
@@ -205,7 +205,7 @@ fun IndividualRecipeScreenPreviewEasterEgg() {
 // this preview shows the example where we do have a selected recipe
 @Preview()
 @Composable
-fun IndividualRecipeScreenPreview() {
+private fun IndividualRecipeScreenPreview() {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
   val firebaseFirestore = FirebaseFirestore.getInstance()
