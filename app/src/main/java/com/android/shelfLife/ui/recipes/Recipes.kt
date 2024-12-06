@@ -180,29 +180,20 @@ fun RecipesScreen(
                           searchBarTestTag = "searchBar",
                           onDeleteTextClicked = { query = "" })
 
-                      Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-                        CustomSearchBar(
-                            query = query,
-                            onQueryChange = { query = it },
-                            onDeleteTextClicked = { query = "" },
-                            placeholder = "Search recipe",
-                            searchBarTestTag = "searchBar")
-
-                        if (filteredRecipes.isEmpty()) {
-                          Box(
-                              modifier = Modifier.fillMaxSize(),
-                              content = {
-                                Text(
-                                    text = "No recipes available",
-                                    modifier = Modifier.testTag("noRecipesAvailableText"))
-                              },
-                              contentAlignment = Alignment.Center)
-                        } else {
-                          // LazyColumn for displaying the list of filtered recipes
-                          LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
-                            items(filteredRecipes) { recipe ->
-                              RecipeItem(recipe, navigationActions, listRecipesViewModel)
-                            }
+                      if (filteredRecipes.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            content = {
+                              Text(
+                                  text = "No recipes available",
+                                  modifier = Modifier.testTag("noRecipesAvailableText"))
+                            },
+                            contentAlignment = Alignment.Center)
+                      } else {
+                        // LazyColumn for displaying the list of filtered recipes
+                        LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
+                          items(filteredRecipes) { recipe ->
+                            RecipeItem(recipe, navigationActions, listRecipesViewModel)
                           }
                         }
                       }
