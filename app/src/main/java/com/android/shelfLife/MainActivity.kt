@@ -43,9 +43,11 @@ import com.android.shelfLife.ui.overview.IndividualFoodItemScreen
 import com.android.shelfLife.ui.overview.OverviewScreen
 import com.android.shelfLife.ui.profile.ProfileScreen
 import com.android.shelfLife.ui.recipes.AddRecipeScreen
+import com.android.shelfLife.ui.recipes.GenerateRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.utils.signOutUser
+import com.android.shelfLife.viewmodel.recipe.RecipeGenerationViewModel
 import com.example.compose.ShelfLifeTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -78,6 +80,9 @@ fun ShelfLifeApp() {
   val recipeGeneratorRepository = RecipeGeneratorOpenAIRepository()
   val listRecipesViewModel = viewModel {
     ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
+  }
+  val recipeGenerationViewModel = viewModel {
+    RecipeGenerationViewModel(recipeRepository, recipeGeneratorRepository)
   }
 
   val context = LocalContext.current
@@ -153,11 +158,7 @@ fun ShelfLifeApp() {
         IndividualRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)
       }
       composable(Screen.ADD_RECIPE) { AddRecipeScreen(navigationActions, listRecipesViewModel) }
-      composable(Screen.ADD_RECIPE) {
-        AddRecipeScreen(navigationActions, listRecipesViewModel)
-        // To test Ai generated recipes: GenerateRecipeScreen(navigationActions,
-        // listRecipesViewModel)
-      }
+      composable(Screen.GENERATE_RECIPE) {GenerateRecipeScreen(navigationActions, recipeGenerationViewModel )}
     }
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
       composable(Screen.PROFILE) {
