@@ -49,6 +49,8 @@ open class InvitationRepositoryFirestore(
                 timestamp = Timestamp.now())
             .toMap()
     db.collection("invitations").document(invitationId).set(invitationData)
+      db.collection("users").document(invitedUserID).update("invitationUIDs", FieldValue.arrayUnion(invitationId))
+
   }
 
   /**
