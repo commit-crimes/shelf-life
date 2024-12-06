@@ -1,5 +1,7 @@
 package com.android.shelfLife.ui.recipes
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
@@ -135,19 +137,25 @@ fun GenerateRecipeScreen(
           )
           generationViewModel.generateRecipe(onSuccess = { recipe ->
             generationViewModel.acceptGeneratedRecipe{
-              Toast.makeText(context, "Recipe generated successfully.", Toast.LENGTH_SHORT).show()
+              Handler(Looper.getMainLooper()).post {
+                Toast.makeText(context, "Recipe generated successfully.", Toast.LENGTH_SHORT).show()
+              }
               navigationActions.goBack()
             }
           },
           onFailure = { error ->
-            Log.e("GenerateRecipe", "Error generating recipe: $error")
+            Handler(Looper.getMainLooper()).post {
+              Log.e("GenerateRecipe", "Error generating recipe: $error")
+            }
             Toast.makeText(context, "Failed to generate recipe.", Toast.LENGTH_SHORT).show()
           })
         } else {
           recipeNameError = if (recipeName.isBlank()) "Please enter a recipe name" else null
           if (foodItems.isEmpty()) {
-            Toast.makeText(context, "Please add at least one food item.", Toast.LENGTH_SHORT)
-              .show()
+            Handler(Looper.getMainLooper()).post {
+              Toast.makeText(context, "Please add at least one food item.", Toast.LENGTH_SHORT)
+                .show()
+            }
           }
         }
       },
