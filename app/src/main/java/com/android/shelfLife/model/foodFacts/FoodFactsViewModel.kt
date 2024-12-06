@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/*
 sealed class SearchStatus {
   data object Idle : SearchStatus()
 
@@ -17,6 +18,7 @@ sealed class SearchStatus {
 
   data object Failure : SearchStatus()
 }
+*/
 
 class FoodFactsViewModel(private val repository: FoodFactsRepository) : ViewModel() {
 

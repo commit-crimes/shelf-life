@@ -9,13 +9,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
+import com.android.shelfLife.model.foodFacts.FoodFactsRepository
+import com.android.shelfLife.model.foodFacts.OpenFoodFactsRepository
 
 /**
  * ViewModel for managing the barcode scanner screen.
  *
  * @property application The application context
  */
-class BarcodeScannerViewModel(application: Application) : AndroidViewModel(application) {
+class BarcodeScannerViewModel(application: Application, foodFactsRepository: FoodFactsRepository) : AndroidViewModel(application) {
 
   private val sharedPreferences =
       getApplication<Application>()

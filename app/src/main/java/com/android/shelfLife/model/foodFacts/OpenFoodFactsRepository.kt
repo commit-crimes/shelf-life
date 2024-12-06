@@ -1,6 +1,11 @@
 package com.android.shelfLife.model.foodFacts
 
 import android.util.Log
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.io.IOException
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -8,12 +13,73 @@ import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
 
+sealed class SearchStatus {
+  data object Idle : SearchStatus()
+
+  data object Loading : SearchStatus()
+
+  data object Success : SearchStatus()
+
+  data object Failure : SearchStatus()
+}
+
 class OpenFoodFactsRepository(
     private val client: OkHttpClient,
     private val baseUrl: String = "https://world.openfoodfacts.net"
 ) : FoodFactsRepository {
 
-  private val MAX_RESULTS = 7 // Adjust the number of results as needed
+  companion object {
+    private val MAX_RESULTS = 7 // Adjust the number of results as needed
+  }
+
+  private val _searchStatus = MutableStateFlow<SearchStatus>(SearchStatus.Idle)
+  val searchStatus: StateFlow<SearchStatus> = _searchStatus
+
+  private val _foodFactsSuggestions = MutableStateFlow<List<FoodFacts>>(emptyList())
+  val foodFactsSuggestions: StateFlow<List<FoodFacts>> = _foodFactsSuggestions
+
+  fun resetSearchStatus() {
+    _searchStatus.value = SearchStatus.Idle
+  }
+
+  fun clearFoodFactsSuggestions() {
+    _foodFactsSuggestions.value = emptyList()
+  }
+
+  // Modified search function
+  override fun searchByBarcode(barcode: Long) {
+      _searchStatus.value = SearchStatus.Loading
+      searchFoodFacts(
+        searchInput = FoodSearchInput.Barcode(barcode),
+        onSuccess = { foodFactsList ->
+          _foodFactsSuggestions.value = foodFactsList
+          _searchStatus.value = SearchStatus.Success
+        },
+        onFailure = {
+          _foodFactsSuggestions.value = emptyList()
+          _searchStatus.value = SearchStatus.Failure
+        })
+    }
+
+  // Function to set a new query and trigger a search using a query string
+  override fun searchByQuery(newQuery: String) {
+    _searchStatus.value = SearchStatus.Loading
+    searchFoodFacts(
+        FoodSearchInput.Query(newQuery),
+        onSuccess = { foodFactsList ->
+          // Filter out items without images
+          val filteredList = foodFactsList.filter { it.imageUrl.isNotEmpty() }
+          _foodFactsSuggestions.value = filteredList
+          _searchStatus.value = SearchStatus.Success
+        },
+        onFailure = {
+          _foodFactsSuggestions.value = emptyList()
+          _searchStatus.value = SearchStatus.Failure
+        })
+    }
+
+
+
 
   private fun buildUrl(vararg paths: String): String {
     return paths.joinToString("/") { it.trim('/') }
@@ -135,4 +201,5 @@ class OpenFoodFactsRepository(
         nutritionFacts = nutritionFacts,
         imageUrl = imageUrl)
   }
+
 }

@@ -27,4 +27,8 @@ interface FoodFactsRepository {
       onSuccess: (List<FoodFacts>) -> Unit,
       onFailure: (Exception) -> Unit
   )
+
+  fun searchByBarcode(barcode: Long)
+
+  fun searchByQuery(query: String)
 }
