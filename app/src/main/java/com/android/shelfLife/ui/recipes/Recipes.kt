@@ -21,13 +21,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -132,73 +130,73 @@ fun RecipesScreen(
               // Floating Action Button to add a new food item
               floatingActionButton = {
                 Column(
-                  horizontalAlignment = Alignment.End,
-                  verticalArrangement = Arrangement.spacedBy(16.dp),
-                  modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)
-                ) {
-                  // Secondary FAB for "Manual" option
-                  if (fabExpanded.value) {
-                    ExtendedFloatingActionButton(
-                      text = { Text("Generate") },
-                      icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "Add") },
-                      onClick = {
-                        // Navigate to Manual Recipe screen
-                        navigationActions.navigateTo(Screen.GENERATE_RECIPE)
-                      },
-                      containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                      modifier = Modifier.testTag("manualRecipeFab").width(150.dp)
-                    )
-                  }
-
-                  // Primary FAB
-                  ExtendedFloatingActionButton(
-                    text = { Text(if (fabExpanded.value) "Manual" else "") },
-                    icon = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                    onClick = {
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)) {
+                      // Secondary FAB for "Manual" option
                       if (fabExpanded.value) {
-                        // Navigate to Generate Recipe screen
-                        navigationActions.navigateTo(Screen.ADD_RECIPE)
-                      } else {
-                        // Expand the FABs
-                        fabExpanded.value = true
+                        ExtendedFloatingActionButton(
+                            text = { Text("Generate") },
+                            icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "Add") },
+                            onClick = {
+                              // Navigate to Manual Recipe screen
+                              navigationActions.navigateTo(Screen.GENERATE_RECIPE)
+                            },
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            modifier = Modifier.testTag("manualRecipeFab").width(150.dp))
                       }
-                    },
-                    expanded = fabExpanded.value, // Bind to the state
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    modifier = Modifier.testTag("addRecipeFab").width(if (fabExpanded.value) 150.dp else 56.dp)
-                  )
-                }
+
+                      // Primary FAB
+                      ExtendedFloatingActionButton(
+                          text = { Text(if (fabExpanded.value) "Manual" else "") },
+                          icon = { Icon(Icons.Default.Add, contentDescription = "Add") },
+                          onClick = {
+                            if (fabExpanded.value) {
+                              // Navigate to Generate Recipe screen
+                              navigationActions.navigateTo(Screen.ADD_RECIPE)
+                            } else {
+                              // Expand the FABs
+                              fabExpanded.value = true
+                            }
+                          },
+                          expanded = fabExpanded.value, // Bind to the state
+                          containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                          modifier =
+                              Modifier.testTag("addRecipeFab")
+                                  .width(if (fabExpanded.value) 150.dp else 56.dp))
+                    }
               },
               content = { paddingValues ->
-                Column(modifier = Modifier.padding(paddingValues).fillMaxSize().pointerInput(Unit) {
-                  detectTapGestures(onTap = {
-                    if (fabExpanded.value) fabExpanded.value = false
-                  })
-                }) {
-                  CustomSearchBar(
-                      query = query,
-                      onQueryChange = { query = it },
-                      placeholder = "Search recipe",
-                      searchBarTestTag = "searchBar")
+                Column(
+                    modifier =
+                        Modifier.padding(paddingValues).fillMaxSize().pointerInput(Unit) {
+                          detectTapGestures(
+                              onTap = { if (fabExpanded.value) fabExpanded.value = false })
+                        }) {
+                      CustomSearchBar(
+                          query = query,
+                          onQueryChange = { query = it },
+                          placeholder = "Search recipe",
+                          searchBarTestTag = "searchBar")
 
-                  if (filteredRecipes.isEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        content = {
-                          Text(
-                              text = "No recipes available",
-                              modifier = Modifier.testTag("noRecipesAvailableText"))
-                        },
-                        contentAlignment = Alignment.Center)
-                  } else {
-                    // LazyColumn for displaying the list of filtered recipes
-                    LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
-                      items(filteredRecipes) { recipe ->
-                        RecipeItem(recipe, navigationActions, listRecipesViewModel)
+                      if (filteredRecipes.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            content = {
+                              Text(
+                                  text = "No recipes available",
+                                  modifier = Modifier.testTag("noRecipesAvailableText"))
+                            },
+                            contentAlignment = Alignment.Center)
+                      } else {
+                        // LazyColumn for displaying the list of filtered recipes
+                        LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
+                          items(filteredRecipes) { recipe ->
+                            RecipeItem(recipe, navigationActions, listRecipesViewModel)
+                          }
+                        }
                       }
                     }
-                  }
-                }
               })
         }
       }

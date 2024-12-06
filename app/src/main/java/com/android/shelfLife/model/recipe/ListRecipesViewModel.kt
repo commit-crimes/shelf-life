@@ -42,7 +42,7 @@ open class ListRecipesViewModel(
   open val selectedRecipe: StateFlow<Recipe?> = _selectedRecipe.asStateFlow()
 
   init {
-    recipeRepository.init(onSuccess = { observeRecipes()})
+    recipeRepository.init(onSuccess = { observeRecipes() })
   }
 
   private fun observeRecipes() {
@@ -69,9 +69,10 @@ open class ListRecipesViewModel(
     return recipeRepository.getUid()
   }
 
-  fun getRecipes() { //deprecated: clean up in next task. We now have observeRecipes that is only called on start
+  fun getRecipes() { // deprecated: clean up in next task. We now have observeRecipes that is only
+                     // called on start
     return recipeRepository.getRecipes(
-        onSuccess = { _recipes.value = listOf(testRecipe) +it }, onFailure = ::_onFail)
+        onSuccess = { _recipes.value = listOf(testRecipe) + it }, onFailure = ::_onFail)
   }
 
   /**

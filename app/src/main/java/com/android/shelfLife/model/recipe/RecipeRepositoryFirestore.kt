@@ -7,13 +7,12 @@ import com.android.shelfLife.model.foodFacts.Quantity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
-import kotlinx.coroutines.flow.asStateFlow
 
 class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepository {
 
@@ -24,7 +23,6 @@ class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepos
   private val auth = FirebaseAuth.getInstance()
   private val _recipes = MutableStateFlow<List<Recipe>>(emptyList())
   override val recipes: StateFlow<List<Recipe>> = _recipes.asStateFlow()
-
 
   private val _selectedRecipe = MutableStateFlow<Recipe?>(null)
   override val selectedRecipe: StateFlow<Recipe?> = _selectedRecipe.asStateFlow()
@@ -123,10 +121,9 @@ class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepos
         .document(recipe.uid)
         .set(recipe)
         .addOnSuccessListener {
-          _recipes.update { currentRecipes ->
-            currentRecipes + recipe
-          }
-          onSuccess() }
+          _recipes.update { currentRecipes -> currentRecipes + recipe }
+          onSuccess()
+        }
         .addOnFailureListener { exception ->
           Log.e("RecipeRepository", "Error adding recipe", exception)
           onFailure(exception)
@@ -151,7 +148,6 @@ class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepos
             }
           }
           onSuccess()
-
         }
         .addOnFailureListener { exception ->
           Log.e("RecipeRepository", "Error updating recipe", exception)
@@ -175,9 +171,7 @@ class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepos
         .document(recipeId)
         .delete()
         .addOnSuccessListener {
-          _recipes.update { currentRecipes ->
-            currentRecipes.filter { it.uid != recipeId }
-          }
+          _recipes.update { currentRecipes -> currentRecipes.filter { it.uid != recipeId } }
           onSuccess()
         }
         .addOnFailureListener { exception ->

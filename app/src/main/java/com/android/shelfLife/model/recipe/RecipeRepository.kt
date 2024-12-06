@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface RecipeRepository {
 
-  //local cache for recipes list (keep data integrity between screens)
+  // local cache for recipes list (keep data integrity between screens)
   val recipes: StateFlow<List<Recipe>>
 
   val selectedRecipe: StateFlow<Recipe?>
