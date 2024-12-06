@@ -57,7 +57,7 @@ class OverviewScreenViewModel(
   private fun loadHouseholds() {
     viewModelScope.launch {
       userRepository.user.value?.let { user ->
-        houseHoldRepository.initializeHouseholds(user.householdUIDs, user.selectedHouseholdUID)
+        houseHoldRepository.initializeHouseholds(user.householdUIDs, user.selectedHouseholdUID!!)
         userRepository.selectHousehold(
             households.value.find { it.uid == user.selectedHouseholdUID }
                 ?: households.value.firstOrNull())

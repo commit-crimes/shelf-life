@@ -37,6 +37,8 @@ interface UserRepository {
 
   suspend fun deleteHouseholdUID(uid: String)
 
+  suspend fun updateSelectedHouseholdUID(householdUID: String)
+
   suspend fun addRecipeUID(recipeUID: String)
 
   suspend fun deleteRecipeUID(uid: String)
@@ -44,6 +46,8 @@ interface UserRepository {
   suspend fun deleteInvitationUID(uid: String)
 
   suspend fun updateUsername(username: String)
+
+  suspend fun updateImage(url: String)
 
   suspend fun updateEmail(email: String)
 

@@ -47,7 +47,7 @@ import com.android.shelfLife.ui.overview.IndividualFoodItemScreen
 import com.android.shelfLife.ui.overview.OverviewScreen
 import com.android.shelfLife.ui.profile.ProfileScreen
 import com.android.shelfLife.ui.recipes.AddRecipeScreen
-import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
+import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.viewmodel.authentication.SignInViewModel
 import com.example.compose.ShelfLifeTheme
@@ -175,7 +175,8 @@ fun ShelfLifeApp() {
       }
       composable(Route.INVITATIONS) {
         InvitationScreen(
-            invitationViewModel = invitationViewModel, navigationActions = navigationActions)
+            navigationActions = navigationActions,
+            invitationRepository = invitationRepositoryFirestore)
       }
     }
   }

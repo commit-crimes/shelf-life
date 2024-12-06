@@ -131,6 +131,7 @@ class UserRepositoryFirestore(
     val updatedUserData =
         when (fieldName) {
           "username" -> currentUserData.copy(username = value as String)
+          "imageURL" -> currentUserData.copy(photoUrl = value as String)
           "email" -> currentUserData.copy(email = value as String)
           "selectedHouseholdUID" -> currentUserData.copy(selectedHouseholdUID = value as String)
           else -> currentUserData
@@ -200,6 +201,10 @@ class UserRepositoryFirestore(
     updateArrayField("householdUIDs", uid, ArrayOperation.REMOVE)
   }
 
+  override suspend fun updateSelectedHouseholdUID(householdUID: String) {
+    updateUserField("selectedHouseholdUID", householdUID)
+  }
+
   override suspend fun addRecipeUID(recipeUID: String) {
     updateArrayField("recipeUIDs", recipeUID, ArrayOperation.ADD)
   }
@@ -216,6 +221,10 @@ class UserRepositoryFirestore(
 
   override suspend fun updateUsername(username: String) {
     updateUserField("username", username)
+  }
+
+  override suspend fun updateImage(url: String) {
+    updateUserField("imageURL", url)
   }
 
   override suspend fun updateEmail(email: String) {
@@ -308,18 +317,26 @@ class UserRepositoryFirestore(
     household?.let { updateSelectedHousehold(it.uid) }
   }
 
-  fun convertToUser(doc: DocumentSnapshot): User? {
+  private fun convertToUser(doc: DocumentSnapshot): User? {
     return try {
       val uid = doc.id
       val username = doc.getString("username") ?: ""
       val email = doc.getString("email") ?: ""
-      val photoURL = doc.getString("photoURL") ?: ""
+      val imageURL = doc.getString("imageURL") ?: ""
       val selectedHouseholdUID = doc.getString("selectedHouseholdUID") ?: ""
       val householdUIDs = doc.get("householdUIDs") as? List<String> ?: emptyList()
       val recipeUIDs = doc.get("recipeUIDs") as? List<String> ?: emptyList()
       val invitationUIDs = doc.get("invitationUIDs") as? List<String> ?: emptyList()
 
-      User(uid, username, email, photoURL, selectedHouseholdUID, householdUIDs, recipeUIDs, invitationUIDs)
+      User(
+          uid,
+          username,
+          email,
+          imageURL,
+          householdUIDs,
+          selectedHouseholdUID,
+          recipeUIDs,
+          invitationUIDs)
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error converting document to HouseHold", e)
       null

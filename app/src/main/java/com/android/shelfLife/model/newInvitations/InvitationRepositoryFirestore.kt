@@ -20,9 +20,8 @@ open class InvitationRepositoryFirestore(
     private val auth: FirebaseAuth) : InvitationRepository {
 
   internal var listenerRegistration: ListenerRegistration? = null
-  private val _invitations = MutableStateFlow<List<Invitation>>(emptyList())
-  val invitations: StateFlow<List<Invitation>> = _invitations.asStateFlow()
-
+  private val _invitations: MutableStateFlow<List<Invitation>> = MutableStateFlow(emptyList())
+  override val invitations: StateFlow<List<Invitation>> = _invitations.asStateFlow()
   private val invitationPath = "invitations"
 
   /** Removes the real-time listener for invitations. */

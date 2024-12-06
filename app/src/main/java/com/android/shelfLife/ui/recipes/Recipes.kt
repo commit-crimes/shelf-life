@@ -21,7 +21,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -62,7 +61,6 @@ import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
 import com.android.shelfLife.ui.utils.CustomSearchBar
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipesScreen(
     navigationActions: NavigationActions,
@@ -134,6 +132,7 @@ fun RecipesScreen(
                   CustomSearchBar(
                       query = query,
                       onQueryChange = { query = it },
+                      onDeleteTextClicked = { query = "" },
                       placeholder = "Search recipe",
                       searchBarTestTag = "searchBar")
 
