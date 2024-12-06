@@ -2,8 +2,8 @@ package com.android.shelfLife.model.user
 
 import android.content.Context
 import android.util.Log
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.android.shelfLife.model.newhousehold.HouseHold
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
@@ -17,9 +17,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 
 class UserRepositoryFirestore(
-  private val db: FirebaseFirestore,
-  private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
-  ) : UserRepository {
+    private val db: FirebaseFirestore,
+    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
+) : UserRepository {
 
   private val auth = FirebaseAuth.getInstance()
   private val userCollection = db.collection("users")
@@ -59,17 +59,23 @@ class UserRepositoryFirestore(
         val name = currentAccount?.displayName ?: "Guest"
         val email = currentAccount?.email ?: ""
         val photoUrl = currentAccount?.photoUrl.toString()
-        _user.value = User(uid = currentUser.uid, username = name, email = email, photoUrl = photoUrl, selectedHouseholdUID = "")
+        _user.value =
+            User(
+                uid = currentUser.uid,
+                username = name,
+                email = email,
+                photoUrl = photoUrl,
+                selectedHouseholdUID = "")
         val userDoc = db.collection("users").document(currentUser.uid)
-        val userData = mapOf(
-            "username" to name,
-            "email" to email,
-            "photoURL" to photoUrl,
-            "selectedHouseholdUID" to "",
-            "householdUIDs" to emptyList<String>(),
-            "recipeUIDs" to emptyList<String>(),
-            "invitationUIDs" to emptyList<String>()
-        )
+        val userData =
+            mapOf(
+                "username" to name,
+                "email" to email,
+                "photoURL" to photoUrl,
+                "selectedHouseholdUID" to "",
+                "householdUIDs" to emptyList<String>(),
+                "recipeUIDs" to emptyList<String>(),
+                "invitationUIDs" to emptyList<String>())
         userDoc.set(userData, SetOptions.merge())
       }
     } catch (e: Exception) {
@@ -333,7 +339,7 @@ class UserRepositoryFirestore(
           username,
           email,
           photoURL,
-        selectedHouseholdUID,
+          selectedHouseholdUID,
           householdUIDs,
           recipeUIDs,
           invitationUIDs)

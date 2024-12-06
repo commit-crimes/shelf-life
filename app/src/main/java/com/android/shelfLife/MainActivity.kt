@@ -82,9 +82,9 @@ fun ShelfLifeApp() {
   val listRecipesViewModel = viewModel {
     ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
   }
-    val userRepository = UserRepositoryFirestore(firebaseFirestore)
+  val userRepository = UserRepositoryFirestore(firebaseFirestore)
   val signInViewModel = viewModel {
-      SignInViewModel(firestore = firebaseFirestore, userRepository = userRepository)
+    SignInViewModel(firestore = firebaseFirestore, userRepository = userRepository)
   }
 
   val context = LocalContext.current
@@ -118,7 +118,7 @@ fun ShelfLifeApp() {
         startDestination = Screen.AUTH,
         route = Route.AUTH,
     ) {
-      composable(Screen.AUTH) { SignInScreen(navigationActions, signInViewModel) }
+      composable(Screen.AUTH) { SignInScreen(navigationActions, userRepository) }
     }
     navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
       composable(Screen.OVERVIEW) {
@@ -171,7 +171,7 @@ fun ShelfLifeApp() {
     }
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
       composable(Screen.PROFILE) {
-        ProfileScreen(navigationActions, signInViewModel, invitationViewModel = invitationViewModel)
+        ProfileScreen(navigationActions, invitationViewModel = invitationViewModel)
       }
       composable(Route.INVITATIONS) {
         InvitationScreen(

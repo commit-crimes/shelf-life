@@ -1,9 +1,10 @@
-package com.android.shelfLife.viewmodel
+package com.android.shelflife.viewmodel
 
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.newFoodItem.*
 import com.android.shelfLife.model.user.User
 import com.android.shelfLife.model.user.UserRepository
+import com.android.shelfLife.viewmodel.FoodItemViewModel
 import com.google.firebase.Timestamp
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
@@ -305,7 +306,12 @@ class FoodItemViewModelTest {
 
   @Test
   fun `addFoodItem does nothing when householdId is null`() = runTest {
-    val user = User(uid = "user1", username = "User1", email = "user1@example.com")
+    val user =
+        User(
+            uid = "user1",
+            username = "User1",
+            email = "user1@example.com",
+            selectedHouseholdUID = null)
     `when`(mockUserRepository.user).thenReturn(MutableStateFlow(user))
 
     val foodItem = mock(FoodItem::class.java)
@@ -315,7 +321,12 @@ class FoodItemViewModelTest {
 
   @Test
   fun `editFoodItem does nothing when householdId is null`() = runTest {
-    val user = User(uid = "user1", username = "User1", email = "user1@example.com")
+    val user =
+        User(
+            uid = "user1",
+            username = "User1",
+            email = "user1@example.com",
+            selectedHouseholdUID = null)
     `when`(mockUserRepository.user).thenReturn(MutableStateFlow(user))
 
     val foodItem = mock(FoodItem::class.java)

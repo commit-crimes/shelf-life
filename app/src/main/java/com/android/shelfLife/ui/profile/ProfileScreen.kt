@@ -29,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
@@ -37,8 +36,6 @@ import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.utils.DropdownFields
-import com.android.shelfLife.ui.utils.signOutUser
-import com.android.shelfLife.viewmodel.authentication.SignInViewModel
 import com.example.compose.LocalThemeMode
 import com.example.compose.LocalThemeTogglerProvider
 import com.example.compose.ThemeMode
@@ -48,11 +45,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 @Composable
 fun ProfileScreen(
     navigationActions: NavigationActions,
-    signInViewModel: SignInViewModel = viewModel(),
+    account: GoogleSignInAccount? = null,
+    signOutUser: () -> Unit = {},
     invitationViewModel: InvitationViewModel
 ) {
   val context = LocalContext.current
-  val currentAccount = GoogleSignIn.getLastSignedInAccount(context)
+  val currentAccount = remember { account ?: getGoogleAccount(context) }
 
   val invitations by invitationViewModel.invitations.collectAsState()
 
@@ -159,14 +157,12 @@ fun ProfileScreen(
 
               Spacer(modifier = Modifier.weight(1f))
 
+              // Logout button
               OutlinedButton(
-                  onClick = {
-                    signInViewModel.signOutUser(context) {
-                      // The navigation will be handled by observing isUserLoggedIn
-                    }
-                  },
+                  onClick = { signOutUser() },
                   modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
-                  border = BorderStroke(1.dp, Color.Red)) {
+                  border = BorderStroke(1.dp, Color.Red) // Outline color matches the current status
+                  ) {
                     Text(text = "Log out", color = Color.Red)
                   }
             }

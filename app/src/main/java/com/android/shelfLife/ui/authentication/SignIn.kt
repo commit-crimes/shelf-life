@@ -32,13 +32,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 @Composable
-fun SignInScreen(
-    navigationActions: NavigationActions,
-    userRepository: UserRepository
-) {
-    val signInViewModel = viewModel{
-        SignInViewModel(userRepository = userRepository)
-    }
+fun SignInScreen(navigationActions: NavigationActions, userRepository: UserRepository) {
+  val signInViewModel = viewModel { SignInViewModel(userRepository = userRepository) }
   val context = LocalContext.current
   val signInState by signInViewModel.signInState.collectAsState()
 
@@ -91,7 +86,8 @@ fun SignInScreen(
 
           Text(
               text = stringResource(R.string.app_name),
-              style = MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
+              style =
+                  MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
               fontWeight = FontWeight.Bold,
               textAlign = TextAlign.Center,
               modifier = Modifier.testTag("loginTitle"))
@@ -107,7 +103,7 @@ fun SignInScreen(
                         .build()
                 val googleSignInClient = GoogleSignIn.getClient(context, gso)
                 launcher.launch(googleSignInClient.signInIntent)
-                  navigationActions.navigateTo(Route.OVERVIEW)
+                navigationActions.navigateTo(Route.OVERVIEW)
               },
               modifier = Modifier.testTag("loginButton"))
 

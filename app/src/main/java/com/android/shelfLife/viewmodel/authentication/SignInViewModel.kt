@@ -6,12 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.R
 import com.android.shelfLife.model.user.UserRepository
-import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -29,7 +27,8 @@ class SignInViewModel(
 
   private val authStateListener =
       FirebaseAuth.AuthStateListener { auth ->
-        userRepository.setUserLoggedInStatus(auth.currentUser != null) }
+        userRepository.setUserLoggedInStatus(auth.currentUser != null)
+      }
 
   init {
     firebaseAuth.addAuthStateListener(authStateListener)

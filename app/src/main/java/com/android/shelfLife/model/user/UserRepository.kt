@@ -1,9 +1,8 @@
 package com.android.shelfLife.model.user
 
 import android.content.Context
-import kotlinx.coroutines.flow.StateFlow
 import com.android.shelfLife.model.newhousehold.HouseHold
-
+import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {
   val isUserLoggedIn: StateFlow<Boolean>
