@@ -21,7 +21,7 @@ class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepos
   }
 
   private val auth = FirebaseAuth.getInstance()
-  private val _recipes = MutableStateFlow<List<Recipe>>(emptyList())W
+  private val _recipes = MutableStateFlow<List<Recipe>>(emptyList())
   override val recipes: StateFlow<List<Recipe>> = _recipes.asStateFlow()
 
   private val _selectedRecipe = MutableStateFlow<Recipe?>(null)
