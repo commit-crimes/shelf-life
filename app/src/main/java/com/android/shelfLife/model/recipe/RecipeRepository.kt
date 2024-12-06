@@ -1,6 +1,12 @@
 package com.android.shelfLife.model.recipe
 
+import kotlinx.coroutines.flow.StateFlow
+
 interface RecipeRepository {
+
+  //local cache for recipes list (keep data integrity between screens)
+  val recipes: StateFlow<List<Recipe>>
+
   /** Generates a new unique ID for a recipe. */
   fun getUid(): String
 

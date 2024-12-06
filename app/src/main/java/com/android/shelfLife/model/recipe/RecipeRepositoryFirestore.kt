@@ -7,6 +7,10 @@ import com.android.shelfLife.model.foodFacts.Quantity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -17,6 +21,9 @@ class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepos
   }
 
   private val auth = FirebaseAuth.getInstance()
+  private val _recipes = MutableStateFlow<List<Recipe>>(emptyList())
+  override val recipes: StateFlow<List<Recipe>> = _recipes.asStateFlow()
+
 
   /**
    * Generates a new unique ID for a recipe.
@@ -62,6 +69,7 @@ class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepos
             val recipe = convertToRecipe(document)
             if (recipe != null) recipeList.add(recipe)
           }
+          _recipes.value = recipeList
           onSuccess(recipeList)
         }
         .addOnFailureListener { exception ->
@@ -110,7 +118,11 @@ class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepos
     db.collection(COLLECTION_PATH)
         .document(recipe.uid)
         .set(recipe)
-        .addOnSuccessListener { onSuccess() }
+        .addOnSuccessListener {
+          _recipes.update { currentRecipes ->
+            currentRecipes + recipe
+          }
+          onSuccess() }
         .addOnFailureListener { exception ->
           Log.e("RecipeRepository", "Error adding recipe", exception)
           onFailure(exception)
@@ -128,7 +140,15 @@ class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepos
     db.collection(COLLECTION_PATH)
         .document(recipe.uid)
         .set(recipe)
-        .addOnSuccessListener { onSuccess() }
+        .addOnSuccessListener {
+          _recipes.update { currentRecipes ->
+            currentRecipes.map { existingRecipe ->
+              if (existingRecipe.uid == recipe.uid) recipe else existingRecipe
+            }
+          }
+          onSuccess()
+
+        }
         .addOnFailureListener { exception ->
           Log.e("RecipeRepository", "Error updating recipe", exception)
           onFailure(exception)
@@ -150,7 +170,12 @@ class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepos
     db.collection(COLLECTION_PATH)
         .document(recipeId)
         .delete()
-        .addOnSuccessListener { onSuccess() }
+        .addOnSuccessListener {
+          _recipes.update { currentRecipes ->
+            currentRecipes.filter { it.uid != recipeId }
+          }
+          onSuccess()
+        }
         .addOnFailureListener { exception ->
           Log.e("RecipeRepository", "Error deleting recipe", exception)
           onFailure(exception)
