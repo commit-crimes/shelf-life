@@ -34,7 +34,7 @@ open class ListRecipesViewModel(
           time = 1.toDuration(DurationUnit.SECONDS),
       )
 
-  private val _recipes = MutableStateFlow<List<Recipe>>(emptyList())
+  private val _recipes = MutableStateFlow<List<Recipe>>(listOf(testRecipe))
   val recipes: StateFlow<List<Recipe>> = _recipes.asStateFlow()
 
   // Selected recipe, i.e the recipe for the detail view
