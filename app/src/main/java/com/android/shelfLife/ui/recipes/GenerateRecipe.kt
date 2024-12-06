@@ -12,6 +12,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -21,25 +22,28 @@ import androidx.compose.ui.unit.sp
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.recipe.RecipePrompt
+import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.viewmodel.recipe.RecipeGenerationViewModel
 
 @Composable
 fun GenerateRecipeScreen(
-    navigationActions: NavigationActions,
-    generationViewModel: RecipeGenerationViewModel
+  navigationActions: NavigationActions,
+  recipeRepository: RecipeRepository,
+  recipeGeneratorRepository: RecipeGeneratorRepository
 ) {
   val context = LocalContext.current
 
   // States for recipe name and food items
-  var recipeName by remember { mutableStateOf("") }
-  var recipeNameError by remember { mutableStateOf<String?>(null) }
+  var recipeName by rememberSaveable { mutableStateOf("") }
+  var recipeNameError by rememberSaveable { mutableStateOf<String?>(null) }
 
-  val foodItems = remember { mutableStateListOf<String>() }
-  var newFoodItem by remember { mutableStateOf("") }
-  var foodItemError by remember { mutableStateOf<String?>(null) }
+  val foodItems = rememberSaveable { mutableStateListOf<String>() }
+  var newFoodItem by rememberSaveable { mutableStateOf("") }
+  var foodItemError by rememberSaveable { mutableStateOf<String?>(null) }
 
   Column(modifier = Modifier.padding(top = 50.dp, start = 16.dp, end = 16.dp)) {
     // Header
