@@ -29,22 +29,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.newInvitations.Invitation
-import com.android.shelfLife.model.newInvitations.InvitationRepositoryFirestore
-import com.android.shelfLife.model.user.UserRepositoryFirestore
-import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.model.newInvitations.InvitationRepository
+import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.viewmodel.InvitationViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InvitationScreen(viewModel: InvitationViewModel, navigationActions: NavigationActions) {
-  val invitations by viewModel.invitations.collectAsState()
+fun InvitationScreen(invitationRepository: InvitationRepository, userRepository: UserRepository) {
+  val invitationViewModel = viewModel { InvitationViewModel(invitationRepository, userRepository) }
+  val invitations by invitationViewModel.invitations.collectAsState()
   Scaffold(topBar = { TopAppBar(title = { Text("Invitations") }) }) { paddingValues ->
     if (invitations.isEmpty()) {
       Box(
@@ -56,7 +53,7 @@ fun InvitationScreen(viewModel: InvitationViewModel, navigationActions: Navigati
       // Show list of invitations
       LazyColumn(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
         items(invitations) { invitation ->
-          InvitationCard(invitation, viewModel)
+          InvitationCard(invitation, invitationViewModel)
           Spacer(modifier = Modifier.height(8.dp))
         }
       }
@@ -103,16 +100,4 @@ fun InvitationCard(
       }
     }
   }
-}
-
-@Preview
-@Composable
-fun PreviewInvitationScreen() {
-  val db = FirebaseFirestore.getInstance()
-  val auth = FirebaseAuth.getInstance()
-  val userRepo = UserRepositoryFirestore(db)
-  val invitationRepo = InvitationRepositoryFirestore(db, auth)
-  InvitationScreen(
-      viewModel = InvitationViewModel(invitationRepo, userRepo),
-      navigationActions = NavigationActions(rememberNavController()))
 }

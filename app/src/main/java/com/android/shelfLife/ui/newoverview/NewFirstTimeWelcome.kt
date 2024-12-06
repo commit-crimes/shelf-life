@@ -24,7 +24,8 @@ import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 /**
  * Composable function to display the first time welcome screen for the user to create a new
  *
- * @param householdViewModel The ViewModel for the households the user has access to
+ * @param navigationActions The actions to handle navigation
+ * @param overviewScreenViewModel The view model to handle the overview screen data
  */
 @Composable
 fun FirstTimeWelcomeScreen(
