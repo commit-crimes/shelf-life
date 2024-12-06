@@ -1,6 +1,10 @@
 package com.android.shelfLife.model.newhousehold
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.test.core.app.ApplicationProvider
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
+import com.android.shelfLife.model.user.UserRepository
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
@@ -27,6 +31,9 @@ class HouseholdRepositoryFirestoreTest {
   @Mock private lateinit var mockDocument: DocumentReference
   @Mock private lateinit var mockQuerySnapshot: QuerySnapshot
   @Mock private lateinit var mockDocumentSnapshot: DocumentSnapshot
+  @Mock private lateinit var dataStore: DataStore<Preferences>
+  @Mock private lateinit var listFoodItemRepository: FoodItemRepository
+  @Mock private lateinit var userRepository: UserRepository
 
   private lateinit var householdRepository: HouseholdRepositoryFirestore
 
@@ -207,7 +214,7 @@ class HouseholdRepositoryFirestoreTest {
     val _households = householdsField.get(householdRepository) as MutableStateFlow<List<HouseHold>>
     _households.value = emptyList()
 
-    householdRepository.initializeHouseholds(householdIds)
+    householdRepository.initializeHouseholds(householdIds, "user1")
 
     val households = householdRepository.households.value
 

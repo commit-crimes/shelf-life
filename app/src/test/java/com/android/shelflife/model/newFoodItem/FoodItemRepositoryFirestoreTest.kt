@@ -220,8 +220,9 @@ class FoodItemRepositoryFirestoreTest {
                 existingFoodItem.foodFacts.copy(
                     quantity = Quantity(amount = 80.0, unit = FoodUnit.GRAM)))
 
+    // Mock Firestore set operation for any argument
     val mockTask: Task<Void> = Tasks.forResult(null)
-    `when`(mockDocument.set(any<Map<String, Any>>())).thenReturn(mockTask)
+    `when`(mockDocument.set(any())).thenReturn(mockTask)
 
     // Set initial food items in cache
     val foodItemsField: Field = foodItemRepository.javaClass.getDeclaredField("_foodItems")
@@ -229,10 +230,14 @@ class FoodItemRepositoryFirestoreTest {
     val _foodItems = foodItemsField.get(foodItemRepository) as MutableStateFlow<List<FoodItem>>
     _foodItems.value = listOf(existingFoodItem)
 
+    // Call the method under test
     foodItemRepository.updateFoodItem(householdId, updatedFoodItem)
 
-    val foodItems = foodItemRepository.foodItems.value
+    // Advance time if necessary
+    advanceUntilIdle()
 
+    // Assertions
+    val foodItems = foodItemRepository.foodItems.value
     assertEquals(1, foodItems.size)
     assertEquals(updatedFoodItem, foodItems[0])
   }

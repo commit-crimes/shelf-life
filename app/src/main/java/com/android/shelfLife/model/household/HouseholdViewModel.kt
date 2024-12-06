@@ -159,7 +159,7 @@ class HouseholdViewModel(
   }
 
   /**
-   * Selects a household to edit and loads the list of member emails.
+   * Selects a household to edit
    *
    * @param household - The household to edit.
    */
@@ -365,25 +365,4 @@ class HouseholdViewModel(
       updateViewModelStateWithHousehold(updatedHousehold)
     }
   }
-
-  /**
-   * Factory for creating a [HouseholdViewModel] with a constructor that takes a
-   * [HouseHoldRepository] and a [ListFoodItemsViewModel].
-   */
-  /*
-  companion object {
-    val Factory: ViewModelProvider.Factory =
-        object : ViewModelProvider.Factory {
-          @Suppress("UNCHECKED_CAST")
-          override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            val firebaseFirestore = FirebaseFirestore.getInstance()
-            val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
-            val listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
-            val invitationRepository = InvitationRepositoryFirestore(firebaseFirestore)
-            val repository = HouseholdRepositoryFirestore(firebaseFirestore)
-            return HouseholdViewModel(repository, listFoodItemsViewModel, invitationRepository) as T
-          }
-        }
-
-   */
 }

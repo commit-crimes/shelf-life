@@ -7,6 +7,8 @@ interface RecipeRepository {
   //local cache for recipes list (keep data integrity between screens)
   val recipes: StateFlow<List<Recipe>>
 
+  val selectedRecipe: StateFlow<Recipe?>
+
   /** Generates a new unique ID for a recipe. */
   fun getUid(): String
 
@@ -60,4 +62,11 @@ interface RecipeRepository {
    * @param onFailure - Called when there is an error deleting the recipe.
    */
   fun deleteRecipe(recipeId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+
+  /**
+   * Selects a recipe
+   *
+   * @param recipe - The recipe we want to select
+   */
+  fun selectRecipe(recipe: Recipe)
 }
