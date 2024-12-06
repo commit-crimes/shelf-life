@@ -1,5 +1,6 @@
 package com.android.shelflife.model.user
 
+import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.android.shelfLife.model.user.User
 import com.android.shelfLife.model.user.UserRepositoryFirestore
@@ -12,7 +13,6 @@ import com.google.firebase.firestore.*
 import java.lang.reflect.Field
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
-import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -102,8 +102,9 @@ class UserRepositoryFirestoreTest {
     `when`(mockDocumentSnapshot.get("householdUIDs")).thenReturn(listOf("house1", "house2"))
     `when`(mockDocumentSnapshot.get("recipeUIDs")).thenReturn(listOf("recipe1"))
     `when`(mockDocumentSnapshot.get("invitationUIDs")).thenReturn(listOf("invite1"))
+    val context = mock(Context::class.java)
 
-    userRepository.initializeUserData()
+    userRepository.initializeUserData(context = context)
 
     // Since initializeUserData updates _user, we need to access it
     val user = userRepository.user.value
@@ -113,22 +114,23 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun `initializeUserData sets user to null when snapshot does not exist`() = runTest {
+  fun `initializeUserData creates new user when snapshot does not exist`() = runTest {
     val mockTask: Task<DocumentSnapshot> = Tasks.forResult(mockDocumentSnapshot)
+    val context = ApplicationProvider.getApplicationContext<Context>()
     `when`(mockUserDocument.get()).thenReturn(mockTask)
     `when`(mockDocumentSnapshot.exists()).thenReturn(false)
 
-    userRepository.initializeUserData()
+    userRepository.initializeUserData(context = context)
 
     val user = userRepository.user.value
-    assertNull(user)
+    assertNotNull(user)
   }
 
   @Test(expected = Exception::class)
   fun `initializeUserData throws exception when not logged in`() = runTest {
     `when`(mockAuth.currentUser).thenReturn(null)
-
-    userRepository.initializeUserData()
+    val context = mock(Context::class.java)
+    userRepository.initializeUserData(context = context)
   }
 
   @Test

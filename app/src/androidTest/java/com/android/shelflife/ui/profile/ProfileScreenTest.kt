@@ -1,51 +1,68 @@
+// ProfileScreenTest.kt
 package com.android.shelflife.ui.profile
 
-import android.net.Uri
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.NavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
 import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.profile.ProfileScreen
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.Assert.*
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
+import junit.framework.TestCase.assertEquals
+import org.junit.*
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ProfileScreenTest {
 
   @get:Rule val composeTestRule = createComposeRule()
-  private lateinit var householdViewModel: HouseholdViewModel
   private lateinit var invitationViewModel: InvitationViewModel
 
   @Before
   fun setUp() {
     MockKAnnotations.init(this, relaxUnitFun = true)
+
+    // Initialize InvitationViewModel with a mock repository
     val mockRepository: InvitationRepositoryFirestore = mockk(relaxed = true)
-    val mockListFoodItemsViewModel: ListFoodItemsViewModel = mockk(relaxed = true)
     invitationViewModel = InvitationViewModel(mockRepository)
+
+    // Mock the static method GoogleSignIn.getLastSignedInAccount
+    mockkStatic(GoogleSignIn::class)
+
+    // Create a mock GoogleSignInAccount
+    val mockAccount = mockk<GoogleSignInAccount>()
+    every { mockAccount.displayName } returns "John Smith"
+    every { mockAccount.email } returns "test@example.com"
+    every { mockAccount.photoUrl } returns null // Set this as needed
+
+    // Mock the static method to return the mock account
+    every { GoogleSignIn.getLastSignedInAccount(any()) } returns mockAccount
+  }
+
+  @After
+  fun tearDown() {
+    // Unmock the static method to avoid side effects on other tests
+    unmockkStatic(GoogleSignIn::class)
   }
 
   @Test
   fun testNameText_whenAccountIsNull_displaysGuest() {
+    // Mock getLastSignedInAccount to return null
+    every { GoogleSignIn.getLastSignedInAccount(any()) } returns null
+
     val navigationActions = NavigationActions(mockk<NavHostController>(relaxed = true))
     composeTestRule.setContent {
       ProfileScreen(
-          navigationActions = navigationActions,
-          account = null,
-          invitationViewModel = invitationViewModel)
+          navigationActions = navigationActions, invitationViewModel = invitationViewModel)
     }
 
     composeTestRule.onNodeWithTag("profileNameText").assertIsDisplayed().assertTextEquals("Guest")
@@ -54,42 +71,25 @@ class ProfileScreenTest {
   @Test
   fun profileScreen_displaysAccountName() {
     val navigationActions = NavigationActions(mockk<NavHostController>(relaxed = true))
-    val account =
-        mockk<GoogleSignInAccount>(
-            block = {
-              every { displayName } returns "John Smith"
-              every { photoUrl } returns null
-              every { email } returns null
-            })
 
     composeTestRule.setContent {
       ProfileScreen(
-          navigationActions = navigationActions,
-          account = account,
-          invitationViewModel = invitationViewModel)
+          navigationActions = navigationActions, invitationViewModel = invitationViewModel)
     }
 
-    composeTestRule.onNodeWithTag("profileNameText").assertTextEquals("John Smith")
+    composeTestRule
+        .onNodeWithTag("profileNameText")
+        .assertIsDisplayed()
+        .assertTextEquals("John Smith")
   }
 
   @Test
   fun testGreetingText_whenAccountIsNotNull_displaysEmail() {
     val navigationActions = NavigationActions(mockk<NavHostController>(relaxed = true))
 
-    val account =
-        mockk<GoogleSignInAccount>(
-            block = {
-              every { email } returns "test@example.com"
-              every { displayName } returns "Jon Smith"
-              every { photoUrl } returns
-                  Uri.parse(
-                      "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg")
-            })
     composeTestRule.setContent {
       ProfileScreen(
-          navigationActions = navigationActions,
-          account = account,
-          invitationViewModel = invitationViewModel)
+          navigationActions = navigationActions, invitationViewModel = invitationViewModel)
     }
 
     composeTestRule
@@ -100,12 +100,17 @@ class ProfileScreenTest {
 
   @Test
   fun profileScreen_hidesEmailWhenNotAvailable() {
+    // Mock getLastSignedInAccount to return a mock account with null email
+    val mockAccount = mockk<GoogleSignInAccount>()
+    every { mockAccount.displayName } returns "John Smith"
+    every { mockAccount.email } returns null
+    every { mockAccount.photoUrl } returns null
+    every { GoogleSignIn.getLastSignedInAccount(any()) } returns mockAccount
+
     val navigationActions = NavigationActions(mockk<NavHostController>(relaxed = true))
     composeTestRule.setContent {
       ProfileScreen(
-          navigationActions = navigationActions,
-          account = null,
-          invitationViewModel = invitationViewModel)
+          navigationActions = navigationActions, invitationViewModel = invitationViewModel)
     }
 
     composeTestRule.onNodeWithTag("profileEmailText").assertDoesNotExist()
@@ -116,21 +121,13 @@ class ProfileScreenTest {
     val navigationActions =
         mockk<NavigationActions>(
             relaxed = true, block = { every { currentRoute() } returns Route.AUTH })
-    var signOutCalled = false
-    val signOutUser = { signOutCalled = true }
 
     composeTestRule.setContent {
       ProfileScreen(
-          navigationActions = navigationActions,
-          account = null,
-          signOutUser = signOutUser,
-          invitationViewModel = invitationViewModel)
+          navigationActions = navigationActions, invitationViewModel = invitationViewModel)
     }
 
     composeTestRule.onNodeWithTag("logoutButton").assertIsDisplayed().performClick()
-
-    // Check that signOutUser was called
-    assertTrue(signOutCalled)
 
     // Check that navigation navigated to AUTH
     assertEquals(Route.AUTH, navigationActions.currentRoute())
@@ -141,9 +138,7 @@ class ProfileScreenTest {
     val navigationActions = NavigationActions(mockk<NavHostController>(relaxed = true))
     composeTestRule.setContent {
       ProfileScreen(
-          navigationActions = navigationActions,
-          account = null,
-          invitationViewModel = invitationViewModel)
+          navigationActions = navigationActions, invitationViewModel = invitationViewModel)
     }
 
     composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
@@ -154,9 +149,7 @@ class ProfileScreenTest {
     val navigationActions = NavigationActions(mockk<NavHostController>(relaxed = true))
     composeTestRule.setContent {
       ProfileScreen(
-          navigationActions = navigationActions,
-          account = null,
-          invitationViewModel = invitationViewModel)
+          navigationActions = navigationActions, invitationViewModel = invitationViewModel)
     }
 
     composeTestRule.onNodeWithText("Profile").assertIsDisplayed().assertIsSelected()
@@ -169,9 +162,7 @@ class ProfileScreenTest {
             relaxed = true, block = { every { currentRoute() } returns Route.RECIPES })
     composeTestRule.setContent {
       ProfileScreen(
-          navigationActions = navigationActions,
-          account = null,
-          invitationViewModel = invitationViewModel)
+          navigationActions = navigationActions, invitationViewModel = invitationViewModel)
     }
 
     composeTestRule.onNodeWithText("Recipes").performClick()
@@ -187,9 +178,7 @@ class ProfileScreenTest {
 
     composeTestRule.setContent {
       ProfileScreen(
-          navigationActions = navigationActions,
-          account = null,
-          invitationViewModel = invitationViewModel)
+          navigationActions = navigationActions, invitationViewModel = invitationViewModel)
     }
 
     composeTestRule.onNodeWithTag("dropdownMenu_App Theme").performClick()
