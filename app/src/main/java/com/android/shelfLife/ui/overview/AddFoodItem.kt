@@ -23,6 +23,7 @@ import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.*
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.utils.*
 import com.google.firebase.Timestamp
 
@@ -256,7 +257,7 @@ fun AddFoodItemScreen(
                                 status = FoodStatus.CLOSED)
                         houseHoldViewModel.addFoodItem(newFoodItem)
                         foodFactsViewModel.clearFoodFactsSuggestions()
-                        navigationActions.goBack()
+                        navigationActions.navigateTo(Route.OVERVIEW)
                       } else {
                         Toast.makeText(
                                 context, R.string.submission_error_message, Toast.LENGTH_SHORT)

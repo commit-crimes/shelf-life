@@ -51,7 +51,6 @@ class FirstFoodItemTest {
         composeTestRule.setContent {
             FirstFoodItem(
                 navigationActions = navigationActions,
-                foodItemViewModel = foodItemViewModel,
                 foodFactsViewModel = foodFactsViewModel
             )
         }
@@ -67,7 +66,6 @@ class FirstFoodItemTest {
         composeTestRule.setContent {
             FirstFoodItem(
                 navigationActions = navigationActions,
-                foodItemViewModel = foodItemViewModel,
                 foodFactsViewModel = foodFactsViewModel
             )
         }
@@ -97,7 +95,6 @@ class FirstFoodItemTest {
         composeTestRule.setContent {
             FirstFoodItem(
                 navigationActions = navigationActions,
-                foodItemViewModel = foodItemViewModel,
                 foodFactsViewModel = foodFactsViewModel
             )
         }
@@ -114,7 +111,6 @@ class FirstFoodItemTest {
         composeTestRule.setContent {
             FirstFoodItem(
                 navigationActions = navigationActions,
-                foodItemViewModel = foodItemViewModel,
                 foodFactsViewModel = foodFactsViewModel
             )
         }
@@ -124,7 +120,6 @@ class FirstFoodItemTest {
         composeTestRule.onNodeWithTag("submitButton").performClick()
 
         // Verify food item is set and navigation to the next screen is triggered
-        verify { foodItemViewModel.setNewFoodItemName("Bananas") }
         verify { foodFactsViewModel.searchByQuery("Bananas") }
         verify { navigationActions.navigateTo(Screen.CHOOSE_FOOD_ITEM) }
     }
@@ -134,7 +129,6 @@ class FirstFoodItemTest {
         composeTestRule.setContent {
             FirstFoodItem(
                 navigationActions = navigationActions,
-                foodItemViewModel = foodItemViewModel,
                 foodFactsViewModel = foodFactsViewModel
             )
         }

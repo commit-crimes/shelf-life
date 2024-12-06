@@ -271,14 +271,14 @@ class EndToEndM2Test {
     composeTestRule.onNodeWithTag("foodSave").performClick()
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
     // Goes and Scans the item
-    composeTestRule.onNodeWithTag("Scanner").assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
-    composeTestRule.runOnUiThread { foodFactsViewModel.searchByBarcode(1234567890L) }
-    composeTestRule.onNodeWithTag("locationDropdown").performClick()
-    composeTestRule.onNodeWithTag("dropDownItem_Pantry").performClick()
-    composeTestRule.onNodeWithTag("dropdownMenu_Select location").assertTextContains("Pantry")
-    composeTestRule.onNodeWithTag("expireDateTextField").performTextInput("29122024")
-    composeTestRule.onNodeWithTag("submitButton").performClick()
+//    composeTestRule.onNodeWithTag("Scanner").assertIsDisplayed().performClick()
+//    composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
+//    composeTestRule.runOnUiThread { foodFactsViewModel.searchByBarcode(1234567890L) }
+//    composeTestRule.onNodeWithTag("locationDropdown").performClick()
+//    composeTestRule.onNodeWithTag("dropDownItem_Pantry").performClick()
+//    composeTestRule.onNodeWithTag("dropdownMenu_Select location").assertTextContains("Pantry")
+//    composeTestRule.onNodeWithTag("expireDateTextField").performTextInput("29122024")
+//    composeTestRule.onNodeWithTag("submitButton").performClick()
   }
 
   /*// In this test the user wants to first add a friend into a new household

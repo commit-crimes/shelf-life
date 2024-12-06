@@ -26,7 +26,6 @@ import com.android.shelfLife.ui.utils.validateFoodName
 @Composable
 fun FirstFoodItem(
     navigationActions: NavigationActions,
-    foodItemViewModel: ListFoodItemsViewModel,
     foodFactsViewModel: FoodFactsViewModel,
     paddingValues: PaddingValues = PaddingValues(16.dp)
 ) {
@@ -76,7 +75,6 @@ fun FirstFoodItem(
                         button2OnClick = {
                             val isNameValid = validateFoodName(foodName) == null
                             if (isNameValid) {
-                                foodItemViewModel.setNewFoodItemName(foodName)
                                 foodFactsViewModel.searchByQuery(foodName)
                                 navigationActions.navigateTo(Screen.CHOOSE_FOOD_ITEM)
                             }
