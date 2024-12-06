@@ -18,10 +18,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.R
+import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.viewmodel.authentication.SignInState
 import com.android.shelfLife.viewmodel.authentication.SignInViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -30,8 +34,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 @Composable
 fun SignInScreen(
     navigationActions: NavigationActions,
-    signInViewModel: SignInViewModel
+    userRepository: UserRepository
 ) {
+    val signInViewModel = viewModel{
+        SignInViewModel(userRepository = userRepository)
+    }
   val context = LocalContext.current
   val signInState by signInViewModel.signInState.collectAsState()
 
@@ -65,7 +72,7 @@ fun SignInScreen(
         Toast.makeText(context, "Login failed: $message", Toast.LENGTH_LONG).show()
       }
       else -> {
-        /* No action needed */
+        Log.e("SignInScreen", "Unexpected sign-in state: $signInState")
       }
     }
   }
@@ -84,11 +91,13 @@ fun SignInScreen(
 
           Text(
               text = stringResource(R.string.app_name),
-              style = MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp),
+              style = MaterialTheme.typography.headlineLarge.copy(fontSize = 57.sp, lineHeight = 64.sp),
               fontWeight = FontWeight.Bold,
+              textAlign = TextAlign.Center,
               modifier = Modifier.testTag("loginTitle"))
 
           Spacer(modifier = Modifier.height(48.dp))
+
           GoogleSignInButton(
               onSignInClick = {
                 val gso =
@@ -98,6 +107,7 @@ fun SignInScreen(
                         .build()
                 val googleSignInClient = GoogleSignIn.getClient(context, gso)
                 launcher.launch(googleSignInClient.signInIntent)
+                  navigationActions.navigateTo(Route.OVERVIEW)
               },
               modifier = Modifier.testTag("loginButton"))
 
@@ -118,7 +128,7 @@ fun GoogleSignInButton(
       onClick = onSignInClick,
       shape = RoundedCornerShape(50),
       border = BorderStroke(1.dp, Color.LightGray),
-      modifier = modifier.padding(8.dp).height(48.dp)) {
+      modifier = modifier.padding(8.dp).height(48.dp).testTag("loginButton")) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,

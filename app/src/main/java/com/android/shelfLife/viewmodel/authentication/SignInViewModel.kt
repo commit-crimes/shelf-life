@@ -19,7 +19,7 @@ import kotlinx.coroutines.tasks.await
 class SignInViewModel(
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance(),
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
-    private val userRepository: UserRepositoryFirestore
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
   private val _signInState = MutableStateFlow<SignInState>(SignInState.Idle)

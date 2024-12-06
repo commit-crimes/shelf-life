@@ -6,6 +6,8 @@ import com.android.shelfLife.model.newhousehold.HouseHold
 
 
 interface UserRepository {
+  val isUserLoggedIn: StateFlow<Boolean>
+
   /** Exposes the user data as a StateFlow. */
   val user: StateFlow<User?>
 
@@ -31,6 +33,13 @@ interface UserRepository {
    * needed to avoid memory leaks.
    */
   fun stopListeningForInvitations()
+
+  /**
+   * Sets the user's logged-in status. This is used to determine whether to show the sign-in screen
+   *
+   * @param isLoggedIn - The new logged-in status.
+   */
+  fun setUserLoggedInStatus(isLoggedIn: Boolean)
 
   // Other suspend functions for updating user data
   suspend fun addHouseholdUID(householdUID: String)

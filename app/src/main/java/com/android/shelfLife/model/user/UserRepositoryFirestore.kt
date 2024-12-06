@@ -29,7 +29,7 @@ class UserRepositoryFirestore(
   override val user: StateFlow<User?> = _user.asStateFlow()
 
   private val _isUserLoggedIn = MutableStateFlow(firebaseAuth.currentUser != null)
-  val isUserLoggedIn: StateFlow<Boolean> = _isUserLoggedIn
+  override val isUserLoggedIn: StateFlow<Boolean> = _isUserLoggedIn
 
   // Invitations StateFlow
   private val _invitations = MutableStateFlow<List<String>>(emptyList())
@@ -131,7 +131,7 @@ class UserRepositoryFirestore(
     val updatedUserData =
         when (fieldName) {
           "username" -> currentUserData.copy(username = value as String)
-          "imageURL" -> currentUserData.copy(photoUrl = value as String)
+          "photoURL" -> currentUserData.copy(photoUrl = value as String)
           "email" -> currentUserData.copy(email = value as String)
           "selectedHouseholdUID" -> currentUserData.copy(selectedHouseholdUID = value as String)
           else -> currentUserData
@@ -184,7 +184,7 @@ class UserRepositoryFirestore(
     _user.value = updatedUserData
   }
 
-  fun setUserLoggedInStatus(isLoggedIn: Boolean) {
+  override fun setUserLoggedInStatus(isLoggedIn: Boolean) {
     _isUserLoggedIn.value = isLoggedIn
   }
 
@@ -224,7 +224,7 @@ class UserRepositoryFirestore(
   }
 
   override suspend fun updateImage(url: String) {
-    updateUserField("imageURL", url)
+    updateUserField("photoURL", url)
   }
 
   override suspend fun updateEmail(email: String) {
@@ -322,7 +322,7 @@ class UserRepositoryFirestore(
       val uid = doc.id
       val username = doc.getString("username") ?: ""
       val email = doc.getString("email") ?: ""
-      val imageURL = doc.getString("imageURL") ?: ""
+      val photoURL = doc.getString("photoURL") ?: ""
       val selectedHouseholdUID = doc.getString("selectedHouseholdUID") ?: ""
       val householdUIDs = doc.get("householdUIDs") as? List<String> ?: emptyList()
       val recipeUIDs = doc.get("recipeUIDs") as? List<String> ?: emptyList()
@@ -332,9 +332,9 @@ class UserRepositoryFirestore(
           uid,
           username,
           email,
-          imageURL,
+          photoURL,
+        selectedHouseholdUID,
           householdUIDs,
-          selectedHouseholdUID,
           recipeUIDs,
           invitationUIDs)
     } catch (e: Exception) {
