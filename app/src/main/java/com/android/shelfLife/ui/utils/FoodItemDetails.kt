@@ -30,7 +30,7 @@ fun FoodItemDetails(foodItem: FoodItem) {
   val formattedOpenDate =
       foodItem.openDate?.let { formatTimestampToDisplayDate(it) }
           ?: stringResource(R.string.food_item_not_opened)
-  val formattedBuyDate = formatTimestampToDisplayDate(foodItem.buyDate)
+  val formattedBuyDate = foodItem.buyDate?.let { formatTimestampToDisplayDate(it) }
 
   ElevatedCard(
       modifier =
@@ -60,10 +60,12 @@ fun FoodItemDetails(foodItem: FoodItem) {
               text = stringResource(R.string.food_item_open_date_label, formattedOpenDate),
               tag = "openDateText",
               style = textStyle)
-          FoodItemDetailText(
-              text = stringResource(R.string.food_item_buy_date_label, formattedBuyDate),
-              tag = "buyDateText",
-              style = textStyle)
+            formattedBuyDate?.let { stringResource(R.string.food_item_buy_date_label, it) }?.let {
+                FoodItemDetailText(
+                    text = it,
+                    tag = "buyDateText",
+                    style = textStyle)
+            }
           FoodItemDetailText(
               text =
                   stringResource(
@@ -90,14 +92,4 @@ fun FoodItemDetails(foodItem: FoodItem) {
       }
 }
 
-/**
- * Composable function to display a text detail of a food item.
- *
- * @param text The text to be displayed.
- * @param tag The test tag for the text.
- * @param style The style to be applied to the text.
- */
-@Composable
-fun FoodItemDetailText(text: String, tag: String, style: TextStyle) {
-  Text(text = text, style = style, modifier = Modifier.testTag(tag))
-}
+
