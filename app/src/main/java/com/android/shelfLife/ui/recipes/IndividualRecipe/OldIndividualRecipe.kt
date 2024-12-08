@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.recipes
+package com.android.shelfLife.ui.recipes.IndividualRecipe
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box

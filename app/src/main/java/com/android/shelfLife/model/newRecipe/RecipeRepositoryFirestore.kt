@@ -1,10 +1,12 @@
-package com.android.shelfLife.model.recipe
+package com.android.shelfLife.model.newRecipe
 
 import android.util.Log
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.google.firebase.auth.FirebaseAuth
+import com.android.shelfLife.model.recipe.Ingredient
+import com.android.shelfLife.model.recipe.Recipe
+import com.android.shelfLife.model.recipe.RecipeRepository
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.time.DurationUnit
@@ -14,13 +16,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepository {
+class RecipeRepositoryFirestore(
+    private val db: FirebaseFirestore,
+) : com.android.shelfLife.model.newRecipe.RecipeRepository {
 
   companion object {
     private const val COLLECTION_PATH = "recipes"
   }
 
-  private val auth = FirebaseAuth.getInstance()
   private val _recipes = MutableStateFlow<List<Recipe>>(emptyList())
   override val recipes: StateFlow<List<Recipe>> = _recipes.asStateFlow()
 
@@ -35,25 +38,6 @@ class RecipeRepositoryFirestore(private val db: FirebaseFirestore) : RecipeRepos
   override fun getUid(): String {
     Log.d("RecipeRepository", "getUid called")
     return db.collection(COLLECTION_PATH).document().id
-  }
-
-  override fun init(onSuccess: () -> Unit) {
-    auth.addAuthStateListener { authVal ->
-      val currentUser = authVal.currentUser
-      if (currentUser != null) {
-        db.collection(COLLECTION_PATH).get().addOnCompleteListener { task ->
-          if (task.isSuccessful) {
-            onSuccess()
-          } else {
-            Log.e(
-                "RecipeRepositoryFirestore",
-                "init failed: could not get collection : ${task.exception}")
-          }
-        }
-      } else {
-        Log.e("RecipeRepositoryFirestore", "init failed: user not logged in")
-      }
-    }
   }
 
   /**

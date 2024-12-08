@@ -45,7 +45,7 @@ import com.android.shelfLife.ui.overview.IndividualFoodItemScreen
 import com.android.shelfLife.ui.overview.OverviewScreen
 import com.android.shelfLife.ui.profile.ProfileScreen
 import com.android.shelfLife.ui.recipes.AddRecipeScreen
-import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
+import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.utils.formatTimestampToDate
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -188,10 +188,7 @@ class EndToEndM2Test {
         }
         composable(Route.PROFILE) {
           ProfileScreen(
-              navigationActions = navigationActions,
-              account = account,
-              signOutUser = signOutUser,
-              invitationViewModel = invitationViewModel)
+              navigationActions = navigationActions, invitationViewModel = invitationViewModel)
         }
         composable(Screen.HOUSEHOLD_CREATION) {
           HouseHoldCreationScreen(navigationActions, householdViewModel = householdViewModel)
