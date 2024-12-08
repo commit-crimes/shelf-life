@@ -13,13 +13,6 @@ interface RecipeRepository {
   fun getUid(): String
 
   /**
-   * Initializes the repository (e.g., setting up database connections or initial data).
-   *
-   * @param onSuccess - Called when the initialization is successful.
-   */
-  fun init(onSuccess: () -> Unit)
-
-  /**
    * Fetches all recipes from the repository.
    *
    * @param onSuccess - Called when the list of recipes is successfully retrieved.

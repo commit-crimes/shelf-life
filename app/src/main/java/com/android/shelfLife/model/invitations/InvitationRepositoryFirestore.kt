@@ -5,128 +5,74 @@ import com.android.shelfLife.model.household.HouseHold
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.tasks.await
 
-open class InvitationRepositoryFirestore(private val db: FirebaseFirestore) : InvitationRepository {
+open class InvitationRepositoryFirestore(
+    private val db: FirebaseFirestore,
+    private val auth: FirebaseAuth
+) : InvitationRepository {
 
-  private var listenerRegistration: ListenerRegistration? = null
-
-  /**
-   * Sets up a real-time listener for invitations for the current user.
-   *
-   * @param onUpdate The callback to invoke with the updated list of invitations.
-   * @param onError The callback to invoke in case of an error.
-   */
-  override fun addInvitationListener(
-      onUpdate: (List<Invitation>) -> Unit,
-      onError: (Exception) -> Unit
-  ) {
-    val currentUser = FirebaseAuth.getInstance().currentUser
-    if (currentUser != null) {
-      listenerRegistration =
-          db.collection("invitations")
-              .whereEqualTo("invitedUserId", currentUser.uid)
-              .addSnapshotListener { snapshots, error ->
-                if (error != null) {
-                  onError(error)
-                  return@addSnapshotListener
-                }
-
-                if (snapshots != null) {
-                  val invitations =
-                      snapshots.documents.mapNotNull { doc -> convertToInvitation(doc) }
-                  onUpdate(invitations)
-                }
-              }
-    } else {
-      onError(Exception("User not logged in"))
-    }
-  }
+  internal var listenerRegistration: ListenerRegistration? = null
+  private val _invitations: MutableStateFlow<List<Invitation>> = MutableStateFlow(emptyList())
+  override val invitations: StateFlow<List<Invitation>> = _invitations.asStateFlow()
+  private val invitationPath = "invitations"
 
   /** Removes the real-time listener for invitations. */
   override fun removeInvitationListener() {
     listenerRegistration?.remove()
+    listenerRegistration = null
   }
 
   /**
    * Sends an invitation to a user to join a household.
    *
    * @param household The household to invite the user to.
-   * @param invitedUserEmail The email of the user to invite.
-   * @param onSuccess The callback to be invoked on success.
-   * @param onFailure The callback to be invoked on failure.
    */
-  override fun sendInvitation(
-      household: HouseHold,
-      invitedUserEmail: String,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    // Get the user ID of the invited user by email
-    db.collection("users")
-        .whereEqualTo("email", invitedUserEmail)
-        .get()
-        .addOnSuccessListener { querySnapshot ->
-          if (!querySnapshot.isEmpty) {
-            val invitedUserDoc = querySnapshot.documents[0]
-            val invitedUserId = invitedUserDoc.id
-            val invitationId = db.collection("invitations").document().id
-            val invitationData =
-                mapOf(
-                    "invitationId" to invitationId,
-                    "householdId" to household.uid,
-                    "householdName" to household.name,
-                    "invitedUserId" to invitedUserId,
-                    "inviterUserId" to FirebaseAuth.getInstance().currentUser?.uid,
-                    "timestamp" to Timestamp.now())
-            db.collection("invitations")
-                .document(invitationId)
-                .set(invitationData)
-                .addOnSuccessListener { onSuccess() }
-                .addOnFailureListener { exception ->
-                  Log.e("HouseholdRepository", "Error sending invitation", exception)
-                  onFailure(exception)
-                }
-          } else {
-            Log.e("HouseholdRepository", "No user found with email: $invitedUserEmail")
-            onFailure(Exception("No user found with email: $invitedUserEmail"))
-          }
-        }
-        .addOnFailureListener { exception ->
-          Log.e("HouseholdRepository", "Error finding user by email", exception)
-          onFailure(exception)
-        }
+  override fun sendInvitation(household: HouseHold, invitedUserID: String) {
+    val inviterUserId =
+        auth.currentUser?.uid ?: throw IllegalStateException("User not authenticated")
+    val invitationId = db.collection(invitationPath).document().id
+    val invitationData =
+        Invitation(
+                invitationId = invitationId,
+                householdId = household.uid,
+                householdName = household.name,
+                invitedUserId = invitedUserID,
+                inviterUserId = inviterUserId,
+                timestamp = Timestamp.now())
+            .toMap()
+    db.collection("invitations").document(invitationId).set(invitationData)
   }
 
   /**
    * Fetches all invitations for the current user.
    *
-   * @param onSuccess The callback to be invoked on success.
-   * @param onFailure The callback to be invoked on failure.
+   * @param listOfInvitationUids The list of invitation UIDs to fetch.
    * @return The list of invitations.
    */
-  override fun getInvitations(
-      onSuccess: (List<Invitation>) -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    val currentUser = FirebaseAuth.getInstance().currentUser
-    if (currentUser != null) {
-      db.collection("invitations")
-          .whereEqualTo("invitedUserId", currentUser.uid)
-          .get()
-          .addOnSuccessListener { querySnapshot ->
-            val invitations = querySnapshot.documents.mapNotNull { doc -> convertToInvitation(doc) }
-            onSuccess(invitations)
-          }
-          .addOnFailureListener { exception ->
-            Log.e("HouseholdRepository", "Error fetching invitations", exception)
-            onFailure(exception)
-          }
-    } else {
-      Log.e("HouseholdRepository", "User not logged in")
-      onFailure(Exception("User not logged in"))
+  override suspend fun getInvitations(listOfInvitationUids: List<String>): List<Invitation> {
+    if (listOfInvitationUids.isEmpty()) {
+      return emptyList()
+    }
+    return try {
+      _invitations.value =
+          db.collection(invitationPath)
+              .whereIn(FieldPath.documentId(), listOfInvitationUids)
+              .get()
+              .await()
+              .documents
+              .mapNotNull { convertToInvitation(it) }
+      invitations.value
+    } catch (e: Exception) {
+      Log.e("HouseholdRepository", "Error fetching households", e)
+      emptyList()
     }
   }
 
@@ -134,61 +80,22 @@ open class InvitationRepositoryFirestore(private val db: FirebaseFirestore) : In
    * Accepts an invitation.
    *
    * @param invitation The invitation to accept.
-   * @param onSuccess The callback to be invoked on success.
-   * @param onFailure The callback to be invoked on failure.
    */
-  override fun acceptInvitation(
-      invitation: Invitation,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    val currentUser = FirebaseAuth.getInstance().currentUser
-
-    if (currentUser != null) {
-      db.collection("invitations")
-          .whereEqualTo("invitedUserId", currentUser.uid)
-          .get()
-          .addOnSuccessListener {
-            // delete the invitation
-            db.collection("invitations").document(invitation.invitationId).delete()
-            // add the user to the household
-            db.collection("households")
-                .document(invitation.householdId)
-                .update("members", FieldValue.arrayUnion(currentUser.uid))
-            Log.d("HouseholdRepository", "Invitation accepted")
-            onSuccess()
-          }
-          .addOnFailureListener { exception ->
-            Log.e("HouseholdRepository", "Error fetching invitations", exception)
-            onFailure(exception)
-          }
-    } else {
-      Log.e("HouseholdRepository", "User not logged in")
-      onFailure(Exception("User not logged in"))
-    }
+  override suspend fun acceptInvitation(invitation: Invitation) {
+    db.collection(invitationPath).document(invitation.invitationId).delete()
+    db.collection("households")
+        .document(invitation.householdId)
+        .update("members", FieldValue.arrayUnion(invitation.invitedUserId))
+    Log.d("HouseholdRepository", "Invitation accepted")
   }
 
   /**
    * Declines an invitation.
    *
    * @param invitation The invitation to decline.
-   * @param onSuccess The callback to be invoked on success.
-   * @param onFailure The callback to be invoked on failure.
    */
-  override fun declineInvitation(
-      invitation: Invitation,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    // delete the invitation
-    db.collection("invitations")
-        .document(invitation.invitationId)
-        .delete()
-        .addOnSuccessListener { onSuccess() }
-        .addOnFailureListener { exception ->
-          Log.e("HouseholdRepository", "Error declining invitation", exception)
-          onFailure(exception)
-        }
+  override suspend fun declineInvitation(invitation: Invitation) {
+    db.collection(invitationPath).document(invitation.invitationId).delete()
   }
 
   /**
@@ -210,5 +117,15 @@ open class InvitationRepositoryFirestore(private val db: FirebaseFirestore) : In
       Log.e("HouseholdRepository", "Error converting document to Invitation", e)
       null
     }
+  }
+
+  private fun Invitation.toMap(): Map<String, Any?> {
+    return mapOf(
+        "invitationId" to invitationId,
+        "householdId" to householdId,
+        "householdName" to householdName,
+        "invitedUserId" to invitedUserId,
+        "inviterUserId" to inviterUserId,
+        "timestamp" to timestamp)
   }
 }

@@ -2,13 +2,17 @@ package com.android.shelfLife.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.shelfLife.model.newhousehold.HouseHold
-import com.android.shelfLife.model.newhousehold.HouseHoldRepository
+import com.android.shelfLife.model.household.HouseHold
+import com.android.shelfLife.model.household.HouseHoldRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class HouseholdViewModel(private val repository: HouseHoldRepository) : ViewModel() {
+@HiltViewModel
+class HouseholdViewModel @Inject constructor(private val repository: HouseHoldRepository) :
+    ViewModel() {
 
   // StateFlow to hold the list of households
   private val _households = MutableStateFlow<List<HouseHold>>(emptyList())

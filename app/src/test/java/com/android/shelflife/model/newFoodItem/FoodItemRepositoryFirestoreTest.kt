@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.newFoodItem
+package com.android.shelfLife.model.foodItem
 
 import androidx.test.core.app.ApplicationProvider
 import com.android.shelfLife.model.foodFacts.FoodFacts

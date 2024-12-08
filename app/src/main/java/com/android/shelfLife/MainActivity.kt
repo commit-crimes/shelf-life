@@ -54,11 +54,9 @@ import com.android.shelfLife.viewmodel.authentication.SignInViewModel
 import com.android.shelfLife.viewmodel.recipe.RecipeGenerationViewModel
 import com.example.compose.ShelfLifeTheme
 import com.google.firebase.firestore.FirebaseFirestore
-import dagger.hilt.android.HiltAndroidApp
 import okhttp3.OkHttpClient
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-
 
 class MainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {

@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.newFoodItem
+package com.android.shelfLife.model.foodItem
 
 import com.android.shelfLife.utils.*
 import com.google.firebase.firestore.DocumentSnapshot

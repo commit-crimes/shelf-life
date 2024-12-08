@@ -1,58 +1,60 @@
 package com.android.shelfLife.model.household
 
+import kotlinx.coroutines.flow.StateFlow
+
 interface HouseHoldRepository {
+
+  val householdToEdit: StateFlow<HouseHold?>
+  val households: StateFlow<List<HouseHold>>
 
   /** Generates a new unique ID for a household. */
   fun getNewUid(): String
 
   /**
-   * Fetches all households from the repository associated with the current user.
+   * Selects a household to edit
    *
-   * @param onSuccess - Called when the list of households is successfully retrieved.
-   * @param onFailure - Called when there is an error retrieving the households.
+   * @param household - The household to edit.
    */
-  fun getHouseholds(onSuccess: (List<HouseHold>) -> Unit, onFailure: (Exception) -> Unit)
+  fun selectHouseholdToEdit(household: HouseHold?)
 
   /**
-   * Adds a new household to the repository.
+   * Fetches households by their UIDs.
    *
-   * @param household - The household to be added.
-   * @param onSuccess - Called when the household is successfully added.
-   * @param onFailure - Called when there is an error adding the household.
+   * @param listOfHouseHoldUid - List of household UIDs to fetch.
+   * @return List of households corresponding to the provided UIDs.
    */
-  fun addHousehold(household: HouseHold, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  suspend fun getHouseholds(listOfHouseHoldUid: List<String>): List<HouseHold>
+
+  /** Adds a new household to the repository. */
+  suspend fun addHousehold(household: HouseHold)
+
+  /** Updates an existing household in the repository. */
+  suspend fun updateHousehold(household: HouseHold)
+
+  /** Deletes a household by its unique ID. */
+  suspend fun deleteHouseholdById(id: String)
 
   /**
-   * Updates an existing household in the repository.
+   * Fetches the list of members for a specific household.
    *
-   * @param household - The household with updated data.
-   * @param onSuccess - Called when the household is successfully updated.
-   * @param onFailure - Called when there is an error updating the household.
+   * @param householdId The UID of the household.
+   * @return List of member UIDs in the household.
    */
-  fun updateHousehold(household: HouseHold, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  suspend fun getHouseholdMembers(householdId: String): List<String>
 
   /**
-   * Deletes a household by its unique ID.
+   * Initializes households by fetching them from Firestore and updating the local cache.
    *
-   * @param id - The unique ID of the household to delete.
-   * @param onSuccess - Called when the household is successfully deleted.
-   * @param onFailure - Called when there is an error deleting the household.
+   * @param householdIds List of household IDs to fetch.
+   * @param selectedHouseholdId The ID of the selected household.
    */
-  fun deleteHouseholdById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  suspend fun initializeHouseholds(householdIds: List<String>, selectedHouseholdUid: String)
 
   /**
-   * Gets the user IDs for a list of users in the repository we want.
+   * Checks if a household name already exists in the list of households.
    *
-   * @param users - The list of users of which we want the IDs.
-   * @param callback - Called when the user IDs are successfully retrieved.
+   * @param houseHoldName - The name of the household to check.
+   * @return True if the household name already exists, false otherwise.
    */
-  fun getUserIds(users: Set<String?>, callback: (Map<String, String>) -> Unit)
-
-  /**
-   * Gets the user emails for a list of users in the repository we want.
-   *
-   * @param userIds - The list of user IDs of which we want the emails.
-   * @param callback - Called when the user emails are successfully retrieved.
-   */
-  fun getUserEmails(userIds: List<String>, callback: (Map<String, String>) -> Unit)
+  fun checkIfHouseholdNameExists(houseHoldName: String): Boolean
 }

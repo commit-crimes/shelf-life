@@ -1,252 +1,206 @@
 package com.android.shelfLife.model.household
 
 import android.util.Log
-import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FieldPath
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.tasks.await
 
-open class HouseholdRepositoryFirestore(private val db: FirebaseFirestore) : HouseHoldRepository {
+class HouseholdRepositoryFirestore(
+    private val db: FirebaseFirestore,
+) : HouseHoldRepository {
 
-  private val houseHoldsCollectionPath = "households"
-  var auth = FirebaseAuth.getInstance()
-  var foodItemRepository = FoodItemRepositoryFirestore(db)
+  private val collectionPath = "households"
 
-  /**
-   * Generates a new unique ID for a household.
-   *
-   * @return A new unique ID.
-   */
+  // Local cache for households
+  private val _households = MutableStateFlow<List<HouseHold>>(emptyList())
+  override val households: StateFlow<List<HouseHold>> = _households.asStateFlow()
+
+  private val _householdToEdit = MutableStateFlow<HouseHold?>(null)
+  override val householdToEdit: StateFlow<HouseHold?> = _householdToEdit.asStateFlow()
+
+  // Listener registration for real-time updates
+  private var householdsListenerRegistration: ListenerRegistration? = null
+
   override fun getNewUid(): String {
-    return db.collection(houseHoldsCollectionPath).document().id
+    return db.collection(collectionPath).document().id
   }
 
-  /**
-   * Fetches all households from the repository associated with the current user.
-   *
-   * @param onSuccess - The callback to be invoked on success.
-   * @param onFailure - The callback to be invoked on failure.
-   */
-  override fun getHouseholds(onSuccess: (List<HouseHold>) -> Unit, onFailure: (Exception) -> Unit) {
-    val currentUser = auth.currentUser
-    if (currentUser != null) {
-      db.collection(houseHoldsCollectionPath)
-          .whereArrayContains("members", currentUser.uid)
-          .get()
-          .addOnSuccessListener { result ->
-            val householdList = result.documents.mapNotNull { convertToHousehold(it) }
-            Log.d("HouseholdRepository", "Households fetched successfully${householdList}")
-            onSuccess(householdList)
-          }
-          .addOnFailureListener { exception ->
-            Log.e("HouseholdRepository", "Error fetching households", exception)
-            onFailure(exception)
-          }
-    } else {
-      Log.e("HouseholdRepository", "User not logged in")
-      onFailure(Exception("User not logged in"))
+  override fun selectHouseholdToEdit(household: HouseHold?) {
+    _householdToEdit.value = household
+  }
+
+  override fun checkIfHouseholdNameExists(houseHoldName: String): Boolean {
+    return _households.value.any { it.name == houseHoldName }
+  }
+
+  override suspend fun getHouseholds(listOfHouseHoldUid: List<String>): List<HouseHold> {
+    if (listOfHouseHoldUid.isEmpty()) {
+      return emptyList()
+    }
+    return try {
+      val querySnapshot =
+          db.collection(collectionPath)
+              .whereIn(FieldPath.documentId(), listOfHouseHoldUid)
+              .get()
+              .await()
+
+      val fetchedHouseholds = querySnapshot.documents.mapNotNull { convertToHousehold(it) }
+      fetchedHouseholds
+    } catch (e: Exception) {
+      Log.e("HouseholdRepository", "Error fetching households", e)
+      emptyList()
+    }
+  }
+
+  override suspend fun initializeHouseholds(
+      householdIds: List<String>,
+      selectedHouseholdUid: String
+  ) {
+    if (householdIds.isEmpty()) {
+      Log.d("HouseholdRepository", "No household IDs provided")
+      _households.value = emptyList()
+      return
+    }
+    try {
+      // Fetch households from Firestore
+      val querySnapshot =
+          db.collection(collectionPath).whereIn(FieldPath.documentId(), householdIds).get().await()
+
+      Log.d("HouseholdRepository", "Fetched households: ${querySnapshot.documents}")
+      val fetchedHouseholds = querySnapshot.documents.mapNotNull { convertToHousehold(it) }
+      _households.value = fetchedHouseholds
+      Log.d("HouseholdRepository", "Households: ${_households.value}")
+
+      Log.d("HouseholdRepositoryFirestore", "Selected household UID: $selectedHouseholdUid")
+    } catch (e: Exception) {
+      Log.e("HouseholdRepository", "Error initializing households", e)
     }
   }
 
   /**
-   * Adds a new household to the repository.
+   * Adds a new household to the repository and updates the local cache.
    *
-   * @param household - The household to be added.
-   * @param onSuccess - The callback to be invoked on success.
-   * @param onFailure - The callback to be invoked on failure.
+   * @param household The household to add.
    */
-  override fun addHousehold(
-      household: HouseHold,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    val currentUser = auth.currentUser
-    if (currentUser != null) {
-      val householdData =
-          mapOf(
-              "uid" to household.uid,
-              "name" to household.name,
-              "members" to household.members,
-              "foodItems" to
-                  household.foodItems.map { foodItem ->
-                    foodItemRepository.convertFoodItemToMap(foodItem)
-                  })
-      db.collection(houseHoldsCollectionPath)
-          .document(household.uid)
+  override suspend fun addHousehold(household: HouseHold) {
+    val householdData =
+        mapOf(
+            "name" to household.name,
+            "members" to household.members,
+            "sharedRecipes" to household.sharedRecipes)
+    try {
+      db.collection(collectionPath)
+          .document(household.uid) // Use the household UID as the document ID
           .set(householdData)
-          .addOnSuccessListener { onSuccess() }
-          .addOnFailureListener { exception ->
-            Log.e("HouseholdRepository", "Error adding household", exception)
-            onFailure(exception)
-          }
-    } else {
-      Log.e("HouseholdRepository", "User not logged in")
-      onFailure(Exception("User not logged in"))
-    }
-    getHouseholds({}, {})
-  }
-
-  /**
-   * Updates an existing household in the repository.
-   *
-   * @param household - The household with updated data.
-   * @param onSuccess - The callback to be invoked on success.
-   * @param onFailure - The callback to be invoked on failure.
-   */
-  override fun updateHousehold(
-      household: HouseHold,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    val currentUser = auth.currentUser
-    if (currentUser != null) {
-      val householdData =
-          mapOf(
-              "uid" to household.uid,
-              "name" to household.name,
-              "members" to household.members,
-              "foodItems" to
-                  household.foodItems.map { foodItem ->
-                    foodItemRepository.convertFoodItemToMap(foodItem)
-                  })
-      db.collection(houseHoldsCollectionPath)
-          .document(household.uid)
-          .update(householdData)
-          .addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-              onSuccess()
-            } else {
-              Log.e("HouseholdRepository", "Error updating household", task.exception)
-              task.exception?.let { onFailure(it) }
-            }
-          }
-    } else {
-      Log.e("HouseholdRepository", "User not logged in")
-      onFailure(Exception("User not logged in"))
+          .await()
+      // Update local cache
+      Log.d("HouseholdRepository", "Added household: $household")
+      val currentHouseholds = _households.value.toMutableList()
+      currentHouseholds.add(household)
+      _households.value = currentHouseholds
+    } catch (e: Exception) {
+      Log.e("HouseholdRepository", "Error adding household", e)
     }
   }
 
   /**
-   * Deletes a household by its unique ID.
+   * Updates an existing household in the repository and updates the local cache.
    *
-   * @param id - The unique ID of the household to delete.
-   * @param onSuccess - The callback to be invoked on success.
-   * @param onFailure - The callback to be invoked on failure.
+   * @param household The household with updated data.
    */
-  override fun deleteHouseholdById(
-      id: String,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    val currentUser = auth.currentUser
-    if (currentUser != null) {
-      db.collection(houseHoldsCollectionPath)
-          .document(id)
-          .delete()
-          .addOnSuccessListener { onSuccess() }
-          .addOnFailureListener { exception ->
-            Log.e("HouseholdRepository", "Error deleting household", exception)
-            onFailure(exception)
-          }
-    } else {
-      Log.e("HouseholdRepository", "User not logged in")
-      onFailure(Exception("User not logged in"))
+  override suspend fun updateHousehold(household: HouseHold) {
+    val householdData =
+        mapOf(
+            "name" to household.name,
+            "members" to household.members,
+            "sharedRecipes" to household.sharedRecipes)
+    try {
+      db.collection(collectionPath).document(household.uid).set(householdData).await()
+
+      // Update local cache
+      val currentHouseholds = _households.value.toMutableList()
+      val index = currentHouseholds.indexOfFirst { it.uid == household.uid }
+      if (index != -1) {
+        currentHouseholds[index] = household
+      } else {
+        currentHouseholds.add(household)
+      }
+      Log.d("HouseholdRepository", "Updated household: $household")
+      _households.value = currentHouseholds
+    } catch (e: Exception) {
+      Log.e("HouseholdRepository", "Error updating household", e)
     }
   }
 
-  override fun getUserIds(users: Set<String?>, callback: (Map<String, String>) -> Unit) {
-    if (users.isEmpty()) {
-      callback(emptyMap())
-      return
-    }
-    val emailBatches = users.chunked(10) // Firestore allows up to 10 values in 'whereIn'
-    val emailToUserId = mutableMapOf<String, String>()
-    var batchesProcessed = 0
+  override suspend fun deleteHouseholdById(id: String) {
+    try {
+      db.collection(collectionPath).document(id).delete().await()
 
-    for (emailBatch in emailBatches) {
-      db.collection("users")
-          .whereIn("email", emailBatch)
-          .get()
-          .addOnSuccessListener { querySnapshot ->
-            for (doc in querySnapshot.documents) {
-              val email = doc.getString("email")
-              val userId = doc.id
-              if (email != null) {
-                emailToUserId[email] = userId
-              }
-            }
-            batchesProcessed++
-            if (batchesProcessed == emailBatches.size) {
-              callback(emailToUserId)
-            }
-          }
-          .addOnFailureListener { exception ->
-            Log.e("HouseholdRepository", "Error fetching user IDs by emails", exception)
-            batchesProcessed++
-            if (batchesProcessed == emailBatches.size) {
-              callback(emailToUserId)
-            }
-          }
+      // Update local cache
+      val currentHouseholds = _households.value.filterNot { it.uid == id }
+      _households.value = currentHouseholds
+    } catch (e: Exception) {
+      Log.e("HouseholdRepository", "Error deleting household", e)
     }
   }
 
-  override fun getUserEmails(userIds: List<String>, callback: (Map<String, String>) -> Unit) {
-    if (userIds.isEmpty()) {
-      callback(emptyMap())
+  override suspend fun getHouseholdMembers(householdId: String): List<String> {
+    val household = _households.value.find { it.uid == householdId }
+    return household?.members ?: emptyList()
+  }
+
+  /**
+   * Starts listening for real-time updates to the households collection.
+   *
+   * @param householdIds List of household IDs to listen to.
+   */
+  fun startListeningForHouseholds(householdIds: List<String>) {
+    // Remove any existing listener
+    householdsListenerRegistration?.remove()
+
+    if (householdIds.isEmpty()) {
+      _households.value = emptyList()
       return
     }
 
-    val uidBatches = userIds.chunked(10) // Firestore allows up to 10 values in 'whereIn'
-    val uidToEmail = mutableMapOf<String, String>()
-    var batchesProcessed = 0
-
-    for (uidBatch in uidBatches) {
-      db.collection("users")
-          .whereIn(FieldPath.documentId(), uidBatch)
-          .get()
-          .addOnSuccessListener { querySnapshot ->
-            for (doc in querySnapshot.documents) {
-              val email = doc.getString("email")
-              val userId = doc.id
-              if (email != null) {
-                uidToEmail[userId] = email
+    householdsListenerRegistration =
+        db.collection(collectionPath)
+            .whereIn(FieldPath.documentId(), householdIds)
+            .addSnapshotListener { snapshot, error ->
+              if (error != null) {
+                Log.e("HouseholdRepository", "Error fetching households", error)
+                _households.value = emptyList()
+                return@addSnapshotListener
+              }
+              if (snapshot != null) {
+                val updatedHouseholds = snapshot.documents.mapNotNull { convertToHousehold(it) }
+                _households.value = updatedHouseholds
               }
             }
-            batchesProcessed++
-            if (batchesProcessed == uidBatches.size) {
-              callback(uidToEmail)
-            }
-          }
-          .addOnFailureListener { exception ->
-            Log.e("HouseholdRepository", "Error fetching emails by user IDs", exception)
-            batchesProcessed++
-            if (batchesProcessed == uidBatches.size) {
-              callback(uidToEmail)
-            }
-          }
-    }
+  }
+
+  /** Stops listening for real-time updates. */
+  fun stopListeningForHouseholds() {
+    householdsListenerRegistration?.remove()
+    householdsListenerRegistration = null
   }
 
   /**
    * Converts a Firestore document to a HouseHold object.
    *
    * @param doc The Firestore document to convert.
+   * @return A HouseHold object or null if conversion fails.
    */
-  fun convertToHousehold(doc: DocumentSnapshot): HouseHold? {
+  private fun convertToHousehold(doc: DocumentSnapshot): HouseHold? {
     return try {
-      val uid = doc.getString("uid") ?: return null
+      val uid = doc.id // Use the document ID as the UID
       val name = doc.getString("name") ?: return null
       val members = doc.get("members") as? List<String> ?: emptyList()
-      val foodItems = doc.get("foodItems") as? List<Map<String, Any>> ?: emptyList()
+      val sharedRecipes = doc.get("sharedRecipes") as? List<String> ?: emptyList()
 
-      // Convert the list of food items from firestore into a list of FoodItem objects
-      val foodItemList =
-          foodItems.mapNotNull { foodItemMap ->
-            foodItemRepository.convertToFoodItemFromMap(foodItemMap)
-          }
-
-      HouseHold(uid = uid, name = name, members = members, foodItems = foodItemList)
+      HouseHold(uid = uid, name = name, members = members, sharedRecipes = sharedRecipes)
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error converting document to HouseHold", e)
       null
