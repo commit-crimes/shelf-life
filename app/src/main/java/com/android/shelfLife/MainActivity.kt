@@ -80,21 +80,16 @@ fun ShelfLifeApp() {
     ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
   }
   val userRepository = UserRepositoryFirestore(firebaseFirestore)
-  val signInViewModel = viewModel {
-    SignInViewModel(firestore = firebaseFirestore, userRepository = userRepository)
-  }
     val householdRepository = HouseholdRepositoryFirestore(firebaseFirestore)
   val invitationRepositoryFirestore = InvitationRepositoryFirestore(firebaseFirestore)
 
   val context = LocalContext.current
 
   val barcodeScannerViewModel: BarcodeScannerViewModel = viewModel()
-
-  val isUserLoggedIn by signInViewModel.isUserLoggedIn.collectAsState()
-
+  val isUserLoggedIn = userRepository.isUserLoggedIn.collectAsState()
   // Observe authentication state changes
-  LaunchedEffect(isUserLoggedIn) {
-    if (isUserLoggedIn) {
+  LaunchedEffect(isUserLoggedIn.value) {
+    if (isUserLoggedIn.value) {
       navController.navigate(Route.OVERVIEW) { popUpTo(Route.AUTH) { inclusive = true } }
     } else {
       navController.navigate(Route.AUTH) { popUpTo(Route.OVERVIEW) { inclusive = true } }
@@ -107,7 +102,7 @@ fun ShelfLifeApp() {
         startDestination = Screen.AUTH,
         route = Route.AUTH,
     ) {
-      composable(Screen.AUTH) { SignInScreen(navigationActions, userRepository) }
+      composable(Screen.AUTH) { SignInScreen(navigationActions, userRepository, foodItemRepository, householdRepository) }
     }
     navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
       composable(Screen.OVERVIEW) {

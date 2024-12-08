@@ -25,7 +25,7 @@ class HouseholdViewModel(private val repository: HouseHoldRepository) : ViewMode
   // Function to load all households
   fun loadHouseholds() {
     viewModelScope.launch {
-      // Logic to load households from the repository
+
     }
   }
 

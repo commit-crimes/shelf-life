@@ -43,6 +43,15 @@ interface FoodItemRepository {
    */
   suspend fun deleteFoodItem(householdId: String, foodItemId: String)
 
+  /**
+   * Starts listening for real-time updates to the food items collection.
+   *
+   * @param householdId The ID of the household.
+   */
+  fun startListeningForFoodItems(householdId: String)
+
+  fun stopListeningForFoodItems()
+
   /** Selects a FoodItem document for individual view */
   fun selectFoodItem(foodItem: FoodItem?)
 }

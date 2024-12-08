@@ -156,7 +156,7 @@ class HouseholdRepositoryFirestore(
    *
    * @param householdIds List of household IDs to listen to.
    */
-  fun startListeningForHouseholds(householdIds: List<String>) {
+  override fun startListeningForHouseholds(householdIds: List<String>) {
     // Remove any existing listener
     householdsListenerRegistration?.remove()
 
@@ -182,7 +182,7 @@ class HouseholdRepositoryFirestore(
   }
 
   /** Stops listening for real-time updates. */
-  fun stopListeningForHouseholds() {
+  override fun stopListeningForHouseholds() {
     householdsListenerRegistration?.remove()
     householdsListenerRegistration = null
   }

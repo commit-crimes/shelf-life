@@ -4,6 +4,7 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.newInvitations.Invitation
 import com.android.shelfLife.model.newInvitations.InvitationRepository
 import com.android.shelfLife.model.user.UserRepository
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 class ProfileScreenViewModel(
     private val invitationRepository: InvitationRepository,
     private val userRepository: UserRepository,
+    private val foodItemRepository: FoodItemRepository
 ) : ViewModel() {
   var changeThemeMenuState = mutableStateOf(false)
   val invitations: StateFlow<List<Invitation>> = invitationRepository.invitations
@@ -27,9 +29,11 @@ class ProfileScreenViewModel(
     val googleSignInClient: GoogleSignInClient =
         GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN)
     FirebaseAuth.getInstance().signOut()
-
     googleSignInClient.revokeAccess().addOnCompleteListener { task: Task<Void> ->
       if (task.isSuccessful) {
+        userRepository.setUserLoggedInStatus(false)
+        userRepository.stopListeningForInvitations()
+        foodItemRepository.stopListeningForFoodItems()
         Toast.makeText(context, "Sign-out successful", Toast.LENGTH_SHORT).show()
       } else {
         Toast.makeText(context, "Sign-out failed : ${task.exception}", Toast.LENGTH_SHORT).show()

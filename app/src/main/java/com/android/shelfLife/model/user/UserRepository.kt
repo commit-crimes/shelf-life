@@ -13,6 +13,7 @@ interface UserRepository {
   /** Exposes the invitations list as a StateFlow. */
   val invitations: StateFlow<List<String>>
 
+  /** Exposes the selected household as a StateFlow. */
   val selectedHousehold: StateFlow<HouseHold?>
 
   /** Generates a new unique ID for a user. */

@@ -57,4 +57,14 @@ interface HouseHoldRepository {
    * @return True if the household name already exists, false otherwise.
    */
   fun checkIfHouseholdNameExists(houseHoldName: String): Boolean
+
+  /**
+   * Starts listening for real-time updates to the households collection.
+   *
+   * @param householdIds List of household IDs to listen to.
+   */
+  fun startListeningForHouseholds(householdIds: List<String>)
+
+  /** Stops listening for real-time updates. */
+  fun stopListeningForHouseholds()
 }

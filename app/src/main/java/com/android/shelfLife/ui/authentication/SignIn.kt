@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.R
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
+import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
@@ -32,8 +34,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 @Composable
-fun SignInScreen(navigationActions: NavigationActions, userRepository: UserRepository) {
-  val signInViewModel = viewModel { SignInViewModel(userRepository = userRepository) }
+fun SignInScreen(navigationActions: NavigationActions, userRepository: UserRepository,
+                 foodItemRepository: FoodItemRepository,
+                 houseHoldRepository: HouseHoldRepository) {
+  val signInViewModel = viewModel { SignInViewModel(
+      userRepository = userRepository,
+      foodItemRepository = foodItemRepository,
+      houseHoldRepository = houseHoldRepository) }
   val context = LocalContext.current
   val signInState by signInViewModel.signInState.collectAsState()
 

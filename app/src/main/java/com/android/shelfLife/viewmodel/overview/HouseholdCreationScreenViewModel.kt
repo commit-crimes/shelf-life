@@ -107,7 +107,7 @@ class HouseholdCreationScreenViewModel(
         viewModelScope.launch {
           houseHoldRepository.addHousehold(household)
           userRepository.addHouseholdUID(household.uid)
-          if (selectedHousehold.value == null) {
+          if (selectedHousehold.value == null)  {
             Log.d("HouseholdViewModel", "Selected household is null")
             userRepository.selectHousehold(
                 households.value.firstOrNull()) // Default to the first household

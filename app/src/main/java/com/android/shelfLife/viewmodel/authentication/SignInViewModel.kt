@@ -5,6 +5,8 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.R
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
+import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -12,24 +14,23 @@ import com.google.firebase.auth.*
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.tasks.await
 
 class SignInViewModel(
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance(),
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance(),
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val foodItemRepository: FoodItemRepository,
+    private val houseHoldRepository: HouseHoldRepository
 ) : ViewModel() {
 
   private val _signInState = MutableStateFlow<SignInState>(SignInState.Idle)
   val signInState: StateFlow<SignInState> = _signInState
 
-  val isUserLoggedIn: StateFlow<Boolean> = userRepository.isUserLoggedIn
-
   private val authStateListener =
       FirebaseAuth.AuthStateListener { auth ->
         userRepository.setUserLoggedInStatus(auth.currentUser != null)
       }
-
   init {
     firebaseAuth.addAuthStateListener(authStateListener)
   }
@@ -44,9 +45,22 @@ class SignInViewModel(
     viewModelScope.launch {
       _signInState.value = SignInState.Loading
       try {
-        val authResult = firebaseAuth.signInWithCredential(credential).await()
-        val user = authResult.user
-        userRepository.initializeUserData(context)
+          val authResult = firebaseAuth.signInWithCredential(credential).await()
+          userRepository.initializeUserData(context)
+          userRepository.startListeningForInvitations()
+          userRepository.user.value?.householdUIDs.let{ householdUIDs ->
+            if (householdUIDs != emptyList<String>()) {
+                houseHoldRepository
+                    .startListeningForHouseholds(householdUIDs!!)
+                houseHoldRepository
+                    .initializeHouseholds(householdUIDs,
+                        userRepository.user.value?.selectedHouseholdUID!!)
+                foodItemRepository
+                    .getFoodItems(userRepository.user.value?.selectedHouseholdUID!!)
+                foodItemRepository
+                    .startListeningForFoodItems(userRepository.user.value?.selectedHouseholdUID!!)
+            }
+          }
         _signInState.value = SignInState.Success(authResult)
       } catch (e: Exception) {
         _signInState.value = SignInState.Error(e.message ?: "Unknown error occurred.")

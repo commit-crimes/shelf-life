@@ -149,7 +149,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
    *
    * @param householdId The ID of the household.
    */
-  fun startListeningForFoodItems(householdId: String) {
+  override fun startListeningForFoodItems(householdId: String) {
     // Remove any existing listener
     foodItemsListenerRegistration?.remove()
 
@@ -172,7 +172,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
   }
 
   /** Stops listening for real-time updates. */
-  fun stopListeningForFoodItems() {
+  override fun stopListeningForFoodItems() {
     foodItemsListenerRegistration?.remove()
     foodItemsListenerRegistration = null
   }

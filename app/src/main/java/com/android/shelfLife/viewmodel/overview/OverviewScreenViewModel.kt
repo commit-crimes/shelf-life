@@ -64,6 +64,7 @@ class OverviewScreenViewModel(
       Log.d("OverviewScreenViewModel", "Households loaded")
       finishedLoading.value = true
     }
+    // TODO - initalize should not have the selectedHouseholdUID as a parameter => doesn't do anything
   }
 
   /**
