@@ -36,7 +36,6 @@ class AddRecipeViewModel(
 
   private val _newIngredient =
       MutableStateFlow(Ingredient(name = "", quantity = Quantity(amount = 0.0)))
-  val newIngredient: StateFlow<Ingredient> = _newIngredient.asStateFlow()
 
   private val _instructions = MutableStateFlow<List<String>>(emptyList())
   val instructions: StateFlow<List<String>> = _instructions.asStateFlow()

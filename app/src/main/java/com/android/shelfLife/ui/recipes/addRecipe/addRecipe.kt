@@ -75,7 +75,7 @@ fun AddRecipeScreen(
               // Recipe title
               item {
                 OutlinedTextField(
-                    value = addRecipeViewModel.title,
+                    value = addRecipeViewModel.title.collectAsState().value,
                     onValueChange = { newTitle -> addRecipeViewModel.changeTitle(newTitle) },
                     label = { Text(stringResource(R.string.title_of_recipe)) },
                     modifier =
@@ -85,12 +85,15 @@ fun AddRecipeScreen(
               }
 
               // Error message for title
-              item { ErrorTextBox(addRecipeViewModel.titleError, "titleErrorMessage") }
+              item {
+                ErrorTextBoxNEW(
+                    addRecipeViewModel.titleError.collectAsState().value, "titleErrorMessage")
+              }
 
               // Recipe servings
               item {
                 OutlinedTextField(
-                    value = addRecipeViewModel.servings,
+                    value = addRecipeViewModel.servings.collectAsState().value,
                     onValueChange = { newServings ->
                       addRecipeViewModel.changeServings(newServings)
                     },
@@ -103,12 +106,15 @@ fun AddRecipeScreen(
               }
 
               // Error message for servings
-              item { ErrorTextBox(addRecipeViewModel.servingsError, "servingsErrorMessage") }
+              item {
+                ErrorTextBoxNEW(
+                    addRecipeViewModel.servingsError.collectAsState().value, "servingsErrorMessage")
+              }
 
               // Recipe time
               item {
                 OutlinedTextField(
-                    value = addRecipeViewModel.time,
+                    value = addRecipeViewModel.time.collectAsState().value,
                     onValueChange = { newTime -> addRecipeViewModel.changeTime(newTime) },
                     label = { Text(stringResource(R.string.time)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -119,7 +125,10 @@ fun AddRecipeScreen(
               }
 
               // Error message for time
-              item { ErrorTextBox(addRecipeViewModel.timeError, "timeErrorMessage") }
+              item {
+                ErrorTextBoxNEW(
+                    addRecipeViewModel.timeError.collectAsState().value, "timeErrorMessage")
+              }
 
               // Recipe Ingredients Section
               item {
@@ -130,7 +139,9 @@ fun AddRecipeScreen(
                 }
               }
 
-              itemsIndexed(addRecipeViewModel.ingredients) { index, ingredient ->
+              itemsIndexed(addRecipeViewModel.ingredients.collectAsState().value) {
+                  index,
+                  ingredient ->
                 IngredientItemNEW(
                     index = index,
                     ingredient = ingredient,
@@ -157,7 +168,9 @@ fun AddRecipeScreen(
                 }
               }
 
-              itemsIndexed(addRecipeViewModel.instructions) { index, instruction ->
+              itemsIndexed(addRecipeViewModel.instructions.collectAsState().value) {
+                  index,
+                  instruction ->
                 InstructionItem(index = index, addRecipeViewModel = addRecipeViewModel)
               }
 
@@ -205,7 +218,7 @@ fun AddRecipeScreen(
             }
 
         // Ingredient Dialog, inside the composable block
-        if (addRecipeViewModel.showIngredientDialog) {
+        if (addRecipeViewModel.showIngredientDialog.collectAsState().value) {
           IngredientDialog(addRecipeViewModel)
         }
       })
@@ -238,7 +251,7 @@ fun InstructionItem(
 
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
     OutlinedTextField(
-        value = addRecipeViewModel.instructions[index],
+        value = addRecipeViewModel.instructions.collectAsState().value[index],
         onValueChange = { newInstruction ->
           addRecipeViewModel.changeInstruction(index, newInstruction)
         },
@@ -251,7 +264,8 @@ fun InstructionItem(
         }
   }
   // Display error message if needed
-  ErrorTextBox(addRecipeViewModel.instructionError[index], "instructionErrorMessage")
+  ErrorTextBoxNEW(
+      addRecipeViewModel.instructionError.collectAsState().value[index], "instructionErrorMessage")
 }
 
 /**
@@ -308,16 +322,18 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
         Column(modifier = Modifier.testTag("addIngredientPopUp")) {
           // ingredient name
           OutlinedTextField(
-              value = addRecipeViewModel.ingredientName,
+              value = addRecipeViewModel.ingredientName.collectAsState().value,
               onValueChange = { newName -> addRecipeViewModel.changeIngredientName(newName) },
               label = { Text(stringResource(R.string.ingredient_name)) },
               modifier = Modifier.fillMaxWidth().testTag("inputIngredientName"))
           // error message if ingredient name is empty
-          ErrorTextBox(addRecipeViewModel.ingredientNameError, "ingredientNameErrorMessage")
+          ErrorTextBoxNEW(
+              addRecipeViewModel.ingredientNameError.collectAsState().value,
+              "ingredientNameErrorMessage")
 
           // ingredient quantity (it is a string but will be transformed later on)
           OutlinedTextField(
-              value = addRecipeViewModel.ingredientQuantityAmount,
+              value = addRecipeViewModel.ingredientQuantityAmount.collectAsState().value,
               onValueChange = { newAmount ->
                 addRecipeViewModel.changeIngredientQuantityAmount(newAmount)
               },
@@ -326,8 +342,9 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
               modifier = Modifier.fillMaxWidth().testTag("inputIngredientQuantity"))
 
           // error message if the ingredient quantity is empty
-          ErrorTextBox(
-              addRecipeViewModel.ingredientQuantityAmountError, "ingredientQuantityErrorMessage")
+          ErrorTextBoxNEW(
+              addRecipeViewModel.ingredientQuantityAmountError.collectAsState().value,
+              "ingredientQuantityErrorMessage")
 
           // Quantity Unit Dropdown
           Row {
@@ -339,11 +356,15 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
                   colors =
                       ButtonDefaults.buttonColors(
                           containerColor =
-                              if (addRecipeViewModel.ingredientQuantityUnit == unit)
+                              if (addRecipeViewModel.ingredientQuantityUnit
+                                  .collectAsState()
+                                  .value == unit)
                                   primaryContainerDark
                               else primaryContainerLight,
                           contentColor =
-                              if (addRecipeViewModel.ingredientQuantityUnit == unit)
+                              if (addRecipeViewModel.ingredientQuantityUnit
+                                  .collectAsState()
+                                  .value == unit)
                                   secondaryContainerLight
                               else secondaryContainerDark),
               ) {
@@ -402,7 +423,7 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
  * @param errorMessageId The error message to display. If null or empty, no text is shown.
  */
 @Composable
-fun ErrorTextBox(errorMessageId: Int?, testTag: String) {
+fun ErrorTextBoxNEW(errorMessageId: Int?, testTag: String) {
   if (errorMessageId != null) {
     Text(
         text = stringResource(errorMessageId),
