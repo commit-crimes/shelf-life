@@ -1,7 +1,6 @@
 package com.android.shelfLife.ui.recipes.addRecipe
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +24,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -139,9 +139,7 @@ fun AddRecipeScreen(
                 }
               }
 
-              itemsIndexed(addRecipeViewModel.ingredients.collectAsState().value) {
-                  index,
-                  ingredient ->
+              itemsIndexed(addRecipeViewModel.ingredients.value) { index, ingredient ->
                 IngredientItemNEW(
                     index = index,
                     ingredient = ingredient,
@@ -168,9 +166,7 @@ fun AddRecipeScreen(
                 }
               }
 
-              itemsIndexed(addRecipeViewModel.instructions.collectAsState().value) {
-                  index,
-                  instruction ->
+              itemsIndexed(addRecipeViewModel.instructions.value) { index, instruction ->
                 InstructionItem(index = index, addRecipeViewModel = addRecipeViewModel)
               }
 
@@ -194,10 +190,7 @@ fun AddRecipeScreen(
                     button2OnClick = {
                       coroutineScope.launch {
                         addRecipeViewModel.addNewRecipe(
-                            onSuccess = {
-                              navigationActions.goBack()
-                              Log.i("AAAAAAAAAA", "Aofklkrk")
-                            },
+                            onSuccess = { navigationActions.goBack() },
                             showToast = { messageId ->
                               val message =
                                   if (messageId == 0) {
@@ -356,15 +349,11 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
                   colors =
                       ButtonDefaults.buttonColors(
                           containerColor =
-                              if (addRecipeViewModel.ingredientQuantityUnit
-                                  .collectAsState()
-                                  .value == unit)
+                              if (addRecipeViewModel.ingredientQuantityUnit.value == unit)
                                   primaryContainerDark
                               else primaryContainerLight,
                           contentColor =
-                              if (addRecipeViewModel.ingredientQuantityUnit
-                                  .collectAsState()
-                                  .value == unit)
+                              if (addRecipeViewModel.ingredientQuantityUnit.value == unit)
                                   secondaryContainerLight
                               else secondaryContainerDark),
               ) {
@@ -380,7 +369,7 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
         Button(
             onClick = {
               coroutineScope.launch {
-                var ingredientAdded = addRecipeViewModel.addNewIngredient()
+                val ingredientAdded = addRecipeViewModel.addNewIngredient()
                 if (ingredientAdded) {
                   addRecipeViewModel.closeIngredientDialog()
                 } else {
