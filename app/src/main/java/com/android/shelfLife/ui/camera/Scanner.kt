@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 fun BarcodeScannerScreen(
     navigationActions: NavigationActions,
     cameraViewModel: BarcodeScannerViewModel = viewModel(),
+    foodFactsViewModel: FoodFactsViewModel,
     householdViewModel: HouseholdViewModel,
     foodItemViewModel: ListFoodItemsViewModel
 ) {
