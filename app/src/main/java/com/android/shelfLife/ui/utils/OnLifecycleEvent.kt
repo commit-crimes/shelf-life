@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.newutils
+package com.android.shelfLife.ui.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect

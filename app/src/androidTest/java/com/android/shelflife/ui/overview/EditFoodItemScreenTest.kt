@@ -26,7 +26,7 @@ import com.android.shelfLife.model.newhousehold.HouseholdViewModel
 import com.android.shelfLife.ui.newnavigation.NavigationActions
 import com.android.shelfLife.ui.newnavigation.Route
 import com.android.shelfLife.ui.newoverview.EditFoodItemScreen
-import com.android.shelfLife.ui.newutils.formatTimestampToDate
+import com.android.shelfLife.ui.utils.formatTimestampToDate
 import com.google.firebase.Timestamp
 import io.mockk.MockKAnnotations
 import io.mockk.every

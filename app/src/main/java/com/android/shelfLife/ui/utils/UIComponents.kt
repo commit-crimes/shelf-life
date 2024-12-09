@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.newutils
+package com.android.shelfLife.ui.utils
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

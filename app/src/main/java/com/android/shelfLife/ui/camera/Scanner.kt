@@ -29,7 +29,7 @@ import com.android.shelfLife.ui.newnavigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.newnavigation.NavigationActions
 import com.android.shelfLife.ui.newnavigation.Route
 import com.android.shelfLife.ui.newnavigation.Screen
-import com.android.shelfLife.ui.newutils.OnLifecycleEvent
+import com.android.shelfLife.ui.utils.OnLifecycleEvent
 import kotlinx.coroutines.launch
 
 /**

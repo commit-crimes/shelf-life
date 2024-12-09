@@ -9,8 +9,8 @@ import com.android.shelfLife.model.newRecipe.Ingredient
 import com.android.shelfLife.model.newRecipe.Recipe
 import com.android.shelfLife.model.newRecipe.RecipeRepository
 import com.android.shelfLife.model.user.UserRepository
-import com.android.shelfLife.ui.newutils.validateNumber
-import com.android.shelfLife.ui.newutils.validateString
+import com.android.shelfLife.ui.utils.validateNumber
+import com.android.shelfLife.ui.utils.validateString
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes

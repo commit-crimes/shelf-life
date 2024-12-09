@@ -6,6 +6,9 @@ import com.android.shelfLife.ui.theme.expired
 import com.android.shelfLife.ui.theme.expiresInALongTime
 import com.android.shelfLife.ui.theme.expiresLater
 import com.android.shelfLife.ui.theme.expiresSoon
+import com.android.shelfLife.ui.utils.getExpiryInfo
+import com.android.shelfLife.ui.utils.getExpiryMessageBasedOnDays
+import com.android.shelfLife.ui.utils.getProgressBarState
 import java.text.SimpleDateFormat
 import org.junit.Assert.assertEquals
 import org.junit.Test

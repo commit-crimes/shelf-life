@@ -4,7 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.newFoodItem.*
 import com.android.shelfLife.ui.newutils.FoodItemDetails
-import com.android.shelfLife.ui.newutils.formatTimestampToDisplayDate
+import com.android.shelfLife.ui.utils.formatTimestampToDisplayDate
 import com.google.firebase.Timestamp
 import java.util.Date
 import org.junit.Rule

@@ -63,7 +63,7 @@ import com.android.shelfLife.ui.newnavigation.Route
 import com.android.shelfLife.ui.newnavigation.Screen
 import com.android.shelfLife.ui.newnavigation.TopNavigationBar
 import com.android.shelfLife.ui.newoverview.FirstTimeWelcomeScreen
-import com.android.shelfLife.ui.newutils.CustomSearchBar
+import com.android.shelfLife.ui.utils.CustomSearchBar
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -47,7 +47,7 @@ import com.android.shelfLife.ui.newProfile.ProfileScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.recipes.addRecipe.AddRecipeScreen
-import com.android.shelfLife.ui.newutils.formatTimestampToDate
+import com.android.shelfLife.ui.utils.formatTimestampToDate
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.Timestamp
 import io.mockk.Runs

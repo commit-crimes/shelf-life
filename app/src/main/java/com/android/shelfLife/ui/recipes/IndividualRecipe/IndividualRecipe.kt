@@ -38,7 +38,7 @@ import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.newnavigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.newnavigation.NavigationActions
 import com.android.shelfLife.ui.newnavigation.Route
-import com.android.shelfLife.ui.newutils.CustomTopAppBar
+import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.math.floor

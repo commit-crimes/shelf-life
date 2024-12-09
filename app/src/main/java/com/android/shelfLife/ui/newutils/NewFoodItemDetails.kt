@@ -13,6 +13,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
+import com.android.shelfLife.ui.utils.formatTimestampToDisplayDate
 
 /**
  * Composable function to display the details of a food item.

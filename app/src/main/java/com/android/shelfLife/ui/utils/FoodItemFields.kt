@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.newutils
+package com.android.shelfLife.ui.utils
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -181,7 +181,7 @@ fun NewLocationDropdownField(
 ) {
   DropdownFields(
       label = stringResource(id = R.string.location_label),
-      options = com.android.shelfLife.model.newFoodItem.FoodStorageLocation.entries.toTypedArray(),
+      options = FoodStorageLocation.entries.toTypedArray(),
       selectedOption = location,
       onOptionSelected = onLocationChange,
       expanded = locationExpanded,

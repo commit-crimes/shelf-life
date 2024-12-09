@@ -13,7 +13,7 @@ import com.android.shelfLife.model.user.User
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.newnavigation.NavigationActions
 import com.android.shelfLife.ui.newnavigation.Route
-import com.android.shelfLife.ui.newutils.formatTimestampToDate
+import com.android.shelfLife.ui.utils.formatTimestampToDate
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
