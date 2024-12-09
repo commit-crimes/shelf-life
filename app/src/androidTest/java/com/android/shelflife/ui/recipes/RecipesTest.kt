@@ -18,7 +18,7 @@ import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.recipe.RecipeRepository
-import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.newnavigation.NavigationActions
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.google.firebase.Timestamp
 import io.mockk.mockk
@@ -158,7 +158,7 @@ class RecipesTest {
     composeTestRule.onNodeWithTag("recipesCards").performClick()
     composeTestRule.waitForIdle()
     verify(navigationActions)
-        .navigateTo(com.android.shelfLife.ui.navigation.Screen.INDIVIDUAL_RECIPE)
+        .navigateTo(com.android.shelfLife.ui.newnavigation.Screen.INDIVIDUAL_RECIPE)
   }
 
   @Test
@@ -171,7 +171,7 @@ class RecipesTest {
         .onNodeWithTag("addRecipeFab")
         .performClick() // click twice to go to add recipe screen
     composeTestRule.waitForIdle()
-    verify(navigationActions).navigateTo(com.android.shelfLife.ui.navigation.Screen.ADD_RECIPE)
+    verify(navigationActions).navigateTo(com.android.shelfLife.ui.newnavigation.Screen.ADD_RECIPE)
   }
 
   @Test

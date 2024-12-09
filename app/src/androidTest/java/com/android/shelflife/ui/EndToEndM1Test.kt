@@ -32,11 +32,11 @@ import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
-import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.overview.AddFoodItemScreen
-import com.android.shelfLife.ui.overview.OverviewScreen
+import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.ui.newnavigation.Route
+import com.android.shelfLife.ui.newnavigation.Screen
+import com.android.shelfLife.ui.newoverview.AddFoodItemScreen
+import com.android.shelfLife.ui.newoverview.OverviewScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.google.firebase.Timestamp
 import io.mockk.every

@@ -18,7 +18,7 @@ import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.recipe.RecipeRepository
-import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.newnavigation.NavigationActions
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.google.firebase.Timestamp
 import io.mockk.mockk

@@ -42,7 +42,7 @@ open class ListRecipesViewModel(
   open val selectedRecipe: StateFlow<Recipe?> = _selectedRecipe.asStateFlow()
 
   init {
-    recipeRepository.init(onSuccess = { observeRecipes() })
+    //recipeRepository.init(onSuccess = { observeRecipes() })
   }
 
   private fun observeRecipes() {

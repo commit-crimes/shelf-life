@@ -24,12 +24,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.SearchStatus
-import com.android.shelfLife.ui.navigation.BottomNavigationMenu
-import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
-import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.utils.OnLifecycleEvent
+import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
+import com.android.shelfLife.ui.newnavigation.LIST_TOP_LEVEL_DESTINATION
+import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.ui.newnavigation.Route
+import com.android.shelfLife.ui.newnavigation.Screen
+import com.android.shelfLife.ui.newutils.OnLifecycleEvent
 import kotlinx.coroutines.launch
 
 /**

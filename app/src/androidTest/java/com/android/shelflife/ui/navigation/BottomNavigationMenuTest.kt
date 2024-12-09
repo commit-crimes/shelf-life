@@ -11,9 +11,9 @@ import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
 import com.android.shelfLife.model.invitations.InvitationViewModel
-import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.TopLevelDestinations
-import com.android.shelfLife.ui.profile.ProfileScreen
+import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.ui.newnavigation.TopLevelDestinations
+import com.android.shelfLife.ui.newProfile.ProfileScreen
 import io.mockk.MockKAnnotations
 import io.mockk.mockk
 import org.junit.Before

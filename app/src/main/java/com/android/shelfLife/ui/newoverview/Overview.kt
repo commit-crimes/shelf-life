@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.overview
+package com.android.shelfLife.ui.newoverview
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -23,14 +23,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.android.shelfLife.ui.navigation.BottomNavigationMenu
-import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
-import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
-import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.navigation.TopNavigationBar
-import com.android.shelfLife.ui.utils.CustomSearchBar
+import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
+import com.android.shelfLife.ui.newnavigation.HouseHoldSelectionDrawer
+import com.android.shelfLife.ui.newnavigation.LIST_TOP_LEVEL_DESTINATION
+import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.ui.newnavigation.Route
+import com.android.shelfLife.ui.newnavigation.Screen
+import com.android.shelfLife.ui.newnavigation.TopNavigationBar
+import com.android.shelfLife.ui.newutils.CustomSearchBar
 import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import kotlinx.coroutines.launch
 

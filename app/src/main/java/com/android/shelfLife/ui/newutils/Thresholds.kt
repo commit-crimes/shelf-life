@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.utils
+package com.android.shelfLife.ui.newutils
 
 import androidx.compose.ui.graphics.Color
 import com.android.shelfLife.ui.theme.expired

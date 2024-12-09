@@ -15,24 +15,21 @@ import org.mockito.Mockito.*
 @InstallIn(SingletonComponent::class)
 object TestUserModule {
 
-    @Provides
-    @Singleton
-    fun provideMockFirestore(): FirebaseFirestore {
-        return mock(FirebaseFirestore::class.java)
-    }
+  @Provides
+  @Singleton
+  fun provideMockFirestore(): FirebaseFirestore {
+    return mock(FirebaseFirestore::class.java)
+  }
 
-    @Provides
-    @Singleton
-    fun provideMockFirebaseAuth(): FirebaseAuth {
-        return mock(FirebaseAuth::class.java)
-    }
+  @Provides
+  @Singleton
+  fun provideMockFirebaseAuth(): FirebaseAuth {
+    return mock(FirebaseAuth::class.java)
+  }
 
-    @Provides
-    @Singleton
-    fun provideUserRepository(
-        firestore: FirebaseFirestore,
-        auth: FirebaseAuth
-    ): UserRepository {
-        return UserRepositoryFirestore(firestore, auth)
-    }
+  @Provides
+  @Singleton
+  fun provideUserRepository(firestore: FirebaseFirestore, auth: FirebaseAuth): UserRepository {
+    return UserRepositoryFirestore(firestore, auth)
+  }
 }

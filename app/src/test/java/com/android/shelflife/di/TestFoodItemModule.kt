@@ -11,13 +11,13 @@ import org.mockito.Mockito
 @InstallIn(SingletonComponent::class)
 object TestFoodItemModule {
 
-    @Provides
-    fun provideMockFirestore(): FirebaseFirestore {
-        return Mockito.mock(FirebaseFirestore::class.java)
-    }
+  @Provides
+  fun provideMockFirestore(): FirebaseFirestore {
+    return Mockito.mock(FirebaseFirestore::class.java)
+  }
 
-    @Provides
-    fun provideFoodItemRepository(db: FirebaseFirestore): FoodItemRepository {
-        return FoodItemRepositoryFirestore(db)
-    }
+  @Provides
+  fun provideFoodItemRepository(db: FirebaseFirestore): FoodItemRepository {
+    return FoodItemRepositoryFirestore(db)
+  }
 }

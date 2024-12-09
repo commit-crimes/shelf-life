@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.utils
+package com.android.shelfLife.ui.newutils
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions

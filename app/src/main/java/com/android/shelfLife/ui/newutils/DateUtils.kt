@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.utils
+package com.android.shelfLife.ui.newutils
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping

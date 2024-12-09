@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.overview
+package com.android.shelfLife.ui.newoverview
 
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,13 +25,13 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
-import com.android.shelfLife.ui.navigation.BottomNavigationMenu
-import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
-import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.utils.CustomTopAppBar
-import com.android.shelfLife.ui.utils.FoodItemDetails
+import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
+import com.android.shelfLife.ui.newnavigation.LIST_TOP_LEVEL_DESTINATION
+import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.ui.newnavigation.Route
+import com.android.shelfLife.ui.newnavigation.Screen
+import com.android.shelfLife.ui.newutils.CustomTopAppBar
+import com.android.shelfLife.ui.newutils.FoodItemDetails
 import com.android.shelfLife.viewmodel.overview.IndividualFoodItemViewModel
 import kotlinx.coroutines.launch
 

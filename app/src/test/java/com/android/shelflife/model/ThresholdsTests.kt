@@ -1,6 +1,6 @@
 // ExpiryUtilsTest.kt
 
-package com.android.shelfLife.ui.utils
+package com.android.shelfLife.ui.newutils
 
 import com.android.shelfLife.ui.theme.expired
 import com.android.shelfLife.ui.theme.expiresInALongTime

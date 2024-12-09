@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.navigation
+package com.android.shelfLife.ui.newnavigation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically

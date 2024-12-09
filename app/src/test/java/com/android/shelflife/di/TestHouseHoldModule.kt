@@ -5,22 +5,22 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import org.mockito.Mockito.mock
 import javax.inject.Singleton
+import org.mockito.Mockito.mock
 
 @Module
 @InstallIn(SingletonComponent::class)
 object TestHouseHoldModule {
 
-    @Provides
-    @Singleton
-    fun provideMockFirestore(): FirebaseFirestore {
-        return mock(FirebaseFirestore::class.java)
-    }
+  @Provides
+  @Singleton
+  fun provideMockFirestore(): FirebaseFirestore {
+    return mock(FirebaseFirestore::class.java)
+  }
 
-    @Provides
-    @Singleton
-    fun provideHouseHoldRepository(firestore: FirebaseFirestore): HouseHoldRepository {
-        return HouseholdRepositoryFirestore(firestore)
-    }
+  @Provides
+  @Singleton
+  fun provideHouseHoldRepository(firestore: FirebaseFirestore): HouseHoldRepository {
+    return HouseholdRepositoryFirestore(firestore)
+  }
 }

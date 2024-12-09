@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.utils
+package com.android.shelfLife.ui.newutils
 
 import android.content.Context
 import android.widget.Toast

@@ -40,14 +40,14 @@ import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
 import com.android.shelfLife.model.user.UserRepositoryFirestore
-import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.newnavigation.NavigationActions
 import com.android.shelfLife.ui.theme.onSecondaryDark
 import com.android.shelfLife.ui.theme.primaryContainerDark
 import com.android.shelfLife.ui.theme.primaryContainerLight
 import com.android.shelfLife.ui.theme.secondaryContainerDark
 import com.android.shelfLife.ui.theme.secondaryContainerLight
-import com.android.shelfLife.ui.utils.CustomButtons
-import com.android.shelfLife.ui.utils.CustomTopAppBar
+import com.android.shelfLife.ui.newutils.CustomButtons
+import com.android.shelfLife.ui.newutils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.recipes.AddRecipeViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch

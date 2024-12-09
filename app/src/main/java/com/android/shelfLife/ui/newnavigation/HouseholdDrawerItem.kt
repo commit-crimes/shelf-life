@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.navigation
+package com.android.shelfLife.ui.newnavigation
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth

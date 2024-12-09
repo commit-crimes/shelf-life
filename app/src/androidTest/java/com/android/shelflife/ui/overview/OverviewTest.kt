@@ -17,10 +17,10 @@ import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.invitations.InvitationRepository
 import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
-import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.overview.OverviewScreen
+import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.ui.newnavigation.Route
+import com.android.shelfLife.ui.newnavigation.Screen
+import com.android.shelfLife.ui.newoverview.OverviewScreen
 import com.google.firebase.Timestamp
 import io.mockk.mockk
 import java.util.*
@@ -503,7 +503,7 @@ class OverviewTest {
     composeTestRule.onNodeWithTag("addFoodFab").performClick()
 
     // Verify that navigateTo(Screen.ADD_FOOD) was called
-    verify(navigationActions).navigateTo(com.android.shelfLife.ui.navigation.Screen.ADD_FOOD)
+    verify(navigationActions).navigateTo(com.android.shelfLife.ui.newnavigation.Screen.ADD_FOOD)
   }
 
   @Test

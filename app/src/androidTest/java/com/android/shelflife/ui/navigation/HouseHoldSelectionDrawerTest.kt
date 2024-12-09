@@ -15,9 +15,9 @@ import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
-import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
-import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.newnavigation.HouseHoldSelectionDrawer
+import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.ui.newnavigation.Screen
 import io.mockk.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before

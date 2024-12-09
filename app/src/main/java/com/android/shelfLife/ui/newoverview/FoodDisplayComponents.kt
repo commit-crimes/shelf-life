@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.overview
+package com.android.shelfLife.ui.newoverview
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -37,8 +37,8 @@ import coil3.compose.AsyncImage
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodStatus
-import com.android.shelfLife.ui.utils.getExpiryMessageBasedOnDays
-import com.android.shelfLife.ui.utils.getProgressBarState
+import com.android.shelfLife.ui.newutils.getExpiryMessageBasedOnDays
+import com.android.shelfLife.ui.newutils.getProgressBarState
 import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat

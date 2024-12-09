@@ -11,8 +11,8 @@ import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.invitations.Invitation
 import com.android.shelfLife.model.invitations.InvitationRepository
-import com.android.shelfLife.ui.invitations.InvitationScreen
-import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.newInvitations.InvitationScreen
+import com.android.shelfLife.ui.newnavigation.NavigationActions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import io.mockk.MockKAnnotations

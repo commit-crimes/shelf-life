@@ -10,9 +10,9 @@ import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
-import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.ui.newnavigation.Route
+import com.android.shelfLife.ui.newnavigation.Screen
 import io.mockk.*
 import org.junit.Before
 import org.junit.Rule

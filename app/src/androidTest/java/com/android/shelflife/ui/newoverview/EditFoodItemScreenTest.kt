@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.overview
+package com.android.shelfLife.ui.newoverview
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.*
@@ -11,9 +11,9 @@ import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.foodItem.FoodStorageLocation
 import com.android.shelfLife.model.user.User
 import com.android.shelfLife.model.user.UserRepository
-import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.utils.formatTimestampToDate
+import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.ui.newnavigation.Route
+import com.android.shelfLife.ui.newutils.formatTimestampToDate
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking

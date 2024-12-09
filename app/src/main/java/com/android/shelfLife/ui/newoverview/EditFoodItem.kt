@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.overview
+package com.android.shelfLife.ui.newoverview
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
@@ -15,9 +15,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
-import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.utils.*
+import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.ui.newnavigation.Route
+import com.android.shelfLife.ui.newutils.*
 import com.android.shelfLife.viewmodel.FoodItemViewModel
 import kotlinx.coroutines.launch
 

@@ -9,8 +9,8 @@ import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.user.UserRepository
-import com.android.shelfLife.ui.utils.validateNumber
-import com.android.shelfLife.ui.utils.validateString
+import com.android.shelfLife.ui.newutils.validateNumber
+import com.android.shelfLife.ui.newutils.validateString
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -23,10 +23,10 @@ import com.android.shelfLife.model.foodItem.FoodStatus
 import com.android.shelfLife.model.foodItem.FoodStorageLocation
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
-import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.overview.EditFoodItemScreen
-import com.android.shelfLife.ui.utils.formatTimestampToDate
+import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.ui.newnavigation.Route
+import com.android.shelfLife.ui.newoverview.EditFoodItemScreen
+import com.android.shelfLife.ui.newutils.formatTimestampToDate
 import com.google.firebase.Timestamp
 import io.mockk.MockKAnnotations
 import io.mockk.every

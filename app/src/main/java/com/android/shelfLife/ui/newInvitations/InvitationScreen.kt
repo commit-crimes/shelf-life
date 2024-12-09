@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.invitations
+package com.android.shelfLife.ui.newInvitations
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
@@ -32,7 +32,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.model.invitations.Invitation
-import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.newnavigation.NavigationActions
 import com.android.shelfLife.viewmodel.InvitationViewModel
 import kotlinx.coroutines.launch
 

@@ -5,6 +5,7 @@ import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.google.firebase.firestore.*
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import org.junit.Assert.assertEquals
@@ -14,19 +15,15 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.*
-import javax.inject.Inject
 
 @HiltAndroidTest
 class HouseholdRepositoryFirestoreTest {
 
-  @get:Rule
-  var hiltRule = HiltAndroidRule(this)
+  @get:Rule var hiltRule = HiltAndroidRule(this)
 
-  @Inject
-  lateinit var houseHoldRepository: HouseholdRepositoryFirestore
+  @Inject lateinit var houseHoldRepository: HouseholdRepositoryFirestore
 
-  @Inject
-  lateinit var mockFirestore: FirebaseFirestore
+  @Inject lateinit var mockFirestore: FirebaseFirestore
 
   private lateinit var mockCollection: CollectionReference
   private lateinit var mockDocument: DocumentReference
@@ -45,17 +42,17 @@ class HouseholdRepositoryFirestoreTest {
   @Test
   fun `addHousehold adds household to Firestore`(): Unit = runBlocking {
     // Arrange
-    val household = HouseHold(
-      uid = "house123",
-      name = "My Household",
-      members = listOf("user1"),
-      sharedRecipes = listOf("recipe1", "recipe2")
-    )
-    val expectedMap = mapOf(
-      "name" to household.name,
-      "members" to household.members,
-      "sharedRecipes" to household.sharedRecipes
-    )
+    val household =
+        HouseHold(
+            uid = "house123",
+            name = "My Household",
+            members = listOf("user1"),
+            sharedRecipes = listOf("recipe1", "recipe2"))
+    val expectedMap =
+        mapOf(
+            "name" to household.name,
+            "members" to household.members,
+            "sharedRecipes" to household.sharedRecipes)
 
     // Act
     houseHoldRepository.addHousehold(household)
@@ -94,7 +91,8 @@ class HouseholdRepositoryFirestoreTest {
     `when`(mockDocument2.get("sharedRecipes")).thenReturn(listOf("recipe1"))
 
     `when`(mockSnapshot.documents).thenReturn(listOf(mockDocument1, mockDocument2))
-    `when`(mockCollection.whereIn(FieldPath.documentId(), householdIds).get().await()).thenReturn(mockSnapshot)
+    `when`(mockCollection.whereIn(FieldPath.documentId(), householdIds).get().await())
+        .thenReturn(mockSnapshot)
 
     // Act
     val households = houseHoldRepository.getHouseholds(householdIds)
@@ -112,7 +110,7 @@ class HouseholdRepositoryFirestoreTest {
     // Arrange
     val householdIds = listOf("house123", "house456")
     `when`(mockCollection.whereIn(FieldPath.documentId(), householdIds).get())
-      .thenThrow(RuntimeException("Firestore error"))
+        .thenThrow(RuntimeException("Firestore error"))
 
     // Act
     val households = houseHoldRepository.getHouseholds(householdIds)
@@ -126,17 +124,17 @@ class HouseholdRepositoryFirestoreTest {
   @Test
   fun `updateHousehold updates an existing household in Firestore`(): Unit = runBlocking {
     // Arrange
-    val household = HouseHold(
-      uid = "house123",
-      name = "Updated Household",
-      members = listOf("user1"),
-      sharedRecipes = listOf("recipe1")
-    )
-    val expectedMap = mapOf(
-      "name" to household.name,
-      "members" to household.members,
-      "sharedRecipes" to household.sharedRecipes
-    )
+    val household =
+        HouseHold(
+            uid = "house123",
+            name = "Updated Household",
+            members = listOf("user1"),
+            sharedRecipes = listOf("recipe1"))
+    val expectedMap =
+        mapOf(
+            "name" to household.name,
+            "members" to household.members,
+            "sharedRecipes" to household.sharedRecipes)
 
     // Act
     houseHoldRepository.updateHousehold(household)
@@ -149,19 +147,24 @@ class HouseholdRepositoryFirestoreTest {
   @Test
   fun `startListeningForHouseholds sets up Firestore listener`() {
     val mockListenerRegistration = mock(ListenerRegistration::class.java)
-    `when`(mockDocument.collection("members").addSnapshotListener(any<EventListener<QuerySnapshot>>()))
-      .thenReturn(mockListenerRegistration)
+    `when`(
+            mockDocument
+                .collection("members")
+                .addSnapshotListener(any<EventListener<QuerySnapshot>>()))
+        .thenReturn(mockListenerRegistration)
 
     houseHoldRepository.startListeningForHouseholds(listOf("house123"))
 
-    verify(mockDocument.collection("members")).addSnapshotListener(any<EventListener<QuerySnapshot>>())
+    verify(mockDocument.collection("members"))
+        .addSnapshotListener(any<EventListener<QuerySnapshot>>())
   }
 
   @Test
   fun `stopListeningForHouseholds removes Firestore listener`() {
     val mockListenerRegistration = mock(ListenerRegistration::class.java)
 
-    val field = HouseholdRepositoryFirestore::class.java.getDeclaredField("householdsListenerRegistration")
+    val field =
+        HouseholdRepositoryFirestore::class.java.getDeclaredField("householdsListenerRegistration")
     field.isAccessible = true
     field.set(houseHoldRepository, mockListenerRegistration)
 
