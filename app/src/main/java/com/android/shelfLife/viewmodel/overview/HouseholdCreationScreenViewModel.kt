@@ -82,39 +82,19 @@ constructor(
     if (newHouseholdNameIsInvalid(householdName)) {
       return false
     }
-
     val editHousehold = householdToEdit.value
     if (editHousehold != null) {
-      // Editing existing household
-      val updatedHousehold = editHousehold.copy(name = householdName)
+      var updatedHousehold = editHousehold.copy(name = householdName)
       val emailToUserIds = getEmailToUserId(_emailList.value)
       if (emailToUserIds.isNotEmpty()) {
-        val oldUidList = updatedHousehold.members
         val uidList = _emailList.value.mapNotNull { emailToUserIds[it] }
-
-        // Compare sizes to determine if we need to send invites or remove members
-        when {
-          oldUidList.size < uidList.size -> {
-            updateHousehold(
-              updatedHousehold.copy(members = uidList),
-              shouldUpdateRepo = false
-            )
-          }
-          oldUidList.size > uidList.size -> {
-            updateHousehold(
-              updatedHousehold.copy(members = uidList),
-              shouldUpdateRepo = true
-            )
-          }
-        }
-        updateHousehold(updatedHousehold)
+        updatedHousehold = updatedHousehold.copy(members = uidList)
       }
+      updateHousehold(updatedHousehold)
     } else {
-      // Creating new household
       addNewHousehold(householdName, _emailList.value)
       Log.d("HouseholdCreationScreen", "Added new household")
     }
-
     return true
   }
 
@@ -149,7 +129,7 @@ constructor(
     }
   }
 
-  private fun updateHousehold(household: HouseHold, shouldUpdateRepo: Boolean = true) {
+  private fun updateHousehold(household: HouseHold) {
     viewModelScope.launch {
       val oldHousehold = houseHoldRepository.households.value.find { it.uid == household.uid }
       if (oldHousehold != null) {
@@ -158,13 +138,6 @@ constructor(
           newMemberUids.forEach {
             invitationRepository.sendInvitation(household, it)
           }
-        }
-      }
-
-      if (shouldUpdateRepo) {
-        houseHoldRepository.updateHousehold(household)
-        if (selectedHousehold.value == null || household.uid == selectedHousehold.value!!.uid) {
-          userRepository.selectHousehold(household)
         }
       }
     }
