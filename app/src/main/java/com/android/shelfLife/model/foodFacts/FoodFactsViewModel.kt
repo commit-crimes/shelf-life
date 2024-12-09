@@ -3,15 +3,12 @@ package com.android.shelfLife.model.foodFacts
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.android.shelfLife.model.foodFacts.FoodFactsRepository
-import com.android.shelfLife.model.foodFacts.FoodSearchInput
-import com.android.shelfLife.model.foodFacts.SearchStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-/*
+
 sealed class SearchStatus {
   data object Idle : SearchStatus()
 
@@ -21,7 +18,7 @@ sealed class SearchStatus {
 
   data object Failure : SearchStatus()
 }
-*/
+
 
 class FoodFactsViewModel(private val repository: FoodFactsRepository) : ViewModel() {
 
