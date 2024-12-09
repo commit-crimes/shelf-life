@@ -25,9 +25,9 @@ import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.model.newFoodItem.FoodStorageLocation
-import com.android.shelfLife.model.newRecipe.RecipePrompt
-import com.android.shelfLife.model.newRecipe.RecipeType
-import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.model.recipe.RecipePrompt
+import com.android.shelfLife.model.recipe.RecipeType
+import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.viewmodel.recipe.RecipeGenerationViewModel
 
 @Composable
@@ -139,7 +139,8 @@ fun GenerateRecipeScreen(navigationActions: NavigationActions) {
                 RecipePrompt(
                     name = recipeName,
                     ingredients = testIngredients,
-                    recipeType = RecipeType.HIGH_PROTEIN))
+                    recipeType = RecipeType.HIGH_PROTEIN)
+            )
             generationViewModel.generateRecipe(
                 onSuccess = { recipe ->
                   generationViewModel.acceptGeneratedRecipe {

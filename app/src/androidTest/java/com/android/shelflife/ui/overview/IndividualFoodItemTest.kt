@@ -14,7 +14,7 @@ import com.android.shelfLife.model.newFoodItem.FoodStatus
 import com.android.shelfLife.model.newFoodItem.FoodStorageLocation
 import com.android.shelfLife.model.newFoodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.newhousehold.HouseholdViewModel
-import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.ui.navigation.NavigationActions
 import com.google.firebase.Timestamp
 import io.mockk.MockKAnnotations
 import io.mockk.every

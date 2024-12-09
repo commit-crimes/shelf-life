@@ -1,9 +1,9 @@
 package com.android.shelflife.viewmodel
 
-import com.android.shelfLife.model.newRecipe.ListRecipesViewModel
-import com.android.shelfLife.model.newRecipe.Recipe
-import com.android.shelfLife.model.newRecipe.RecipeGeneratorRepository
-import com.android.shelfLife.model.newRecipe.RecipePrompt
+import com.android.shelfLife.model.recipe.ListRecipesViewModel
+import com.android.shelfLife.model.recipe.Recipe
+import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
+import com.android.shelfLife.model.recipe.RecipePrompt
 import com.android.shelfLife.model.newRecipe.RecipeRepository
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull

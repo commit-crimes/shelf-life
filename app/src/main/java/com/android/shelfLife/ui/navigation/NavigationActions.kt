@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.newnavigation
+package com.android.shelfLife.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BookmarkBorder
@@ -74,7 +74,8 @@ val LIST_TOP_LEVEL_DESTINATION =
         TopLevelDestinations.OVERVIEW,
         TopLevelDestinations.SCANNER,
         TopLevelDestinations.RECIPES,
-        TopLevelDestinations.PROFILE)
+        TopLevelDestinations.PROFILE
+    )
 
 open class NavigationActions(
     private val navController: NavHostController,

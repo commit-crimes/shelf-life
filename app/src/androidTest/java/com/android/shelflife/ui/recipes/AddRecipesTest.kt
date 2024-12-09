@@ -21,10 +21,10 @@ import com.android.shelfLife.model.newhousehold.HouseHold
 import com.android.shelfLife.model.newhousehold.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.newhousehold.HouseholdViewModel
 import com.android.shelfLife.model.newInvitations.InvitationRepositoryFirestore
-import com.android.shelfLife.model.newRecipe.ListRecipesViewModel
-import com.android.shelfLife.model.newRecipe.RecipeGeneratorRepository
+import com.android.shelfLife.model.recipe.ListRecipesViewModel
+import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.newRecipe.RecipeRepository
-import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.recipes.addRecipe.AddRecipeScreen
 import com.google.firebase.Timestamp
 import io.mockk.mockk

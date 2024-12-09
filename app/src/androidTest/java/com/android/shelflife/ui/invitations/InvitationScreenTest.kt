@@ -12,7 +12,7 @@ import com.android.shelfLife.model.newhousehold.HouseholdViewModel
 import com.android.shelfLife.model.newInvitations.Invitation
 import com.android.shelfLife.model.newInvitations.InvitationRepository
 import com.android.shelfLife.ui.newInvitations.InvitationScreen
-import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.ui.navigation.NavigationActions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import io.mockk.MockKAnnotations

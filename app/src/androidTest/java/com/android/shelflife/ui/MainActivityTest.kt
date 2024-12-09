@@ -11,9 +11,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.shelfLife.ui.newnavigation.NavigationActions
-import com.android.shelfLife.ui.newnavigation.Route
-import com.android.shelfLife.ui.newnavigation.TopLevelDestination
+import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.navigation.TopLevelDestination
 import io.mockk.mockk
 import org.junit.Before
 import org.junit.Rule
@@ -48,7 +48,8 @@ class MainActivityTest {
   fun testNavigateToOverview() {
     composeTestRule.runOnUiThread {
       navigationActions.navigateTo(
-          TopLevelDestination(route = Route.OVERVIEW, icon = mockk(), textId = "Overview"))
+          TopLevelDestination(route = Route.OVERVIEW, icon = mockk(), textId = "Overview")
+      )
     }
 
     composeTestRule.onNodeWithTag("Overview").assertIsDisplayed()

@@ -32,7 +32,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.model.newInvitations.Invitation
-import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.viewmodel.InvitationViewModel
 import kotlinx.coroutines.launch
 

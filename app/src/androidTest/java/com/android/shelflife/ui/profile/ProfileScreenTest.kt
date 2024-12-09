@@ -7,8 +7,8 @@ import androidx.navigation.NavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.newInvitations.InvitationRepositoryFirestore
 import com.android.shelfLife.model.newInvitations.InvitationViewModel
-import com.android.shelfLife.ui.newnavigation.NavigationActions
-import com.android.shelfLife.ui.newnavigation.Route
+import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.newProfile.ProfileScreen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount

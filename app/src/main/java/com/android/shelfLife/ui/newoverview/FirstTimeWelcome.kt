@@ -17,8 +17,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.android.shelfLife.ui.newnavigation.NavigationActions
-import com.android.shelfLife.ui.newnavigation.Screen
+import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 
 /**

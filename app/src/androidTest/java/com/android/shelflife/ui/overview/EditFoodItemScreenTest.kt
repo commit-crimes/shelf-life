@@ -23,8 +23,8 @@ import com.android.shelfLife.model.newFoodItem.FoodStatus
 import com.android.shelfLife.model.newFoodItem.FoodStorageLocation
 import com.android.shelfLife.model.newFoodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.newhousehold.HouseholdViewModel
-import com.android.shelfLife.ui.newnavigation.NavigationActions
-import com.android.shelfLife.ui.newnavigation.Route
+import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.newoverview.EditFoodItemScreen
 import com.android.shelfLife.ui.utils.formatTimestampToDate
 import com.google.firebase.Timestamp

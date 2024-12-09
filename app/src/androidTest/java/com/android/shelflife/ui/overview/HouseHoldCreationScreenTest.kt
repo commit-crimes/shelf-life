@@ -18,7 +18,7 @@ import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.newhousehold.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.newhousehold.HouseholdViewModel
 import com.android.shelfLife.model.newInvitations.InvitationRepositoryFirestore
-import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.newoverview.HouseHoldCreationScreen
 import io.mockk.MockKAnnotations
 import io.mockk.mockk

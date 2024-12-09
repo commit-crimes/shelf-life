@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
-import com.android.shelfLife.model.newRecipe.Ingredient
-import com.android.shelfLife.ui.newnavigation.NavigationActions
+import com.android.shelfLife.model.recipe.Ingredient
+import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.theme.onSecondaryDark
 import com.android.shelfLife.ui.theme.primaryContainerDark
 import com.android.shelfLife.ui.theme.primaryContainerLight

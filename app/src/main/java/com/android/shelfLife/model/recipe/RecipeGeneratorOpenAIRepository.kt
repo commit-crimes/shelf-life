@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.newRecipe
+package com.android.shelfLife.model.recipe
 
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole

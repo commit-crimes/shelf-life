@@ -1,5 +1,6 @@
 package com.android.shelfLife.model.newRecipe
 
+import com.android.shelfLife.model.recipe.Recipe
 import kotlinx.coroutines.flow.StateFlow
 
 interface RecipeRepository {

@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.newRecipe
+package com.android.shelfLife.model.recipe
 
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity

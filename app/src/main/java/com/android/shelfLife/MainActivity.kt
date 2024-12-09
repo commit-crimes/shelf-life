@@ -19,9 +19,9 @@ import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
 import com.android.shelfLife.ui.newInvitations.InvitationScreen
-import com.android.shelfLife.ui.newnavigation.NavigationActions
-import com.android.shelfLife.ui.newnavigation.Route
-import com.android.shelfLife.ui.newnavigation.Screen
+import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.newoverview.AddFoodItemScreen
 import com.android.shelfLife.ui.newoverview.EditFoodItemScreen
 import com.android.shelfLife.ui.newoverview.HouseHoldCreationScreen

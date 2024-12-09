@@ -28,9 +28,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
-import com.android.shelfLife.ui.newnavigation.LIST_TOP_LEVEL_DESTINATION
-import com.android.shelfLife.ui.newnavigation.NavigationActions
-import com.android.shelfLife.ui.newnavigation.Route
+import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
+import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.utils.DropdownFields
 import com.android.shelfLife.viewmodel.ProfileScreenViewModel
 import com.example.compose.LocalThemeMode

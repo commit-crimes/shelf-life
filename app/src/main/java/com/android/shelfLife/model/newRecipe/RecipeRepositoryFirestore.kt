@@ -4,6 +4,8 @@ import android.util.Log
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
+import com.android.shelfLife.model.recipe.Ingredient
+import com.android.shelfLife.model.recipe.Recipe
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.time.DurationUnit
