@@ -1,6 +1,5 @@
 package com.android.shelfLife.model.foodFacts
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -60,17 +59,18 @@ class FoodFactsViewModel(private val repository: FoodFactsRepository) : ViewMode
   fun searchByQuery(newQuery: String) {
     _query.update { newQuery }
     viewModelScope.launch {
-        _searchStatus.value = SearchStatus.Loading
+      _searchStatus.value = SearchStatus.Loading
       repository.searchFoodFacts(
           FoodSearchInput.Query(newQuery),
           onSuccess = { foodFactsList ->
             // Filter out items without images
             val filteredList = foodFactsList.filter { it.imageUrl.isNotEmpty() }
             _foodFactsSuggestions.value = foodFactsList
-              _searchStatus.value = SearchStatus.Success
+            _searchStatus.value = SearchStatus.Success
           },
-          onFailure = { _foodFactsSuggestions.value = emptyList()
-              _searchStatus.value = SearchStatus.Failure
+          onFailure = {
+            _foodFactsSuggestions.value = emptyList()
+            _searchStatus.value = SearchStatus.Failure
           })
     }
   }

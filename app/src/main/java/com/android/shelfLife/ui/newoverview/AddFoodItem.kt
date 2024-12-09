@@ -63,9 +63,7 @@ fun AddFoodItemScreen(
               item(key = "foodName") {
                 FoodNameField(
                     foodName = foodItemViewModel.foodName,
-                    onFoodNameChange = { newValue ->
-                      foodItemViewModel.changeFoodName(newValue)
-                    },
+                    onFoodNameChange = { newValue -> foodItemViewModel.changeFoodName(newValue) },
                     foodNameErrorResId = foodItemViewModel.foodNameErrorResId)
                 Spacer(modifier = Modifier.height(16.dp))
               }

@@ -5,7 +5,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -25,7 +24,6 @@ import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.overview.AddFoodItemScreen
-import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.utils.formatTimestampToDate
 import com.google.firebase.Timestamp
 import io.mockk.MockKAnnotations
@@ -358,7 +356,7 @@ class AddFoodItemScreenTest {
     verify { houseHoldViewModel.addFoodItem(any()) }
 
     // Verify that navigation action was called
-    verify {navigationActions.goBack() }
+    verify { navigationActions.goBack() }
   }
 
   @Test
@@ -433,7 +431,6 @@ class AddFoodItemScreenTest {
 
     verify { navigationActions.goBack() }
   }
-
 
   fun testDateReValidation() {
     composeTestRule.setContent {

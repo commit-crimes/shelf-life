@@ -83,7 +83,7 @@ open class ListFoodItemsViewModel(private val repository: FoodItemRepository) : 
     _selectedFoodItem.value = foodItem
   }
 
-  fun setNewFoodItemName(name:String){
+  fun setNewFoodItemName(name: String) {
     _newFoodItemName.value = name
   }
 

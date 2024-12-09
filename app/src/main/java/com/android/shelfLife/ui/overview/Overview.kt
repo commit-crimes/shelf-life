@@ -23,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
@@ -115,14 +114,13 @@ fun OverviewScreen(
               },
               // Floating Action Button to add a new food item
               floatingActionButton = {
-                  Box {
-                      FloatingActionButton(
-                          onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
-                          content = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                          modifier = Modifier.testTag("addFoodFab"),
-                          containerColor = MaterialTheme.colorScheme.secondaryContainer
-                      )
-                  }
+                Box {
+                  FloatingActionButton(
+                      onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
+                      content = { Icon(Icons.Default.Add, contentDescription = "Add") },
+                      modifier = Modifier.testTag("addFoodFab"),
+                      containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                }
               },
           ) { paddingValues ->
             Column(

@@ -6,12 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -123,19 +118,22 @@ fun OverviewScreen(
           },
           // Floating Action Button to add a new food item
           floatingActionButton = {
-              ExpandableFAB(
-                  fabExpanded = overviewScreenViewModel.fabExpanded,
-                  navigationActions = navigationActions,
-                  firstScreen = Screen.FIRST_FOOD_ITEM,
-                  secondScreen = Screen.ADD_FOOD
-              )
+            ExpandableFAB(
+                fabExpanded = overviewScreenViewModel.fabExpanded,
+                navigationActions = navigationActions,
+                firstScreen = Screen.FIRST_FOOD_ITEM,
+                secondScreen = Screen.ADD_FOOD)
           },
       ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues).fillMaxSize().pointerInput(Unit) {
-                detectTapGestures(
-                    onTap = { if (overviewScreenViewModel.fabExpanded.value) overviewScreenViewModel.fabExpanded.value = false })
-            },
+            modifier =
+                Modifier.padding(paddingValues).fillMaxSize().pointerInput(Unit) {
+                  detectTapGestures(
+                      onTap = {
+                        if (overviewScreenViewModel.fabExpanded.value)
+                            overviewScreenViewModel.fabExpanded.value = false
+                      })
+                },
         ) {
           CustomSearchBar(
               query = searchQuery,

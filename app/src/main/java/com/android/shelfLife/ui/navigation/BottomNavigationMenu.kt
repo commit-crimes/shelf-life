@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.navigation
 
-import android.util.Log
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -34,8 +33,7 @@ fun BottomNavigationMenu(
           icon = { Icon(tab.icon, tab.textId) },
           label = { Text(tab.textId) },
           selected = selectedItem == tab.route,
-          onClick = {
-              onTabSelect(tab) },
+          onClick = { onTabSelect(tab) },
           colors =
               NavigationBarItemDefaults.colors(
                   indicatorColor =

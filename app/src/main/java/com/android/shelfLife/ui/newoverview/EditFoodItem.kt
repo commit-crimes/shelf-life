@@ -51,7 +51,11 @@ fun EditFoodItemScreen(
       topBar = {
         CustomTopAppBar(
             onClick = { navigationActions.goBack() },
-            title = stringResource(id = if (foodItemViewModel.isSelected) R.string.edit_food_item_title else R.string.finish_food_item_title),
+            title =
+                stringResource(
+                    id =
+                        if (foodItemViewModel.isSelected) R.string.edit_food_item_title
+                        else R.string.finish_food_item_title),
             titleTestTag = "editFoodItemTitle",
             actions = {
               IconButton(
@@ -138,31 +142,28 @@ fun EditFoodItemScreen(
                 Spacer(modifier = Modifier.height(32.dp))
               }
 
-                //Only if its in Edit Food Item and not in Add Food Item
-                if (foodItemViewModel.isSelected){
-                    item{
-                        foodItemViewModel.selectedImage ?.let {
-                            Text(
-                                stringResource(id = R.string.selected_image_label),
-                                modifier = Modifier.testTag("selectedImageText")
-                            )
-                            Image(
-                                painter = rememberAsyncImagePainter(it.imageUrl),
-                                contentDescription = null,
-                                modifier = Modifier.size(150.dp).padding(8.dp).testTag("selectedImage")
-                            )
-                            Spacer(modifier = Modifier.height(16.dp))
-                        }
-                    }
-                    item(key = "ChangePic"){
-                        Button(
-                            onClick = { navigationActions.navigateTo(Screen.CHOOSE_FOOD_ITEM) },
-                            modifier = Modifier.testTag("navigateToChooseFoodItemButton")
-                        ) {
-                            Text("Go to Choose Food Item")
-                        }
-                    }
+              // Only if its in Edit Food Item and not in Add Food Item
+              if (foodItemViewModel.isSelected) {
+                item {
+                  foodItemViewModel.selectedImage?.let {
+                    Text(
+                        stringResource(id = R.string.selected_image_label),
+                        modifier = Modifier.testTag("selectedImageText"))
+                    Image(
+                        painter = rememberAsyncImagePainter(it.imageUrl),
+                        contentDescription = null,
+                        modifier = Modifier.size(150.dp).padding(8.dp).testTag("selectedImage"))
+                    Spacer(modifier = Modifier.height(16.dp))
+                  }
                 }
+                item(key = "ChangePic") {
+                  Button(
+                      onClick = { navigationActions.navigateTo(Screen.CHOOSE_FOOD_ITEM) },
+                      modifier = Modifier.testTag("navigateToChooseFoodItemButton")) {
+                        Text("Go to Choose Food Item")
+                      }
+                }
+              }
 
               item(key = "buttons") {
                 CustomButtons(
@@ -173,7 +174,7 @@ fun EditFoodItemScreen(
                       coroutineScope.launch {
                         val success = foodItemViewModel.submitFoodItem()
                         if (success) {
-                            navigationActions.navigateTo(Route.OVERVIEW)
+                          navigationActions.navigateTo(Route.OVERVIEW)
                         } else {
                           Toast.makeText(
                                   context, R.string.submission_error_message, Toast.LENGTH_SHORT)

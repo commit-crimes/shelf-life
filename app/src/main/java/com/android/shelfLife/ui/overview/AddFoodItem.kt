@@ -1,15 +1,8 @@
 package com.android.shelfLife.ui.overview
 
-import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,13 +11,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import coil3.compose.rememberAsyncImagePainter
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.*
 import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.utils.*
 import com.google.firebase.Timestamp
 
@@ -66,7 +57,6 @@ fun AddFoodItemScreen(
   var locationExpanded by remember { mutableStateOf(false) }
 
   val context = LocalContext.current
-
 
   /** Validates all fields when the submit button is clicked. */
   fun validateAllFieldsWhenSubmitButton() {

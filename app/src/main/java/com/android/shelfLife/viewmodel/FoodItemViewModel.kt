@@ -136,15 +136,14 @@ class FoodItemViewModel(
         validateOpenDate(openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
   }
 
-    suspend fun submbitFoodName():Boolean{
-        val isFoodNameValid = foodNameErrorResId == null
-        if(isFoodNameValid){
-            return true
-        }else{
-            return false
-        }
-
+  suspend fun submbitFoodName(): Boolean {
+    val isFoodNameValid = foodNameErrorResId == null
+    if (isFoodNameValid) {
+      return true
+    } else {
+      return false
     }
+  }
 
   suspend fun submitFoodItem(): Boolean {
     validateAllFieldsWhenSubmitButton()
