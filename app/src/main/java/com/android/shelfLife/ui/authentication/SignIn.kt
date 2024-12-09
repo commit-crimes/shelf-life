@@ -21,9 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
-import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.viewmodel.authentication.SignInState
@@ -32,8 +31,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 @Composable
-fun SignInScreen(navigationActions: NavigationActions, userRepository: UserRepository) {
-  val signInViewModel = viewModel { SignInViewModel(userRepository = userRepository) }
+fun SignInScreen(navigationActions: NavigationActions) {
+  val signInViewModel = hiltViewModel<SignInViewModel>()
   val context = LocalContext.current
   val signInState by signInViewModel.signInState.collectAsState()
 

@@ -29,21 +29,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.model.invitations.Invitation
-import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
-import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.viewmodel.InvitationViewModel
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InvitationScreen(viewModel: InvitationViewModel, navigationActions: NavigationActions) {
+fun InvitationScreen(navigationActions: NavigationActions) {
+  val viewModel = hiltViewModel<InvitationViewModel>()
   val invitations by viewModel.invitations.collectAsState()
   Scaffold(topBar = { TopAppBar(title = { Text("Invitations") }) }) { paddingValues ->
     if (invitations.isEmpty()) {
@@ -103,16 +99,4 @@ fun InvitationCard(
       }
     }
   }
-}
-
-@Preview
-@Composable
-fun PreviewInvitationScreen() {
-  val db = FirebaseFirestore.getInstance()
-  val auth = FirebaseAuth.getInstance()
-  val userRepo = UserRepositoryFirestore(db)
-  val invitationRepo = InvitationRepositoryFirestore(db, auth)
-  InvitationScreen(
-      viewModel = InvitationViewModel(invitationRepo, userRepo),
-      navigationActions = NavigationActions(rememberNavController()))
 }

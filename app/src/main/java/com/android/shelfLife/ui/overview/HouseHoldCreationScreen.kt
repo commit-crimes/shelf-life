@@ -31,15 +31,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
-import com.android.shelfLife.model.household.HouseHoldRepository
-import com.android.shelfLife.model.invitations.InvitationRepository
-import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.utils.DeletionConfirmationPopUp
 import com.android.shelfLife.ui.utils.CustomButtons
+import com.android.shelfLife.ui.utils.DeletionConfirmationPopUp
 import com.android.shelfLife.viewmodel.overview.HouseholdCreationScreenViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
@@ -48,16 +45,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun HouseHoldCreationScreen(
     navigationActions: NavigationActions,
-    houseHoldRepository: HouseHoldRepository,
-    invitationRepository: InvitationRepository,
-    userRepository: UserRepository
 ) {
-  val householdCreationScreenViewModel: HouseholdCreationScreenViewModel = viewModel {
-    HouseholdCreationScreenViewModel(
-        houseHoldRepository = houseHoldRepository,
-        invitationRepository = invitationRepository,
-        userRepository = userRepository)
-  }
+  val householdCreationScreenViewModel: HouseholdCreationScreenViewModel =
+      hiltViewModel<HouseholdCreationScreenViewModel>()
   val householdToEdit by householdCreationScreenViewModel.householdToEdit.collectAsState()
 
   var isError by rememberSaveable { mutableStateOf(false) }
@@ -278,9 +268,7 @@ fun HouseHoldCreationScreen(
                   onConfirm = {
                     navigationActions.goBack()
                     showConfirmationDialog = false
-                  },
-                  houseHoldRepository = houseHoldRepository,
-                  userRepository = userRepository)
+                  })
             }
       }
 }

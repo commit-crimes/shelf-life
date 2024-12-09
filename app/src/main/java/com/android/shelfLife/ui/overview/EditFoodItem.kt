@@ -13,9 +13,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
-import com.android.shelfLife.model.foodItem.FoodItemRepository
-import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.utils.*
@@ -34,13 +33,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun EditFoodItemScreen(
     navigationActions: NavigationActions,
-    foodItemRepository: FoodItemRepository,
-    userRepository: UserRepository,
     paddingValues: PaddingValues = PaddingValues(16.dp)
 ) {
 
   val context = LocalContext.current
-  val foodItemViewModel = FoodItemViewModel(foodItemRepository, userRepository)
+  val foodItemViewModel = hiltViewModel<FoodItemViewModel>()
   val coroutineScope = rememberCoroutineScope()
 
   Scaffold(

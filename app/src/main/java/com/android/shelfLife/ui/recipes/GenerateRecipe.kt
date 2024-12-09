@@ -19,25 +19,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodItem.FoodItem
-import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.recipe.RecipePrompt
-import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.viewmodel.recipe.RecipeGenerationViewModel
 
 @Composable
-fun GenerateRecipeScreen(
-    navigationActions: NavigationActions,
-    recipeRepository: RecipeRepository,
-    recipeGeneratorRepository: RecipeGeneratorRepository
-) {
+fun GenerateRecipeScreen(navigationActions: NavigationActions) {
   val context = LocalContext.current
 
-  val generationViewModel = RecipeGenerationViewModel(recipeRepository, recipeGeneratorRepository)
+  val generationViewModel = hiltViewModel<RecipeGenerationViewModel>()
 
   // States for recipe name and food items
   var recipeName by rememberSaveable { mutableStateOf("") }

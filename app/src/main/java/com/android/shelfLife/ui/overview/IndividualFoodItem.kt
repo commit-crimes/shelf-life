@@ -23,9 +23,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
-import com.android.shelfLife.model.foodItem.FoodItemRepository
-import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -40,11 +39,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun IndividualFoodItemScreen(
     navigationActions: NavigationActions,
-    foodItemRepository: FoodItemRepository,
-    userRepository: UserRepositoryFirestore
 ) {
   val coroutineScope = rememberCoroutineScope()
-  val individualFoodItemViewModel = IndividualFoodItemViewModel(foodItemRepository, userRepository)
+  val individualFoodItemViewModel = hiltViewModel<IndividualFoodItemViewModel>()
   val context = LocalContext.current
 
   Scaffold(

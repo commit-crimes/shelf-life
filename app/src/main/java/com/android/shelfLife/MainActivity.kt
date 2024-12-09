@@ -11,7 +11,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
@@ -21,17 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
-import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
-import com.android.shelfLife.model.foodFacts.OpenFoodFactsRepository
-import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
-import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
-import com.android.shelfLife.model.household.HouseholdViewModel
-import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
-import com.android.shelfLife.model.invitations.InvitationViewModel
-import com.android.shelfLife.model.recipe.ListRecipesViewModel
-import com.android.shelfLife.model.recipe.RecipeGeneratorOpenAIRepository
-import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
+import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
@@ -50,53 +39,33 @@ import com.android.shelfLife.ui.recipes.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.GenerateRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
-import com.android.shelfLife.viewmodel.authentication.SignInViewModel
-import com.android.shelfLife.viewmodel.recipe.RecipeGenerationViewModel
 import com.example.compose.ShelfLifeTheme
-import com.google.firebase.firestore.FirebaseFirestore
-import okhttp3.OkHttpClient
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+  @Inject lateinit var userRepositoryFirestore: UserRepositoryFirestore
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
-    setContent { ShelfLifeTheme { Surface { ShelfLifeApp() } } }
+    setContent { ShelfLifeTheme { Surface { ShelfLifeApp(userRepositoryFirestore) } } }
   }
 }
 
-@Preview
 @Composable
-fun ShelfLifeApp() {
+fun ShelfLifeApp(userRepository: UserRepository) {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
-  val firebaseFirestore = FirebaseFirestore.getInstance()
-  val foodItemRepository = FoodItemRepositoryFirestore(firebaseFirestore)
-  val listFoodItemViewModel = viewModel { ListFoodItemsViewModel(foodItemRepository) }
-  val invitationRepositoryFirestore = InvitationRepositoryFirestore(firebaseFirestore)
-  val invitationViewModel = viewModel { InvitationViewModel(invitationRepositoryFirestore) }
-  val foodFactsRepository = OpenFoodFactsRepository(OkHttpClient())
-  val foodFactsViewModel = viewModel { FoodFactsViewModel(foodFactsRepository) }
-  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
-  val recipeGeneratorRepository = RecipeGeneratorOpenAIRepository()
-  val listRecipesViewModel = viewModel {
-    ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
-  }
-  val recipeGenerationViewModel = viewModel {
-    RecipeGenerationViewModel(recipeRepository, recipeGeneratorRepository)
-  }
-  val userRepository = UserRepositoryFirestore(firebaseFirestore)
-  val signInViewModel = viewModel {
-    SignInViewModel(firestore = firebaseFirestore, userRepository = userRepository)
-  }
 
   val context = LocalContext.current
 
   val barcodeScannerViewModel: BarcodeScannerViewModel = viewModel()
 
-  val isUserLoggedIn by signInViewModel.isUserLoggedIn.collectAsState()
-  val signInState by signInViewModel.signInState.collectAsState()
+  val isUserLoggedIn = userRepository.isUserLoggedIn.collectAsState().value
 
   // Observe authentication state changes
   LaunchedEffect(isUserLoggedIn) {
@@ -107,41 +76,20 @@ fun ShelfLifeApp() {
     }
   }
 
-  // Initialize HouseholdViewModel only if the user is logged in
-  val householdViewModel = viewModel {
-    HouseholdViewModel(
-        houseHoldRepository = HouseholdRepositoryFirestore(firebaseFirestore),
-        listFoodItemsViewModel = listFoodItemViewModel,
-        invitationRepository = invitationRepositoryFirestore,
-        context.dataStore)
-  }
-
   NavHost(navController = navController, startDestination = Route.AUTH) {
     // Authentication route
     navigation(
         startDestination = Screen.AUTH,
         route = Route.AUTH,
     ) {
-      composable(Screen.AUTH) { SignInScreen(navigationActions, userRepository) }
+      composable(Screen.AUTH) { SignInScreen(navigationActions) }
     }
     navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
-      composable(Screen.OVERVIEW) {
-        OverviewScreen(navigationActions, householdViewModel, listFoodItemViewModel)
-      }
-      composable(Screen.ADD_FOOD) {
-        AddFoodItemScreen(
-            navigationActions, householdViewModel, listFoodItemViewModel, foodFactsViewModel)
-      }
-      composable(Screen.EDIT_FOOD) {
-        EditFoodItemScreen(navigationActions, householdViewModel, listFoodItemViewModel)
-      }
-      composable(Screen.HOUSEHOLD_CREATION) {
-        HouseHoldCreationScreen(navigationActions, householdViewModel = householdViewModel)
-      }
-      composable(Screen.INDIVIDUAL_FOOD_ITEM) {
-        IndividualFoodItemScreen(
-            navigationActions = navigationActions, householdViewModel, listFoodItemViewModel)
-      }
+      composable(Screen.OVERVIEW) { OverviewScreen(navigationActions) }
+      composable(Screen.ADD_FOOD) { AddFoodItemScreen(navigationActions) }
+      composable(Screen.EDIT_FOOD) { EditFoodItemScreen(navigationActions) }
+      composable(Screen.HOUSEHOLD_CREATION) { HouseHoldCreationScreen(navigationActions) }
+      composable(Screen.INDIVIDUAL_FOOD_ITEM) { IndividualFoodItemScreen(navigationActions) }
     }
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
       composable(Screen.PERMISSION_HANDLER) {
@@ -167,19 +115,11 @@ fun ShelfLifeApp() {
         IndividualRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)
       }
       composable(Screen.ADD_RECIPE) { AddRecipeScreen(navigationActions, listRecipesViewModel) }
-      composable(Screen.GENERATE_RECIPE) {
-        GenerateRecipeScreen(navigationActions, recipeRepository, recipeGeneratorRepository)
-      }
+      composable(Screen.GENERATE_RECIPE) { GenerateRecipeScreen(navigationActions) }
     }
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
-      composable(Screen.PROFILE) {
-        ProfileScreen(navigationActions, invitationViewModel = invitationViewModel)
-      }
-      composable(Route.INVITATIONS) {
-        InvitationScreen(
-            navigationActions = navigationActions,
-            invitationRepository = invitationRepositoryFirestore)
-      }
+      composable(Screen.PROFILE) { ProfileScreen(navigationActions, context) }
+      composable(Route.INVITATIONS) { InvitationScreen(navigationActions) }
     }
   }
 }
