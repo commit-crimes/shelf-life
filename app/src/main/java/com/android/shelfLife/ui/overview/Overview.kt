@@ -122,14 +122,6 @@ fun OverviewScreen(
                           modifier = Modifier.testTag("addFoodFab"),
                           containerColor = MaterialTheme.colorScheme.secondaryContainer
                       )
-                      FloatingActionButton(
-                          onClick = { navigationActions.navigateTo(Screen.FIRST_FOOD_ITEM) },
-                          content = { Icon(Icons.Default.Add, contentDescription = "Another Action") },
-                          modifier = Modifier
-                              .testTag("anotherFab")
-                              .padding(top = 70.dp), // Adjust the padding as needed
-                          containerColor = MaterialTheme.colorScheme.primaryContainer
-                      )
                   }
               },
           ) { paddingValues ->

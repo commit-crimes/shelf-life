@@ -131,12 +131,6 @@ fun ShelfLifeApp() {
       composable(Screen.OVERVIEW) {
         OverviewScreen(navigationActions, householdViewModel, listFoodItemViewModel)
       }
-        composable(Screen.FIRST_FOOD_ITEM){
-            FirstFoodItem(navigationActions, foodFactsViewModel)
-        }
-        composable(Screen.CHOOSE_FOOD_ITEM){
-            ChooseFoodItem(navigationActions, foodFactsViewModel)
-        }
       composable(Screen.ADD_FOOD) {
         AddFoodItemScreen(
             navigationActions, householdViewModel, listFoodItemViewModel, foodFactsViewModel)

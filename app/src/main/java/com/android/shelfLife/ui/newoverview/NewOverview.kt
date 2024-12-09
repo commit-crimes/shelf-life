@@ -1,6 +1,7 @@
 package com.android.shelfLife.ui.newoverview
 
 import android.util.Log
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +22,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
@@ -34,6 +36,7 @@ import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.newnavigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.newnavigation.TopNavigationBar
 import com.android.shelfLife.ui.utils.CustomSearchBar
+import com.android.shelfLife.ui.utils.ExpandableFAB
 import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import kotlinx.coroutines.launch
 
@@ -120,15 +123,19 @@ fun OverviewScreen(
           },
           // Floating Action Button to add a new food item
           floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
-                content = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                modifier = Modifier.testTag("addFoodFab"),
-                containerColor = MaterialTheme.colorScheme.secondaryContainer)
+              ExpandableFAB(
+                  fabExpanded = overviewScreenViewModel.fabExpanded,
+                  navigationActions = navigationActions,
+                  firstScreen = Screen.FIRST_FOOD_ITEM,
+                  secondScreen = Screen.ADD_FOOD
+              )
           },
       ) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues),
+            modifier = Modifier.padding(paddingValues).fillMaxSize().pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = { if (overviewScreenViewModel.fabExpanded.value) overviewScreenViewModel.fabExpanded.value = false })
+            },
         ) {
           CustomSearchBar(
               query = searchQuery,

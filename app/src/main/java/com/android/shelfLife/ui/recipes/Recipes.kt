@@ -64,6 +64,7 @@ import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
 import com.android.shelfLife.ui.utils.CustomSearchBar
+import com.android.shelfLife.ui.utils.ExpandableFAB
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -129,42 +130,10 @@ fun RecipesScreen(
               },
               // Floating Action Button to add a new food item
               floatingActionButton = {
-                Column(
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)) {
-                      // Secondary FAB for "Manual" option
-                      if (fabExpanded.value) {
-                        ExtendedFloatingActionButton(
-                            text = { Text("Generate") },
-                            icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "Add") },
-                            onClick = {
-                              // Navigate to Manual Recipe screen
-                              navigationActions.navigateTo(Screen.GENERATE_RECIPE)
-                            },
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            modifier = Modifier.testTag("generateRecipeFab").width(150.dp))
-                      }
-
-                      // Primary FAB
-                      ExtendedFloatingActionButton(
-                          text = { Text(if (fabExpanded.value) "Manual" else "") },
-                          icon = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                          onClick = {
-                            if (fabExpanded.value) {
-                              // Navigate to Generate Recipe screen
-                              navigationActions.navigateTo(Screen.ADD_RECIPE)
-                            } else {
-                              // Expand the FABs
-                              fabExpanded.value = true
-                            }
-                          },
-                          expanded = fabExpanded.value, // Bind to the state
-                          containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                          modifier =
-                              Modifier.testTag("addRecipeFab")
-                                  .width(if (fabExpanded.value) 150.dp else 56.dp))
-                    }
+                  ExpandableFAB(
+                      fabExpanded = fabExpanded,
+                      navigationActions= navigationActions
+                  )
               },
               content = { paddingValues ->
                 Column(

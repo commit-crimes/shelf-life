@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.overview
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -99,7 +100,6 @@ fun AddFoodItemScreen(
                     onFoodNameChange = { newValue ->
                       foodName = newValue
                       foodNameErrorResId = validateFoodName(foodName)
-                      foodFactsViewModel.searchByQuery(foodName)
                     },
                     foodNameErrorResId = foodNameErrorResId)
                 Spacer(modifier = Modifier.height(16.dp))
@@ -257,7 +257,8 @@ fun AddFoodItemScreen(
                                 status = FoodStatus.CLOSED)
                         houseHoldViewModel.addFoodItem(newFoodItem)
                         foodFactsViewModel.clearFoodFactsSuggestions()
-                        navigationActions.navigateTo(Route.OVERVIEW)
+
+                        navigationActions.goBack()
                       } else {
                         Toast.makeText(
                                 context, R.string.submission_error_message, Toast.LENGTH_SHORT)

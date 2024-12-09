@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -31,27 +32,36 @@ import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.android.shelfLife.model.foodFacts.SearchStatus
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
+import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
+import com.android.shelfLife.viewmodel.FoodItemViewModel
 
 @Composable
 fun ChooseFoodItem(
     navigationActions: NavigationActions,
     foodFactsViewModel: FoodFactsViewModel,
+    foodItemRepository: FoodItemRepository,
+    userRepository: UserRepository,
     paddingValues: PaddingValues = PaddingValues(16.dp)
 ) {
-    var selectedImage by remember { mutableStateOf<FoodFacts?>(null) }
+    val coroutineScope = rememberCoroutineScope()
+    val foodItemViewModel = FoodItemViewModel(foodItemRepository, userRepository)
+
+    val context = LocalContext.current
+    //TODO These are temp while we work on the new FoodFactsModel
     val foodFacts by foodFactsViewModel.foodFactsSuggestions.collectAsState()
     val searchStatus by foodFactsViewModel.searchStatus.collectAsState()
-    var currentPage by remember { mutableStateOf(0) }
 
     Scaffold(
         topBar = {
             CustomTopAppBar(
                 onClick = { navigationActions.goBack() },
-                title = "Choose Food Item",
+                title = stringResource(R.string.choose_food_item_title),
                 titleTestTag = "chooseFoodItemTitle"
             )
         },
@@ -84,70 +94,67 @@ fun ChooseFoodItem(
                             )
                         }
                         is SearchStatus.Success -> {
-                            val startIndex = currentPage * 9
-                            val endIndex = (startIndex + 9).coerceAtMost(foodFacts.size)
-                            if (startIndex < endIndex) {
-                                Box(modifier = Modifier.height(350.dp)) {
-                                    LazyVerticalGrid(
-                                        columns = GridCells.Fixed(3),
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentPadding = PaddingValues(4.dp)
-                                    ) {
-                                        items(foodFacts.subList(startIndex, endIndex) + listOf(null)) { foodFact ->
-                                            val borderColor = if (selectedImage == foodFact) {
-                                                MaterialTheme.colorScheme.primary
-                                            } else {
-                                                Color.Gray}
+                            Box(modifier = Modifier.height(350.dp)) {
+                                LazyVerticalGrid(
+                                    columns = GridCells.Fixed(3),
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentPadding = PaddingValues(4.dp)
+                                ) {
+                                    items(foodFacts.take(7) + listOf(null)) { foodFact ->
+                                        val borderColor = if (foodItemViewModel.selectedImage == foodFact) {
+                                            MaterialTheme.colorScheme.primary
+                                        } else {
+                                            Color.Gray}
 
-                                            val alpha = if (selectedImage == foodFact || selectedImage == null) 1f else 0.5f
+                                        val alpha = if (foodItemViewModel.selectedImage == foodFact || foodItemViewModel.selectedImage  == null) 1f else 0.5f
 
-                                                if (foodFact != null) {
-                                                Box(
-                                                    modifier = Modifier
-                                                        .padding(4.dp)
-                                                        .size(100.dp)
-                                                        .border(
-                                                            width = if (selectedImage == foodFact) 4.dp else 1.dp,
-                                                            color = borderColor,
-                                                            shape = RoundedCornerShape(8.dp)
-                                                        )
-                                                        .clickable { selectedImage = foodFact }
-                                                        .testTag("foodImage")
-                                                ) {
-                                                    AsyncImage(
-                                                        model = foodFact.imageUrl,
-                                                        contentDescription = "Food Image",
-                                                        modifier = Modifier
-                                                            .fillMaxSize()
-                                                            .clip(RoundedCornerShape(8.dp))
-                                                            .graphicsLayer (alpha = alpha)
-                                                            .testTag("IndividualFoodItemImage"),
-                                                        contentScale = ContentScale.Crop
+                                        if (foodFact != null) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .padding(4.dp)
+                                                    .size(100.dp)
+                                                    .border(
+                                                        width = if (foodItemViewModel.selectedImage  == foodFact) 4.dp else 1.dp,
+                                                        color = borderColor,
+                                                        shape = RoundedCornerShape(8.dp)
                                                     )
-                                                }
-                                            } else {
-                                                Box(
+                                                    .clickable { foodItemViewModel.selectedImage  = foodFact }
+                                                    .testTag("foodImage")
+                                            ) {
+                                                AsyncImage(
+                                                    model = foodFact.imageUrl,
+                                                    contentDescription = "Food Image",
                                                     modifier = Modifier
-                                                        .padding(4.dp)
-                                                        .size(100.dp)
-                                                        .border(
-                                                            width = if (selectedImage == null) 4.dp else 1.dp,
-                                                            color = borderColor,
-                                                            shape = RoundedCornerShape(8.dp)
-                                                        )
-                                                        .clickable {
-                                                            selectedImage = null // Indicate no image selected
-                                                        }
-                                                        .testTag("noImage"),
-                                                    contentAlignment = Alignment.Center
-                                                ) {
-                                                    Text(
-                                                        stringResource(id = R.string.no_image_option),
-                                                        modifier = Modifier.testTag("noImageText")
+                                                        .fillMaxSize()
+                                                        .clip(RoundedCornerShape(8.dp))
+                                                        .graphicsLayer (alpha = alpha)
+                                                        .testTag("IndividualFoodItemImage"),
+                                                    contentScale = ContentScale.Crop
+                                                )
+                                            }
+                                        } else {
+                                            Box(
+                                                modifier = Modifier
+                                                    .padding(4.dp)
+                                                    .size(100.dp)
+                                                    .border(
+                                                        width = if (foodItemViewModel.selectedImage  == null) 4.dp else 1.dp,
+                                                        color = borderColor,
+                                                        shape = RoundedCornerShape(8.dp)
                                                     )
-                                                }
+                                                    .clickable {
+                                                        foodItemViewModel.selectedImage  = null // Indicate no image selected
+                                                    }
+                                                    .testTag("noImage"),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    stringResource(id = R.string.no_image_option),
+                                                    modifier = Modifier.testTag("noImageText")
+                                                )
                                             }
                                         }
+
                                     }
                                 }
                             }
@@ -168,7 +175,7 @@ fun ChooseFoodItem(
                 }
 
                 item {
-                    selectedImage?.let {
+                    foodItemViewModel.selectedImage ?.let {
                         Text(
                             stringResource(id = R.string.selected_image_label),
                             modifier = Modifier.testTag("selectedImageText")
@@ -197,11 +204,15 @@ fun ChooseFoodItem(
 
                 item{
                     CustomButtons(
-                        button1OnClick = { navigationActions.goBack() },
+                        button1OnClick = {
+                            foodFactsViewModel.resetSearchStatus()
+                            foodItemViewModel.selectedImage = null
+                            navigationActions.navigateTo(Route.OVERVIEW)
+                        },
                         button1TestTag = "cancelButton",
                         button1Text = stringResource(id = R.string.cancel_button),
                         button2OnClick = {
-                            //TODO Remeber to save the selected Food Fact in the viewmodel
+                            foodFactsViewModel.resetSearchStatus()
                             navigationActions.navigateTo(Screen.EDIT_FOOD)
                         },
                         button2TestTag = "foodSave",
@@ -216,7 +227,9 @@ fun ChooseFoodItem(
                         modifier = Modifier.padding(bottom = 16.dp).testTag("foodItemDetailsTitle")
                     )
                     Button(
-                        onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
+                        onClick = {
+                            foodFactsViewModel.resetSearchStatus()
+                            navigationActions.navigateTo(Screen.ADD_FOOD) },
                         modifier = Modifier.testTag("manualEntryButton")
                     ) {
                         Text(stringResource(id = R.string.food_item_manual_alternative))

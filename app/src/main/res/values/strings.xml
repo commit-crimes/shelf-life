@@ -8,6 +8,9 @@
     <!-- Screen Titles -->
     <string name="add_food_item_title">Add Food Item</string>
     <string name="edit_food_item_title">Edit Food Item</string>
+    <string name="first_food_item_title">First Food Item</string>
+    <string name="choose_food_item_title">Choose Food Item</string>
+    <string name="finish_food_item_title">Finish Food Item</string>
 
     <!-- Input Field Hints -->
     <string name="food_name_hint">Enter food name</string>

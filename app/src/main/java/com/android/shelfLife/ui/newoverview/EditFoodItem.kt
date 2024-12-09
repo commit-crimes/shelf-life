@@ -1,6 +1,7 @@
 package com.android.shelfLife.ui.newoverview
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -13,11 +14,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import coil3.compose.rememberAsyncImagePainter
 import com.android.shelfLife.R
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.utils.*
 import com.android.shelfLife.viewmodel.FoodItemViewModel
 import kotlinx.coroutines.launch
@@ -48,7 +51,7 @@ fun EditFoodItemScreen(
       topBar = {
         CustomTopAppBar(
             onClick = { navigationActions.goBack() },
-            title = stringResource(id = R.string.edit_food_item_title),
+            title = stringResource(id = if (foodItemViewModel.isSelected) R.string.edit_food_item_title else R.string.finish_food_item_title),
             titleTestTag = "editFoodItemTitle",
             actions = {
               IconButton(
@@ -135,16 +138,42 @@ fun EditFoodItemScreen(
                 Spacer(modifier = Modifier.height(32.dp))
               }
 
+                //Only if its in Edit Food Item and not in Add Food Item
+                if (foodItemViewModel.isSelected){
+                    item{
+                        foodItemViewModel.selectedImage ?.let {
+                            Text(
+                                stringResource(id = R.string.selected_image_label),
+                                modifier = Modifier.testTag("selectedImageText")
+                            )
+                            Image(
+                                painter = rememberAsyncImagePainter(it.imageUrl),
+                                contentDescription = null,
+                                modifier = Modifier.size(150.dp).padding(8.dp).testTag("selectedImage")
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                    }
+                    item(key = "ChangePic"){
+                        Button(
+                            onClick = { navigationActions.navigateTo(Screen.CHOOSE_FOOD_ITEM) },
+                            modifier = Modifier.testTag("navigateToChooseFoodItemButton")
+                        ) {
+                            Text("Go to Choose Food Item")
+                        }
+                    }
+                }
+
               item(key = "buttons") {
                 CustomButtons(
-                    button1OnClick = { navigationActions.goBack() },
+                    button1OnClick = { navigationActions.navigateTo(Route.OVERVIEW) },
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(R.string.cancel_button),
                     button2OnClick = {
                       coroutineScope.launch {
                         val success = foodItemViewModel.submitFoodItem()
                         if (success) {
-                          navigationActions.goBack()
+                            navigationActions.navigateTo(Route.OVERVIEW)
                         } else {
                           Toast.makeText(
                                   context, R.string.submission_error_message, Toast.LENGTH_SHORT)

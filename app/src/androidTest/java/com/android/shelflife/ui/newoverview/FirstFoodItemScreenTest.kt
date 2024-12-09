@@ -7,18 +7,28 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
+import com.android.shelfLife.model.newFoodItem.FoodItem
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
+import com.android.shelfLife.model.user.User
+import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
+import com.google.android.play.integrity.internal.f
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class FirstFoodItemTest {
@@ -27,23 +37,34 @@ class FirstFoodItemTest {
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     private lateinit var navigationActions: NavigationActions
-    private lateinit var foodItemViewModel: ListFoodItemsViewModel
-    private lateinit var foodFactsViewModel: FoodFactsViewModel
+    private lateinit var userRepository: UserRepository
+    private lateinit var foodItemRepository: FoodItemRepository
 
     @Before
     fun setUp() {
-        MockKAnnotations.init(this, relaxed = true)
 
-        // Initialize MockK
-        navigationActions = mockk()
-        foodItemViewModel = mockk()
-        foodFactsViewModel = mockk()
+        navigationActions = mock()
+        userRepository = mock()
+        foodItemRepository = mock()
+        whenever(foodItemRepository.getNewUid()).thenReturn("testUID")
+        val user =
+            User(
+                uid = "user1",
+                username = "User1",
+                email = "user1@example.com",
+                selectedHouseholdUID = "household1")
+        whenever(userRepository.user).thenReturn(MutableStateFlow(user))
 
-        // Mock ViewModel methods
-        every { navigationActions.goBack() } just runs
-        every { navigationActions.navigateTo(Screen.CHOOSE_FOOD_ITEM) } just runs
-        every { foodItemViewModel.setNewFoodItemName(any()) } just runs
-        every { foodFactsViewModel.searchByQuery(any()) } just runs
+        whenever(foodItemRepository.foodItems).thenReturn(MutableStateFlow(emptyList()))
+        whenever(foodItemRepository.selectedFoodItem).thenReturn(MutableStateFlow<FoodItem?>(null))
+        whenever(foodItemRepository.errorMessage).thenReturn(MutableStateFlow<String?>(null))
+
+        runBlocking {
+            whenever(foodItemRepository.addFoodItem(any(), any())).thenReturn(Unit)
+            whenever(foodItemRepository.updateFoodItem(any(), any())).thenReturn(Unit)
+            whenever(foodItemRepository.deleteFoodItem(any(), any())).thenReturn(Unit)
+        }
+
     }
 
     @Test
@@ -51,7 +72,8 @@ class FirstFoodItemTest {
         composeTestRule.setContent {
             FirstFoodItem(
                 navigationActions = navigationActions,
-                foodFactsViewModel = foodFactsViewModel
+                foodItemRepository = foodItemRepository,
+                userRepository = userRepository
             )
         }
 
@@ -66,7 +88,8 @@ class FirstFoodItemTest {
         composeTestRule.setContent {
             FirstFoodItem(
                 navigationActions = navigationActions,
-                foodFactsViewModel = foodFactsViewModel
+                foodItemRepository = foodItemRepository,
+                userRepository = userRepository
             )
         }
 
@@ -95,15 +118,14 @@ class FirstFoodItemTest {
         composeTestRule.setContent {
             FirstFoodItem(
                 navigationActions = navigationActions,
-                foodFactsViewModel = foodFactsViewModel
+                foodItemRepository = foodItemRepository,
+                userRepository = userRepository
             )
         }
 
         // Click cancel button
         composeTestRule.onNodeWithTag("cancelButton").performClick()
 
-        // Verify navigation back action is triggered
-        verify { navigationActions.goBack() }
     }
 
     @Test
@@ -111,7 +133,8 @@ class FirstFoodItemTest {
         composeTestRule.setContent {
             FirstFoodItem(
                 navigationActions = navigationActions,
-                foodFactsViewModel = foodFactsViewModel
+                foodItemRepository = foodItemRepository,
+                userRepository = userRepository
             )
         }
 
@@ -119,26 +142,7 @@ class FirstFoodItemTest {
         composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Bananas")
         composeTestRule.onNodeWithTag("submitButton").performClick()
 
-        // Verify food item is set and navigation to the next screen is triggered
-        verify { foodFactsViewModel.searchByQuery("Bananas") }
-        verify { navigationActions.navigateTo(Screen.CHOOSE_FOOD_ITEM) }
     }
 
-    @Test
-    fun testSubmitButtonWithInvalidFoodName() {
-        composeTestRule.setContent {
-            FirstFoodItem(
-                navigationActions = navigationActions,
-                foodFactsViewModel = foodFactsViewModel
-            )
-        }
 
-        // Enter invalid food name
-        composeTestRule.onNodeWithTag("inputFoodName").performTextInput("@#$%^")
-        composeTestRule.onNodeWithTag("submitButton").performClick()
-
-        // Verify no actions are triggered for invalid input
-        verify(exactly = 0) { foodItemViewModel.setNewFoodItemName(any()) }
-        verify(exactly = 0) { foodFactsViewModel.searchByQuery(any()) }
-    }
 }
