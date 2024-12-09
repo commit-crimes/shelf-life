@@ -1,10 +1,8 @@
 package com.android.shelflife.model.newInvitations
 
 import androidx.test.core.app.ApplicationProvider
-import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.invitations.Invitation
 import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
-import com.android.shelfLife.model.user.User
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
