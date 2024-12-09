@@ -43,8 +43,6 @@ import com.example.compose.ShelfLifeTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
   @Inject lateinit var userRepositoryFirestore: UserRepositoryFirestore
