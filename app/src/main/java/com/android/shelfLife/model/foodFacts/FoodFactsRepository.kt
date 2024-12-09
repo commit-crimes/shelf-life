@@ -1,5 +1,8 @@
 package com.android.shelfLife.model.foodFacts
 
+import com.android.shelfLife.model.foodItem.FoodItem
+import kotlinx.coroutines.flow.StateFlow
+
 /**
  * Represents a food facts object.
  *
@@ -15,6 +18,13 @@ sealed class FoodSearchInput {
 }
 
 interface FoodFactsRepository {
+
+  val searchStatus: StateFlow<SearchStatus>
+
+  fun resetSearchStatus()
+
+  val foodFactsSuggestions: StateFlow<List<FoodFacts>>
+
   /**
    * Searches for food facts based on the provided search input.
    *
@@ -23,8 +33,13 @@ interface FoodFactsRepository {
    * @param onFailure Callback function to handle search failures.
    */
   fun searchFoodFacts(
-      searchInput: FoodSearchInput,
-      onSuccess: (List<FoodFacts>) -> Unit,
-      onFailure: (Exception) -> Unit
+    searchInput: FoodSearchInput,
+    onSuccess: (List<FoodFacts>) -> Unit,
+    onFailure: (Exception) -> Unit
   )
+
+  fun searchByBarcode(barcode: Long)
+
+  fun searchByQuery(query: String)
+
 }

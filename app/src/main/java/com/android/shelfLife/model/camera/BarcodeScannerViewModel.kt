@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.FoodFactsRepository
 import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.android.shelfLife.model.foodFacts.SearchStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +27,7 @@ class BarcodeScannerViewModel
 @Inject
 constructor(
     application: Application,
-    private val foodFactsRepository: FoodFactsViewModel
+    private val foodFactsRepository: FoodFactsRepository
     ) : AndroidViewModel(application) {
 
   private val sharedPreferences =
