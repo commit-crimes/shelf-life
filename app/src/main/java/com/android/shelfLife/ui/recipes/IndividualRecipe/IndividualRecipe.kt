@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
@@ -53,8 +54,6 @@ import kotlin.time.Duration.Companion.minutes
  *
  * @param navigationActions The navigation actions for handling navigation events, such as going
  *   back.
- * @param individualRecipeViewModel The ViewModel for managing and providing data related to the
- *   selected recipe.
  *
  * Structure:
  * - Displays a top bar with the recipe name and a back button.
@@ -67,9 +66,9 @@ import kotlin.time.Duration.Companion.minutes
  */
 fun IndividualRecipeScreen(
     navigationActions: NavigationActions,
-    individualRecipeViewModel: IndividualRecipeViewModel,
 ) {
 
+    val individualRecipeViewModel = hiltViewModel<IndividualRecipeViewModel>()
   if (individualRecipeViewModel.selectedRecipeIsNonEmpty) {
     // Scaffold that provides the structure for the screen, including top and bottom bars.
     Scaffold(
@@ -200,7 +199,7 @@ private fun IndividualRecipeScreenPreviewEasterEgg() {
 
   // Render the IndividualRecipeScreen with a null selectedRecipe
   IndividualRecipeScreen(
-      navigationActions = navigationActions, individualRecipeViewModel = individualRecipeViewModel)
+      navigationActions = navigationActions)
 }
 // this preview shows the example where we do have a selected recipe
 @Preview()
@@ -255,5 +254,5 @@ private fun IndividualRecipeScreenPreview() {
 
   // Render the IndividualRecipeScreen with a null selectedRecipe
   IndividualRecipeScreen(
-      navigationActions = navigationActions, individualRecipeViewModel = individualRecipeViewModel)
+      navigationActions = navigationActions)
 }

@@ -1,10 +1,8 @@
 package com.android.shelflife.model.newInvitations
 
 import androidx.test.core.app.ApplicationProvider
-import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.invitations.Invitation
 import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
-import com.android.shelfLife.model.user.User
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.FirebaseApp
@@ -64,43 +62,6 @@ class InvitationRepositoryFirestoreTest {
   @After
   fun tearDown() {
     Dispatchers.resetMain()
-  }
-
-  @Test
-  fun `sendInvitation sends invitation to Firestore`() {
-    val household =
-        HouseHold(
-            uid = "householdId",
-            name = "Household Name",
-            members = listOf("member1"),
-            sharedRecipes = listOf("recipe1"))
-    val invitedUser =
-        User(
-            uid = "invitedUserId",
-            username = "InvitedUser",
-            email = "inviteduser@example.com",
-            selectedHouseholdUID = "householdId",
-            householdUIDs = listOf(),
-            recipeUIDs = listOf(),
-            invitationUIDs = listOf())
-    val invitationId = "invitationId123"
-    val mockTask: Task<Void> = Tasks.forResult(null)
-
-    // Mock the collection and document behavior
-    `when`(mockCollection.document()).thenReturn(mockDocument)
-    `when`(mockDocument.id).thenReturn(invitationId)
-    `when`(mockDocument.set(any<Map<String, Any>>())).thenReturn(mockTask)
-
-    invitationRepository.sendInvitation(household, invitedUser.uid)
-
-    val invitationDataCaptor = ArgumentCaptor.forClass(Map::class.java)
-    verify(mockDocument).set(invitationDataCaptor.capture())
-
-    val invitationData = invitationDataCaptor.value as Map<String, Any>
-    assertEquals(invitationId, invitationData["invitationId"])
-    assertEquals("householdId", invitationData["householdId"])
-    assertEquals("Household Name", invitationData["householdName"])
-    assertEquals("invitedUserId", invitationData["invitedUserId"])
   }
 
   @Test

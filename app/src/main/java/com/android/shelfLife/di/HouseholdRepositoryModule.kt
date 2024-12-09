@@ -1,5 +1,7 @@
-package com.android.shelfLife.model.household
+package com.android.shelfLife.di
 
+import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
