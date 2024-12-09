@@ -18,10 +18,11 @@ import kotlinx.coroutines.launch
 class HouseholdCreationScreenViewModel
 @Inject
 constructor(
-    private val houseHoldRepository: HouseHoldRepository,
-    private val invitationRepository: InvitationRepository,
-    private val userRepository: UserRepository
+  private val houseHoldRepository: HouseHoldRepository,
+  private val invitationRepository: InvitationRepository,
+  private val userRepository: UserRepository
 ) : ViewModel() {
+
   private val _emailList = MutableStateFlow<Set<String>>(emptySet())
   val emailList: StateFlow<Set<String>> = _emailList.asStateFlow()
 
@@ -29,30 +30,18 @@ constructor(
   val selectedHousehold = userRepository.selectedHousehold
   val households = houseHoldRepository.households
   val currentUser = userRepository.user
+  // TODO Should this be there?
+  private var finishedLoading = MutableStateFlow(false)
 
-  var finishedLoading = MutableStateFlow(false)
-
-  // Fetch the list of members for the household to edit and set the email list
   init {
     viewModelScope.launch {
       val members = houseHoldRepository.getHouseholdMembers(householdToEdit.value?.uid ?: "")
-      userRepository.getUserEmails(members) { uidToEmail ->
-        _emailList.value = uidToEmail.values.toSet()
-      }
+      _emailList.value = userRepository.getUserEmails(members).values.toSet()
       finishedLoading.value = true
     }
   }
 
-  /**
-   * Sets the list of emails to the provided list. FOR TESTING PURPOSES ONLY.
-   *
-   * @param emails - The list of emails to set.
-   */
-  fun setEmails(emails: Set<String>) {
-    _emailList.value = emails
-  }
-
-  fun addEmail(email: String) {
+  private fun addEmail(email: String) {
     _emailList.value += email
   }
 
@@ -60,92 +49,119 @@ constructor(
     _emailList.value -= email
   }
 
-  /**
-   * Gets the user IDs corresponding to a list of emails.
-   *
-   * @param emails - The list of emails to get user IDs for.
-   * @param callback - The callback to be invoked with the map of email to user ID.
-   */
-  fun getUserIdsByEmails(emails: Set<String>, callback: (Map<String, String>) -> Unit) {
-    userRepository.getUserIds(emails) { emailToUid -> callback(emailToUid) }
-  }
-
-  fun newHouseholdNameIsInvalid(householdName: String): Boolean {
+  private fun newHouseholdNameIsInvalid(householdName: String): Boolean {
     return (householdName.isBlank() ||
-        houseHoldRepository.checkIfHouseholdNameExists(householdName) &&
-            (householdToEdit.value == null || householdName != householdToEdit.value!!.name))
+            (houseHoldRepository.checkIfHouseholdNameExists(householdName) &&
+                    (householdToEdit.value == null || householdName != householdToEdit.value!!.name)))
+  }
+
+  suspend fun getEmailToUserId(emails: Set<String>): Map<String, String> {
+    return userRepository.getUserIds(emails)
   }
 
   /**
-   * Adds a new household to the repository and updates the household list.
-   *
-   * @param householdName - The name of the household to be added.
+   * Attempts to add an email card, returning true if successful and false otherwise.
+   * This encapsulates the logic for checking duplicates and blank inputs.
    */
-  fun addNewHousehold(householdName: String, friendEmails: Set<String?> = emptySet()) {
-    if (currentUser.value != null) {
-      val householdUid = houseHoldRepository.getNewUid()
-      var household =
-          HouseHold(householdUid, householdName, listOf(currentUser.value!!.uid), emptyList())
-
-      if (friendEmails.isNotEmpty()) { // Corrected condition
-        userRepository.getUserIds(friendEmails) { emailToUserId ->
-          val emailsNotFound = friendEmails.filter { it !in emailToUserId.keys }
-          if (emailsNotFound.isNotEmpty()) {
-            Log.w("HouseholdViewModel", "Emails not found: $emailsNotFound")
-          }
-          viewModelScope.launch {
-            houseHoldRepository.addHousehold(household)
-            userRepository.addHouseholdUID(household.uid)
-            for (user in friendEmails.filter { it != currentUser.value!!.email }) {
-              invitationRepository.sendInvitation(household = household, invitedUserID = user!!)
-            }
-            if (selectedHousehold.value == null) {
-              Log.d("HouseholdViewModel", "Selected household is null")
-              userRepository.selectHousehold(
-                  households.value.firstOrNull()) // Default to the first household
-            }
-          }
-        }
-      } else {
-        // No friend emails, add household with current user only
-        household = household.copy(members = listOf(currentUser.value!!.uid))
-        viewModelScope.launch {
-          houseHoldRepository.addHousehold(household)
-          userRepository.addHouseholdUID(household.uid)
-          if (selectedHousehold.value == null) {
-            Log.d("HouseholdViewModel", "Selected household is null")
-            userRepository.selectHousehold(
-                households.value.firstOrNull()) // Default to the first household
-          }
-        }
-      }
-    } else {
-      Log.e("HouseholdViewModel", "User not logged in")
+  fun tryAddEmailCard(emailInput: String): Boolean {
+    val trimmedEmail = emailInput.trim()
+    if (trimmedEmail.isNotBlank() && trimmedEmail !in _emailList.value) {
+      addEmail(trimmedEmail)
+      return true
     }
+    return false
   }
 
   /**
-   * Updates an existing household in the repository and refreshes the household list.
-   *
-   * @param household - The updated household.
+   * Handles creating or updating a household when the user clicks "Save".
+   * Returns:
+   * - false if household name is invalid
+   * - true if the operation succeeded
    */
-  fun updateHousehold(household: HouseHold, shouldUpdateRepo: Boolean = true) {
-    val oldHousehold = houseHoldRepository.households.value.find { it.uid == household.uid }
-    if (oldHousehold != null) {
-      if (oldHousehold.members != household.members) {
-        val newMemberUids = household.members.toSet() - oldHousehold.members.toSet()
-        if (newMemberUids.isNotEmpty()) {
-          for (uid in newMemberUids) {
-            invitationRepository.sendInvitation(
-                household = household,
-                invitedUserID = uid,
+  suspend fun confirmHouseholdActions(householdName: String): Boolean {
+    if (newHouseholdNameIsInvalid(householdName)) {
+      return false
+    }
+
+    val editHousehold = householdToEdit.value
+    if (editHousehold != null) {
+      // Editing existing household
+      val updatedHousehold = editHousehold.copy(name = householdName)
+      val emailToUserIds = getEmailToUserId(_emailList.value)
+      if (emailToUserIds.isNotEmpty()) {
+        val oldUidList = updatedHousehold.members
+        val uidList = _emailList.value.mapNotNull { emailToUserIds[it] }
+
+        // Compare sizes to determine if we need to send invites or remove members
+        when {
+          oldUidList.size < uidList.size -> {
+            updateHousehold(
+              updatedHousehold.copy(members = uidList),
+              shouldUpdateRepo = false
+            )
+          }
+          oldUidList.size > uidList.size -> {
+            updateHousehold(
+              updatedHousehold.copy(members = uidList),
+              shouldUpdateRepo = true
             )
           }
         }
+        updateHousehold(updatedHousehold)
+      }
+    } else {
+      // Creating new household
+      addNewHousehold(householdName, _emailList.value)
+      Log.d("HouseholdCreationScreen", "Added new household")
+    }
+
+    return true
+  }
+
+  private fun addNewHousehold(householdName: String, friendEmails: Set<String?> = emptySet()) {
+    viewModelScope.launch {
+      val user = currentUser.value ?: run {
+        Log.e("HouseholdViewModel", "User not logged in")
+        return@launch
+      }
+
+      val householdUid = houseHoldRepository.getNewUid()
+      var household = HouseHold(householdUid, householdName, listOf(user.uid), emptyList())
+
+      houseHoldRepository.addHousehold(household)
+      userRepository.addHouseholdUID(household.uid)
+
+      if (friendEmails.isNotEmpty()) {
+        val emailToUid = userRepository.getUserIds(friendEmails)
+        val emailsNotFound = friendEmails.filter { it !in emailToUid.keys }
+        if (emailsNotFound.isNotEmpty()) {
+          Log.w("HouseholdViewModel", "Emails not found: $emailsNotFound")
+        }
+        emailToUid
+          .filterKeys { it != user.email }
+          .values
+          .forEach { invitationRepository.sendInvitation(household, it) }
+      }
+      if (selectedHousehold.value == null) {
+        Log.d("HouseholdViewModel", "Selected household is null")
+        userRepository.selectHousehold(households.value.firstOrNull())
       }
     }
-    if (shouldUpdateRepo) {
-      viewModelScope.launch {
+  }
+
+  private fun updateHousehold(household: HouseHold, shouldUpdateRepo: Boolean = true) {
+    viewModelScope.launch {
+      val oldHousehold = houseHoldRepository.households.value.find { it.uid == household.uid }
+      if (oldHousehold != null) {
+        val newMemberUids = household.members.toSet() - oldHousehold.members.toSet()
+        if (newMemberUids.isNotEmpty()) {
+          newMemberUids.forEach {
+            invitationRepository.sendInvitation(household, it)
+          }
+        }
+      }
+
+      if (shouldUpdateRepo) {
         houseHoldRepository.updateHousehold(household)
         if (selectedHousehold.value == null || household.uid == selectedHousehold.value!!.uid) {
           userRepository.selectHousehold(household)
