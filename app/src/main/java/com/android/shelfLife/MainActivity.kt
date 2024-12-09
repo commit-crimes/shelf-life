@@ -92,15 +92,12 @@ fun ShelfLifeApp(userRepository: UserRepository) {
     }
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
       composable(Screen.PERMISSION_HANDLER) {
-        CameraPermissionHandler(navigationActions, barcodeScannerViewModel)
+        CameraPermissionHandler(navigationActions)
       }
       composable(Screen.BARCODE_SCANNER) {
         BarcodeScannerScreen(
             navigationActions,
-            barcodeScannerViewModel,
-            foodFactsViewModel,
-            householdViewModel,
-            listFoodItemViewModel)
+            )
       }
     }
     navigation(
