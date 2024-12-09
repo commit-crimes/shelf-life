@@ -16,11 +16,11 @@ import com.android.shelfLife.model.foodItem.FoodStorageLocation
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.utils.formatDateToTimestamp
 import com.android.shelfLife.ui.utils.formatTimestampToDate
-import com.android.shelfLife.ui.utils.validateAmount
 import com.android.shelfLife.ui.utils.validateBuyDate
 import com.android.shelfLife.ui.utils.validateExpireDate
-import com.android.shelfLife.ui.utils.validateFoodName
+import com.android.shelfLife.ui.utils.validateNumber
 import com.android.shelfLife.ui.utils.validateOpenDate
+import com.android.shelfLife.ui.utils.validateString
 import com.google.firebase.Timestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -77,9 +77,9 @@ constructor(
   /** Validates all fields when the submit button is clicked. */
   fun validateAllFieldsWhenSubmitButton() {
     if (!isSelected) {
-      foodNameErrorResId = validateFoodName(foodName)
+      foodNameErrorResId = validateString(foodName)
     }
-    amountErrorResId = validateAmount(amount)
+    amountErrorResId = validateNumber(amount)
     buyDateErrorResId = validateBuyDate(buyDate)
     expireDateErrorResId = validateExpireDate(expireDate, buyDate, buyDateErrorResId)
     openDateErrorResId =
@@ -110,12 +110,12 @@ constructor(
 
   fun changeFoodName(newFoodName: String) {
     foodName = newFoodName
-    foodNameErrorResId = validateFoodName(foodName)
+    foodNameErrorResId = validateString(foodName)
   }
 
   fun changeAmount(newAmount: String) {
     amount = newAmount
-    amountErrorResId = validateAmount(amount)
+    amountErrorResId = validateNumber(amount)
   }
 
   fun changeExpiryDate(newDate: String) {

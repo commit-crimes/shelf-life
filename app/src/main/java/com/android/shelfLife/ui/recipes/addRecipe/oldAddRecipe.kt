@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.recipes
+package com.android.shelfLife.ui.recipes.addRecipe
 
 import android.annotation.SuppressLint
 import android.widget.Toast
@@ -99,8 +99,7 @@ fun AddRecipeScreen(
                     onValueChange = {
                       title = it
                       titleError =
-                          if (title.isEmpty())
-                              context.getString(R.string.error_message_title_of_recipe)
+                          if (title.isEmpty()) context.getString(R.string.recipe_title_empty_error)
                           else null
                     },
                     label = { Text(stringResource(R.string.title_of_recipe)) },
@@ -120,7 +119,7 @@ fun AddRecipeScreen(
                     onValueChange = {
                       servings = it
                       servingsError =
-                          if (servings.isEmpty()) context.getString(R.string.error_message_servings)
+                          if (servings.isEmpty()) context.getString(R.string.servings_empty_error)
                           else null
                     },
                     label = { Text(stringResource(R.string.servings)) },
@@ -141,8 +140,7 @@ fun AddRecipeScreen(
                     onValueChange = {
                       time = it
                       timeError =
-                          if (time.isEmpty()) context.getString(R.string.error_message_time)
-                          else null
+                          if (time.isEmpty()) context.getString(R.string.time_empty_error) else null
                     },
                     label = { Text(stringResource(R.string.time)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -302,7 +300,7 @@ fun InstructionItem(
         onValueChange = { newInstruction ->
           onInstructionChange(newInstruction)
           instructionError =
-              if (newInstruction.isEmpty()) context.getString(R.string.error_message_instructions)
+              if (newInstruction.isEmpty()) context.getString(R.string.instruction_empty_error)
               else null
         },
         label = { Text(stringResource(R.string.instruction_step, index + 1)) },
@@ -389,7 +387,7 @@ fun IngredientDialog(
                 ingredientName = it
                 ingredientNameError =
                     if (ingredientName.isEmpty())
-                        context.getString(R.string.error_message_ingredient_name)
+                        context.getString(R.string.ingredient_name_empty_error)
                     else null
               },
               label = { Text(stringResource(R.string.ingredient_name)) },
@@ -404,7 +402,7 @@ fun IngredientDialog(
                 ingredientQuantity = it
                 quantityError =
                     if (ingredientQuantity.isEmpty())
-                        context.getString(R.string.error_message_ingredient_quantity)
+                        context.getString(R.string.ingredient_quantity_empty_error)
                     else null
               },
               label = { Text(stringResource(R.string.ingredient_quantity)) },
