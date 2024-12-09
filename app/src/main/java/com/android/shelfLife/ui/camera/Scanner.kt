@@ -43,7 +43,6 @@ import kotlinx.coroutines.launch
  * @param householdViewModel ViewModel for household.
  * @param foodItemViewModel ViewModel for food items.
  */
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BarcodeScannerScreen(
