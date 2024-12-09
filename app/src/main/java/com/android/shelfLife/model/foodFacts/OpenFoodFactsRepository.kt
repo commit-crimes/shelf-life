@@ -2,6 +2,10 @@ package com.android.shelfLife.model.foodFacts
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.android.shelfLife.model.foodFacts.FoodCategory
+import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.NutritionFacts
+import com.android.shelfLife.model.foodFacts.Quantity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -65,7 +69,7 @@ class OpenFoodFactsRepository(
   override fun searchByQuery(newQuery: String) {
     _searchStatus.value = SearchStatus.Loading
     searchFoodFacts(
-        FoodSearchInput.Query(newQuery),
+      FoodSearchInput.Query(newQuery),
         onSuccess = { foodFactsList ->
           // Filter out items without images
           val filteredList = foodFactsList.filter { it.imageUrl.isNotEmpty() }
@@ -86,9 +90,9 @@ class OpenFoodFactsRepository(
   }
 
   override fun searchFoodFacts(
-      searchInput: FoodSearchInput,
-      onSuccess: (List<FoodFacts>) -> Unit,
-      onFailure: (Exception) -> Unit
+    searchInput: FoodSearchInput,
+    onSuccess: (List<FoodFacts>) -> Unit,
+    onFailure: (Exception) -> Unit
   ) {
     val url =
         when (searchInput) {
@@ -190,7 +194,7 @@ class OpenFoodFactsRepository(
             salt = productObject.optJSONObject("nutriments")?.optDouble("salt_100g") ?: 0.0)
 
     val foodCategory =
-        FoodCategory.OTHER // You can refine the logic to determine the category if needed
+      FoodCategory.OTHER // You can refine the logic to determine the category if needed
 
     // Create and return the FoodFacts object
     return FoodFacts(

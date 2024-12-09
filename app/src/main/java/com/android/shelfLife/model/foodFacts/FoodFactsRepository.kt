@@ -1,5 +1,7 @@
 package com.android.shelfLife.model.foodFacts
 
+import com.android.shelfLife.model.foodFacts.FoodFacts
+
 /**
  * Represents a food facts object.
  *
@@ -23,9 +25,9 @@ interface FoodFactsRepository {
    * @param onFailure Callback function to handle search failures.
    */
   fun searchFoodFacts(
-      searchInput: FoodSearchInput,
-      onSuccess: (List<FoodFacts>) -> Unit,
-      onFailure: (Exception) -> Unit
+    searchInput: FoodSearchInput,
+    onSuccess: (List<FoodFacts>) -> Unit,
+    onFailure: (Exception) -> Unit
   )
 
   fun searchByBarcode(barcode: Long)

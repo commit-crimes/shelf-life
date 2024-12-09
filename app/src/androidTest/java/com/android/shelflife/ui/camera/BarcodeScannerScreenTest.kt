@@ -10,6 +10,8 @@ import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
 import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.foodFacts.FoodFactsRepository
+import com.android.shelfLife.model.foodFacts.FoodSearchInput
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
@@ -281,9 +283,9 @@ class BarcodeScannerScreenTest {
     var foodFactsList = listOf<FoodFacts>()
 
     override fun searchFoodFacts(
-        searchInput: FoodSearchInput,
-        onSuccess: (List<FoodFacts>) -> Unit,
-        onFailure: (Exception) -> Unit
+      searchInput: FoodSearchInput,
+      onSuccess: (List<FoodFacts>) -> Unit,
+      onFailure: (Exception) -> Unit
     ) {
       if (shouldReturnError) {
         onFailure(Exception("Test exception"))

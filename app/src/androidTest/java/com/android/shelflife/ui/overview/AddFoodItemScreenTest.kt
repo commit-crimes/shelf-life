@@ -505,9 +505,9 @@ class AddFoodItemScreenTest {
     var foodFactsList = listOf<FoodFacts>()
 
     override fun searchFoodFacts(
-        searchInput: FoodSearchInput,
-        onSuccess: (List<FoodFacts>) -> Unit,
-        onFailure: (Exception) -> Unit
+      searchInput: FoodSearchInput,
+      onSuccess: (List<FoodFacts>) -> Unit,
+      onFailure: (Exception) -> Unit
     ) {
       if (shouldReturnError) {
         onFailure(Exception("Test exception"))
