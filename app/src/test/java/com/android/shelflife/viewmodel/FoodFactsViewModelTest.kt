@@ -1,4 +1,4 @@
-package com.android.shelflife.model.foodFacts
+package com.android.shelflife.viewmodel
 
 import androidx.lifecycle.ViewModel
 import com.android.shelfLife.model.foodFacts.FoodCategory
