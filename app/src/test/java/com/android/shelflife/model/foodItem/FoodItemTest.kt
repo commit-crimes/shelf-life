@@ -1,102 +1,101 @@
-package com.android.shelflife.model.foodItem
+package com.android.shelfLife.model.foodItem
 
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.foodItem.FoodItem
 import com.google.firebase.Timestamp
-import java.util.Calendar
-import java.util.Date
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import com.google.firebase.firestore.DocumentSnapshot
+import org.junit.Assert.*
 import org.junit.Test
+import org.mockito.Mockito.*
 
 class FoodItemTest {
 
-  // Mock FoodFacts to use in tests
-  private val mockFoodFacts =
-      FoodFacts(
-          name = "Sample Food",
-          nutritionFacts = NutritionFacts(energyKcal = 150, proteins = 5.0),
-          quantity = Quantity(amount = 200.0),
-      )
+    private val mockFoodFacts = FoodFacts(
+        name = "Sample Food",
+        nutritionFacts = NutritionFacts(energyKcal = 150, proteins = 5.0),
+        quantity = Quantity(amount = 200.0)
+    )
 
-  @Test
-  fun `test getImportantDetails`() {
-    val foodItem =
-        FoodItem(uid = "1", foodFacts = mockFoodFacts, expiryDate = getFutureTimestamp(days = 10))
-
-    val importantDetails = foodItem.getImportantDetails()
-    println("Hey $importantDetails")
-    assertTrue(importantDetails.contains("Sample Food"))
-    assertTrue(importantDetails.contains("150Kcal"))
-    assertTrue(importantDetails.contains("5.0g protein"))
-    assertTrue(importantDetails.contains("Expires in 10 days"))
-    assertTrue(importantDetails.contains("200.0 gram"))
-  }
-
-  @Test
-  fun `test openDate for a FoodItem`() {
-    val today = Timestamp.now()
-
-    val foodItem =
-        FoodItem(
-            uid = "1",
+    @Test
+    fun `test FoodItem toMap conversion`() {
+        // Arrange
+        val foodItem = FoodItem(
+            uid = "item123",
             foodFacts = mockFoodFacts,
-            expiryDate = getFutureTimestamp(days = 3),
-            openDate = today)
+            buyDate = Timestamp.now(),
+            expiryDate = Timestamp.now(),
+            openDate = Timestamp.now(),
+            location = FoodStorageLocation.PANTRY,
+            status = FoodStatus.UNOPENED,
+            owner = "user123"
+        )
 
-    assertEquals(today, foodItem.openDate)
-  }
+        // Act
+        val result = foodItem.toMap()
 
-  @Test
-  fun `test getRemainingDays for future expiry date`() {
-    val foodItem =
-        FoodItem(uid = "1", foodFacts = mockFoodFacts, expiryDate = getFutureTimestamp(days = 5))
+        // Assert
+        assertEquals("item123", result["uid"])
+        assertEquals("user123", result["owner"])
+        assertEquals(FoodStorageLocation.PANTRY.name, result["location"])
+        assertEquals(FoodStatus.UNOPENED.name, result["status"])
+        assertNotNull(result["foodFacts"])
+    }
 
-    assertEquals(5, foodItem.getRemainingDays())
-  }
+    @Test
+    fun `test DocumentSnapshot toFoodItem conversion`() {
+        // Arrange
+        val mockSnapshot = mock(DocumentSnapshot::class.java)
+        val foodFactsMap = mapOf(
+            "name" to "Sample Food",
+            "nutritionFacts" to mapOf("energyKcal" to 150, "proteins" to 5.0),
+            "quantity" to mapOf("amount" to 200.0)
+        )
 
-  @Test
-  fun `test getRemainingDays for past expiry date`() {
-    val foodItem =
-        FoodItem(uid = "1", foodFacts = mockFoodFacts, expiryDate = getPastTimestamp(days = 3))
+        `when`(mockSnapshot.getString("uid")).thenReturn("item123")
+        `when`(mockSnapshot.get("foodFacts")).thenReturn(foodFactsMap)
+        `when`(mockSnapshot.getTimestamp("buyDate")).thenReturn(Timestamp.now())
+        `when`(mockSnapshot.getTimestamp("expiryDate")).thenReturn(Timestamp.now())
+        `when`(mockSnapshot.getTimestamp("openDate")).thenReturn(Timestamp.now())
+        `when`(mockSnapshot.getString("location")).thenReturn(FoodStorageLocation.FRIDGE.name)
+        `when`(mockSnapshot.getString("status")).thenReturn(FoodStatus.OPENED.name)
+        `when`(mockSnapshot.getString("owner")).thenReturn("user123")
 
-    assertEquals(-3, foodItem.getRemainingDays())
-  }
+        // Act
+        val foodItem = mockSnapshot.toFoodItem()
 
-  @Test
-  fun `test isExpired for expired item`() {
-    val foodItem =
-        FoodItem(uid = "1", foodFacts = mockFoodFacts, expiryDate = getPastTimestamp(days = 1))
+        // Assert
+        assertNotNull(foodItem)
+        assertEquals("item123", foodItem?.uid)
+        assertEquals("user123", foodItem?.owner)
+        assertEquals(FoodStorageLocation.FRIDGE, foodItem?.location)
+        assertEquals(FoodStatus.OPENED, foodItem?.status)
+        assertNotNull(foodItem?.foodFacts)
+    }
 
-    assertTrue(foodItem.isExpired())
-  }
+    @Test
+    fun `test DocumentSnapshot toFoodItem conversion with missing data`() {
+        // Arrange
+        val mockSnapshot = mock(DocumentSnapshot::class.java)
+        `when`(mockSnapshot.data).thenReturn(null)
 
-  @Test
-  fun `test isExpired for non-expired item`() {
-    val foodItem =
-        FoodItem(uid = "1", foodFacts = mockFoodFacts, expiryDate = getFutureTimestamp(days = 1))
+        // Act
+        val foodItem = mockSnapshot.toFoodItem()
 
-    assertTrue(!foodItem.isExpired())
-  }
+        // Assert
+        assertNull(foodItem)
+    }
 
-  // Helper functions to create future and past timestamps
-  private fun getFutureTimestamp(days: Int): Timestamp {
-    val calendar =
-        Calendar.getInstance().apply {
-          time = Date()
-          add(Calendar.DAY_OF_YEAR, days)
-        }
-    return Timestamp(calendar.time)
-  }
+    @Test
+    fun `test DocumentSnapshot toFoodItem conversion with invalid data`() {
+        // Arrange
+        val mockSnapshot = mock(DocumentSnapshot::class.java)
+        `when`(mockSnapshot.getString("uid")).thenReturn(null) // Missing UID
 
-  private fun getPastTimestamp(days: Int): Timestamp {
-    val calendar =
-        Calendar.getInstance().apply {
-          time = Date()
-          add(Calendar.DAY_OF_YEAR, -days)
-        }
-    return Timestamp(calendar.time)
-  }
+        // Act
+        val foodItem = mockSnapshot.toFoodItem()
+
+        // Assert
+        assertNull(foodItem)
+    }
 }
