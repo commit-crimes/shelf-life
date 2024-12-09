@@ -261,7 +261,7 @@ class EditFoodItemScreenTest {
     runBlocking { verify(foodItemRepository).updateFoodItem(eq("household1"), any()) }
 
     // Navigation back
-    verify(navigationActions).goBack()
+    verify(navigationActions).navigateTo(Route.OVERVIEW)
   }
 
   @Test
@@ -334,7 +334,7 @@ class EditFoodItemScreenTest {
     composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
 
     composeTestRule.onNodeWithTag("cancelButton").performClick()
-    verify(navigationActions).goBack()
+    verify(navigationActions).navigateTo(Route.OVERVIEW)
   }
 
   @Test

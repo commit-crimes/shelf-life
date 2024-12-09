@@ -199,7 +199,6 @@ class EndToEndM1Test {
 
     // Scroll to and interact with the input fields
     val scrollableNode = composeTestRule.onNodeWithTag("addFoodItemScreen")
-
     scrollableNode.performScrollToNode(hasTestTag("inputFoodName"))
     composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Apple")
 
@@ -230,14 +229,10 @@ class EndToEndM1Test {
     // Scroll to and click the submit button again
     scrollableNode.performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").performClick()
-    // Thread.sleep(1000)
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
-    // Thread.sleep(1000)
     // User now wants to use the scanner
     composeTestRule.onNodeWithTag("Scanner").assertIsDisplayed()
     composeTestRule.onNodeWithTag("Scanner").performClick()
-    composeTestRule.onNodeWithTag("Scanner").performClick()
-    // Thread.sleep(1000)
     composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
     // User now want to check for the Recepie for Paella
     composeTestRule.onNodeWithTag("Recipes").assertIsDisplayed()

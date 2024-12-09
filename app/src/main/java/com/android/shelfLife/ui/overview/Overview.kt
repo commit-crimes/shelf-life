@@ -2,6 +2,7 @@ package com.android.shelfLife.ui.overview
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -113,11 +114,13 @@ fun OverviewScreen(
               },
               // Floating Action Button to add a new food item
               floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
-                    content = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                    modifier = Modifier.testTag("addFoodFab"),
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                Box {
+                  FloatingActionButton(
+                      onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
+                      content = { Icon(Icons.Default.Add, contentDescription = "Add") },
+                      modifier = Modifier.testTag("addFoodFab"),
+                      containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                }
               },
           ) { paddingValues ->
             Column(
