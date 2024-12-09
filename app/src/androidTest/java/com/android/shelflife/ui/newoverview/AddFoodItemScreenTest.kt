@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.newoverview
+package com.android.shelfLife.ui.overview
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.*

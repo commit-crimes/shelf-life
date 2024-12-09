@@ -23,39 +23,47 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.android.shelfLife.model.household.HouseholdViewModel
-import com.android.shelfLife.model.overview.OverviewScreenViewModel
+import com.android.shelfLife.model.foodItem.FoodItemRepository
+import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
-import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.TopNavigationBar
 import com.android.shelfLife.ui.utils.CustomSearchBar
+import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import kotlinx.coroutines.launch
 
 /**
  * Composable function to display the overview screen
  *
  * @param navigationActions The actions to handle navigation
- * @param householdViewModel The ViewModel for the households the user has access to
+ * @param houseHoldRepository The repository to handle household data
  */
 @Composable
 fun OverviewScreen(
     navigationActions: NavigationActions,
-    householdViewModel: HouseholdViewModel,
-    listFoodItemsViewModel: ListFoodItemsViewModel
+    houseHoldRepository: HouseHoldRepository,
+    listFoodItemRepository: FoodItemRepository,
+    userRepository: UserRepositoryFirestore
 ) {
-  val overviewScreenViewModel = viewModel<OverviewScreenViewModel>()
+  val overviewScreenViewModel = viewModel {
+    OverviewScreenViewModel(
+        houseHoldRepository = houseHoldRepository,
+        listFoodItemsRepository = listFoodItemRepository,
+        userRepository = userRepository)
+  }
 
-  val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
-  val foodItems by listFoodItemsViewModel.foodItems.collectAsState()
-  val userHouseholds by householdViewModel.households.collectAsState()
-  val householdViewModelIsLoaded by householdViewModel.finishedLoading.collectAsState()
+  val selectedHousehold by overviewScreenViewModel.selectedHousehold.collectAsState()
+  val foodItems by overviewScreenViewModel.foodItems.collectAsState()
+  val households by overviewScreenViewModel.households.collectAsState()
+  val householdViewModelIsLoaded by overviewScreenViewModel.finishedLoading.collectAsState()
   val selectedFilters by overviewScreenViewModel.selectedFilters.collectAsState()
-  val multipleSelectedFoodItems = listFoodItemsViewModel.multipleSelectedFoodItems.collectAsState()
+  val multipleSelectedFoodItems by
+      overviewScreenViewModel.multipleSelectedFoodItems.collectAsState()
 
   var searchQuery by rememberSaveable { mutableStateOf("") }
 
@@ -65,83 +73,81 @@ fun OverviewScreen(
   HouseHoldSelectionDrawer(
       scope = scope,
       drawerState = drawerState,
-      householdViewModel = householdViewModel,
-      navigationActions = navigationActions) {
-        val filteredFoodItems =
-            foodItems.filter { item ->
-              item.foodFacts.name.contains(searchQuery, ignoreCase = true) &&
-                  (selectedFilters.isEmpty() ||
-                      selectedFilters.contains(item.foodFacts.category.name))
-            }
+      navigationActions = navigationActions,
+      houseHoldRepository = houseHoldRepository,
+      userRepository = userRepository,
+  ) {
+    val filteredFoodItems =
+        foodItems.filter { item ->
+          item.foodFacts.name.contains(searchQuery, ignoreCase = true) &&
+              (selectedFilters.isEmpty() || selectedFilters.contains(item.foodFacts.category.name))
+        }
 
-        if (!householdViewModelIsLoaded) {
-          Column(
-              modifier = Modifier.fillMaxSize(),
-              horizontalAlignment = Alignment.CenterHorizontally,
-              verticalArrangement = Arrangement.Center,
-          ) {
-            CircularProgressIndicator()
-          }
-        } else if (selectedHousehold == null && userHouseholds.isEmpty()) {
-          Log.d("OverviewScreen", userHouseholds.toString())
-          FirstTimeWelcomeScreen(navigationActions, householdViewModel)
-        } else {
-          Scaffold(
-              modifier = Modifier.testTag("overviewScreen"),
-              topBar = {
-                selectedHousehold?.let {
-                  TopNavigationBar(
-                      houseHold = it,
-                      onHamburgerClick = { scope.launch { drawerState.open() } },
-                      filters = overviewScreenViewModel.filters,
-                      selectedFilters = selectedFilters,
-                      onFilterChange = { filter, _ ->
-                        overviewScreenViewModel.toggleFilter(filter)
-                      },
-                      showDeleteOption = multipleSelectedFoodItems.value.isNotEmpty(),
-                      onDeleteClick = {
-                        householdViewModel.deleteMultipleFoodItems(multipleSelectedFoodItems.value)
-                        listFoodItemsViewModel.clearMultipleSelectedFoodItems()
-                      })
-                }
-              },
-              bottomBar = {
-                BottomNavigationMenu(
-                    onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                    tabList = LIST_TOP_LEVEL_DESTINATION,
-                    selectedItem = Route.OVERVIEW)
-              },
-              // Floating Action Button to add a new food item
-              floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
-                    content = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                    modifier = Modifier.testTag("addFoodFab"),
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer)
-              },
-          ) { paddingValues ->
-            Column(
-                modifier = Modifier.padding(paddingValues),
-            ) {
-              CustomSearchBar(
-                  query = searchQuery,
-                  onQueryChange = { searchQuery = it },
-                  placeholder = "Search food item",
-                  onDeleteTextClicked = { searchQuery = "" },
-                  searchBarTestTag = "foodSearchBar")
-              ListFoodItems(
-                  foodItems = filteredFoodItems,
-                  householdViewModel = householdViewModel,
-                  listFoodItemsViewModel = listFoodItemsViewModel,
-                  onFoodItemClick = { selectedFoodItem ->
-                    listFoodItemsViewModel.selectFoodItem(selectedFoodItem)
-                    navigationActions.navigateTo(Screen.INDIVIDUAL_FOOD_ITEM)
-                  },
-                  onFoodItemLongHold = { selectedFoodItem ->
-                    listFoodItemsViewModel.selectMultipleFoodItems(selectedFoodItem)
+    if (!householdViewModelIsLoaded) {
+      Column(
+          modifier = Modifier.fillMaxSize(),
+          horizontalAlignment = Alignment.CenterHorizontally,
+          verticalArrangement = Arrangement.Center,
+      ) {
+        CircularProgressIndicator()
+      }
+    } else if (selectedHousehold == null && households.isEmpty()) {
+      Log.d("OverviewScreen", households.toString())
+      FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel)
+    } else {
+      Scaffold(
+          modifier = Modifier.testTag("overviewScreen"),
+          topBar = {
+            selectedHousehold?.let {
+              TopNavigationBar(
+                  houseHold = it,
+                  onHamburgerClick = { scope.launch { drawerState.open() } },
+                  filters = overviewScreenViewModel.filters,
+                  selectedFilters = selectedFilters,
+                  onFilterChange = { filter, _ -> overviewScreenViewModel.toggleFilter(filter) },
+                  showDeleteOption = multipleSelectedFoodItems.isNotEmpty(),
+                  onDeleteClick = {
+                    overviewScreenViewModel.deleteMultipleFoodItems(multipleSelectedFoodItems)
+                    overviewScreenViewModel.clearMultipleSelectedFoodItems()
                   })
             }
-          }
+          },
+          bottomBar = {
+            BottomNavigationMenu(
+                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                tabList = LIST_TOP_LEVEL_DESTINATION,
+                selectedItem = Route.OVERVIEW)
+          },
+          // Floating Action Button to add a new food item
+          floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
+                content = { Icon(Icons.Default.Add, contentDescription = "Add") },
+                modifier = Modifier.testTag("addFoodFab"),
+                containerColor = MaterialTheme.colorScheme.secondaryContainer)
+          },
+      ) { paddingValues ->
+        Column(
+            modifier = Modifier.padding(paddingValues),
+        ) {
+          CustomSearchBar(
+              query = searchQuery,
+              onQueryChange = { searchQuery = it },
+              placeholder = "Search food item",
+              onDeleteTextClicked = { searchQuery = "" },
+              searchBarTestTag = "foodSearchBar")
+          ListFoodItems(
+              foodItems = filteredFoodItems,
+              overviewScreenViewModel = overviewScreenViewModel,
+              onFoodItemClick = { selectedFoodItem ->
+                overviewScreenViewModel.selectFoodItem(selectedFoodItem)
+                navigationActions.navigateTo(Screen.INDIVIDUAL_FOOD_ITEM)
+              },
+              onFoodItemLongHold = { selectedFoodItem ->
+                overviewScreenViewModel.selectMultipleFoodItems(selectedFoodItem)
+              })
         }
       }
+    }
+  }
 }
