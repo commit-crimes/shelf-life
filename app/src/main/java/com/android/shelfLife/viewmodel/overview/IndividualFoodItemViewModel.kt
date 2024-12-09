@@ -8,22 +8,21 @@ import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.user.UserRepository
 
-class IndividualFoodItemViewModel (
+class IndividualFoodItemViewModel(
     private val foodItemRepository: FoodItemRepository,
-            private val userRepository: UserRepository
-): ViewModel(){
-    var selectedFood by mutableStateOf<FoodItem?>(null)
+    private val userRepository: UserRepository
+) : ViewModel() {
+  var selectedFood by mutableStateOf<FoodItem?>(null)
 
-    init{
-        selectedFood = foodItemRepository.selectedFoodItem.value
+  init {
+    selectedFood = foodItemRepository.selectedFoodItem.value
+  }
+
+  suspend fun deleteFoodItem() {
+    val householdId = userRepository.user.value?.selectedHouseholdUID
+    if (householdId != null) {
+      foodItemRepository.deleteFoodItem(householdId, selectedFood!!.uid)
+      foodItemRepository.selectFoodItem(null)
     }
-
-    suspend fun deleteFoodItem(){
-        val householdId = userRepository.user.value?.selectedHouseholdUID
-        if(householdId != null){
-            foodItemRepository.deleteFoodItem(householdId, selectedFood!!.uid)
-            foodItemRepository.selectFoodItem(null)
-        }
-    }
-
+  }
 }

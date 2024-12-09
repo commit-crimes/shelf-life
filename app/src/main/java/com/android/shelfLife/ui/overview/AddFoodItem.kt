@@ -71,8 +71,8 @@ fun AddFoodItemScreen(
 
   /** Validates all fields when the submit button is clicked. */
   fun validateAllFieldsWhenSubmitButton() {
-    foodNameErrorResId = validateFoodName(foodName)
-    amountErrorResId = validateAmount(amount)
+    foodNameErrorResId = validateString(foodName)
+    amountErrorResId = validateNumber(amount)
     buyDateErrorResId = validateBuyDate(buyDate)
     expireDateErrorResId = validateExpireDate(expireDate, buyDate, buyDateErrorResId)
     openDateErrorResId =
@@ -100,7 +100,7 @@ fun AddFoodItemScreen(
                     foodName = foodName,
                     onFoodNameChange = { newValue ->
                       foodName = newValue
-                      foodNameErrorResId = validateFoodName(foodName)
+                      foodNameErrorResId = validateString(foodName)
                       foodFactsViewModel.searchByQuery(foodName)
                     },
                     foodNameErrorResId = foodNameErrorResId)
@@ -115,7 +115,7 @@ fun AddFoodItemScreen(
                           amount = amount,
                           onAmountChange = { newValue ->
                             amount = newValue
-                            amountErrorResId = validateAmount(amount)
+                            amountErrorResId = validateNumber(amount)
                           },
                           amountErrorResId = amountErrorResId,
                           modifier = Modifier.weight(1f),

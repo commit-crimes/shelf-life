@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -60,12 +59,9 @@ fun FoodItemDetails(foodItem: FoodItem) {
               text = stringResource(R.string.food_item_open_date_label, formattedOpenDate),
               tag = "openDateText",
               style = textStyle)
-            formattedBuyDate?.let { stringResource(R.string.food_item_buy_date_label, it) }?.let {
-                FoodItemDetailText(
-                    text = it,
-                    tag = "buyDateText",
-                    style = textStyle)
-            }
+          formattedBuyDate
+              ?.let { stringResource(R.string.food_item_buy_date_label, it) }
+              ?.let { FoodItemDetailText(text = it, tag = "buyDateText", style = textStyle) }
           FoodItemDetailText(
               text =
                   stringResource(
@@ -91,5 +87,3 @@ fun FoodItemDetails(foodItem: FoodItem) {
         }
       }
 }
-
-

@@ -60,7 +60,7 @@ fun EditFoodItemScreen(
   val context = LocalContext.current
   /** Validates all fields when the submit button is clicked. */
   fun validateAllFieldsWhenSubmitButton() {
-    amountErrorResId = validateAmount(amount)
+    amountErrorResId = validateNumber(amount)
     buyDateErrorResId = validateBuyDate(buyDate)
     expireDateErrorResId = validateExpireDate(expireDate, buyDate, buyDateErrorResId)
     openDateErrorResId =
@@ -103,7 +103,7 @@ fun EditFoodItemScreen(
                           amount = amount,
                           onAmountChange = { newValue ->
                             amount = newValue
-                            amountErrorResId = validateAmount(amount)
+                            amountErrorResId = validateNumber(amount)
                           },
                           amountErrorResId = amountErrorResId,
                           modifier = Modifier.weight(1f),
