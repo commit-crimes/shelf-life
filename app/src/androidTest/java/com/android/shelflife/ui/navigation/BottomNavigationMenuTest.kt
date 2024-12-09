@@ -6,11 +6,11 @@ import androidx.compose.ui.test.performClick
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
-import com.android.shelfLife.model.household.HouseholdViewModel
-import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
-import com.android.shelfLife.model.invitations.InvitationViewModel
+import com.android.shelfLife.model.newFoodItem.ListFoodItemsViewModel
+import com.android.shelfLife.model.newhousehold.HouseholdRepositoryFirestore
+import com.android.shelfLife.model.newhousehold.HouseholdViewModel
+import com.android.shelfLife.model.newInvitations.InvitationRepositoryFirestore
+import com.android.shelfLife.model.newInvitations.InvitationViewModel
 import com.android.shelfLife.ui.newnavigation.NavigationActions
 import com.android.shelfLife.ui.newnavigation.TopLevelDestinations
 import com.android.shelfLife.ui.newProfile.ProfileScreen

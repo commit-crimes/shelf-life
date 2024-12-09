@@ -4,9 +4,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.android.shelfLife.model.recipe.Ingredient
-import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.model.recipe.RecipeRepository
+import com.android.shelfLife.model.newRecipe.Ingredient
+import com.android.shelfLife.model.newRecipe.Recipe
+import com.android.shelfLife.model.newRecipe.RecipeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

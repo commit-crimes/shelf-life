@@ -31,9 +31,9 @@ import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.recipe.Ingredient
-import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
+import com.android.shelfLife.model.newRecipe.Ingredient
+import com.android.shelfLife.model.newRecipe.Recipe
+import com.android.shelfLife.model.newRecipe.RecipeRepositoryFirestore
 import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.newnavigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.newnavigation.NavigationActions

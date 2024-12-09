@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.household
+package com.android.shelfLife.model.newhousehold
 
 /**
  * Data class representing a household.

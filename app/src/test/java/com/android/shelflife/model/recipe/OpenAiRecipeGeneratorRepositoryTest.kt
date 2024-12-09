@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.recipe
+package com.android.shelfLife.model.newRecipe
 
 import com.aallam.openai.api.chat.ChatChoice
 import com.aallam.openai.api.chat.ChatCompletion
@@ -12,7 +12,7 @@ import com.aallam.openai.client.OpenAI
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.newFoodItem.FoodItem
 import java.lang.reflect.Method
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.ExperimentalCoroutinesApi

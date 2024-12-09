@@ -1,7 +1,7 @@
-package com.android.shelfLife.model.invitations
+package com.android.shelfLife.model.newInvitations
 
 import android.util.Log
-import com.android.shelfLife.model.household.HouseHold
+import com.android.shelfLife.model.newhousehold.HouseHold
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot

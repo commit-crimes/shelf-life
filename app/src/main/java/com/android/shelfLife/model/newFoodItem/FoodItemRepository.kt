@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.foodItem
+package com.android.shelfLife.model.newFoodItem
 
 import kotlinx.coroutines.flow.StateFlow
 

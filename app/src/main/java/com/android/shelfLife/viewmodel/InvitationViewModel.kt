@@ -1,8 +1,8 @@
 package com.android.shelfLife.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.android.shelfLife.model.invitations.Invitation
-import com.android.shelfLife.model.invitations.InvitationRepository
+import com.android.shelfLife.model.newInvitations.Invitation
+import com.android.shelfLife.model.newInvitations.InvitationRepository
 import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

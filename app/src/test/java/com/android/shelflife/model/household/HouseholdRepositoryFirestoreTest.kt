@@ -1,7 +1,7 @@
 package com.android.shelflife.model.household
 
-import com.android.shelfLife.model.household.HouseHold
-import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
+import com.android.shelfLife.model.newhousehold.HouseHold
+import com.android.shelfLife.model.newhousehold.HouseholdRepositoryFirestore
 import com.google.firebase.firestore.*
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest

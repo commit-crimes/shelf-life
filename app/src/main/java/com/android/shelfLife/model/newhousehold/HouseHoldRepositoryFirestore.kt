@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.household
+package com.android.shelfLife.model.newhousehold
 
 import android.util.Log
 import com.google.firebase.firestore.*

@@ -31,15 +31,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
-import com.android.shelfLife.model.recipe.Ingredient
-import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
-import com.android.shelfLife.model.user.UserRepositoryFirestore
+import com.android.shelfLife.model.newRecipe.Ingredient
 import com.android.shelfLife.ui.newnavigation.NavigationActions
 import com.android.shelfLife.ui.theme.onSecondaryDark
 import com.android.shelfLife.ui.theme.primaryContainerDark
@@ -49,7 +45,6 @@ import com.android.shelfLife.ui.theme.secondaryContainerLight
 import com.android.shelfLife.ui.newutils.CustomButtons
 import com.android.shelfLife.ui.newutils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.recipes.AddRecipeViewModel
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 @Composable

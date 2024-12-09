@@ -23,10 +23,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.foodItem.FoodItem
-import com.android.shelfLife.model.foodItem.FoodStorageLocation
-import com.android.shelfLife.model.recipe.RecipePrompt
-import com.android.shelfLife.model.recipe.RecipeType
+import com.android.shelfLife.model.newFoodItem.FoodItem
+import com.android.shelfLife.model.newFoodItem.FoodStorageLocation
+import com.android.shelfLife.model.newRecipe.RecipePrompt
+import com.android.shelfLife.model.newRecipe.RecipeType
 import com.android.shelfLife.ui.newnavigation.NavigationActions
 import com.android.shelfLife.viewmodel.recipe.RecipeGenerationViewModel
 

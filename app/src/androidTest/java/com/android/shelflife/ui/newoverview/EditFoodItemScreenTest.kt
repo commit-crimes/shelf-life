@@ -6,9 +6,9 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodUnit
-import com.android.shelfLife.model.foodItem.FoodItem
-import com.android.shelfLife.model.foodItem.FoodItemRepository
-import com.android.shelfLife.model.foodItem.FoodStorageLocation
+import com.android.shelfLife.model.newFoodItem.FoodItem
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
+import com.android.shelfLife.model.newFoodItem.FoodStorageLocation
 import com.android.shelfLife.model.user.User
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.newnavigation.NavigationActions

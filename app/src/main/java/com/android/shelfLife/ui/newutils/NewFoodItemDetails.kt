@@ -20,7 +20,7 @@ import com.android.shelfLife.R
  * @param foodItem The food item whose details are to be displayed.
  */
 @Composable
-fun FoodItemDetails(foodItem: com.android.shelfLife.model.foodItem.FoodItem) {
+fun FoodItemDetails(foodItem: com.android.shelfLife.model.newFoodItem.FoodItem) {
   val textStyle = TextStyle(fontSize = 14.sp)
 
   val formattedExpiryDate =

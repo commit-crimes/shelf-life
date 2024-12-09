@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.invitations
+package com.android.shelfLife.model.newInvitations
 
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Timestamp

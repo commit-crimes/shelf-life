@@ -1,7 +1,7 @@
 package com.android.shelfLife.di
 
-import com.android.shelfLife.model.recipe.RecipeGeneratorOpenAIRepository
-import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
+import com.android.shelfLife.model.newRecipe.RecipeGeneratorOpenAIRepository
+import com.android.shelfLife.model.newRecipe.RecipeGeneratorRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

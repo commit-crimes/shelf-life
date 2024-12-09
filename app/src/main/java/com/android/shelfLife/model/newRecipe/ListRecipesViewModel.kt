@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.recipe
+package com.android.shelfLife.model.newRecipe
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

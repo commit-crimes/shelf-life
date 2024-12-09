@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.recipe
+package com.android.shelfLife.model.newRecipe
 
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
@@ -6,21 +6,18 @@ import com.aallam.openai.api.chat.ToolCall
 import com.aallam.openai.api.chat.ToolChoice
 import com.aallam.openai.api.chat.chatCompletionRequest
 import com.aallam.openai.api.core.Parameters
-import com.aallam.openai.api.http.Timeout
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
-import com.android.shelfLife.BuildConfig
 import com.android.shelfLife.di.IoDispatcher
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.newFoodItem.FoodItem
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.doubleOrNull

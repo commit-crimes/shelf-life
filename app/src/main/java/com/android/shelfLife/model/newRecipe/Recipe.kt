@@ -1,8 +1,8 @@
-package com.android.shelfLife.model.recipe
+package com.android.shelfLife.model.newRecipe
 
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.newFoodItem.FoodItem
 import kotlin.time.Duration
 
 /** Data class representing a recipe object */

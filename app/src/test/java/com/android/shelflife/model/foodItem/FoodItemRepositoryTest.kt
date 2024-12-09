@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.foodItem
+package com.android.shelfLife.model.newFoodItem
 
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.google.firebase.firestore.*

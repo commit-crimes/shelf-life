@@ -5,8 +5,8 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.NavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
-import com.android.shelfLife.model.invitations.InvitationViewModel
+import com.android.shelfLife.model.newInvitations.InvitationRepositoryFirestore
+import com.android.shelfLife.model.newInvitations.InvitationViewModel
 import com.android.shelfLife.ui.newnavigation.NavigationActions
 import com.android.shelfLife.ui.newnavigation.Route
 import com.android.shelfLife.ui.newProfile.ProfileScreen

@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.household
+package com.android.shelfLife.model.newhousehold
 
 import kotlinx.coroutines.flow.StateFlow
 

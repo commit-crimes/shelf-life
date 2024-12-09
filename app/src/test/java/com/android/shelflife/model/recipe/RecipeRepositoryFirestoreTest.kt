@@ -1,8 +1,8 @@
 import androidx.test.core.app.ApplicationProvider
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
+import com.android.shelfLife.model.newRecipe.Recipe
+import com.android.shelfLife.model.newRecipe.RecipeRepositoryFirestore
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser

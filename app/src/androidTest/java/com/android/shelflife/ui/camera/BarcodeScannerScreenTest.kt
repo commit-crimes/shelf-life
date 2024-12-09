@@ -8,8 +8,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.*
-import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.newFoodItem.ListFoodItemsViewModel
+import com.android.shelfLife.model.newhousehold.HouseholdViewModel
 import com.android.shelfLife.ui.newnavigation.NavigationActions
 import com.android.shelfLife.ui.newnavigation.Route
 import com.android.shelfLife.ui.newnavigation.Screen

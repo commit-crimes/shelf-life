@@ -2,7 +2,7 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.foodFacts.*
-import com.android.shelfLife.model.foodItem.*
+import com.android.shelfLife.model.newFoodItem.*
 import com.android.shelfLife.ui.newutils.FoodItemDetails
 import com.android.shelfLife.ui.newutils.formatTimestampToDisplayDate
 import com.google.firebase.Timestamp

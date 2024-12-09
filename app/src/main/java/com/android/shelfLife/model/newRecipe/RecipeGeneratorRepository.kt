@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.recipe
+package com.android.shelfLife.model.newRecipe
 
 /** Interface describing a model for generating recipes */
 interface RecipeGeneratorRepository {

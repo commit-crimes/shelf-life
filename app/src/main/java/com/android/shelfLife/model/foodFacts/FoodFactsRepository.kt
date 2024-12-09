@@ -1,6 +1,5 @@
 package com.android.shelfLife.model.foodFacts
 
-import com.android.shelfLife.model.foodItem.FoodItem
 import kotlinx.coroutines.flow.StateFlow
 
 /**

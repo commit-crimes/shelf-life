@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.recipe.Ingredient
-import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.model.recipe.RecipeRepository
+import com.android.shelfLife.model.newRecipe.Ingredient
+import com.android.shelfLife.model.newRecipe.Recipe
+import com.android.shelfLife.model.newRecipe.RecipeRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.newutils.validateNumber
 import com.android.shelfLife.ui.newutils.validateString
