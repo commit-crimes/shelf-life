@@ -32,7 +32,9 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // Use HiltTestRunner for instrumentation tests
+        testInstrumentationRunner = "com.android.shelfLife.HiltTestRunner"
+
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -294,13 +296,28 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
-    // Testing Unit
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+
+    // Hilt Testing
+    androidTestImplementation(libs.hilt.android.testing)
+    kaptAndroidTest(libs.hilt.android.compiler)
+    testImplementation(libs.hilt.android.testing)
+    kaptTest(libs.hilt.android.compiler)
+    implementation(libs.androidx.runner)
+    implementation(libs.hilt.android.testing)
+
+    // Unit Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
     testImplementation(libs.json)
     testImplementation(libs.mockwebserver)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockk)
 
     // Test UI
     androidTestImplementation(libs.androidx.junit)
@@ -323,6 +340,9 @@ dependencies {
 
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.fragment)
+    implementation(libs.androidx.hilt.navigation.compose)
+
 }
 
 kapt {

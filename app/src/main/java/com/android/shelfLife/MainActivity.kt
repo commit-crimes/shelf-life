@@ -1,6 +1,5 @@
 package com.android.shelfLife
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,9 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -41,8 +37,6 @@ import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.example.compose.ShelfLifeTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -108,7 +102,7 @@ fun ShelfLifeApp(userRepository: UserRepository) {
         RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
       }
       composable(Screen.INDIVIDUAL_RECIPE) {
-        IndividualRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)
+        IndividualRecipeScreen(navigationActions)
       }
       composable(Screen.ADD_RECIPE) { AddRecipeScreen(navigationActions, listRecipesViewModel) }
       composable(Screen.GENERATE_RECIPE) { GenerateRecipeScreen(navigationActions) }

@@ -1,5 +1,7 @@
-package com.android.shelfLife.model.foodItem
+package com.android.shelfLife.di
 
+import com.android.shelfLife.model.foodItem.FoodItemRepository
+import com.android.shelfLife.model.foodItem.FoodItemRepositoryFirestore
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides

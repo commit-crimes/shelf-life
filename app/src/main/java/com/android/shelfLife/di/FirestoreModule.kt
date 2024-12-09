@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.firestore
+package com.android.shelfLife.di
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
