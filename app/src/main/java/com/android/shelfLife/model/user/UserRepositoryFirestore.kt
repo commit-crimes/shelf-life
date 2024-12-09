@@ -3,6 +3,7 @@ package com.android.shelfLife.model.user
 import android.content.Context
 import android.util.Log
 import com.android.shelfLife.model.household.HouseHold
+import com.android.shelfLife.model.invitations.InvitationRepository
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -245,78 +246,47 @@ class UserRepositoryFirestore(
     updateUserField("selectedHouseholdUID", selectedHouseholdUID)
   }
 
-  override fun getUserIds(userEmails: Set<String?>, callback: (Map<String, String>) -> Unit) {
-    if (userEmails.isEmpty()) {
-      callback(emptyMap())
-      return
-    }
-    val emailBatches = userEmails.chunked(10) // Firestore allows up to 10 values in 'whereIn'
-    val emailToUserId = mutableMapOf<String, String>()
-    var batchesProcessed = 0
 
-    for (emailBatch in emailBatches) {
-      db.collection("users")
-          .whereIn("email", emailBatch)
-          .get()
-          .addOnSuccessListener { querySnapshot ->
-            for (doc in querySnapshot.documents) {
-              val email = doc.getString("email")
-              val userId = doc.id
-              if (email != null) {
-                emailToUserId[email] = userId
-              }
-            }
-            batchesProcessed++
-            if (batchesProcessed == emailBatches.size) {
-              callback(emailToUserId)
-            }
-          }
-          .addOnFailureListener { exception ->
-            Log.e("HouseholdRepository", "Error fetching user IDs by emails", exception)
-            batchesProcessed++
-            if (batchesProcessed == emailBatches.size) {
-              callback(emailToUserId)
-            }
-          }
-    }
-  }
+    // Suspend function to get user IDs from emails
+    override suspend fun getUserIds(userEmails: Set<String?>): Map<String, String> {
+        if (userEmails.isEmpty()) return emptyMap()
 
-  override fun getUserEmails(userIds: List<String>, callback: (Map<String, String>) -> Unit) {
-    if (userIds.isEmpty()) {
-      callback(emptyMap())
-      return
+        val emailToUserId = mutableMapOf<String, String>()
+        val chunks = userEmails.filterNotNull().chunked(10)
+
+        for (chunk in chunks) {
+            val query = db.collection("users")
+                .whereIn("email", chunk)
+                .get()
+                .await()
+            for (doc in query.documents) {
+                val email = doc.getString("email")
+                val userId = doc.id
+                if (email != null) emailToUserId[email] = userId
+            }
+        }
+        return emailToUserId
     }
 
-    val uidBatches = userIds.chunked(10) // Firestore allows up to 10 values in 'whereIn'
-    val uidToEmail = mutableMapOf<String, String>()
-    var batchesProcessed = 0
+    override suspend fun getUserEmails(userIds: List<String>): Map<String, String> {
+        if (userIds.isEmpty()) return emptyMap()
 
-    for (uidBatch in uidBatches) {
-      db.collection("users")
-          .whereIn(FieldPath.documentId(), uidBatch)
-          .get()
-          .addOnSuccessListener { querySnapshot ->
-            for (doc in querySnapshot.documents) {
-              val email = doc.getString("email")
-              val userId = doc.id
-              if (email != null) {
-                uidToEmail[userId] = email
-              }
+        val uidToEmail = mutableMapOf<String, String>()
+        val chunks = userIds.chunked(10)
+
+        for (chunk in chunks) {
+            val query = db.collection("users")
+                .whereIn(FieldPath.documentId(), chunk)
+                .get()
+                .await()
+            for (doc in query.documents) {
+                val email = doc.getString("email")
+                val userId = doc.id
+                if (email != null) uidToEmail[userId] = email
             }
-            batchesProcessed++
-            if (batchesProcessed == uidBatches.size) {
-              callback(uidToEmail)
-            }
-          }
-          .addOnFailureListener { exception ->
-            Log.e("HouseholdRepository", "Error fetching emails by user IDs", exception)
-            batchesProcessed++
-            if (batchesProcessed == uidBatches.size) {
-              callback(uidToEmail)
-            }
-          }
+        }
+        return uidToEmail
     }
-  }
 
   override suspend fun selectHousehold(household: HouseHold?) {
     _selectedHousehold.value = household
