@@ -25,9 +25,9 @@ interface FoodFactsRepository {
    * @param onFailure Callback function to handle search failures.
    */
   fun searchFoodFacts(
-    searchInput: FoodSearchInput,
-    onSuccess: (List<FoodFacts>) -> Unit,
-    onFailure: (Exception) -> Unit
+      searchInput: FoodSearchInput,
+      onSuccess: (List<FoodFacts>) -> Unit,
+      onFailure: (Exception) -> Unit
   )
 
   fun searchByBarcode(barcode: Long)

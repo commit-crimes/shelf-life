@@ -9,8 +9,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 class OpenFoodFactsRepository(
-  private val client: OkHttpClient,
-  private val baseUrl: String = "https://world.openfoodfacts.net"
+    private val client: OkHttpClient,
+    private val baseUrl: String = "https://world.openfoodfacts.net"
 ) : FoodFactsRepository {
 
   private val MAX_RESULTS = 7 // Adjust the number of results as needed
@@ -20,44 +20,44 @@ class OpenFoodFactsRepository(
   }
 
   override fun searchFoodFacts(
-    searchInput: FoodSearchInput,
-    onSuccess: (List<FoodFacts>) -> Unit,
-    onFailure: (Exception) -> Unit
+      searchInput: FoodSearchInput,
+      onSuccess: (List<FoodFacts>) -> Unit,
+      onFailure: (Exception) -> Unit
   ) {
     val url =
-      when (searchInput) {
-        is FoodSearchInput.Barcode ->
-          buildUrl(baseUrl, "api/v0/product/${searchInput.barcode}.json")
-        is FoodSearchInput.Query ->
-          buildUrl(
-            baseUrl,
-            "cgi/search.pl?search_terms=${searchInput.searchQuery}&page_size=$MAX_RESULTS&json=true")
-      }
+        when (searchInput) {
+          is FoodSearchInput.Barcode ->
+              buildUrl(baseUrl, "api/v0/product/${searchInput.barcode}.json")
+          is FoodSearchInput.Query ->
+              buildUrl(
+                  baseUrl,
+                  "cgi/search.pl?search_terms=${searchInput.searchQuery}&page_size=$MAX_RESULTS&json=true")
+        }
 
     val request = Request.Builder().url(url).build()
 
     client
-      .newCall(request)
-      .enqueue(
-        object : okhttp3.Callback {
-          override fun onFailure(call: okhttp3.Call, e: IOException) {
-            onFailure(e)
-          }
+        .newCall(request)
+        .enqueue(
+            object : okhttp3.Callback {
+              override fun onFailure(call: okhttp3.Call, e: IOException) {
+                onFailure(e)
+              }
 
-          override fun onResponse(call: okhttp3.Call, response: Response) {
-            if (!response.isSuccessful) {
-              onFailure(
-                IOException("Server error: HTTP ${response.code} - ${response.message}"))
-              return
-            }
+              override fun onResponse(call: okhttp3.Call, response: Response) {
+                if (!response.isSuccessful) {
+                  onFailure(
+                      IOException("Server error: HTTP ${response.code} - ${response.message}"))
+                  return
+                }
 
-            val body = response.body?.string() ?: ""
-            val foodFactsList = parseFoodFactsResponse(body, searchInput)
-            println("Response: $body") // Logging the response
-            Log.d("OpenFoodFactsRepository", "Food Facts: $foodFactsList")
-            onSuccess(foodFactsList)
-          }
-        })
+                val body = response.body?.string() ?: ""
+                val foodFactsList = parseFoodFactsResponse(body, searchInput)
+                println("Response: $body") // Logging the response
+                Log.d("OpenFoodFactsRepository", "Food Facts: $foodFactsList")
+                onSuccess(foodFactsList)
+              }
+            })
   }
 
   /**
@@ -112,27 +112,27 @@ class OpenFoodFactsRepository(
 
     // Map nutrition facts
     val nutritionFacts =
-      NutritionFacts(
-        energyKcal = productObject.optJSONObject("nutriments")?.optInt("energy-kcal_100g") ?: 0,
-        fat = productObject.optJSONObject("nutriments")?.optDouble("fat_100g") ?: 0.0,
-        saturatedFat =
-        productObject.optJSONObject("nutriments")?.optDouble("saturated-fat_100g") ?: 0.0,
-        carbohydrates =
-        productObject.optJSONObject("nutriments")?.optDouble("carbohydrates_100g") ?: 0.0,
-        sugars = productObject.optJSONObject("nutriments")?.optDouble("sugars_100g") ?: 0.0,
-        proteins = productObject.optJSONObject("nutriments")?.optDouble("proteins_100g") ?: 0.0,
-        salt = productObject.optJSONObject("nutriments")?.optDouble("salt_100g") ?: 0.0)
+        NutritionFacts(
+            energyKcal = productObject.optJSONObject("nutriments")?.optInt("energy-kcal_100g") ?: 0,
+            fat = productObject.optJSONObject("nutriments")?.optDouble("fat_100g") ?: 0.0,
+            saturatedFat =
+                productObject.optJSONObject("nutriments")?.optDouble("saturated-fat_100g") ?: 0.0,
+            carbohydrates =
+                productObject.optJSONObject("nutriments")?.optDouble("carbohydrates_100g") ?: 0.0,
+            sugars = productObject.optJSONObject("nutriments")?.optDouble("sugars_100g") ?: 0.0,
+            proteins = productObject.optJSONObject("nutriments")?.optDouble("proteins_100g") ?: 0.0,
+            salt = productObject.optJSONObject("nutriments")?.optDouble("salt_100g") ?: 0.0)
 
     val foodCategory =
-      FoodCategory.OTHER // You can refine the logic to determine the category if needed
+        FoodCategory.OTHER // You can refine the logic to determine the category if needed
 
     // Create and return the FoodFacts object
     return FoodFacts(
-      name = name,
-      barcode = barcode,
-      quantity = quantity,
-      category = foodCategory,
-      nutritionFacts = nutritionFacts,
-      imageUrl = imageUrl)
+        name = name,
+        barcode = barcode,
+        quantity = quantity,
+        category = foodCategory,
+        nutritionFacts = nutritionFacts,
+        imageUrl = imageUrl)
   }
 }
