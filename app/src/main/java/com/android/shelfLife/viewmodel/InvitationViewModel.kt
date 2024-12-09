@@ -3,11 +3,11 @@ package com.android.shelfLife.viewmodel
 import androidx.lifecycle.ViewModel
 import com.android.shelfLife.model.newInvitations.Invitation
 import com.android.shelfLife.model.newInvitations.InvitationRepository
-import com.android.shelfLife.model.user.UserRepositoryFirestore
+import com.android.shelfLife.model.user.UserRepository
 
 class InvitationViewModel(
     private val invitationRepository: InvitationRepository,
-    private val userRepo: UserRepositoryFirestore
+    private val userRepo: UserRepository
 ) : ViewModel() {
 
   val invitations = invitationRepository.invitations
