@@ -1,4 +1,6 @@
-package com.android.shelfLife.model.foodFacts
+package com.android.shelfLife.model.newFoodFacts
+
+import com.android.shelfLife.model.foodFacts.FoodFacts
 
 /**
  * Represents a food facts object.
@@ -27,4 +29,8 @@ interface FoodFactsRepository {
     onSuccess: (List<FoodFacts>) -> Unit,
     onFailure: (Exception) -> Unit
   )
+
+  fun searchByBarcode(barcode: Long)
+
+  fun searchByQuery(query: String)
 }
