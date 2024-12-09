@@ -2,6 +2,8 @@ package com.android.shelfLife.ui.recipes
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,11 +20,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -39,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -85,6 +89,8 @@ fun RecipesScreen(
   val filters =
       listOf("Soon to expire", "Only household items", "High protein", "Low calories", "Personal")
 
+  var fabExpanded = remember { mutableStateOf(false) }
+
   HouseHoldSelectionDrawer(
       scope = scope,
       drawerState = drawerState,
@@ -123,41 +129,101 @@ fun RecipesScreen(
               },
               // Floating Action Button to add a new food item
               floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigationActions.navigateTo(Screen.ADD_RECIPE) },
-                    content = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                    modifier = Modifier.testTag("addRecipeFab"),
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)) {
+                      // Secondary FAB for "Manual" option
+                      if (fabExpanded.value) {
+                        ExtendedFloatingActionButton(
+                            text = { Text("Generate") },
+                            icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "Add") },
+                            onClick = {
+                              // Navigate to Manual Recipe screen
+                              navigationActions.navigateTo(Screen.GENERATE_RECIPE)
+                            },
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            modifier = Modifier.testTag("generateRecipeFab").width(150.dp))
+                      }
+
+                      // Primary FAB
+                      ExtendedFloatingActionButton(
+                          text = { Text(if (fabExpanded.value) "Manual" else "") },
+                          icon = { Icon(Icons.Default.Add, contentDescription = "Add") },
+                          onClick = {
+                            if (fabExpanded.value) {
+                              // Navigate to Generate Recipe screen
+                              navigationActions.navigateTo(Screen.ADD_RECIPE)
+                            } else {
+                              // Expand the FABs
+                              fabExpanded.value = true
+                            }
+                          },
+                          expanded = fabExpanded.value, // Bind to the state
+                          containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                          modifier =
+                              Modifier.testTag("addRecipeFab")
+                                  .width(if (fabExpanded.value) 150.dp else 56.dp))
+                    }
               },
               content = { paddingValues ->
-                Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
-                  CustomSearchBar(
-                      query = query,
-                      onQueryChange = { query = it },
-                      placeholder = "Search recipe",
-                      searchBarTestTag = "searchBar")
+                Column(
+                    modifier =
+                        Modifier.padding(paddingValues).fillMaxSize().pointerInput(Unit) {
+                          detectTapGestures(
+                              onTap = { if (fabExpanded.value) fabExpanded.value = false })
+                        }) {
+                      CustomSearchBar(
+                          query = query,
+                          onQueryChange = { query = it },
+                          placeholder = "Search recipe",
+                          searchBarTestTag = "searchBar",
+                          onDeleteTextClicked = { query = "" })
 
-                  if (filteredRecipes.isEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        content = {
-                          Text(
-                              text = "No recipes available",
-                              modifier = Modifier.testTag("noRecipesAvailableText"))
-                        },
-                        contentAlignment = Alignment.Center)
-                  } else {
-                    // LazyColumn for displaying the list of filtered recipes
-                    LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
-                      items(filteredRecipes) { recipe ->
-                        RecipeItem(recipe, navigationActions, listRecipesViewModel)
+                      if (filteredRecipes.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            content = {
+                              Text(
+                                  text = "No recipes available",
+                                  modifier = Modifier.testTag("noRecipesAvailableText"))
+                            },
+                            contentAlignment = Alignment.Center)
+                      } else {
+                        // LazyColumn for displaying the list of filtered recipes
+                        LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
+                          items(filteredRecipes) { recipe ->
+                            RecipeItem(recipe, navigationActions, listRecipesViewModel)
+                          }
+                        }
                       }
                     }
-                  }
-                }
               })
         }
       }
+}
+/**
+ * Converts a string representation of a recipe type into a corresponding
+ * `RecipesRepository.SearchRecipeType` enumeration value.
+ *
+ * @param string A string describing the type of recipe to search for. Possible values include:
+ *     - "Soon to expire": Recipes with ingredients that are nearing expiration.
+ *     - "Only household items": Recipes using only ingredients available in the household.
+ *     - "High protein": Recipes with a high protein content.
+ *     - "Low calories": Recipes with low caloric content.
+ *
+ * @return The corresponding `RecipesRepository.SearchRecipeType` enum value.
+ * @throws IllegalArgumentException If the input string does not match any known recipe type.
+ */
+fun stringToSearchRecipeType(string: String): RecipeType {
+  return when (string) {
+    "Soon to expire" -> RecipeType.USE_SOON_TO_EXPIRE
+    "Only household items" -> RecipeType.USE_ONLY_HOUSEHOLD_ITEMS
+    "High protein" -> RecipeType.HIGH_PROTEIN
+    "Low calories" -> RecipeType.LOW_CALORIE
+    "Personal" -> RecipeType.PERSONAL
+    else -> throw IllegalArgumentException("Unknown filter: $string")
+  }
 }
 
 @Composable
@@ -267,30 +333,6 @@ fun RecipeItem(
     listRecipesViewModel.selectRecipe(recipe) // Select the clicked recipe in the ViewModel
     navigationActions.navigateTo(
         Screen.INDIVIDUAL_RECIPE) // Navigate to the individual recipe screen
-  }
-}
-
-/**
- * Converts a string representation of a recipe type into a corresponding
- * `RecipesRepository.SearchRecipeType` enumeration value.
- *
- * @param string A string describing the type of recipe to search for. Possible values include:
- *     - "Soon to expire": Recipes with ingredients that are nearing expiration.
- *     - "Only household items": Recipes using only ingredients available in the household.
- *     - "High protein": Recipes with a high protein content.
- *     - "Low calories": Recipes with low caloric content.
- *
- * @return The corresponding `RecipesRepository.SearchRecipeType` enum value.
- * @throws IllegalArgumentException If the input string does not match any known recipe type.
- */
-fun stringToSearchRecipeType(string: String): RecipeType {
-  return when (string) {
-    "Soon to expire" -> RecipeType.USE_SOON_TO_EXPIRE
-    "Only household items" -> RecipeType.USE_ONLY_HOUSEHOLD_ITEMS
-    "High protein" -> RecipeType.HIGH_PROTEIN
-    "Low calories" -> RecipeType.LOW_CALORIE
-    "Personal" -> RecipeType.PERSONAL
-    else -> throw IllegalArgumentException("Unknown filter: $string")
   }
 }
 

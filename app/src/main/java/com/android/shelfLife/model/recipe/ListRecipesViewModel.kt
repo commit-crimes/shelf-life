@@ -1,6 +1,7 @@
 package com.android.shelfLife.model.recipe
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
 import kotlin.time.DurationUnit
@@ -8,6 +9,7 @@ import kotlin.time.toDuration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 open class ListRecipesViewModel(
     private val recipeRepository: RecipeRepository,
@@ -40,7 +42,17 @@ open class ListRecipesViewModel(
   open val selectedRecipe: StateFlow<Recipe?> = _selectedRecipe.asStateFlow()
 
   init {
-    recipeRepository.init(onSuccess = { getRecipes() })
+    recipeRepository.init(onSuccess = { observeRecipes() })
+  }
+
+  private fun observeRecipes() {
+    getRecipes()
+    viewModelScope.launch {
+      recipeRepository.recipes.collect { recipeList ->
+        // Add the test recipe to the current recipes
+        _recipes.value = listOf(testRecipe) + recipeList
+      }
+    }
   }
 
   /**
@@ -57,9 +69,10 @@ open class ListRecipesViewModel(
     return recipeRepository.getUid()
   }
 
-  fun getRecipes() {
+  fun getRecipes() { // deprecated: clean up in next task. We now have observeRecipes that is only
+    // called on start
     return recipeRepository.getRecipes(
-        onSuccess = { _recipes.value = it + listOf(testRecipe) }, onFailure = ::_onFail)
+        onSuccess = { _recipes.value = listOf(testRecipe) + it }, onFailure = ::_onFail)
   }
 
   /**

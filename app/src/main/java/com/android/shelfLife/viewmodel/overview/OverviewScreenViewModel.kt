@@ -48,7 +48,6 @@ class OverviewScreenViewModel(
     FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
       if (firebaseAuth.currentUser != null) {
         Log.d("OverviewScreenViewModel", "User logged in, loading....")
-        loadHouseholds()
       }
     }
   }
@@ -56,10 +55,8 @@ class OverviewScreenViewModel(
   /** Loads the list of households from the repository and updates the [_households] flow. */
   private fun loadHouseholds() {
     viewModelScope.launch {
-      // Maybe this should be done elsewhere?
-      userRepository.initializeUserData()
       userRepository.user.value?.let { user ->
-        houseHoldRepository.initializeHouseholds(user.householdUIDs, user.selectedHouseholdUID)
+        houseHoldRepository.initializeHouseholds(user.householdUIDs, user.selectedHouseholdUID!!)
         userRepository.selectHousehold(
             households.value.find { it.uid == user.selectedHouseholdUID }
                 ?: households.value.firstOrNull())
