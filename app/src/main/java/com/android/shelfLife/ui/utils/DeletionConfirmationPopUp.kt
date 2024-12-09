@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.newutils
+package com.android.shelfLife.ui.utils
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme

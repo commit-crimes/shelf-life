@@ -36,7 +36,7 @@ import com.android.shelfLife.R
 import com.android.shelfLife.ui.newnavigation.NavigationActions
 import com.android.shelfLife.ui.newnavigation.Screen
 import com.android.shelfLife.ui.newutils.CustomButtons
-import com.android.shelfLife.ui.newutils.DeletionConfirmationPopUp
+import com.android.shelfLife.ui.utils.DeletionConfirmationPopUp
 import com.android.shelfLife.viewmodel.overview.HouseholdCreationScreenViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch

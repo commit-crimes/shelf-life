@@ -32,7 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.android.shelfLife.ui.newutils.DeletionConfirmationPopUp
+import com.android.shelfLife.ui.utils.DeletionConfirmationPopUp
 import com.android.shelfLife.viewmodel.navigation.HouseholdSelectionDrawerViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
