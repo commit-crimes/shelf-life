@@ -15,47 +15,33 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
-import com.android.shelfLife.model.invitations.InvitationViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.utils.DropdownFields
+import com.android.shelfLife.viewmodel.ProfileScreenViewModel
 import com.example.compose.LocalThemeMode
 import com.example.compose.LocalThemeTogglerProvider
 import com.example.compose.ThemeMode
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 
 @Composable
-fun ProfileScreen(
-    navigationActions: NavigationActions,
-    account: GoogleSignInAccount? = null,
-    signOutUser: () -> Unit = {},
-    invitationViewModel: InvitationViewModel
-) {
-  val context = LocalContext.current
-  val currentAccount = remember { account ?: getGoogleAccount(context) }
-
-  val invitations by invitationViewModel.invitations.collectAsState()
-
-  var expanded by remember { mutableStateOf(false) }
-
+fun ProfileScreen(navigationActions: NavigationActions, context: Context) {
+  val profileViewModel = hiltViewModel<ProfileScreenViewModel>()
+  val currentUser = profileViewModel.currentUser.collectAsState()
+  val invitations by profileViewModel.invitations.collectAsState()
   // Get the current theme mode and the theme toggler from ShelfLifeTheme
   val currentThemeMode = LocalThemeMode.current
   val themeToggler = LocalThemeTogglerProvider.current
@@ -85,10 +71,7 @@ fun ProfileScreen(
                     .testTag("profileColumn"),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top) {
-
-              // Profile picture using Coil to load the image from a URL
-              val profileImageUrl = currentAccount?.photoUrl?.toString()
-              if (profileImageUrl == null) {
+              if (currentUser.value?.photoUrl == null) {
                 Image(
                     imageVector = Icons.Outlined.AccountCircle,
                     contentDescription = "Profile Picture",
@@ -96,28 +79,26 @@ fun ProfileScreen(
                     contentScale = ContentScale.Crop)
               } else {
                 AsyncImage(
-                    model = profileImageUrl,
+                    model = currentUser.value?.photoUrl,
                     contentDescription = "Profile Picture",
                     modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"),
                     contentScale = ContentScale.Crop)
               }
               Spacer(modifier = Modifier.height(32.dp))
               Text(
-                  text = currentAccount?.displayName ?: "Guest",
+                  text = currentUser.value?.username ?: "Guest",
                   fontWeight = FontWeight.Bold,
                   color = color.primary,
                   fontSize = 28.sp,
                   textAlign = TextAlign.Center,
                   modifier = Modifier.testTag("profileNameText"))
 
-              if (currentAccount?.email != null) {
-                Text(
-                    text = currentAccount.email!!,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.testTag("profileEmailText"))
-              }
+              Text(
+                  text = currentUser.value?.email ?: "",
+                  fontWeight = FontWeight.Bold,
+                  fontSize = 16.sp,
+                  textAlign = TextAlign.Center,
+                  modifier = Modifier.testTag("profileEmailText"))
 
               Spacer(modifier = Modifier.weight(0.2f))
 
@@ -133,16 +114,15 @@ fun ProfileScreen(
                           themeToggler.toggleTheme(selectedOption)
                           navigationActions.navigateToAndClearBackStack(Route.PROFILE)
                         },
-                        expanded = expanded,
-                        onExpandedChange = { expanded = it },
+                        expanded = profileViewModel.changeThemeMenuState.value,
+                        onExpandedChange = { profileViewModel.changeThemeMenuState.value = it },
                         optionLabel = { option ->
                           (optionLabels[option] ?: "System Default") + " Mode"
                         },
                         modifier = Modifier.padding(horizontal = 16.dp))
                   }
-
               Spacer(modifier = Modifier.height(16.dp))
-
+              // Show pending invitations
               if (invitations.isNotEmpty()) {
                 Text(
                     text = "Pending Invitations",
@@ -159,7 +139,7 @@ fun ProfileScreen(
 
               // Logout button
               OutlinedButton(
-                  onClick = { signOutUser() },
+                  onClick = { profileViewModel.signOut(context) },
                   modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
                   border = BorderStroke(1.dp, Color.Red) // Outline color matches the current status
                   ) {
@@ -167,9 +147,4 @@ fun ProfileScreen(
                   }
             }
       }
-}
-
-// Function to get the signed-in Google account
-fun getGoogleAccount(context: Context): GoogleSignInAccount? {
-  return GoogleSignIn.getLastSignedInAccount(context)
 }

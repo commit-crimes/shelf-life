@@ -16,16 +16,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
-import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -33,28 +32,36 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.ui.utils.FoodItemDetails
+import com.android.shelfLife.viewmodel.overview.IndividualFoodItemViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IndividualFoodItemScreen(
     navigationActions: NavigationActions,
-    houseHoldViewModel: HouseholdViewModel,
-    foodItemViewModel: ListFoodItemsViewModel
 ) {
-  val foodItem by foodItemViewModel.selectedFoodItem.collectAsState()
+  val coroutineScope = rememberCoroutineScope()
+  val individualFoodItemViewModel = hiltViewModel<IndividualFoodItemViewModel>()
+  val context = LocalContext.current
+
   Scaffold(
       modifier = Modifier.testTag("IndividualFoodItemScreen"),
       topBar = {
         CustomTopAppBar(
             onClick = { navigationActions.goBack() },
-            title = if (foodItem != null) foodItem!!.foodFacts.name else "",
+            title =
+                if (individualFoodItemViewModel.selectedFood != null)
+                    individualFoodItemViewModel.selectedFood!!.foodFacts.name
+                else "",
             titleTestTag = "IndividualFoodItemName",
             actions = {
               IconButton(
                   onClick = {
-                    foodItem?.let {
-                      houseHoldViewModel.deleteFoodItem(it)
-                      navigationActions.goBack()
+                    individualFoodItemViewModel.selectedFood?.let {
+                      coroutineScope.launch {
+                        individualFoodItemViewModel.deleteFoodItem()
+                        navigationActions.goBack()
+                      }
                     }
                   },
                   modifier = Modifier.testTag("deleteFoodItem")) {
@@ -78,9 +85,9 @@ fun IndividualFoodItemScreen(
       }) { paddingValues ->
         LazyColumn(modifier = Modifier.padding(paddingValues)) {
           item {
-            if (foodItem != null) {
+            if (individualFoodItemViewModel.selectedFood != null) {
               AsyncImage(
-                  model = foodItem!!.foodFacts.imageUrl,
+                  model = individualFoodItemViewModel.selectedFood!!.foodFacts.imageUrl,
                   contentDescription = "Food Image",
                   modifier =
                       Modifier.fillMaxWidth()
@@ -90,7 +97,7 @@ fun IndividualFoodItemScreen(
                           .testTag("IndividualFoodItemImage"),
                   contentScale = ContentScale.Crop)
 
-              FoodItemDetails(foodItem = foodItem!!)
+              FoodItemDetails(foodItem = individualFoodItemViewModel.selectedFood!!)
             } else {
               CircularProgressIndicator(modifier = Modifier.testTag("CircularProgressIndicator"))
             }

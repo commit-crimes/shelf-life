@@ -3,16 +3,21 @@ package com.android.shelfLife.viewmodel.overview
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.shelfLife.model.newInvitations.InvitationRepository
-import com.android.shelfLife.model.newhousehold.HouseHold
-import com.android.shelfLife.model.newhousehold.HouseHoldRepository
+import com.android.shelfLife.model.household.HouseHold
+import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.invitations.InvitationRepository
 import com.android.shelfLife.model.user.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class HouseholdCreationScreenViewModel(
+@HiltViewModel
+class HouseholdCreationScreenViewModel
+@Inject
+constructor(
     private val houseHoldRepository: HouseHoldRepository,
     private val invitationRepository: InvitationRepository,
     private val userRepository: UserRepository

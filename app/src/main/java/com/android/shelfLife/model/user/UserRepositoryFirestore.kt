@@ -2,7 +2,7 @@ package com.android.shelfLife.model.user
 
 import android.content.Context
 import android.util.Log
-import com.android.shelfLife.model.newhousehold.HouseHold
+import com.android.shelfLife.model.household.HouseHold
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot

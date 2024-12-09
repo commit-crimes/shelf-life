@@ -1,7 +1,7 @@
 package com.android.shelfLife.model.user
 
 import android.content.Context
-import com.android.shelfLife.model.newhousehold.HouseHold
+import com.android.shelfLife.model.household.HouseHold
 import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {

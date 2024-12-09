@@ -1,7 +1,7 @@
 package com.android.shelflife.viewmodel
 
 import com.android.shelfLife.model.foodFacts.*
-import com.android.shelfLife.model.newFoodItem.*
+import com.android.shelfLife.model.foodItem.*
 import com.android.shelfLife.model.user.User
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.viewmodel.FoodItemViewModel

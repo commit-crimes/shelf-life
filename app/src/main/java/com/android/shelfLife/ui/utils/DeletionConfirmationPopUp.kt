@@ -6,19 +6,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import com.android.shelfLife.model.household.HouseholdViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.android.shelfLife.viewmodel.utils.DeletionConfirmationViewModel
 
 @Composable
 fun DeletionConfirmationPopUp(
     showDeleteDialog: Boolean,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    householdViewModel: HouseholdViewModel
 ) {
-  val householdToDelete = householdViewModel.householdToEdit.collectAsState().value
-  val selectedHousehold = householdViewModel.selectedHousehold.collectAsState().value
+  val deletionConfirmationViewModel: DeletionConfirmationViewModel =
+      hiltViewModel<DeletionConfirmationViewModel>()
+  val householdToDelete by deletionConfirmationViewModel.householdToEdit.collectAsState()
 
   if (showDeleteDialog) {
     AlertDialog(
@@ -29,7 +31,7 @@ fun DeletionConfirmationPopUp(
         confirmButton = {
           TextButton(
               onClick = {
-                householdViewModel.deleteHouseholdById(householdToDelete!!.uid)
+                deletionConfirmationViewModel.deleteHouseholdById(householdToDelete!!.uid)
                 onConfirm()
               },
               modifier = Modifier.testTag("confirmDeleteHouseholdButton")) {

@@ -24,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,10 +37,9 @@ import coil3.compose.AsyncImage
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodStatus
-import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.ui.utils.getExpiryMessageBasedOnDays
 import com.android.shelfLife.ui.utils.getProgressBarState
+import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -54,8 +52,7 @@ import java.util.Locale
 @Composable
 fun ListFoodItems(
     foodItems: List<FoodItem>,
-    householdViewModel: HouseholdViewModel,
-    listFoodItemsViewModel: ListFoodItemsViewModel,
+    overviewScreenViewModel: OverviewScreenViewModel,
     onFoodItemClick: (FoodItem) -> Unit,
     onFoodItemLongHold: (FoodItem) -> Unit
 ) {
@@ -72,8 +69,7 @@ fun ListFoodItems(
         // Call a composable that renders each individual to-do item
         FoodItemCard(
             foodItem = item,
-            householdViewModel,
-            listFoodItemsViewModel = listFoodItemsViewModel,
+            overviewScreenViewModel = overviewScreenViewModel,
             onClick = { onFoodItemClick(item) },
             onLongPress = { onFoodItemLongHold(item) })
       }
@@ -85,12 +81,11 @@ fun ListFoodItems(
 @Composable
 fun FoodItemCard(
     foodItem: FoodItem,
-    householdViewModel: HouseholdViewModel,
-    listFoodItemsViewModel: ListFoodItemsViewModel,
+    overviewScreenViewModel: OverviewScreenViewModel,
     onClick: () -> Unit = {},
     onLongPress: () -> Unit = {}
 ) {
-  val selectedItems by listFoodItemsViewModel.multipleSelectedFoodItems.collectAsState()
+  val selectedItems by overviewScreenViewModel.multipleSelectedFoodItems.collectAsState()
   val isSelected = selectedItems.contains(foodItem)
   val cardColor =
       if (isSelected) MaterialTheme.colorScheme.primaryContainer
@@ -123,9 +118,10 @@ fun FoodItemCard(
             expiryDate = foodItem.expiryDate,
             openDate = foodItem.openDate,
             buyDate = foodItem.buyDate,
-            status = FoodStatus.EXPIRED)
-    householdViewModel.editFoodItem(newFoodItem, foodItem)
-    listFoodItemsViewModel.selectFoodItem(newFoodItem)
+            status = FoodStatus.EXPIRED,
+            owner = foodItem.owner)
+    overviewScreenViewModel.editFoodItem(newFoodItem, foodItem)
+    overviewScreenViewModel.selectFoodItem(newFoodItem)
   }
 
   // Composable UI

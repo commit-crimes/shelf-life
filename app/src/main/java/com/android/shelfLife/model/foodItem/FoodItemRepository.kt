@@ -1,48 +1,48 @@
 package com.android.shelfLife.model.foodItem
 
+import kotlinx.coroutines.flow.StateFlow
+
 interface FoodItemRepository {
+
+  val foodItems: StateFlow<List<FoodItem>>
+  val selectedFoodItem: StateFlow<FoodItem?>
+  val errorMessage: StateFlow<String?>
+
   /** Generates a new unique ID for a food item. */
   fun getNewUid(): String
 
   /**
-   * Initializes the repository (e.g., setting up database connections or initial data).
+   * Adds a new food item to a household.
    *
-   * @param onSuccess - Called when the initialization is successful.
+   * @param householdId The ID of the household.
+   * @param foodItem The food item to add.
    */
-  fun init(onSuccess: () -> Unit)
+  suspend fun addFoodItem(householdId: String, foodItem: FoodItem)
 
   /**
-   * Fetches all food items from the repository.
+   * Retrieves all food items for a household.
    *
-   * @param onSuccess - Called when the list of food items is successfully retrieved.
-   * @param onFailure - Called when there is an error retrieving the food items.
+   * @param householdId The ID of the household.
+   * @return A list of food items.
    */
-  fun getFoodItems(onSuccess: (List<FoodItem>) -> Unit, onFailure: (Exception) -> Unit)
+  suspend fun getFoodItems(householdId: String): List<FoodItem>
 
   /**
-   * Adds a new food item to the repository.
+   * Updates an existing food item in a household.
    *
-   * @param foodItem - The food item to be added.
-   * @param onSuccess - Called when the food item is successfully added.
-   * @param onFailure - Called when there is an error adding the food item.
+   * @param householdId The ID of the household.
+   * @param foodItem The updated food item.
    */
-  fun addFoodItem(foodItem: FoodItem, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  suspend fun updateFoodItem(householdId: String, foodItem: FoodItem)
 
   /**
-   * Updates an existing food item in the repository.
+   * Deletes a food item from a household.
    *
-   * @param foodItem - The food item with updated data.
-   * @param onSuccess - Called when the food item is successfully updated.
-   * @param onFailure - Called when there is an error updating the food item.
+   * @param householdId The ID of the household.
+   * @param foodItemId The ID of the food item to delete.
    */
-  fun updateFoodItem(foodItem: FoodItem, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  suspend fun deleteFoodItem(householdId: String, foodItemId: String)
 
-  /**
-   * Deletes a food item by its unique ID.
-   *
-   * @param id - The unique ID of the food item to delete.
-   * @param onSuccess - Called when the food item is successfully deleted.
-   * @param onFailure - Called when there is an error deleting the food item.
-   */
-  fun deleteFoodItemById(id: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  /** Selects a FoodItem document for individual view */
+  fun selectFoodItem(foodItem: FoodItem?)
 }

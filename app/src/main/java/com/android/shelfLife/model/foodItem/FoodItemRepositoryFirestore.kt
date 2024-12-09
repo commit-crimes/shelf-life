@@ -1,291 +1,194 @@
 package com.android.shelfLife.model.foodItem
 
 import android.util.Log
-import com.android.shelfLife.model.foodFacts.FoodCategory
-import com.android.shelfLife.model.foodFacts.FoodFacts
-import com.android.shelfLife.model.foodFacts.FoodUnit
-import com.android.shelfLife.model.foodFacts.NutritionFacts
-import com.android.shelfLife.model.foodFacts.Quantity
-import com.google.firebase.Timestamp
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.tasks.await
 
 class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemRepository {
 
-  companion object {
-    private const val COLLECTION_PATH = "foodItems"
-  }
+  private val collectionPath = "foodItems"
 
-  private val auth = FirebaseAuth.getInstance()
-  /**
-   * Generates a new unique ID for a food item.
-   *
-   * @return A new unique ID.
-   */
+  // Local cache for food items per household
+  private val _foodItems = MutableStateFlow<List<FoodItem>>(emptyList())
+  override val foodItems: StateFlow<List<FoodItem>> = _foodItems.asStateFlow()
+
+  private val _selectedFoodItem = MutableStateFlow<FoodItem?>(null)
+  override val selectedFoodItem: StateFlow<FoodItem?> = _selectedFoodItem.asStateFlow()
+
+  private val _errorMessage = MutableStateFlow<String?>(null)
+  override val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
+
+  // Listener registration
+  private var foodItemsListenerRegistration: ListenerRegistration? = null
+
   override fun getNewUid(): String {
-    Log.d("FoodItemRepository", "getNewUid called")
-    return db.collection(COLLECTION_PATH).document().id
+    return db.collection(collectionPath).document().id
   }
 
-  /**
-   * Initializes the repository (e.g., setting up database connections or initial data).
-   *
-   * @param onSuccess - Called when the initialization is successful.
-   */
-  override fun init(onSuccess: () -> Unit) {
-    auth.addAuthStateListener { authVal ->
-      val currentUser = authVal.currentUser
-      if (currentUser != null) {
-        db.collection(COLLECTION_PATH).get().addOnCompleteListener { task ->
-          if (task.isSuccessful) {
-            onSuccess()
-          } else {
-            Log.e("FoodItemRepoFire", "init failed: could not get collection : ${task.exception}")
-          }
-        }
-      } else {
-        Log.e("FoodItemRepoFire", "init failed: user not logged in")
-      }
-    }
-  }
+  override suspend fun addFoodItem(householdId: String, foodItem: FoodItem) {
+    try {
+      // Update local cache
+      val currentFoodItems = _foodItems.value.toMutableList()
+      currentFoodItems.add(foodItem)
+      _foodItems.value = currentFoodItems
 
-  /**
-   * Fetches all food items from the repository.
-   *
-   * @param onSuccess - Called when the list of food items is successfully retrieved.
-   * @param onFailure - Called when there is an error retrieving the food items.
-   */
-  override fun getFoodItems(onSuccess: (List<FoodItem>) -> Unit, onFailure: (Exception) -> Unit) {
-    db.collection(COLLECTION_PATH)
-        .get()
-        .addOnSuccessListener { result ->
-          val foodItemList = mutableListOf<FoodItem>()
-          for (document in result) {
-            val foodItem = convertToFoodItem(document)
-            if (foodItem != null) foodItemList.add(foodItem)
-          }
-          onSuccess(foodItemList)
-        }
-        .addOnFailureListener { exception ->
-          Log.e("FoodItemRepository", "Error fetching food items", exception)
-          onFailure(exception)
-        }
-  }
-
-  /**
-   * Adds a new food item to the repository.
-   *
-   * @param foodItem - The food item to be added.
-   * @param onSuccess - Called when the food item is successfully added.
-   * @param onFailure - Called when there is an error adding the food item.
-   */
-  override fun addFoodItem(
-      foodItem: FoodItem,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    db.collection(COLLECTION_PATH)
-        .document(foodItem.uid)
-        .set(foodItem)
-        .addOnSuccessListener { onSuccess() }
-        .addOnFailureListener { exception ->
-          Log.e("FoodItemRepository", "Error adding food item", exception)
-          onFailure(exception)
-        }
-  }
-
-  /**
-   * Updates an existing food item in the repository.
-   *
-   * @param foodItem - The food item with updated data.
-   * @param onSuccess - Called when the food item is successfully updated.
-   * @param onFailure - Called when there is an error updating the food item.
-   */
-  override fun updateFoodItem(
-      foodItem: FoodItem,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    db.collection(COLLECTION_PATH)
-        .document(foodItem.uid)
-        .set(foodItem)
-        .addOnSuccessListener { onSuccess() }
-        .addOnFailureListener { exception ->
-          Log.e("FoodItemRepository", "Error updating food item", exception)
-          onFailure(exception)
-        }
-  }
-
-  /**
-   * Deletes a food item by its unique ID.
-   *
-   * @param id - The unique ID of the food item to delete.
-   * @param onSuccess - Called when the food item is successfully deleted.
-   * @param onFailure - Called when there is an error deleting the food item.
-   */
-  override fun deleteFoodItemById(
-      id: String,
-      onSuccess: () -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    db.collection(COLLECTION_PATH)
-        .document(id)
-        .delete()
-        .addOnSuccessListener { onSuccess() }
-        .addOnFailureListener { exception ->
-          Log.e("FoodItemRepository", "Error deleting food item", exception)
-          onFailure(exception)
-        }
-  }
-
-  // Helper function to convert Firestore DocumentSnapshot into a FoodItem object
-  fun convertToFoodItem(doc: DocumentSnapshot): FoodItem? {
-    return try {
-      val uid = doc.getString("uid") ?: return null
-
-      // Extract FoodFacts properties from the Firestore document
-      val name = doc.getString("name") ?: return null
-      val barcode = doc.getString("barcode") ?: return null
-
-      val quantityMap = doc["quantity"] as? Map<*, *> ?: return null
-      val quantity =
-          Quantity(
-              amount = quantityMap["amount"] as? Double ?: 0.0,
-              unit = FoodUnit.valueOf(quantityMap["unit"] as? String ?: "GRAM"))
-
-      val nutritionMap = doc["nutritionFacts"] as? Map<*, *>
-      val nutritionFacts =
-          if (nutritionMap != null) {
-            NutritionFacts(
-                energyKcal = (nutritionMap["energyKcal"] as? Long)?.toInt() ?: 0,
-                fat = (nutritionMap["fat"] as? Double) ?: 0.0,
-                saturatedFat = (nutritionMap["saturatedFat"] as? Double) ?: 0.0,
-                carbohydrates = (nutritionMap["carbohydrates"] as? Double) ?: 0.0,
-                sugars = (nutritionMap["sugars"] as? Double) ?: 0.0,
-                proteins = (nutritionMap["proteins"] as? Double) ?: 0.0,
-                salt = (nutritionMap["salt"] as? Double) ?: 0.0)
-          } else {
-            NutritionFacts() // default empty values
-          }
-
-      val categoryString = doc.getString("category") ?: FoodCategory.OTHER.name
-      val foodCategory = FoodCategory.valueOf(categoryString)
-
-      // Create the FoodFacts object
-      val foodFacts =
-          FoodFacts(
-              name = name,
-              barcode = barcode,
-              quantity = quantity,
-              category = foodCategory,
-              nutritionFacts = nutritionFacts)
-
-      // Extract FoodItem-specific properties
-      val openDate = doc.getTimestamp("openDate") ?: Timestamp.now()
-      val expiryDate = doc.getTimestamp("expiryDate") ?: Timestamp.now()
-      val buyDate = doc.getTimestamp("buyDate") ?: Timestamp.now()
-      val status = doc.getString("status") ?: FoodStatus.CLOSED.name
-      val foodStatus = FoodStatus.valueOf(status)
-
-      // TODO: update expiration status to Firebase!
-
-      val locationMap = doc["location"] as? Map<*, *>
-      val foodStorageLocation =
-          if (locationMap != null) {
-            FoodStorageLocation.valueOf(
-                locationMap["location"] as? String ?: FoodStorageLocation.PANTRY.name)
-          } else {
-            FoodStorageLocation.PANTRY
-          }
-
-      // Create the FoodItem object using FoodFacts
-      FoodItem(
-          uid = uid,
-          foodFacts = foodFacts,
-          status = foodStatus,
-          location = foodStorageLocation,
-          expiryDate = expiryDate,
-          buyDate = buyDate,
-          openDate = openDate)
+      db.collection(collectionPath)
+          .document(householdId)
+          .collection("items")
+          .document(foodItem.uid)
+          .set(foodItem.toMap())
+          .await()
     } catch (e: Exception) {
-      Log.e("FoodItemRepository", "Error converting document to FoodItem", e)
-      null
+      Log.e("FoodItemRepository", "Error adding food item", e)
+      val updatedFoodItems = _foodItems.value.filterNot { it.uid == foodItem.uid }
+      _foodItems.value = updatedFoodItems
+      // Notify the user about the error
+      _errorMessage.value = "Failed to add item. Please try again."
     }
+  }
+
+  override suspend fun getFoodItems(householdId: String): List<FoodItem> {
+    return try {
+      val snapshot =
+          db.collection(collectionPath).document(householdId).collection("items").get().await()
+
+      val fetchedFoodItems = snapshot.documents.mapNotNull { it.toObject(FoodItem::class.java) }
+      _foodItems.value = fetchedFoodItems
+      fetchedFoodItems
+    } catch (e: Exception) {
+      Log.e("FoodItemRepository", "Error fetching food items", e)
+      emptyList()
+    }
+  }
+
+  override fun selectFoodItem(foodItem: FoodItem?) {
+    _selectedFoodItem.value = foodItem
+  }
+
+  override suspend fun updateFoodItem(householdId: String, foodItem: FoodItem) {
+    var originalItem: FoodItem? = null
+    try {
+      // Find the index of the item to be updated
+      val currentFoodItems = _foodItems.value.toMutableList()
+      val index = currentFoodItems.indexOfFirst { it.uid == foodItem.uid }
+      if (index != -1) {
+        // Store a copy of the original item
+        originalItem = currentFoodItems[index]
+        // Update the local cache with the new item
+        currentFoodItems[index] = foodItem
+        _foodItems.value = currentFoodItems
+      } else {
+        // Item not found, add it to the list
+        currentFoodItems.add(foodItem)
+        _foodItems.value = currentFoodItems
+      }
+
+      // Perform Firebase operation asynchronously
+      db.collection(collectionPath)
+          .document(householdId)
+          .collection("items")
+          .document(foodItem.uid)
+          .set(foodItem)
+          .await()
+    } catch (e: Exception) {
+      Log.e("FoodItemRepository", "Error updating food item", e)
+      // Rollback: Restore the original item in the local cache
+      originalItem?.let {
+        val currentFoodItems = _foodItems.value.toMutableList()
+        val index = currentFoodItems.indexOfFirst { it.uid == foodItem.uid }
+        if (index != -1) {
+          currentFoodItems[index] = it
+          _foodItems.value = currentFoodItems
+        } else if (index == currentFoodItems.lastIndex) {
+          currentFoodItems.removeAt(index)
+          _foodItems.value = currentFoodItems
+        }
+      }
+      // Notify the user about the error
+      _errorMessage.value = "Failed to update item. Please try again."
+    }
+  }
+
+  override suspend fun deleteFoodItem(householdId: String, foodItemId: String) {
+    var deletedItem: FoodItem? = null
+    try {
+      // Find the item to be deleted
+      deletedItem = _foodItems.value.find { it.uid == foodItemId }
+
+      // Update local cache immediately
+      val currentFoodItems = _foodItems.value.filterNot { it.uid == foodItemId }
+      _foodItems.value = currentFoodItems
+
+      // Perform Firebase operation asynchronously
+      db.collection(collectionPath)
+          .document(householdId)
+          .collection("items")
+          .document(foodItemId)
+          .delete()
+          .await()
+    } catch (e: Exception) {
+      Log.e("FoodItemRepository", "Error deleting food item", e)
+      // Rollback: Restore the deleted item in the local cache
+      deletedItem?.let {
+        val currentFoodItems = _foodItems.value.toMutableList()
+        currentFoodItems.add(it)
+        _foodItems.value = currentFoodItems
+      }
+      // Notify the user about the error
+      _errorMessage.value = "Failed to delete item. Please try again."
+    }
+  }
+
+  /**
+   * Starts listening for real-time updates to the food items collection.
+   *
+   * @param householdId The ID of the household.
+   */
+  fun startListeningForFoodItems(householdId: String) {
+    // Remove any existing listener
+    foodItemsListenerRegistration?.remove()
+
+    foodItemsListenerRegistration =
+        db.collection(collectionPath)
+            .document(householdId)
+            .collection("items")
+            .addSnapshotListener { snapshot, error ->
+              if (error != null) {
+                Log.e("FoodItemRepository", "Error fetching food items", error)
+                _foodItems.value = emptyList()
+                return@addSnapshotListener
+              }
+              if (snapshot != null) {
+                val updatedFoodItems =
+                    snapshot.documents.mapNotNull { it.toObject(FoodItem::class.java) }
+                _foodItems.value = updatedFoodItems
+              }
+            }
+  }
+
+  /** Stops listening for real-time updates. */
+  fun stopListeningForFoodItems() {
+    foodItemsListenerRegistration?.remove()
+    foodItemsListenerRegistration = null
   }
 
   /**
    * Converts a Firestore document to a FoodItem object.
    *
-   * @param map The Firestore document to convert.
-   * @return A FoodItem object.
+   * @param doc The Firestore document to convert.
+   * @return A FoodItem object or null if conversion fails.
    */
-  fun convertToFoodItemFromMap(map: Map<String, Any?>): FoodItem? {
+  private fun convertToFoodItem(doc: DocumentSnapshot): FoodItem? {
     return try {
-      val uid = map["uid"] as? String ?: return null
-      val name = map["name"] as? String ?: return null
-      val barcode = map["barcode"] as? String ?: ""
-      val quantityMap = map["quantity"] as? Map<*, *>
-      val imageUrl = map["imageUrl"] as? String ?: FoodFacts.DEFAULT_IMAGE_URL
-      val locationStr = map["location"] as? String ?: FoodStorageLocation.PANTRY.name
-      val location = FoodStorageLocation.valueOf(locationStr)
-      val quantity =
-          Quantity(
-              amount = quantityMap?.get("amount") as? Double ?: 0.0,
-              unit = FoodUnit.valueOf(quantityMap?.get("unit") as? String ?: "GRAM"))
-
-      val foodFacts =
-          FoodFacts(name = name, barcode = barcode, quantity = quantity, imageUrl = imageUrl)
-      val expiryDate = map["expiryDate"] as? Timestamp ?: Timestamp.now()
-      val openDate = map["openDate"] as? Timestamp ?: Timestamp.now()
-      val buyDate = map["buyDate"] as? Timestamp ?: Timestamp.now()
-      val status = map["status"] as? String ?: FoodStatus.CLOSED.name
-      val foodStatus = FoodStatus.valueOf(status)
-
-      FoodItem(
-          uid = uid,
-          foodFacts = foodFacts,
-          location = location,
-          expiryDate = expiryDate,
-          status = foodStatus,
-          buyDate = buyDate,
-          openDate = openDate)
+      doc.toFoodItem()
     } catch (e: Exception) {
-      Log.e("FoodItemRepository", "Error converting map to FoodItem", e)
+      Log.e("FoodItemRepository", "Error converting document to FoodItem", e)
       null
     }
-  }
-
-  /**
-   * Converts a FoodItem object to a Firestore document.
-   *
-   * @param foodItem The FoodItem object to convert.
-   * @return A Firestore document.
-   */
-  fun convertFoodItemToMap(foodItem: FoodItem): Map<String, Any?> {
-    return mapOf(
-        "uid" to foodItem.uid,
-        "name" to foodItem.foodFacts.name,
-        "imageUrl" to foodItem.foodFacts.imageUrl,
-        "barcode" to foodItem.foodFacts.barcode,
-        "quantity" to
-            mapOf(
-                "amount" to foodItem.foodFacts.quantity.amount,
-                "unit" to foodItem.foodFacts.quantity.unit.name),
-        "expiryDate" to foodItem.expiryDate,
-        "buyDate" to foodItem.buyDate,
-        "openDate" to foodItem.openDate,
-        "status" to foodItem.status.name,
-        "location" to foodItem.location.name,
-        "nutritionFacts" to
-            mapOf(
-                "energyKcal" to foodItem.foodFacts.nutritionFacts.energyKcal,
-                "fat" to foodItem.foodFacts.nutritionFacts.fat,
-                "saturatedFat" to foodItem.foodFacts.nutritionFacts.saturatedFat,
-                "carbohydrates" to foodItem.foodFacts.nutritionFacts.carbohydrates,
-                "sugars" to foodItem.foodFacts.nutritionFacts.sugars,
-                "proteins" to foodItem.foodFacts.nutritionFacts.proteins,
-                "salt" to foodItem.foodFacts.nutritionFacts.salt),
-        "category" to foodItem.foodFacts.category.name)
   }
 }

@@ -1,9 +1,9 @@
-package com.android.shelfLife.model.newhousehold
+package com.android.shelfLife.model.household
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.test.core.app.ApplicationProvider
-import com.android.shelfLife.model.newFoodItem.FoodItemRepository
+import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks

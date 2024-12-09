@@ -7,8 +7,13 @@ import androidx.lifecycle.ViewModel
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipeRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class IndividualRecipeViewModel(
+@HiltViewModel
+class IndividualRecipeViewModel
+@Inject
+constructor(
     private val recipeRepository: RecipeRepository,
 ) : ViewModel() {
 
