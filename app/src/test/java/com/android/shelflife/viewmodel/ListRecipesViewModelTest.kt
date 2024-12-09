@@ -1,4 +1,4 @@
-package com.android.shelflife.model.recipe
+package com.android.shelflife.viewmodel
 
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
