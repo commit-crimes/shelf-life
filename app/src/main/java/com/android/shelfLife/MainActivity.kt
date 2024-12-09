@@ -8,7 +8,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -87,15 +86,12 @@ fun ShelfLifeApp(userRepository: UserRepository) {
     }
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
       composable(Screen.PERMISSION_HANDLER) {
-        CameraPermissionHandler(navigationActions, barcodeScannerViewModel)
+        CameraPermissionHandler(navigationActions)
       }
       composable(Screen.BARCODE_SCANNER) {
         BarcodeScannerScreen(
             navigationActions,
-            barcodeScannerViewModel,
-            foodFactsViewModel,
-            householdViewModel,
-            listFoodItemViewModel)
+            )
       }
     }
     navigation(

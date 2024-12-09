@@ -37,6 +37,8 @@ constructor(
 
   var isSelected by mutableStateOf(false)
 
+  var isScanned by mutableStateOf(false)
+
   var foodName by mutableStateOf("")
   var amount by mutableStateOf("")
   var unit by mutableStateOf(FoodUnit.GRAM)
@@ -74,12 +76,18 @@ constructor(
     }
   }
 
+  fun isScanned() {
+    isScanned = true
+  }
+
   /** Validates all fields when the submit button is clicked. */
   fun validateAllFieldsWhenSubmitButton() {
-    if (!isSelected) {
+    if (!isSelected && !isScanned) {
       foodNameErrorResId = validateString(foodName)
     }
-    amountErrorResId = validateNumber(amount)
+    if(!isScanned) {
+        amountErrorResId = validateNumber(amount)
+    }
     buyDateErrorResId = validateBuyDate(buyDate)
     expireDateErrorResId = validateExpireDate(expireDate, buyDate, buyDateErrorResId)
     openDateErrorResId =
@@ -141,7 +149,9 @@ constructor(
         validateOpenDate(openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
   }
 
-  suspend fun submitFoodItem(): Boolean {
+  suspend fun submitFoodItem(
+      scannedFoodFacts: FoodFacts? = null
+  ): Boolean {
     validateAllFieldsWhenSubmitButton()
     val isExpireDateValid = expireDateErrorResId == null && expireDate.isNotEmpty()
     val isOpenDateValid = openDateErrorResId == null
@@ -161,6 +171,7 @@ constructor(
         expiryTimestamp != null &&
         buyTimestamp != null) {
       val foodFacts =
+          if(isScanned) scannedFoodFacts!! else
           FoodFacts(
               name = foodName,
               barcode =
