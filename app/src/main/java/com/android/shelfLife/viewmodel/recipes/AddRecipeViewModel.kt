@@ -1,10 +1,7 @@
 package com.android.shelfLife.viewmodel.recipes
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
@@ -15,8 +12,9 @@ import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.utils.validateNumber
 import com.android.shelfLife.ui.utils.validateString
 import kotlin.time.Duration.Companion.minutes
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class AddRecipeViewModel(
@@ -24,84 +22,92 @@ class AddRecipeViewModel(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-  var title by mutableStateOf("")
-  var servings by mutableStateOf("")
-  var time by mutableStateOf("")
-  val ingredients = mutableStateListOf<Ingredient>()
-  var newIngredient by
-      mutableStateOf<Ingredient>(Ingredient(name = "", quantity = Quantity(amount = 0.0)))
-  val instructions = mutableStateListOf<String>()
-  var ingredientName by mutableStateOf("")
-  var ingredientQuantityAmount by mutableStateOf("")
-  var ingredientQuantityUnit by mutableStateOf<FoodUnit>(FoodUnit.GRAM)
+  private val _title = MutableStateFlow("")
+  val title: StateFlow<String> = _title.asStateFlow()
 
-  var showIngredientDialog by mutableStateOf(false)
+  private val _servings = MutableStateFlow("")
+  val servings: StateFlow<String> = _servings.asStateFlow()
 
-  var error by
-      mutableStateOf<Boolean>(
-          false) // represent a general error (if there is a single error on the screen then this is
-  // true)
-  var errorIngredient by
-      mutableStateOf<Boolean>(false) // represent a general error in the ingredient popUp
-  var titleError by mutableStateOf<Int?>(null)
-  var servingsError by mutableStateOf<Int?>(null)
-  var timeError by mutableStateOf<Int?>(null)
-  var instructionError =
-      mutableStateListOf<
-          Int?>() // a list that the error of each instruction. Their indexes are the same. ex: if
-  // there is an error on the instruction at index 1, the value in this list will be
-  // non-null at index 1
-  var instructionsError by
-      mutableStateOf(
-          false) // a general look at the whole error list, i.e. if there is a single error on the
-  // list, this will be true
-  var ingredientsError by mutableStateOf(false) // a general error for the list of ingredients
-  var ingredientNameError by mutableStateOf<Int?>(null)
-  var ingredientQuantityAmountError by mutableStateOf<Int?>(null)
+  private val _time = MutableStateFlow("")
+  val time: StateFlow<String> = _time.asStateFlow()
 
-  init {
-    // we make sure we set the values to their initial values
-    title = ""
-    servings = ""
-    time = ""
-    ingredients.clear()
-    instructions.clear()
+  private val _ingredients = MutableStateFlow<List<Ingredient>>(emptyList())
+  val ingredients: StateFlow<List<Ingredient>> = _ingredients.asStateFlow()
 
-    showIngredientDialog = false
+  private val _newIngredient =
+      MutableStateFlow(Ingredient(name = "", quantity = Quantity(amount = 0.0)))
+  val newIngredient: StateFlow<Ingredient> = _newIngredient.asStateFlow()
 
-    error = false
-    titleError = null
-    servingsError = null
-    timeError = null
-    instructionsError = false
-  }
+  private val _instructions = MutableStateFlow<List<String>>(emptyList())
+  val instructions: StateFlow<List<String>> = _instructions.asStateFlow()
+
+  private val _ingredientName = MutableStateFlow("")
+  val ingredientName: StateFlow<String> = _ingredientName.asStateFlow()
+
+  private val _ingredientQuantityAmount = MutableStateFlow("")
+  val ingredientQuantityAmount: StateFlow<String> = _ingredientQuantityAmount.asStateFlow()
+
+  private val _ingredientQuantityUnit = MutableStateFlow(FoodUnit.GRAM)
+  val ingredientQuantityUnit: StateFlow<FoodUnit> = _ingredientQuantityUnit.asStateFlow()
+
+  private val _showIngredientDialog = MutableStateFlow(false)
+  val showIngredientDialog: StateFlow<Boolean> = _showIngredientDialog.asStateFlow()
+
+  // Error Properties
+  private val _error = MutableStateFlow(false)
+  val error: StateFlow<Boolean> = _error.asStateFlow()
+
+  private val _errorIngredient = MutableStateFlow(false)
+  val errorIngredient: StateFlow<Boolean> = _errorIngredient.asStateFlow()
+
+  private val _titleError = MutableStateFlow<Int?>(null)
+  val titleError: StateFlow<Int?> = _titleError.asStateFlow()
+
+  private val _servingsError = MutableStateFlow<Int?>(null)
+  val servingsError: StateFlow<Int?> = _servingsError.asStateFlow()
+
+  private val _timeError = MutableStateFlow<Int?>(null)
+  val timeError: StateFlow<Int?> = _timeError.asStateFlow()
+
+  private val _instructionError = MutableStateFlow<List<Int?>>(emptyList())
+  val instructionError: StateFlow<List<Int?>> = _instructionError.asStateFlow()
+
+  private val _instructionsError = MutableStateFlow(false)
+
+  private val _ingredientsError = MutableStateFlow(false)
+
+  private val _ingredientNameError = MutableStateFlow<Int?>(null)
+  val ingredientNameError: StateFlow<Int?> = _ingredientNameError.asStateFlow()
+
+  private val _ingredientQuantityAmountError = MutableStateFlow<Int?>(null)
+  val ingredientQuantityAmountError: StateFlow<Int?> = _ingredientQuantityAmountError.asStateFlow()
 
   // Helper function to validate if any instruction is empty
   fun validateInstructions() {
-    instructionsError =
-        instructions.any {
+    _instructionsError.value =
+        instructions.value.any {
           validateString(
               it, R.string.instruction_empty_error, R.string.instructions_invalid_error) != null
         }
   }
 
-    // checks that the no ingredient inside the list of ingredients is empty
+  // Checks that no ingredient inside the list of ingredients is empty
   fun validateIngredients() {
-    instructionsError = instructions.any { it.isBlank() }
+    _ingredientsError.value = ingredients.value.any { it.name.isBlank() }
   }
 
-    //function that allows us to change the title
+  // Function that allows us to change the title
   fun changeTitle(newRecipeTitle: String) {
-    title = newRecipeTitle
-    titleError =
+    _title.value = newRecipeTitle
+    _titleError.value =
         validateString(
             newRecipeTitle, R.string.recipe_title_empty_error, R.string.recipe_title_invalid_error)
   }
 
-    //function that allows us to change the number of servings
+  // Function that allows us to change the number of servings
   fun changeServings(newServings: String) {
-    servings = newServings
-    servingsError =
+    _servings.value = newServings
+    _servingsError.value =
         validateNumber(
             newServings,
             R.string.servings_empty_error,
@@ -109,10 +115,10 @@ class AddRecipeViewModel(
             R.string.amount_negative_error)
   }
 
-    //function that allows us to change the time
+  // Function that allows us to change the time
   fun changeTime(newTime: String) {
-    time = newTime
-    timeError =
+    _time.value = newTime
+    _timeError.value =
         validateNumber(
             newTime,
             R.string.time_empty_error,
@@ -120,20 +126,20 @@ class AddRecipeViewModel(
             R.string.time_negative_error)
   }
 
-    // function that allows us to change the ingredient name
+  // Function that allows us to change the ingredient name
   fun changeIngredientName(newIngredientName: String) {
-    ingredientName = newIngredientName
-    ingredientNameError =
+    _ingredientName.value = newIngredientName
+    _ingredientNameError.value =
         validateString(
             newIngredientName,
             R.string.ingredient_name_empty_error,
             R.string.ingredient_name_invalid_error)
   }
 
-    //function that allows us to change the amount of an ingredient
+  // Function that allows us to change the amount of an ingredient
   fun changeIngredientQuantityAmount(newIngredientQuantityAmount: String) {
-    ingredientQuantityAmount = newIngredientQuantityAmount
-    ingredientQuantityAmountError =
+    _ingredientQuantityAmount.value = newIngredientQuantityAmount
+    _ingredientQuantityAmountError.value =
         validateNumber(
             newIngredientQuantityAmount,
             R.string.ingredient_quantity_empty_error,
@@ -141,133 +147,141 @@ class AddRecipeViewModel(
             R.string.ingredient_quantity_negative_error)
   }
 
-    // function that allows us to change the unit of the ingredient
+  // Function that allows us to change the unit of the ingredient
   fun changeIngredientQuantityUnit(newUnit: FoodUnit) {
-    ingredientQuantityUnit = newUnit
+    _ingredientQuantityUnit.value = newUnit
   }
 
-    // this function is called when we click the add Ingredient button. This function checks that there are no errors with the ingredient information
+  // Function to validate all ingredient fields when the Add button is clicked
   fun validateAllIngredientFieldsWhenAddButton() {
-    ingredientNameError =
+    _ingredientNameError.value =
         validateString(
-            ingredientName,
+            ingredientName.value,
             R.string.ingredient_name_empty_error,
             R.string.ingredient_name_invalid_error)
-    ingredientQuantityAmountError =
+    _ingredientQuantityAmountError.value =
         validateNumber(
-            ingredientQuantityAmount,
+            ingredientQuantityAmount.value,
             R.string.ingredient_quantity_empty_error,
             R.string.ingredient_quantity_not_number_error,
             R.string.ingredient_quantity_negative_error)
-    errorIngredient = (ingredientNameError != null) || (ingredientQuantityAmountError != null)
+    _errorIngredient.value =
+        (_ingredientNameError.value != null) || (_ingredientQuantityAmountError.value != null)
   }
 
-    //this function is called when the submit the recipe. It check that there are no error in the whole screen
+  // Function to validate all fields when the Submit button is clicked
   fun validateAllFieldsWhenSubmitButton() {
-    titleError =
+    _titleError.value =
         validateString(
-            title, R.string.recipe_title_empty_error, R.string.recipe_title_invalid_error)
-    servingsError =
+            title.value, R.string.recipe_title_empty_error, R.string.recipe_title_invalid_error)
+    _servingsError.value =
         validateNumber(
-            servings,
+            servings.value,
             R.string.servings_empty_error,
             R.string.servings_not_number_error,
             R.string.amount_negative_error)
-    timeError =
+    _timeError.value =
         validateNumber(
-            time,
+            time.value,
             R.string.time_empty_error,
             R.string.time_not_number_error,
             R.string.time_negative_error)
     validateInstructions()
     validateIngredients()
 
-    error =
-        (timeError != null) ||
-            (servingsError != null) ||
-            (timeError != null) ||
-            instructionsError ||
-            ingredientsError
+    _error.value =
+        (_titleError.value != null) ||
+            (_servingsError.value != null) ||
+            (_timeError.value != null) ||
+            _instructionsError.value ||
+            _ingredientsError.value
   }
 
-    //this function is used to create a new ingredient
-    //we need to show the popUp and make sure the ingredient info is back at to the initials values
+  // Function to create a new ingredient
   fun createNewIngredient() {
-    showIngredientDialog = true
-    ingredientName = ""
-    ingredientQuantityAmount = ""
-    ingredientQuantityUnit = FoodUnit.GRAM
+    _showIngredientDialog.value = true
+    _ingredientName.value = ""
+    _ingredientQuantityAmount.value = ""
+    _ingredientQuantityUnit.value = FoodUnit.GRAM
   }
 
-    //function to close the popUp
+  // Function to close the pop-up dialog
   fun closeIngredientDialog() {
-    showIngredientDialog = false
+    _showIngredientDialog.value = false
   }
 
-    //This function is to add an ingredient into our list
+  // Function to add a new ingredient to the list
   fun addNewIngredient(): Boolean {
     validateAllIngredientFieldsWhenAddButton()
-    if (!errorIngredient) {
-      newIngredient =
+    if (!_errorIngredient.value) {
+      _newIngredient.value =
           Ingredient(
-              name = ingredientName,
-              quantity = Quantity(ingredientQuantityAmount.toDouble(), ingredientQuantityUnit))
-      ingredients.add(newIngredient)
+              name = ingredientName.value,
+              quantity =
+                  Quantity(ingredientQuantityAmount.value.toDouble(), ingredientQuantityUnit.value))
+      _ingredients.value = ingredients.value + _newIngredient.value
       return true
     }
     return false
   }
 
-    //This function is to remove an ingredient from the list
+  // Function to remove an ingredient from the list
   fun removeIngredient(index: Int) {
-    if (ingredients.size > 0 && index < ingredients.size) {
-      ingredients.removeAt(index)
+    if (ingredients.value.isNotEmpty() && index < ingredients.value.size) {
+      _ingredients.value = ingredients.value.toMutableList().apply { removeAt(index) }
     }
   }
 
-    //This function is to create a new instruction
+  // Function to create a new instruction
   fun createNewInstruction() {
-    instructions.add("")
-    instructionError.add(null)
+    _instructions.value = instructions.value + ""
+    _instructionError.value = instructionError.value + null
   }
 
-    //This function is used to modify an instruction
+  // Function to modify an instruction
   fun changeInstruction(index: Int, newInstruction: String) {
-    instructions[index] = newInstruction
-    instructionError[index] =
-        validateString(
-            newInstruction, R.string.instruction_empty_error, R.string.instructions_invalid_error)
+    val updatedInstructions =
+        instructions.value.toMutableList().apply { this[index] = newInstruction }
+    _instructions.value = updatedInstructions
+    val updatedErrors =
+        instructionError.value.toMutableList().apply {
+          this[index] =
+              validateString(
+                  newInstruction,
+                  R.string.instruction_empty_error,
+                  R.string.instructions_invalid_error)
+        }
+    _instructionError.value = updatedErrors
     validateInstructions()
   }
 
-    //This function is used to remove an instruction
+  // Function to remove an instruction
   fun removeInstruction(index: Int) {
-    if (instructions.size > 0 && instructions.size > index) {
-      instructions.removeAt(index)
-      instructionError.removeAt(index)
+    if (instructions.value.size > index) {
+      _instructions.value = instructions.value.toMutableList().apply { removeAt(index) }
+      _instructionError.value = instructionError.value.toMutableList().apply { removeAt(index) }
     }
   }
 
-    // this function adds the new recipe into our database. It will check there are no errors by calling the validateAllFieldsWhenSubmitButton()
-  @OptIn(DelicateCoroutinesApi::class)
+  // Function to add the new recipe to the database
   suspend fun addNewRecipe(onSuccess: () -> Unit, showToast: (Int) -> Unit) {
     validateAllFieldsWhenSubmitButton()
-    if (error) return showToast(0)
+    if (_error.value) {
+      return showToast(0)
+    }
     val newRecipeUid = recipeRepository.getUid()
-
     val newRecipe =
         Recipe(
             uid = newRecipeUid,
-            name = title,
-            instructions = instructions.toList(),
-            servings = servings.toFloat(),
-            time = time.toDouble().minutes,
-            ingredients = ingredients.toList())
-
+            name = title.value,
+            instructions = instructions.value,
+            servings = servings.value.toFloat(),
+            time = time.value.toDouble().minutes,
+            ingredients = ingredients.value)
     recipeRepository.addRecipe(
-        recipe = newRecipe.copy(uid = recipeRepository.getUid()), // Assign a UID during save
+        recipe = newRecipe.copy(uid = newRecipeUid),
         onSuccess = {
-          GlobalScope.launch { // uses a delicate coroutine api
+          viewModelScope.launch {
             userRepository.addRecipeUID(newRecipeUid)
             onSuccess()
           }

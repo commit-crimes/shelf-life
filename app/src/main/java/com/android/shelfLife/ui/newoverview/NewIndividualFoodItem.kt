@@ -1,12 +1,5 @@
 package com.android.shelfLife.ui.newoverview
 
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
-import com.android.shelfLife.model.newFoodItem.FoodItemRepository
-import com.android.shelfLife.model.user.UserRepositoryFirestore
-import com.android.shelfLife.viewmodel.overview.IndividualFoodItemViewModel
-import kotlinx.coroutines.launch
-
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,12 +16,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
+import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -36,6 +33,8 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.ui.utils.FoodItemDetails
+import com.android.shelfLife.viewmodel.overview.IndividualFoodItemViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,65 +43,68 @@ fun IndividualFoodItemScreen(
     foodItemRepository: FoodItemRepository,
     userRepository: UserRepositoryFirestore
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val individualFoodItemViewModel = IndividualFoodItemViewModel(foodItemRepository, userRepository)
-    val context = LocalContext.current
+  val coroutineScope = rememberCoroutineScope()
+  val individualFoodItemViewModel = IndividualFoodItemViewModel(foodItemRepository, userRepository)
+  val context = LocalContext.current
 
-    Scaffold(
-        modifier = Modifier.testTag("IndividualFoodItemScreen"),
-        topBar = {
-            CustomTopAppBar(
-                onClick = { navigationActions.goBack() },
-                title = if (individualFoodItemViewModel.selectedFood != null) individualFoodItemViewModel.selectedFood!!.foodFacts.name else "",
-                titleTestTag = "IndividualFoodItemName",
-                actions = {
-                    IconButton(
-                        onClick = {
-                            individualFoodItemViewModel.selectedFood?.let {
-                                coroutineScope.launch {
-                                    individualFoodItemViewModel.deleteFoodItem()
-                                    navigationActions.goBack()
-                                }
-                            }
-                        },
-                        modifier = Modifier.testTag("deleteFoodItem")) {
-                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
+  Scaffold(
+      modifier = Modifier.testTag("IndividualFoodItemScreen"),
+      topBar = {
+        CustomTopAppBar(
+            onClick = { navigationActions.goBack() },
+            title =
+                if (individualFoodItemViewModel.selectedFood != null)
+                    individualFoodItemViewModel.selectedFood!!.foodFacts.name
+                else "",
+            titleTestTag = "IndividualFoodItemName",
+            actions = {
+              IconButton(
+                  onClick = {
+                    individualFoodItemViewModel.selectedFood?.let {
+                      coroutineScope.launch {
+                        individualFoodItemViewModel.deleteFoodItem()
+                        navigationActions.goBack()
+                      }
                     }
-                })
-        },
-        // Floating Action Button to edit the food item
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navigationActions.navigateTo(Screen.EDIT_FOOD) },
-                content = { Icon(Icons.Default.Edit, contentDescription = "Edit") },
-                modifier = Modifier.testTag("editFoodFab"),
-                containerColor = MaterialTheme.colorScheme.secondaryContainer)
-        },
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.OVERVIEW)
-        }) { paddingValues ->
+                  },
+                  modifier = Modifier.testTag("deleteFoodItem")) {
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
+                  }
+            })
+      },
+      // Floating Action Button to edit the food item
+      floatingActionButton = {
+        FloatingActionButton(
+            onClick = { navigationActions.navigateTo(Screen.EDIT_FOOD) },
+            content = { Icon(Icons.Default.Edit, contentDescription = "Edit") },
+            modifier = Modifier.testTag("editFoodFab"),
+            containerColor = MaterialTheme.colorScheme.secondaryContainer)
+      },
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = Route.OVERVIEW)
+      }) { paddingValues ->
         LazyColumn(modifier = Modifier.padding(paddingValues)) {
-            item {
-                if (individualFoodItemViewModel.selectedFood != null) {
-                    AsyncImage(
-                        model = individualFoodItemViewModel.selectedFood!!.foodFacts.imageUrl,
-                        contentDescription = "Food Image",
-                        modifier =
-                        Modifier.fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .aspectRatio(1f)
-                            .clip(RoundedCornerShape(8.dp))
-                            .testTag("IndividualFoodItemImage"),
-                        contentScale = ContentScale.Crop)
+          item {
+            if (individualFoodItemViewModel.selectedFood != null) {
+              AsyncImage(
+                  model = individualFoodItemViewModel.selectedFood!!.foodFacts.imageUrl,
+                  contentDescription = "Food Image",
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .padding(horizontal = 16.dp, vertical = 8.dp)
+                          .aspectRatio(1f)
+                          .clip(RoundedCornerShape(8.dp))
+                          .testTag("IndividualFoodItemImage"),
+                  contentScale = ContentScale.Crop)
 
-                    FoodItemDetails(foodItem = individualFoodItemViewModel.selectedFood!!)
-                } else {
-                    CircularProgressIndicator(modifier = Modifier.testTag("CircularProgressIndicator"))
-                }
+              FoodItemDetails(foodItem = individualFoodItemViewModel.selectedFood!!)
+            } else {
+              CircularProgressIndicator(modifier = Modifier.testTag("CircularProgressIndicator"))
             }
+          }
         }
-    }
+      }
 }
