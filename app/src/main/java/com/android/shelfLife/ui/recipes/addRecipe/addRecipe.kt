@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.recipes.addRecipe
 
-import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
@@ -52,12 +52,9 @@ import com.android.shelfLife.viewmodel.recipes.AddRecipeViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
-@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun AddRecipeScreen(
-    navigationActions: NavigationActions,
-    addRecipeViewModel: AddRecipeViewModel,
-) {
+fun AddRecipeScreen(navigationActions: NavigationActions) {
+  val addRecipeViewModel = hiltViewModel<AddRecipeViewModel>()
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
 
@@ -435,8 +432,5 @@ fun AddRecipeScreenPreview() {
   val viewModel = AddRecipeViewModel(recipeRepository, UserRepositoryFirestore(firebaseFirestore))
 
   // Call the AddRecipeScreen with mocked data
-  AddRecipeScreen(
-      navigationActions = navigationActions,
-      addRecipeViewModel = viewModel,
-  )
+  AddRecipeScreen(navigationActions = navigationActions)
 }
