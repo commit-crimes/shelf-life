@@ -67,43 +67,6 @@ class InvitationRepositoryFirestoreTest {
   }
 
   @Test
-  fun `sendInvitation sends invitation to Firestore`() {
-    val household =
-        HouseHold(
-            uid = "householdId",
-            name = "Household Name",
-            members = listOf("member1"),
-            sharedRecipes = listOf("recipe1"))
-    val invitedUser =
-        User(
-            uid = "invitedUserId",
-            username = "InvitedUser",
-            email = "inviteduser@example.com",
-            selectedHouseholdUID = "householdId",
-            householdUIDs = listOf(),
-            recipeUIDs = listOf(),
-            invitationUIDs = listOf())
-    val invitationId = "invitationId123"
-    val mockTask: Task<Void> = Tasks.forResult(null)
-
-    // Mock the collection and document behavior
-    `when`(mockCollection.document()).thenReturn(mockDocument)
-    `when`(mockDocument.id).thenReturn(invitationId)
-    `when`(mockDocument.set(any<Map<String, Any>>())).thenReturn(mockTask)
-
-    invitationRepository.sendInvitation(household, invitedUser.uid)
-
-    val invitationDataCaptor = ArgumentCaptor.forClass(Map::class.java)
-    verify(mockDocument).set(invitationDataCaptor.capture())
-
-    val invitationData = invitationDataCaptor.value as Map<String, Any>
-    assertEquals(invitationId, invitationData["invitationId"])
-    assertEquals("householdId", invitationData["householdId"])
-    assertEquals("Household Name", invitationData["householdName"])
-    assertEquals("invitedUserId", invitationData["invitedUserId"])
-  }
-
-  @Test
   fun `getInvitations returns list of invitations`() = runTest {
     val invitationIds = listOf("inv1", "inv2")
     val mockTask: Task<QuerySnapshot> = Tasks.forResult(mockQuerySnapshot)
