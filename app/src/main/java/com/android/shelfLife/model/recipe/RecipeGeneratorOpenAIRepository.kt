@@ -10,6 +10,7 @@ import com.aallam.openai.api.http.Timeout
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
 import com.android.shelfLife.BuildConfig
+import com.android.shelfLife.di.IoDispatcher
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
@@ -30,11 +31,13 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class RecipeGeneratorOpenAIRepository(
-    private val openai: OpenAI =
-        OpenAI(token = BuildConfig.OPENAI_API_KEY, timeout = Timeout(socket = 60.seconds)),
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+@Singleton
+class RecipeGeneratorOpenAIRepository @Inject constructor(
+    private val openai: OpenAI,
+    @IoDispatcher private val dispatcher: CoroutineDispatcher
 ) : RecipeGeneratorRepository {
 
   companion object {

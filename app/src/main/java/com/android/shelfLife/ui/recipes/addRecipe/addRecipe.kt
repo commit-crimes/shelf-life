@@ -53,8 +53,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 @Composable
-fun AddRecipeScreen(navigationActions: NavigationActions) {
-  val addRecipeViewModel = hiltViewModel<AddRecipeViewModel>()
+fun AddRecipeScreen(
+    navigationActions: NavigationActions,
+    addRecipeViewModel: AddRecipeViewModel = hiltViewModel() // default in production
+) {
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
 
@@ -420,17 +422,24 @@ fun ErrorTextBoxNEW(errorMessageId: Int?, testTag: String) {
   }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun AddRecipeScreenPreview() {
-  // Mock navigation actions
-  val navController = rememberNavController()
-  val navigationActions = NavigationActions(navController)
-  val firebaseFirestore = FirebaseFirestore.getInstance()
-  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
-
-  val viewModel = AddRecipeViewModel(recipeRepository, UserRepositoryFirestore(firebaseFirestore))
-
-  // Call the AddRecipeScreen with mocked data
-  AddRecipeScreen(navigationActions = navigationActions)
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun AddRecipeScreenPreview() {
+//    val navController = rememberNavController()
+//    val navigationActions = NavigationActions(navController)
+//
+//    // Create mock or fake repositories for testing
+//    val fakeRecipeRepository = FakeRecipeRepository() // Implement a simple fake
+//    val fakeUserRepository = FakeUserRepository()     // Implement a simple fake
+//
+//    // Manually instantiate your ViewModel with fakes
+//    val viewModel = AddRecipeViewModel(
+//        recipeRepository = fakeRecipeRepository,
+//        userRepository = fakeUserRepository
+//    )
+//
+//    AddRecipeScreen(
+//        navigationActions = navigationActions,
+//        addRecipeViewModel = viewModel
+//    )
+//}
