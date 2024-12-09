@@ -43,7 +43,7 @@ class ListRecipesViewModelTest {
       (it.arguments[0] as (List<Recipe>) -> Unit).invoke(recipes)
     }
     viewModel.getRecipes()
-    assertEquals(recipes, listOf(viewModel.recipes.value[0]))
+    assertEquals(recipes, listOf(viewModel.recipes.value[1]))
   }
 
   @Test

@@ -1,5 +1,6 @@
-package com.android.shelfLife.model.recipe
+package com.android.shelfLife.model.newRecipe
 
+import com.android.shelfLife.model.recipe.Recipe
 import kotlinx.coroutines.flow.StateFlow
 
 interface RecipeRepository {
@@ -11,13 +12,6 @@ interface RecipeRepository {
 
   /** Generates a new unique ID for a recipe. */
   fun getUid(): String
-
-  /**
-   * Initializes the repository (e.g., setting up database connections or initial data).
-   *
-   * @param onSuccess - Called when the initialization is successful.
-   */
-  fun init(onSuccess: () -> Unit)
 
   /**
    * Fetches all recipes from the repository.
