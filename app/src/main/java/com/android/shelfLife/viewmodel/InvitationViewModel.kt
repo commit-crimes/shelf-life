@@ -3,7 +3,7 @@ package com.android.shelfLife.viewmodel
 import androidx.lifecycle.ViewModel
 import com.android.shelfLife.model.invitations.Invitation
 import com.android.shelfLife.model.invitations.InvitationRepository
-import com.android.shelfLife.model.user.UserRepositoryFirestore
+import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -12,7 +12,7 @@ class InvitationViewModel
 @Inject
 constructor(
     private val invitationRepository: InvitationRepository,
-    private val userRepo: UserRepositoryFirestore
+    private val userRepo: UserRepository
 ) : ViewModel() {
 
   val invitations = invitationRepository.invitations
