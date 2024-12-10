@@ -52,7 +52,9 @@ constructor(
     Log.d("OverviewScreenViewModel", "Initialized")
     FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
       if (firebaseAuth.currentUser != null) {
-        Log.d("OverviewScreenViewModel", "User logged in, loading: ${firebaseAuth.currentUser}, user: ${userRepository.user.value}")
+        Log.d(
+            "OverviewScreenViewModel",
+            "User logged in, loading: ${firebaseAuth.currentUser}, user: ${userRepository.user.value}")
         loadHouseholds()
       }
     }

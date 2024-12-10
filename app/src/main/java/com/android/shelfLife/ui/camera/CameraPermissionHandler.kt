@@ -27,9 +27,7 @@ import com.android.shelfLife.ui.utils.OnLifecycleEvent
  * @param viewModel The ViewModel for the barcode scanner
  */
 @Composable
-fun CameraPermissionHandler(
-    navigationActions: NavigationActions
-) {
+fun CameraPermissionHandler(navigationActions: NavigationActions) {
   val viewModel = viewModel(BarcodeScannerViewModel::class.java)
   val context = LocalContext.current
   val activity = context as Activity

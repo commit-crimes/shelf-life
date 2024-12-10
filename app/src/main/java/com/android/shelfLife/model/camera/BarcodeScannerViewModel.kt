@@ -11,11 +11,10 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodFactsRepository
-import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.android.shelfLife.model.foodFacts.SearchStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * ViewModel for managing the barcode scanner screen.
@@ -25,10 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class BarcodeScannerViewModel
 @Inject
-constructor(
-    application: Application,
-    private val foodFactsRepository: FoodFactsRepository
-    ) : AndroidViewModel(application) {
+constructor(application: Application, private val foodFactsRepository: FoodFactsRepository) :
+    AndroidViewModel(application) {
 
   private val sharedPreferences =
       getApplication<Application>()

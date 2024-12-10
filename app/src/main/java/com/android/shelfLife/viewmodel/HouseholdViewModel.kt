@@ -1,17 +1,17 @@
-//package com.android.shelfLife.viewmodel
+// package com.android.shelfLife.viewmodel
 //
-//import androidx.lifecycle.ViewModel
-//import androidx.lifecycle.viewModelScope
-//import com.android.shelfLife.model.newhousehold.HouseHold
-//import com.android.shelfLife.model.newhousehold.HouseHoldRepository
-//import dagger.hilt.android.lifecycle.HiltViewModel
-//import javax.inject.Inject
-//import kotlinx.coroutines.flow.MutableStateFlow
-//import kotlinx.coroutines.flow.StateFlow
-//import kotlinx.coroutines.launch
+// import androidx.lifecycle.ViewModel
+// import androidx.lifecycle.viewModelScope
+// import com.android.shelfLife.model.newhousehold.HouseHold
+// import com.android.shelfLife.model.newhousehold.HouseHoldRepository
+// import dagger.hilt.android.lifecycle.HiltViewModel
+// import javax.inject.Inject
+// import kotlinx.coroutines.flow.MutableStateFlow
+// import kotlinx.coroutines.flow.StateFlow
+// import kotlinx.coroutines.launch
 //
-//@HiltViewModel
-//class HouseholdViewModel @Inject constructor(private val repository: HouseHoldRepository) :
+// @HiltViewModel
+// class HouseholdViewModel @Inject constructor(private val repository: HouseHoldRepository) :
 //    ViewModel() {
 //
 //  // StateFlow to hold the list of households
@@ -72,4 +72,4 @@
 //      // Logic to delete the household
 //    }
 //  }
-//}
+// }

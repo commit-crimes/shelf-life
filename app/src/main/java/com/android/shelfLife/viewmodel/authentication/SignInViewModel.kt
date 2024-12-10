@@ -33,7 +33,7 @@ constructor(
 
   private val authStateListener =
       FirebaseAuth.AuthStateListener { auth ->
-          Log.d("SignInViewModel", "AuthStateListener triggered, user: ${auth.currentUser}")
+        Log.d("SignInViewModel", "AuthStateListener triggered, user: ${auth.currentUser}")
         userRepository.setUserLoggedInStatus(auth.currentUser != null)
       }
 
@@ -54,7 +54,7 @@ constructor(
         val authResult = firebaseAuth.signInWithCredential(credential).await()
         Log.d("SignInViewModel", "AuthResult : $authResult calling initializeUserData")
         userRepository.initializeUserData(context)
-           userRepository.setUserLoggedInStatus(true)
+        userRepository.setUserLoggedInStatus(true)
         _signInState.value = SignInState.Success(authResult)
       } catch (e: Exception) {
         _signInState.value = SignInState.Error(e.message ?: "Unknown error occurred.")

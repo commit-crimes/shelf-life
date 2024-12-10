@@ -3,9 +3,9 @@ package com.android.shelfLife.viewmodel.overview
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.shelfLife.model.newInvitations.InvitationRepository
 import com.android.shelfLife.model.newhousehold.HouseHold
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
-import com.android.shelfLife.model.newInvitations.InvitationRepository
 import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -18,9 +18,9 @@ import kotlinx.coroutines.launch
 class HouseholdCreationScreenViewModel
 @Inject
 constructor(
-  private val houseHoldRepository: HouseHoldRepository,
-  private val invitationRepository: InvitationRepository,
-  private val userRepository: UserRepository
+    private val houseHoldRepository: HouseHoldRepository,
+    private val invitationRepository: InvitationRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
   private val _emailList = MutableStateFlow<Set<String>>(emptySet())
@@ -51,8 +51,8 @@ constructor(
 
   private fun newHouseholdNameIsInvalid(householdName: String): Boolean {
     return (householdName.isBlank() ||
-            (houseHoldRepository.checkIfHouseholdNameExists(householdName) &&
-                    (householdToEdit.value == null || householdName != householdToEdit.value!!.name)))
+        (houseHoldRepository.checkIfHouseholdNameExists(householdName) &&
+            (householdToEdit.value == null || householdName != householdToEdit.value!!.name)))
   }
 
   suspend fun getEmailToUserId(emails: Set<String>): Map<String, String> {
@@ -60,8 +60,8 @@ constructor(
   }
 
   /**
-   * Attempts to add an email card, returning true if successful and false otherwise.
-   * This encapsulates the logic for checking duplicates and blank inputs.
+   * Attempts to add an email card, returning true if successful and false otherwise. This
+   * encapsulates the logic for checking duplicates and blank inputs.
    */
   fun tryAddEmailCard(emailInput: String): Boolean {
     val trimmedEmail = emailInput.trim()
@@ -73,8 +73,7 @@ constructor(
   }
 
   /**
-   * Handles creating or updating a household when the user clicks "Save".
-   * Returns:
+   * Handles creating or updating a household when the user clicks "Save". Returns:
    * - false if household name is invalid
    * - true if the operation succeeded
    */
@@ -95,16 +94,10 @@ constructor(
         // Compare sizes to determine if we need to send invites or remove members
         when {
           oldUidList.size < uidList.size -> {
-            updateHousehold(
-              updatedHousehold.copy(members = uidList),
-              shouldUpdateRepo = false
-            )
+            updateHousehold(updatedHousehold.copy(members = uidList), shouldUpdateRepo = false)
           }
           oldUidList.size > uidList.size -> {
-            updateHousehold(
-              updatedHousehold.copy(members = uidList),
-              shouldUpdateRepo = true
-            )
+            updateHousehold(updatedHousehold.copy(members = uidList), shouldUpdateRepo = true)
           }
         }
         updateHousehold(updatedHousehold)
@@ -120,10 +113,12 @@ constructor(
 
   private fun addNewHousehold(householdName: String, friendEmails: Set<String?> = emptySet()) {
     viewModelScope.launch {
-      val user = currentUser.value ?: run {
-        Log.e("HouseholdViewModel", "User not logged in")
-        return@launch
-      }
+      val user =
+          currentUser.value
+              ?: run {
+                Log.e("HouseholdViewModel", "User not logged in")
+                return@launch
+              }
 
       val householdUid = houseHoldRepository.getNewUid()
       var household = HouseHold(householdUid, householdName, listOf(user.uid), emptyList())
@@ -138,9 +133,9 @@ constructor(
           Log.w("HouseholdViewModel", "Emails not found: $emailsNotFound")
         }
         emailToUid
-          .filterKeys { it != user.email }
-          .values
-          .forEach { invitationRepository.sendInvitation(household, it) }
+            .filterKeys { it != user.email }
+            .values
+            .forEach { invitationRepository.sendInvitation(household, it) }
       }
       if (selectedHousehold.value == null) {
         Log.d("HouseholdViewModel", "Selected household is null")

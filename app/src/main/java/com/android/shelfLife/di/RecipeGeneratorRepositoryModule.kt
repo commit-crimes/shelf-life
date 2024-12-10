@@ -11,9 +11,9 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RecipeGeneratorRepositoryModule {
-    @Binds
-    @Singleton
-    abstract fun bindRecipeGeneratorRepository(
-        impl: RecipeGeneratorOpenAIRepository
-    ): RecipeGeneratorRepository
+  @Binds
+  @Singleton
+  abstract fun bindRecipeGeneratorRepository(
+      impl: RecipeGeneratorOpenAIRepository
+  ): RecipeGeneratorRepository
 }

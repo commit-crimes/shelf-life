@@ -23,14 +23,14 @@ import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.newFoodItem.ListFoodItemsViewModel
+import com.android.shelfLife.model.newInvitations.InvitationRepositoryFirestore
+import com.android.shelfLife.model.newRecipe.RecipeRepository
 import com.android.shelfLife.model.newhousehold.HouseHold
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.newhousehold.HouseholdRepositoryFirestore
 import com.android.shelfLife.model.newhousehold.HouseholdViewModel
-import com.android.shelfLife.model.newInvitations.InvitationRepositoryFirestore
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
-import com.android.shelfLife.model.newRecipe.RecipeRepository
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route

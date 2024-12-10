@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-
 class FoodFactsViewModel(private val repository: FoodFactsRepository) : ViewModel() {
 
   private val _searchStatus = MutableStateFlow<SearchStatus>(SearchStatus.Idle)

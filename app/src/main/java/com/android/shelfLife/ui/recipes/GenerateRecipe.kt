@@ -64,10 +64,7 @@ fun GenerateRecipeScreen(navigationActions: NavigationActions) {
 
     // Error message for recipe name
     recipeNameError?.let {
-      Text(
-          text = it,
-          color = MaterialTheme.colors.error,
-          style = MaterialTheme.typography.body2)
+      Text(text = it, color = MaterialTheme.colors.error, style = MaterialTheme.typography.body2)
     }
 
     // Section for adding food items
@@ -104,10 +101,7 @@ fun GenerateRecipeScreen(navigationActions: NavigationActions) {
 
     // Error message for food item
     foodItemError?.let {
-      Text(
-          text = it,
-          color = MaterialTheme.colors.error,
-          style = MaterialTheme.typography.body2)
+      Text(text = it, color = MaterialTheme.colors.error, style = MaterialTheme.typography.body2)
     }
 
     // Display the list of food items
@@ -131,16 +125,14 @@ fun GenerateRecipeScreen(navigationActions: NavigationActions) {
                       uid = index.toString(),
                       foodFacts = FoodFacts(name, quantity = Quantity(1.0)),
                       location = FoodStorageLocation.FRIDGE,
-                      owner = "Owner"
-                  )
+                      owner = "Owner")
                 }
             navigationActions.goBack()
             generationViewModel.updateRecipePrompt(
                 RecipePrompt(
                     name = recipeName,
                     ingredients = testIngredients,
-                    recipeType = RecipeType.HIGH_PROTEIN)
-            )
+                    recipeType = RecipeType.HIGH_PROTEIN))
             generationViewModel.generateRecipe(
                 onSuccess = { recipe ->
                   generationViewModel.acceptGeneratedRecipe {
