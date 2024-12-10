@@ -1,5 +1,6 @@
 package com.android.shelfLife.viewmodel.recipes
 
+import android.util.Log
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.lifecycle.ViewModel
@@ -51,8 +52,11 @@ constructor(
 
   init {
     if (user.value != null) {
-      _userRecipes.value = populateUserRecipes()
+      populateUserRecipes()
     }
+    Log.i("AAAAAAAAAA" , "user : ${user.value.toString()}")
+    Log.i("AAAAAAAAAA", "recipes : ${recipeRepository.recipes.value.toString()}")
+    Log.i("AAAAAAAAAAAAA", "user's Recipes : ${_userRecipes.value.toString()}")
   }
 
   /**
@@ -60,10 +64,12 @@ constructor(
    *
    * @return A list of recipes that belong to the current user.
    */
-  private fun populateUserRecipes(): List<Recipe> {
-    return recipeRepository.recipes.value.filter { recipe ->
-      (recipe.uid in userRepository.user.value!!.recipeUIDs)
-    }
+  private fun populateUserRecipes(){
+    recipeRepository.getRecipes({
+      recipeList->
+      _userRecipes.value = recipeList.filter { recipe ->
+      (recipe.uid in userRepository.user.value!!.recipeUIDs) }
+    }, {})
   }
 
   /**

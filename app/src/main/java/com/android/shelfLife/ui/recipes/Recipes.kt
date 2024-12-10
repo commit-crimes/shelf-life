@@ -1,6 +1,7 @@
 package com.android.shelfLife.ui.recipes
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -30,6 +31,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,6 +72,11 @@ fun RecipesScreen(navigationActions: NavigationActions) {
   val user = recipesViewModel.user
   val selectedHousehold = recipesViewModel.household
 
+    val isFabExpanded by recipesViewModel.fabExpanded.collectAsState()
+    val query by recipesViewModel.query.collectAsState()
+    val filteredRecipeList by recipesViewModel.filteredRecipeList.collectAsState()
+    val selectedFilters by recipesViewModel.selectedFilters.collectAsState()
+
   if (selectedHousehold == null) {
     FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel)
   } else {
@@ -86,7 +93,7 @@ fun RecipesScreen(navigationActions: NavigationActions) {
                     }
                   },
                   filters = recipesViewModel.filters,
-                  selectedFilters = recipesViewModel.selectedFilters.value,
+                  selectedFilters = selectedFilters,
                   onFilterChange = { filter, isSelected -> recipesViewModel.clickOnFilter(filter) })
             }
           },
@@ -103,13 +110,14 @@ fun RecipesScreen(navigationActions: NavigationActions) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)) {
                   // Secondary FAB for "Manual" option
-                  if (recipesViewModel.fabExpanded.value) {
+                  if (isFabExpanded) {
                     ExtendedFloatingActionButton(
                         text = { Text("Generate") },
                         icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "Add") },
                         onClick = {
                           // Navigate to Manual Recipe screen
                           navigationActions.navigateTo(Screen.GENERATE_RECIPE)
+                            recipesViewModel.shrinkFab()
                         },
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
                         modifier = Modifier.testTag("generateRecipeFab").width(150.dp))
@@ -117,18 +125,19 @@ fun RecipesScreen(navigationActions: NavigationActions) {
 
                   // Primary FAB
                   ExtendedFloatingActionButton(
-                      text = { Text(if (recipesViewModel.fabExpanded.value) "Manual" else "") },
+                      text = { Text(if (isFabExpanded) "Manual" else "") },
                       icon = { Icon(Icons.Default.Add, contentDescription = "Add") },
                       onClick = {
-                        if (recipesViewModel.fabExpanded.value) {
+                        if (isFabExpanded) {
                           // Navigate to Generate Recipe screen
                           navigationActions.navigateTo(Screen.ADD_RECIPE)
+                            recipesViewModel.shrinkFab()
                         } else {
                           // Expand the FABs
                           recipesViewModel.expandFab()
                         }
                       },
-                      expanded = recipesViewModel.fabExpanded.value, // Bind to the state
+                      expanded = isFabExpanded, // Bind to the state
                       containerColor = MaterialTheme.colorScheme.secondaryContainer,
                       modifier =
                           Modifier.testTag("addRecipeFab")
@@ -142,7 +151,7 @@ fun RecipesScreen(navigationActions: NavigationActions) {
                       detectTapGestures(onTap = { recipesViewModel.shrinkFab() })
                     }) {
                   CustomSearchBar(
-                      query = recipesViewModel.query.value,
+                      query = query,
                       onQueryChange = { newQuery -> recipesViewModel.changeQuery(newQuery) },
                       placeholder = "Search recipe",
                       searchBarTestTag = "searchBar",
@@ -160,7 +169,7 @@ fun RecipesScreen(navigationActions: NavigationActions) {
                   } else {
                     // LazyColumn for displaying the list of filtered recipes
                     LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
-                      items(recipesViewModel.filteredRecipeList.value) { recipe ->
+                      items(filteredRecipeList) { recipe ->
                         RecipeItem(recipe, navigationActions, recipesViewModel)
                       }
                     }

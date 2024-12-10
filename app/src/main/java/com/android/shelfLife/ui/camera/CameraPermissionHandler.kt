@@ -14,11 +14,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.utils.OnLifecycleEvent
+import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 
 /**
  * Composable function for handling camera permissions.
@@ -27,8 +29,10 @@ import com.android.shelfLife.ui.utils.OnLifecycleEvent
  * @param viewModel The ViewModel for the barcode scanner
  */
 @Composable
-fun CameraPermissionHandler(navigationActions: NavigationActions) {
-  val viewModel = viewModel(BarcodeScannerViewModel::class.java)
+fun CameraPermissionHandler(
+    navigationActions: NavigationActions
+) {
+  val viewModel = hiltViewModel<BarcodeScannerViewModel>()
   val context = LocalContext.current
   val activity = context as Activity
 

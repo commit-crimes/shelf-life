@@ -3,6 +3,7 @@ package com.android.shelfLife.viewmodel.overview
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.newInvitations.InvitationRepository
 import com.android.shelfLife.model.newhousehold.HouseHold
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
@@ -19,6 +20,7 @@ class HouseholdCreationScreenViewModel
 @Inject
 constructor(
     private val houseHoldRepository: HouseHoldRepository,
+    private val foodItemRepository: FoodItemRepository,
     private val invitationRepository: InvitationRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
@@ -140,6 +142,9 @@ constructor(
       if (selectedHousehold.value == null) {
         Log.d("HouseholdViewModel", "Selected household is null")
         userRepository.selectHousehold(households.value.firstOrNull())
+        if (selectedHousehold.value != null) {
+          foodItemRepository.getFoodItems(selectedHousehold.value!!.uid)
+        }
       }
     }
   }
@@ -162,6 +167,7 @@ constructor(
         houseHoldRepository.updateHousehold(household)
         if (selectedHousehold.value == null || household.uid == selectedHousehold.value!!.uid) {
           userRepository.selectHousehold(household)
+          foodItemRepository.getFoodItems(household.uid)
         }
       }
     }
