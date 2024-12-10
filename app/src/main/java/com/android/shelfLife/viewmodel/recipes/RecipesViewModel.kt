@@ -3,9 +3,11 @@ package com.android.shelfLife.viewmodel.recipes
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.lifecycle.ViewModel
+import com.android.shelfLife.model.newRecipe.RecipeRepository
+import com.android.shelfLife.model.newhousehold.HouseHold
 import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.recipe.RecipeType
+import com.android.shelfLife.model.user.User
 import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,11 +30,19 @@ constructor(
     val drawerState = _drawerState.asStateFlow()
     val filters = listOf("Soon to expire", "Only household items", "High protein", "Low calories", "Personal")
     var selectedFilters = MutableStateFlow<List<String>>(emptyList())
+    var query = MutableStateFlow<String>("")
+
+    var user = MutableStateFlow<User?>(null)
+    var household = MutableStateFlow<HouseHold?>(null)
+
+
 
     init {
         if(userRepository.user.value != null){
             userRecipes.value = populateUserRecipes()
         }
+        user.value = userRepository.user.value
+        household.value = userRepository.selectedHousehold.value
     }
 
     private fun populateUserRecipes(): List<Recipe> {
@@ -60,12 +70,13 @@ constructor(
         } else {
             selectedFilters.value + filter // Add the filter if it doesn't exist
         }
+        filterRecipes()
     }
 
-
-
-
-
+    fun changeQuery(newQuery : String){
+        query.value = newQuery
+        filterRecipes()
+    }
 
     /**
      * Filters a list of recipes based on selected filters and a search query.
@@ -83,24 +94,18 @@ constructor(
      *     - If both `selectedFilters` and `query` are empty, the original list is returned without any
      *       filtering.
      */
-    fun filterRecipes(
-        listRecipes: List<Recipe>,
-        selectedFilters: List<String>,
-        query: String
-    ): List<Recipe> {
+    fun filterRecipes(){
         // Combined filtering based on selected filters and search query
-        val filteredRecipes =
-            listRecipes.filter { recipe ->
+        filteredRecipeList.value =
+            userRecipes.value.filter { recipe ->
                 // Check if recipe matches selected filters
-                (selectedFilters.isEmpty() ||
-                        selectedFilters.any { filter ->
+                (selectedFilters.value.isEmpty() ||
+                        selectedFilters.value.any { filter ->
                             recipe.recipeType == stringToSearchRecipeType(filter)
                         }) &&
                         // Check if recipe matches the search query
-                        (query.isEmpty() || recipe.name.contains(query, ignoreCase = true))
+                        (query.value.isEmpty() || recipe.name.contains(query.value, ignoreCase = true))
             }
-
-        return filteredRecipes
     }
 
     /**

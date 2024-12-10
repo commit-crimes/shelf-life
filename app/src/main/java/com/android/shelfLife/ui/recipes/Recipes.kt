@@ -23,22 +23,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,20 +46,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.R
-import com.android.shelfLife.model.household.HouseHoldRepository
-import com.android.shelfLife.model.household.HouseholdViewModel
-import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.model.recipe.RecipeRepository
-import com.android.shelfLife.model.recipe.RecipeType
-import com.android.shelfLife.model.user.UserRepository
-import com.android.shelfLife.ui.navigation.BottomNavigationMenu
-import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.newnavigation.TopNavigationBar
 import com.android.shelfLife.ui.newoverview.FirstTimeWelcomeScreen
 import com.android.shelfLife.ui.utils.CustomSearchBar
@@ -73,54 +63,32 @@ import com.android.shelfLife.viewmodel.recipes.RecipesViewModel
 import kotlinx.coroutines.launch
 
 @SuppressLint("StateFlowValueCalledInComposition")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipesScreen(
-    navigationActions: NavigationActions,
-    recipeRepository: RecipeRepository,
-    userRepository: UserRepository,
-    houseHoldRepository: HouseHoldRepository
+    navigationActions: NavigationActions
 ) {
-    val recipesViewModel = RecipesViewModel(userRepository, recipeRepository)
-    var user = userRepository.user.value
+    val recipesViewModel = hiltViewModel<RecipesViewModel>()
+    val overviewScreenViewModel = hiltViewModel<OverviewScreenViewModel>()
 
+    val user = recipesViewModel.user
+    val selectedHousehold = recipesViewModel.household
 
-  // Collect the recipes StateFlow as a composable state
-  val recipeList by listRecipesViewModel.recipes.collectAsState()
-
-  // State for the search query
-  var query by remember { mutableStateOf("") }
-  var selectedFilters = remember { mutableStateListOf<String>() }
-
-  val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
-  val userHouseholds = householdViewModel.households.collectAsState().value
-
-  val drawerState = rememberDrawerState(DrawerValue.Closed)
-  val scope = rememberCoroutineScope()
-
-  val filters =
-      listOf("Soon to expire", "Only household items", "High protein", "Low calories", "Personal")
-
-  var fabExpanded = remember { mutableStateOf(false) }
-
-    if(userRepository.selectedHousehold == null){
-        FirstTimeWelcomeScreen(navigationActions)
+    if(selectedHousehold == null){
+        FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel)
     }else{
         if (user != null){
             Scaffold(
                 modifier = Modifier.testTag("recipesScreen"),
                 topBar = {
-                    selectedHousehold?.let {
-                        userRepository.selectedHousehold.value?.let {
-                            TopNavigationBar(
-                                houseHold = it,
-                                onHamburgerClick = { scope.launch { drawerState.open() } },
-                                filters = recipesViewModel.filters,
-                                selectedFilters = selectedFilters,
-                                onFilterChange = { filter, isSelected ->
-                                    recipesViewModel.clickOnFilter(filter)
-                                })
-                        }
+                    selectedHousehold.value?.let {
+                        TopNavigationBar(
+                            houseHold = it,
+                            onHamburgerClick = { recipesViewModel.viewModelScope.launch { recipesViewModel.drawerState.value.open() } },
+                            filters = recipesViewModel.filters,
+                            selectedFilters = recipesViewModel.selectedFilters.value,
+                            onFilterChange = { filter, isSelected ->
+                                recipesViewModel.clickOnFilter(filter)
+                            })
                     }
                 },
                 bottomBar = {
@@ -176,11 +144,11 @@ fun RecipesScreen(
                                 onTap = { recipesViewModel.shrinkFab() })
                         }) {
                         CustomSearchBar(
-                            query = query,
-                            onQueryChange = { query = it },
+                            query = recipesViewModel.query.value,
+                            onQueryChange = {newQuery -> recipesViewModel.changeQuery(newQuery) },
                             placeholder = "Search recipe",
                             searchBarTestTag = "searchBar",
-                            onDeleteTextClicked = { query = "" })
+                            onDeleteTextClicked = { recipesViewModel.changeQuery("")})
 
                         if (recipesViewModel.selectedFilters.value.isEmpty()) {
                             Box(
@@ -203,24 +171,6 @@ fun RecipesScreen(
                 })
         }
     }
-
-
-
-
-  HouseHoldSelectionDrawer(
-      scope = scope,
-      drawerState = drawerState,
-      navigationActions = navigationActions) {
-
-        // filtering recipeList using the filter and the query from the searchBar
-        val filteredRecipes = filterRecipes(recipeList, selectedFilters, query)
-
-        if (selectedHousehold == null) {
-          FirstTimeWelcomeScreen(navigationActions, OverviewScreenViewModel(houseHoldRepository))
-        } else {
-
-        }
-      }
 }
 
 
