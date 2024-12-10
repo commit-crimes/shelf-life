@@ -23,8 +23,18 @@ open class RecipeGenerationViewModel(
   private val _currentGeneratedRecipe = MutableStateFlow<Recipe?>(null)
   open val currentGeneratedRecipe: StateFlow<Recipe?> = _currentGeneratedRecipe.asStateFlow()
 
+  private val _currentStep = MutableStateFlow(0)
+  open val currentStep: StateFlow<Int> = _currentStep.asStateFlow()
+
   fun updateRecipePrompt(prompt: RecipePrompt) {
     _recipePrompt.value = prompt
+  }
+
+  fun nextStep() {
+    _currentStep.value += 1
+  }
+  fun previousStep() {
+    _currentStep.value -= 1
   }
 
   /** Generates a recipe based on the current prompt. */
