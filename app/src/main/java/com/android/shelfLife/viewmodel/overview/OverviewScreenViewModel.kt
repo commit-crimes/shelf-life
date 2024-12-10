@@ -5,6 +5,7 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.newhousehold.HouseHold
@@ -42,6 +43,18 @@ constructor(
   val selectedHousehold = userRepository.selectedHousehold
   val households = houseHoldRepository.households
   val foodItems = listFoodItemsRepository.foodItems
+
+  private var FILTERS = mapOf(
+    "Dairy" to FoodCategory.DAIRY,
+    "Meat" to FoodCategory.MEAT,
+    "Fish" to FoodCategory.FISH,
+    "Fruit" to FoodCategory.FRUIT,
+    "Vegetables" to FoodCategory.VEGETABLE,
+    "Grain" to FoodCategory.GRAIN,
+    "Beverage" to FoodCategory.BEVERAGE,
+    "Snack" to FoodCategory.SNACK,
+    "Other" to FoodCategory.OTHER
+  )
 
   val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
 
