@@ -25,8 +25,7 @@ open class ListRecipesViewModel(
           ingredients =
               listOf(
                   Ingredient("Rice", Quantity(100.0, FoodUnit.GRAM)),
-                  Ingredient("Chicken", Quantity(500.0, FoodUnit.GRAM))
-              ),
+                  Ingredient("Chicken", Quantity(500.0, FoodUnit.GRAM))),
           instructions =
               listOf(
                   "Test cooking instructions",
@@ -44,7 +43,7 @@ open class ListRecipesViewModel(
   open val selectedRecipe: StateFlow<Recipe?> = _selectedRecipe.asStateFlow()
 
   init {
-    //recipeRepository.init(onSuccess = { observeRecipes() })
+    // recipeRepository.init(onSuccess = { observeRecipes() })
   }
 
   private fun observeRecipes() {

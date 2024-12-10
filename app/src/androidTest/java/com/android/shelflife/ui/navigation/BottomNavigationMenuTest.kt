@@ -7,10 +7,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.newFoodItem.ListFoodItemsViewModel
-import com.android.shelfLife.model.newhousehold.HouseholdRepositoryFirestore
-import com.android.shelfLife.model.newhousehold.HouseholdViewModel
 import com.android.shelfLife.model.newInvitations.InvitationRepositoryFirestore
 import com.android.shelfLife.model.newInvitations.InvitationViewModel
+import com.android.shelfLife.model.newhousehold.HouseholdRepositoryFirestore
+import com.android.shelfLife.model.newhousehold.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.TopLevelDestinations
 import com.android.shelfLife.ui.newProfile.ProfileScreen

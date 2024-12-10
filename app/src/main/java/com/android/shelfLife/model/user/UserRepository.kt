@@ -62,10 +62,10 @@ interface UserRepository {
   suspend fun updateSelectedHousehold(selectedHouseholdUID: String)
 
   /** @param userEmails - The set of user emails to get the user IDs for. */
-  suspend fun getUserIds(userEmails: Set<String?>) : Map<String, String>
+  suspend fun getUserIds(userEmails: Set<String?>): Map<String, String>
 
   /** @param userIds - The list of user IDs to get the emails for. */
-  suspend fun getUserEmails(userIds: List<String>) : Map<String, String>
+  suspend fun getUserEmails(userIds: List<String>): Map<String, String>
 
   /**
    * Selects a household and saves it to the user's data. VIEW MODELS NEED TO MANUALLY SELECT THE

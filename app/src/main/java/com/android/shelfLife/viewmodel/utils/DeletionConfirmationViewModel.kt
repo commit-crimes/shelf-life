@@ -2,6 +2,7 @@ package com.android.shelfLife.viewmodel.utils
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +14,8 @@ class DeletionConfirmationViewModel
 @Inject
 constructor(
     private val houseHoldRepository: HouseHoldRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val foodItemRepository: FoodItemRepository
 ) : ViewModel() {
 
   val householdToEdit = houseHoldRepository.householdToEdit
@@ -51,6 +53,9 @@ constructor(
                 households.value[households.value.size - 1]
               }
             })
+        if (selectedHousehold.value != null) {
+          foodItemRepository.getFoodItems(selectedHousehold.value!!.uid)
+        }
       }
     }
   }

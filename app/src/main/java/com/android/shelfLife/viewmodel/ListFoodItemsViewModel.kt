@@ -1,20 +1,11 @@
 package com.android.shelfLife.viewmodel
 
-import android.util.Log
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import com.android.shelfLife.model.newFoodItem.FoodItem
-import com.android.shelfLife.model.newFoodItem.FoodItemRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-
 /**
  * ViewModel for managing a list of FoodItems.
  *
  * @property repository The repository for managing FoodItems.
  */
-//open class ListFoodItemsViewModel(private val repository: FoodItemRepository) : ViewModel() {
+// open class ListFoodItemsViewModel(private val repository: FoodItemRepository) : ViewModel() {
 //  private val _foodItems = MutableStateFlow<List<FoodItem>>(emptyList())
 //  val foodItems: StateFlow<List<FoodItem>> = _foodItems.asStateFlow()
 //
@@ -75,7 +66,8 @@ import kotlinx.coroutines.flow.asStateFlow
 //
 //  /** Deletes a FoodItem document by ID */
 //  fun deleteFoodItemById(id: String) {
-//    repository.deleteFoodItemById(id = id, onSuccess = { getAllFoodItems() }, onFailure = ::_onFail)
+//    repository.deleteFoodItemById(id = id, onSuccess = { getAllFoodItems() }, onFailure =
+// ::_onFail)
 //  }
 //
 //  /** Selects a FoodItem document for individual view */
@@ -108,4 +100,4 @@ import kotlinx.coroutines.flow.asStateFlow
 //          }
 //        }
 //  }
-//}
+// }

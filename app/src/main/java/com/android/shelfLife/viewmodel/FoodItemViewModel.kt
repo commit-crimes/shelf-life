@@ -85,8 +85,8 @@ constructor(
     if (!isSelected && !isScanned) {
       foodNameErrorResId = validateString(foodName)
     }
-    if(!isScanned) {
-        amountErrorResId = validateNumber(amount)
+    if (!isScanned) {
+      amountErrorResId = validateNumber(amount)
     }
     buyDateErrorResId = validateBuyDate(buyDate)
     expireDateErrorResId = validateExpireDate(expireDate, buyDate, buyDateErrorResId)
@@ -149,9 +149,7 @@ constructor(
         validateOpenDate(openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
   }
 
-  suspend fun submitFoodItem(
-      scannedFoodFacts: FoodFacts? = null
-  ): Boolean {
+  suspend fun submitFoodItem(scannedFoodFacts: FoodFacts? = null): Boolean {
     validateAllFieldsWhenSubmitButton()
     val isExpireDateValid = expireDateErrorResId == null && expireDate.isNotEmpty()
     val isOpenDateValid = openDateErrorResId == null
@@ -171,20 +169,21 @@ constructor(
         expiryTimestamp != null &&
         buyTimestamp != null) {
       val foodFacts =
-          if(isScanned) scannedFoodFacts!! else
-          FoodFacts(
-              name = foodName,
-              barcode =
-                  if (isSelected) selectedFood!!.foodFacts.barcode
-                  else selectedImage?.barcode ?: "",
-              quantity = Quantity(amount.toDouble(), unit),
-              category = category,
-              nutritionFacts =
-                  if (isSelected) selectedFood!!.foodFacts.nutritionFacts
-                  else selectedImage?.nutritionFacts ?: NutritionFacts(),
-              imageUrl =
-                  if (isSelected) selectedFood!!.foodFacts.imageUrl
-                  else selectedImage?.imageUrl ?: FoodFacts.DEFAULT_IMAGE_URL)
+          if (isScanned) scannedFoodFacts!!
+          else
+              FoodFacts(
+                  name = foodName,
+                  barcode =
+                      if (isSelected) selectedFood!!.foodFacts.barcode
+                      else selectedImage?.barcode ?: "",
+                  quantity = Quantity(amount.toDouble(), unit),
+                  category = category,
+                  nutritionFacts =
+                      if (isSelected) selectedFood!!.foodFacts.nutritionFacts
+                      else selectedImage?.nutritionFacts ?: NutritionFacts(),
+                  imageUrl =
+                      if (isSelected) selectedFood!!.foodFacts.imageUrl
+                      else selectedImage?.imageUrl ?: FoodFacts.DEFAULT_IMAGE_URL)
       val newFoodItem =
           FoodItem(
               uid = if (isSelected) selectedFood!!.uid else foodItemRepository.getNewUid(),

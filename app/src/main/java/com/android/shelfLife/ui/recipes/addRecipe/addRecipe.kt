@@ -417,9 +417,9 @@ fun ErrorTextBoxNEW(errorMessageId: Int?, testTag: String) {
   }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun AddRecipeScreenPreview() {
+// @Preview(showBackground = true)
+// @Composable
+// fun AddRecipeScreenPreview() {
 //    val navController = rememberNavController()
 //    val navigationActions = NavigationActions(navController)
 //
@@ -437,4 +437,4 @@ fun ErrorTextBoxNEW(errorMessageId: Int?, testTag: String) {
 //        navigationActions = navigationActions,
 //        addRecipeViewModel = viewModel
 //    )
-//}
+// }

@@ -17,14 +17,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 
 /**
- * Composable function to display the first time welcome screen for the user.
- * Uses Hilt to obtain the [OverviewScreenViewModel].
+ * Composable function to display the first time welcome screen for the user. Uses Hilt to obtain
+ * the [OverviewScreenViewModel].
  *
  * @param navigationActions The actions to navigate between screens.
  */
@@ -33,15 +32,11 @@ fun FirstTimeWelcomeScreen(
     navigationActions: NavigationActions,
     overviewScreenViewModel: OverviewScreenViewModel
 ) {
-    val currentContext = LocalContext.current
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-            .testTag("firstTimeWelcomeScreen"),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+  val currentContext = LocalContext.current
+  Column(
+      modifier = Modifier.fillMaxSize().padding(16.dp).testTag("firstTimeWelcomeScreen"),
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally) {
         // Welcome Text
         Text(
             text = "Welcome to ShelfLife!",
@@ -57,24 +52,19 @@ fun FirstTimeWelcomeScreen(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(horizontal = 16.dp),
-            textAlign = TextAlign.Center
-        )
+            textAlign = TextAlign.Center)
 
         Spacer(modifier = Modifier.height(24.dp))
 
         // Create Household Button
         Button(
             onClick = {
-                overviewScreenViewModel.selectHouseholdToEdit(null)
-                navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
+              overviewScreenViewModel.selectHouseholdToEdit(null)
+              navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
             },
-            modifier = Modifier
-                .fillMaxWidth(0.6f)
-                .height(48.dp)
-                .testTag("householdNameSaveButton"),
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Text(text = "Create Household", style = MaterialTheme.typography.labelLarge)
-        }
-    }
+            modifier = Modifier.fillMaxWidth(0.6f).height(48.dp).testTag("householdNameSaveButton"),
+            shape = MaterialTheme.shapes.medium) {
+              Text(text = "Create Household", style = MaterialTheme.typography.labelLarge)
+            }
+      }
 }
