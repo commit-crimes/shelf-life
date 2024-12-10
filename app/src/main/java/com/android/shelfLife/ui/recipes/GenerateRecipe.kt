@@ -12,6 +12,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,22 +29,32 @@ import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.viewmodel.recipe.RecipeGenerationViewModel
+import java.util.Collections
 
 @Composable
 fun GenerateRecipeScreen(
-    navigationActions: NavigationActions,
+    navigationActions: NavigationActions/*,
     recipeRepository: RecipeRepository,
-    recipeGeneratorRepository: RecipeGeneratorRepository
+    recipeGeneratorRepository: RecipeGeneratorRepository*/
 ) {
-  val context = LocalContext.current
+  //val context = LocalContext.current
 
+/*
   val generationViewModel = RecipeGenerationViewModel(recipeRepository, recipeGeneratorRepository)
+*/
 
   // States for recipe name and food items
   var recipeName by rememberSaveable { mutableStateOf("") }
   var recipeNameError by rememberSaveable { mutableStateOf<String?>(null) }
 
-  val foodItems = rememberSaveable { mutableStateListOf<String>() }
+  val foodItems = rememberSaveable(
+    saver = listSaver(
+      save = { it.toList() }, // Convert SnapshotStateList to a regular List
+      restore = { mutableStateListOf<String>().apply { it } } // Restore from List to SnapshotStateList
+    )
+  ) {
+    mutableStateListOf<String>()
+  }
   var newFoodItem by rememberSaveable { mutableStateOf("") }
   var foodItemError by rememberSaveable { mutableStateOf<String?>(null) }
 
@@ -117,7 +128,9 @@ fun GenerateRecipeScreen(
     foodItems.forEachIndexed { index, foodItem ->
       Row(
           verticalAlignment = Alignment.CenterVertically,
-          modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)) {
             Text(text = "${index + 1}. $foodItem", modifier = Modifier.weight(1f), fontSize = 16.sp)
 
             Button(onClick = { foodItems.removeAt(index) }) { Text("Remove") }
@@ -127,7 +140,7 @@ fun GenerateRecipeScreen(
     // Generate button
     Button(
         onClick = {
-          if (recipeName.isNotBlank() && foodItems.isNotEmpty()) {
+          /*if (recipeName.isNotBlank() && foodItems.isNotEmpty()) {
             val testIngredients =
                 foodItems.mapIndexed { index, name ->
                   FoodItem(
@@ -163,7 +176,7 @@ fun GenerateRecipeScreen(
                     .show()
               }
             }
-          }
+          }*/
         },
         modifier = Modifier.padding(top = 16.dp)) {
           Text("Generate Recipe")
