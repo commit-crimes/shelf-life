@@ -38,57 +38,52 @@ class RecipeGeneratorOpenAIRepository(
 ) : RecipeGeneratorRepository {
 
   companion object {
-    const val USER_PROMPT_USE_TOOL_CALL =
-        "To ensure a great tastin recipe, you can add other ingredients you deem relevant and necessary. Call _createRecipeFunction with a list of ingredients (name + quantity), step by step instructions, servings, and cooking time in seconds"
-    const val USE_SOON_TO_EXPIRE_SYSTEM_PROMPT =
-        "You are an assistant who generates recipes using ingredients that are about to expire."
-    const val USE_SOON_TO_EXPIRE_USER_PROMPT =
-        "Create a recipe using the following ingredients that are about to expire: "
+    val QUICK_RECIPE_DEF = "quick, 15minutes"
+    val LONG_RECIPE_DEF = "long, over 30minutes"
 
-    const val USE_ONLY_HOUSEHOLD_ITEMS_SYSTEM_PROMPT =
-        "You are an assistant who generates recipes using common household ingredients."
-    const val USE_ONLY_HOUSEHOLD_ITEMS_USER_PROMPT =
-        "Create a recipe using the following common household ingredients: "
+    // Base prompts
+    val BASE_SYSTEM_PROMPT =
+      { recipeDescription: String -> "You are an assistant who generates  $recipeDescription recipes according to user's needs." }
 
-    const val HIGH_PROTEIN_SYSTEM_PROMPT =
-        "You are an assistant who generates high-protein recipes."
-    const val HIGH_PROTEIN_USER_PROMPT =
-        "Create a high-protein recipe using the following ingredients: "
+    val BASE_USER_PROMPT: (Float, String, String, Boolean, String, String) -> String =
+      { servings, recipeDescription, ingredients, onlyHousehold, recipeName, specialInstructions -> "Create a $recipeDescription recipe with exactly $servings servings. " +
+        "The user named the recipe \"$recipeName\" and specified the following special instructions: \"$specialInstructions\". Use the following ingredients: (${ingredients}) ${
+        if (onlyHousehold) "To ensure a valid recipe, stick strictly to the provided ingredients. Do not add any other ingredients."
+        else "To ensure a great tasting recipe, you can add other ingredients you deem relevant and necessary."
+      } Call _createRecipeFunction with a list of ingredients (name + quantity), step-by-step instructions, servings, and cooking time in seconds." }
 
-    const val LOW_CALORIE_SYSTEM_PROMPT = "You are an assistant who generates low-calorie recipes."
-    const val LOW_CALORIE_USER_PROMPT =
-        "Create a low-calorie recipe using the following ingredients: "
   }
 
-  // Define custom prompts for different recipe types
-  private fun getPromptsForMode(
-      listFoodItems: List<FoodItem>,
-      recipeType: RecipeType
-  ): Pair<String, String> {
+  private fun getPromptsForMode(recipePrompt: RecipePrompt): Pair<String, String> {
+    val servings = recipePrompt.servings
 
-    val foodItemsNames = listFoodItems.joinToString(", ") { it.toString() }
+    // Helper to filter and sort food items
+    val foodItems = recipePrompt.ingredients
+      .let { ingredients ->
+        when (recipePrompt.recipeType) {
+          RecipeType.USE_SOON_TO_EXPIRE -> ingredients.sortedBy { it.expiryDate }
+          else -> ingredients
+        }
+      }
 
-    // System and user prompts based on the recipe search type
-    return when (recipeType) {
-      RecipeType.USE_SOON_TO_EXPIRE -> {
-        USE_SOON_TO_EXPIRE_SYSTEM_PROMPT to "$USE_SOON_TO_EXPIRE_USER_PROMPT$foodItemsNames."
-      }
-      RecipeType.USE_ONLY_HOUSEHOLD_ITEMS -> {
-        USE_ONLY_HOUSEHOLD_ITEMS_SYSTEM_PROMPT to
-            "$USE_ONLY_HOUSEHOLD_ITEMS_USER_PROMPT$foodItemsNames."
-      }
-      RecipeType.HIGH_PROTEIN -> {
-        HIGH_PROTEIN_SYSTEM_PROMPT to "$HIGH_PROTEIN_USER_PROMPT$foodItemsNames."
-      }
-      RecipeType.LOW_CALORIE -> {
-        LOW_CALORIE_SYSTEM_PROMPT to "$LOW_CALORIE_USER_PROMPT$foodItemsNames."
-      }
-      RecipeType.PERSONAL -> {
-        throw IllegalArgumentException(
-            "SearchRecipeType.PERSONAL is not supported for recipe generation as it is reserved for user-created recipes.")
-      }
+    val foodItemNames = foodItems.joinToString(", ") { it.foodFacts.name }
+
+    val recipeTypeDescription = when (recipePrompt.recipeType) {
+      RecipeType.USE_SOON_TO_EXPIRE -> ""
+      RecipeType.USE_ONLY_HOUSEHOLD_ITEMS -> ""
+      RecipeType.HIGH_PROTEIN -> "high protein"
+      RecipeType.LOW_CALORIE -> "low calorie"
+      RecipeType.PERSONAL -> throw IllegalArgumentException(
+        "RecipeType.PERSONAL is not supported for recipe generation as it is reserved for user-created recipes."
+      )
     }
+    val recipeDescriptionFinal = "$recipeTypeDescription, ${if (recipePrompt.shortDuration) QUICK_RECIPE_DEF else LONG_RECIPE_DEF}"
+
+    val finalUserPrompt = BASE_USER_PROMPT(servings, recipeDescriptionFinal, foodItemNames, recipePrompt.recipeType == RecipeType.USE_ONLY_HOUSEHOLD_ITEMS, recipePrompt.name, recipePrompt.specialInstruction)
+
+    return BASE_SYSTEM_PROMPT(recipeDescriptionFinal) to finalUserPrompt
   }
+
 
   override fun generateRecipe(
       recipePrompt: RecipePrompt,
@@ -98,7 +93,7 @@ class RecipeGeneratorOpenAIRepository(
 
     // Get the custom system and user prompts based on the mode
     val (systemPrompt, userPrompt) =
-        getPromptsForMode(recipePrompt.ingredients, recipePrompt.recipeType)
+        getPromptsForMode(recipePrompt)
     // Launch a coroutine
     CoroutineScope(dispatcher).launch {
       try {
@@ -171,7 +166,7 @@ class RecipeGeneratorOpenAIRepository(
                   ChatMessage(
                       role = ChatRole.User,
                       content =
-                          (userPrompt + USER_PROMPT_USE_TOOL_CALL) // User prompt with food items
+                          userPrompt // User prompt with food items
                       ))
           tools {
             function(
