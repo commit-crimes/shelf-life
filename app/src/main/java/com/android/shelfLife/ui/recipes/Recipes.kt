@@ -75,6 +75,7 @@ fun RecipesScreen(navigationActions: NavigationActions) {
     val isFabExpanded by recipesViewModel.fabExpanded.collectAsState()
     val query by recipesViewModel.query.collectAsState()
     val filteredRecipeList by recipesViewModel.filteredRecipeList.collectAsState()
+    val selectedFilters by recipesViewModel.selectedFilters.collectAsState()
 
   if (selectedHousehold == null) {
     FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel)
@@ -92,7 +93,7 @@ fun RecipesScreen(navigationActions: NavigationActions) {
                     }
                   },
                   filters = recipesViewModel.filters,
-                  selectedFilters = recipesViewModel.selectedFilters.value,
+                  selectedFilters = selectedFilters,
                   onFilterChange = { filter, isSelected -> recipesViewModel.clickOnFilter(filter) })
             }
           },
