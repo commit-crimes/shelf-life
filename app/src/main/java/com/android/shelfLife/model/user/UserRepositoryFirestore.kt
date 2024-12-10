@@ -88,6 +88,48 @@ class UserRepositoryFirestore @Inject constructor(
         Log.d("User Repo", "User data initialized, ${user.value}")
     }
 
+    override suspend fun getUserIds(userEmails: Set<String?>): Map<String, String> {
+        if (userEmails.isEmpty()) return emptyMap()
+
+        val emailToUserId = mutableMapOf<String, String>()
+        val chunks = userEmails.filterNotNull().chunked(10)
+
+        for (chunk in chunks) {
+            val query = db.collection("users")
+                .whereIn("email", chunk)
+                .get()
+                .await()
+            for (doc in query.documents) {
+                val email = doc.getString("email")
+                val userId = doc.id
+                if (email != null) emailToUserId[email] = userId
+            }
+        }
+
+        return emailToUserId
+    }
+
+    override suspend fun getUserEmails(userIds: List<String>): Map<String, String> {
+        if (userIds.isEmpty()) return emptyMap()
+
+        val uidToEmail = mutableMapOf<String, String>()
+        val chunks = userIds.chunked(10)
+
+        for (chunk in chunks) {
+            val query = db.collection("users")
+                .whereIn(FieldPath.documentId(), chunk)
+                .get()
+                .await()
+            for (doc in query.documents) {
+                val email = doc.getString("email")
+                val userId = doc.id
+                if (email != null) uidToEmail[userId] = email
+            }
+        }
+        return uidToEmail
+    }
+
+
     override fun startListeningForInvitations() {
         val currentUser = firebaseAuth.currentUser
         if (currentUser != null) {
@@ -219,79 +261,6 @@ class UserRepositoryFirestore @Inject constructor(
 
     override suspend fun updateSelectedHousehold(selectedHouseholdUID: String) {
         updateUserField("selectedHouseholdUID", selectedHouseholdUID)
-    }
-
-    override fun getUserIds(userEmails: Set<String?>, callback: (Map<String, String>) -> Unit) {
-        if (userEmails.isEmpty()) {
-            callback(emptyMap())
-            return
-        }
-        val emailBatches = userEmails.filterNotNull().chunked(10)
-        val emailToUserId = mutableMapOf<String, String>()
-        var batchesProcessed = 0
-
-        for (emailBatch in emailBatches) {
-            db.collection("users")
-                .whereIn("email", emailBatch)
-                .get()
-                .addOnSuccessListener { querySnapshot ->
-                    for (doc in querySnapshot.documents) {
-                        val email = doc.getString("email")
-                        val userId = doc.id
-                        if (email != null) {
-                            emailToUserId[email] = userId
-                        }
-                    }
-                    batchesProcessed++
-                    if (batchesProcessed == emailBatches.size) {
-                        callback(emailToUserId)
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("HouseholdRepository", "Error fetching user IDs by emails", exception)
-                    batchesProcessed++
-                    if (batchesProcessed == emailBatches.size) {
-                        callback(emailToUserId)
-                    }
-                }
-        }
-    }
-
-    override fun getUserEmails(userIds: List<String>, callback: (Map<String, String>) -> Unit) {
-        if (userIds.isEmpty()) {
-            callback(emptyMap())
-            return
-        }
-
-        val uidBatches = userIds.chunked(10)
-        val uidToEmail = mutableMapOf<String, String>()
-        var batchesProcessed = 0
-
-        for (uidBatch in uidBatches) {
-            db.collection("users")
-                .whereIn(FieldPath.documentId(), uidBatch)
-                .get()
-                .addOnSuccessListener { querySnapshot ->
-                    for (doc in querySnapshot.documents) {
-                        val email = doc.getString("email")
-                        val userId = doc.id
-                        if (email != null) {
-                            uidToEmail[userId] = email
-                        }
-                    }
-                    batchesProcessed++
-                    if (batchesProcessed == uidBatches.size) {
-                        callback(uidToEmail)
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("HouseholdRepository", "Error fetching emails by user IDs", exception)
-                    batchesProcessed++
-                    if (batchesProcessed == uidBatches.size) {
-                        callback(uidToEmail)
-                    }
-                }
-        }
     }
 
     override suspend fun selectHousehold(household: HouseHold?) {
