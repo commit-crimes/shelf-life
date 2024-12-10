@@ -31,8 +31,14 @@ constructor(
   private val _drawerState = MutableStateFlow(DrawerState(DrawerValue.Closed))
   val drawerState = _drawerState.asStateFlow()
 
-  val filters =
-      listOf("Soon to expire", "Only household items", "High protein", "Low calories", "Personal")
+  private val FILTERS = mapOf(
+    "Soon to expire" to RecipeType.USE_SOON_TO_EXPIRE,
+    "Only household items" to RecipeType.USE_ONLY_HOUSEHOLD_ITEMS,
+    "High protein" to RecipeType.HIGH_PROTEIN,
+    "Low calories" to RecipeType.LOW_CALORIE,
+    "Personal" to RecipeType.PERSONAL
+  ) // cannot make a map const
+  var filters = FILTERS.keys.toList()
 
   private val _selectedFilters = MutableStateFlow<List<String>>(emptyList())
   val selectedFilters = _selectedFilters.asStateFlow()
@@ -117,28 +123,10 @@ constructor(
           // Check if recipe matches selected filters
           (selectedFilters.value.isEmpty() ||
               selectedFilters.value.any { filter ->
-                recipe.recipeType == stringToSearchRecipeType(filter)
+                recipe.recipeType == FILTERS.get(filter)
               }) &&
               // Check if recipe matches the search query
               (query.value.isEmpty() || recipe.name.contains(query.value, ignoreCase = true))
         }
-  }
-
-  /**
-   * Converts a filter string into a corresponding RecipeType enum.
-   *
-   * @param string The filter string to convert.
-   * @return The corresponding RecipeType for the given string.
-   * @throws IllegalArgumentException If the string does not match a valid filter.
-   */
-  private fun stringToSearchRecipeType(string: String): RecipeType {
-    return when (string) {
-      "Soon to expire" -> RecipeType.USE_SOON_TO_EXPIRE
-      "Only household items" -> RecipeType.USE_ONLY_HOUSEHOLD_ITEMS
-      "High protein" -> RecipeType.HIGH_PROTEIN
-      "Low calories" -> RecipeType.LOW_CALORIE
-      "Personal" -> RecipeType.PERSONAL
-      else -> throw IllegalArgumentException("Unknown filter: $string")
-    }
   }
 }
