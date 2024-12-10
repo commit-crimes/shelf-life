@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -22,7 +23,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.newFoodItem.FoodItem
+import com.android.shelfLife.model.newFoodItem.FoodStorageLocation
 import com.android.shelfLife.model.recipe.RecipePrompt
 import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -64,8 +66,8 @@ fun GenerateRecipeScreen(navigationActions: NavigationActions) {
     recipeNameError?.let {
       Text(
           text = it,
-          color = androidx.compose.material.MaterialTheme.colors.error,
-          style = androidx.compose.material.MaterialTheme.typography.body2)
+          color = MaterialTheme.colors.error,
+          style = MaterialTheme.typography.body2)
     }
 
     // Section for adding food items
@@ -104,8 +106,8 @@ fun GenerateRecipeScreen(navigationActions: NavigationActions) {
     foodItemError?.let {
       Text(
           text = it,
-          color = androidx.compose.material.MaterialTheme.colors.error,
-          style = androidx.compose.material.MaterialTheme.typography.body2)
+          color = MaterialTheme.colors.error,
+          style = MaterialTheme.typography.body2)
     }
 
     // Display the list of food items
@@ -126,14 +128,19 @@ fun GenerateRecipeScreen(navigationActions: NavigationActions) {
             val testIngredients =
                 foodItems.mapIndexed { index, name ->
                   FoodItem(
-                      uid = index.toString(), foodFacts = FoodFacts(name, quantity = Quantity(1.0)))
+                      uid = index.toString(),
+                      foodFacts = FoodFacts(name, quantity = Quantity(1.0)),
+                      location = FoodStorageLocation.FRIDGE,
+                      owner = "Owner"
+                  )
                 }
             navigationActions.goBack()
             generationViewModel.updateRecipePrompt(
                 RecipePrompt(
                     name = recipeName,
                     ingredients = testIngredients,
-                    recipeType = RecipeType.HIGH_PROTEIN))
+                    recipeType = RecipeType.HIGH_PROTEIN)
+            )
             generationViewModel.generateRecipe(
                 onSuccess = { recipe ->
                   generationViewModel.acceptGeneratedRecipe {

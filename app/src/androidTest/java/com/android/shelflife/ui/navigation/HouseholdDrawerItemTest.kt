@@ -3,8 +3,8 @@ package com.android.shelflife.ui.navigation
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import com.android.shelfLife.model.household.HouseHold
-import com.android.shelfLife.ui.navigation.HouseholdDrawerItem
+import com.android.shelfLife.model.newhousehold.HouseHold
+import com.android.shelfLife.ui.newnavigation.HouseholdDrawerItem
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

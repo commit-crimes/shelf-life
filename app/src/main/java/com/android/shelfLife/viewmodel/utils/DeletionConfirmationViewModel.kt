@@ -2,7 +2,7 @@ package com.android.shelfLife.viewmodel.utils
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

@@ -4,8 +4,8 @@ import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.android.shelfLife.model.invitations.Invitation
-import com.android.shelfLife.model.invitations.InvitationRepository
+import com.android.shelfLife.model.newInvitations.Invitation
+import com.android.shelfLife.model.newInvitations.InvitationRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient

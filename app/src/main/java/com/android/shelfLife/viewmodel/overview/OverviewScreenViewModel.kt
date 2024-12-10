@@ -5,10 +5,10 @@ import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.shelfLife.model.foodItem.FoodItem
-import com.android.shelfLife.model.foodItem.FoodItemRepository
-import com.android.shelfLife.model.household.HouseHold
-import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.newFoodItem.FoodItem
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
+import com.android.shelfLife.model.newhousehold.HouseHold
+import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,7 +52,8 @@ constructor(
     Log.d("OverviewScreenViewModel", "Initialized")
     FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
       if (firebaseAuth.currentUser != null) {
-        Log.d("OverviewScreenViewModel", "User logged in, loading....")
+        Log.d("OverviewScreenViewModel", "User logged in, loading: ${firebaseAuth.currentUser}, user: ${userRepository.user.value}")
+        loadHouseholds()
       }
     }
   }
@@ -60,13 +61,14 @@ constructor(
   /** Loads the list of households from the repository and updates the [_households] flow. */
   private fun loadHouseholds() {
     viewModelScope.launch {
+      Log.d("OverviewScreenViewModel", "Loading households for user: ${userRepository.user.value}")
       userRepository.user.value?.let { user ->
         houseHoldRepository.initializeHouseholds(user.householdUIDs, user.selectedHouseholdUID!!)
         userRepository.selectHousehold(
             households.value.find { it.uid == user.selectedHouseholdUID }
                 ?: households.value.firstOrNull())
       }
-      Log.d("OverviewScreenViewModel", "Households loaded")
+      Log.d("OverviewScreenViewModel", "Households loaded: ${households.value}")
       finishedLoading.value = true
     }
   }
