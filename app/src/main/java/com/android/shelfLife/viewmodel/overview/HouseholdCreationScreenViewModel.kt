@@ -30,7 +30,7 @@ constructor(
   val selectedHousehold = userRepository.selectedHousehold
   val households = houseHoldRepository.households
   val currentUser = userRepository.user
-  // TODO Should this be there?
+
   private var finishedLoading = MutableStateFlow(false)
 
   init {
@@ -55,7 +55,7 @@ constructor(
                     (householdToEdit.value == null || householdName != householdToEdit.value!!.name)))
   }
 
-  suspend fun getEmailToUserId(emails: Set<String>): Map<String, String> {
+  private suspend fun getEmailToUserId(emails: Set<String>): Map<String, String> {
     return userRepository.getUserIds(emails)
   }
 
