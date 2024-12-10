@@ -217,6 +217,7 @@ constructor(private val db: FirebaseFirestore, private val firebaseAuth: Firebas
   }
 
   override fun setUserLoggedInStatus(isLoggedIn: Boolean) {
+    Log.d("UserRepository", "Setting user logged in status to $isLoggedIn")
     _isUserLoggedIn.value = isLoggedIn
   }
 

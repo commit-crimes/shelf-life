@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.viewmodel.authentication.SignInState
 import com.android.shelfLife.viewmodel.authentication.SignInViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -41,8 +40,8 @@ fun SignInScreen(navigationActions: NavigationActions) {
         ->
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
-          val account = task.getResult(Exception::class.java)
-          account?.idToken?.let { idToken -> signInViewModel.signInWithGoogle(idToken, context) }
+          val account = task.getResult(Exception::class.java)!!
+          account.idToken?.let { idToken -> signInViewModel.signInWithGoogle(idToken, context) }
               ?: run {
                 Toast.makeText(context, "Failed to get ID Token!", Toast.LENGTH_LONG).show()
               }
@@ -64,6 +63,9 @@ fun SignInScreen(navigationActions: NavigationActions) {
       is SignInState.Error -> {
         val message = (signInState as SignInState.Error).message
         Toast.makeText(context, "Login failed: $message", Toast.LENGTH_LONG).show()
+      }
+      is SignInState.Loading -> {
+        // Do nothing
       }
       else -> {
         Log.e("SignInScreen", "Unexpected sign-in state: $signInState")
@@ -102,7 +104,6 @@ fun SignInScreen(navigationActions: NavigationActions) {
                         .build()
                 val googleSignInClient = GoogleSignIn.getClient(context, gso)
                 launcher.launch(googleSignInClient.signInIntent)
-                navigationActions.navigateTo(Route.OVERVIEW)
               },
               modifier = Modifier.testTag("loginButton"))
 

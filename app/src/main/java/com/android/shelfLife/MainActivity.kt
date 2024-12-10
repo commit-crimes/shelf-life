@@ -60,9 +60,9 @@ fun ShelfLifeApp(userRepository: UserRepository) {
     if (isUserLoggedIn) {
       Log.d("ShelfLifeApp", "User is logged in, calling initializeUserData")
       userRepository.initializeUserData(context)
-      navController.navigate(Route.OVERVIEW) { popUpTo(Route.AUTH) { inclusive = true } }
+      navigationActions.navigateToAndClearBackStack(Screen.OVERVIEW)
     } else {
-      navController.navigate(Route.AUTH) { popUpTo(Route.OVERVIEW) { inclusive = true } }
+      navigationActions.navigateToAndClearBackStack(Screen.AUTH)
     }
   }
 

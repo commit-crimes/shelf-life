@@ -42,20 +42,25 @@ constructor(
   }
 
   override fun onCleared() {
+    Log.d("SignInViewModel", "onCleared called")
     super.onCleared()
     firebaseAuth.removeAuthStateListener(authStateListener)
   }
 
   fun signInWithGoogle(idToken: String, context: Context) {
+    Log.d("SignInViewModel", "signInWithGoogle called")
+
     val credential = GoogleAuthProvider.getCredential(idToken, null)
     viewModelScope.launch {
       _signInState.value = SignInState.Loading
       try {
         val authResult = firebaseAuth.signInWithCredential(credential).await()
         Log.d("SignInViewModel", "AuthResult : $authResult calling initializeUserData")
-        userRepository.initializeUserData(context)
-        userRepository.setUserLoggedInStatus(true)
-        _signInState.value = SignInState.Success(authResult)
+        viewModelScope.launch {
+          userRepository.initializeUserData(context)
+          userRepository.setUserLoggedInStatus(true)
+          _signInState.value = SignInState.Success(authResult)
+        }
       } catch (e: Exception) {
         _signInState.value = SignInState.Error(e.message ?: "Unknown error occurred.")
       }

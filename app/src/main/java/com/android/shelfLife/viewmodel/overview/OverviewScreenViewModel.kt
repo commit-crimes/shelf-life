@@ -69,6 +69,9 @@ constructor(
         userRepository.selectHousehold(
             households.value.find { it.uid == user.selectedHouseholdUID }
                 ?: households.value.firstOrNull())
+        if (selectedHousehold.value != null) {
+          listFoodItemsRepository.getFoodItems(selectedHousehold.value!!.uid)
+        }
       }
       Log.d("OverviewScreenViewModel", "Households loaded: ${households.value}")
       finishedLoading.value = true
