@@ -38,7 +38,6 @@ import kotlinx.coroutines.launch
  * Composable function to display the overview screen
  *
  * @param navigationActions The actions to handle navigation
- * @param houseHoldRepository The repository to handle household data
  */
 @Composable
 fun OverviewScreen(

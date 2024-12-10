@@ -24,11 +24,10 @@ constructor(
 ) : ViewModel() {
   private val _emailList = MutableStateFlow<Set<String>>(emptySet())
   val emailList: StateFlow<Set<String>> = _emailList.asStateFlow()
-
+  val user = userRepository.user
   val householdToEdit = houseHoldRepository.householdToEdit
   val selectedHousehold = userRepository.selectedHousehold
   val households = houseHoldRepository.households
-  val currentUser = userRepository.user
 
   var finishedLoading = MutableStateFlow(false)
 
@@ -82,10 +81,12 @@ constructor(
    * @param householdName - The name of the household to be added.
    */
   fun addNewHousehold(householdName: String, friendEmails: Set<String?> = emptySet()) {
-    if (currentUser.value != null) {
+    val currentUser = userRepository.user.value
+    Log.d("HouseholdCreationScreenViewModel", "adding new household. user value : $currentUser")
+    if (currentUser != null) {
       val householdUid = houseHoldRepository.getNewUid()
       var household =
-          HouseHold(householdUid, householdName, listOf(currentUser.value!!.uid), emptyList())
+          HouseHold(householdUid, householdName, listOf(currentUser.uid), emptyList())
 
       if (friendEmails.isNotEmpty()) { // Corrected condition
         userRepository.getUserIds(friendEmails) { emailToUserId ->
@@ -96,7 +97,7 @@ constructor(
           viewModelScope.launch {
             houseHoldRepository.addHousehold(household)
             userRepository.addHouseholdUID(household.uid)
-            for (user in friendEmails.filter { it != currentUser.value!!.email }) {
+            for (user in friendEmails.filter { it != currentUser.email }) {
               invitationRepository.sendInvitation(household = household, invitedUserID = user!!)
             }
             if (selectedHousehold.value == null) {
@@ -108,7 +109,7 @@ constructor(
         }
       } else {
         // No friend emails, add household with current user only
-        household = household.copy(members = listOf(currentUser.value!!.uid))
+        household = household.copy(members = listOf(currentUser.uid))
         viewModelScope.launch {
           houseHoldRepository.addHousehold(household)
           userRepository.addHouseholdUID(household.uid)
@@ -120,7 +121,7 @@ constructor(
         }
       }
     } else {
-      Log.e("HouseholdViewModel", "User not logged in")
+      Log.e("HouseholdCreationScreenViewModel", "User not logged in")
     }
   }
 

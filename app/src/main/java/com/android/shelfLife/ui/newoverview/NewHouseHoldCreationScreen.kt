@@ -45,9 +45,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun HouseHoldCreationScreen(
     navigationActions: NavigationActions,
+    householdCreationScreenViewModel: HouseholdCreationScreenViewModel = hiltViewModel()
 ) {
-  val householdCreationScreenViewModel: HouseholdCreationScreenViewModel =
-      hiltViewModel<HouseholdCreationScreenViewModel>()
   val householdToEdit by householdCreationScreenViewModel.householdToEdit.collectAsState()
 
   var isError by rememberSaveable { mutableStateOf(false) }
@@ -253,7 +252,8 @@ fun HouseHoldCreationScreen(
                       } else {
                         householdCreationScreenViewModel.addNewHousehold(
                             houseHoldName, memberEmailList)
-                        Log.d("HouseHoldCreationScreen", "Added new household")
+
+                        Log.d("HouseHoldCreationScreen", "Added new household: $houseHoldName, $memberEmailList")
                       }
                       navigationActions.navigateTo(Screen.OVERVIEW)
                     }

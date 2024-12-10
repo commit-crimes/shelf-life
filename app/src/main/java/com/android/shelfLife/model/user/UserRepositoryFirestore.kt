@@ -85,6 +85,7 @@ class UserRepositoryFirestore @Inject constructor(
             _invitations.value = emptyList()
             throw e
         }
+        Log.d("User Repo", "User data initialized, ${user.value}")
     }
 
     override fun startListeningForInvitations() {
@@ -108,6 +109,7 @@ class UserRepositoryFirestore @Inject constructor(
                             selectedHouseholdUID = ""
                         )
                         _user.value = currentUserData.copy(invitationUIDs = invitationsList)
+                        Log.d("user repo", "start listening for invitations, user: ${user.value}")
                     } else {
                         _invitations.value = emptyList()
                     }

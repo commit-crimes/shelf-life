@@ -1,6 +1,7 @@
 package com.android.shelfLife.viewmodel.authentication
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,6 +33,7 @@ constructor(
 
   private val authStateListener =
       FirebaseAuth.AuthStateListener { auth ->
+          Log.d("SignInViewModel", "AuthStateListener triggered, user: ${auth.currentUser}")
         userRepository.setUserLoggedInStatus(auth.currentUser != null)
       }
 
@@ -50,8 +52,9 @@ constructor(
       _signInState.value = SignInState.Loading
       try {
         val authResult = firebaseAuth.signInWithCredential(credential).await()
-        val user = authResult.user
+        Log.d("SignInViewModel", "AuthResult : $authResult calling initializeUserData")
         userRepository.initializeUserData(context)
+           userRepository.setUserLoggedInStatus(true)
         _signInState.value = SignInState.Success(authResult)
       } catch (e: Exception) {
         _signInState.value = SignInState.Error(e.message ?: "Unknown error occurred.")

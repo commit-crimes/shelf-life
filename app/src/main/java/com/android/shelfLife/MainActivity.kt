@@ -1,6 +1,7 @@
 package com.android.shelfLife
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -37,7 +38,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-  @Inject lateinit var userRepositoryFirestore: UserRepositoryFirestore
+  @Inject lateinit var userRepositoryFirestore: UserRepository
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -58,6 +59,8 @@ fun ShelfLifeApp(userRepository: UserRepository) {
   // Observe authentication state changes
   LaunchedEffect(isUserLoggedIn) {
     if (isUserLoggedIn) {
+      Log.d("ShelfLifeApp", "User is logged in, calling initializeUserData")
+      userRepository.initializeUserData(context)
       navController.navigate(Route.OVERVIEW) { popUpTo(Route.AUTH) { inclusive = true } }
     } else {
       navController.navigate(Route.AUTH) { popUpTo(Route.OVERVIEW) { inclusive = true } }
