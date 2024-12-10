@@ -23,26 +23,33 @@ constructor(
     private val recipeRepository: RecipeRepository
 ): ViewModel(){
 
-    val userRecipes = MutableStateFlow<List<Recipe>>(emptyList())
-    val  filteredRecipeList = MutableStateFlow<List<Recipe>>(emptyList())
+    private val _userRecipes = MutableStateFlow<List<Recipe>>(emptyList())
+    val userRecipes = _userRecipes.asStateFlow()
+
+    private val _filteredRecipeList = MutableStateFlow<List<Recipe>>(emptyList())
+    val  filteredRecipeList = _filteredRecipeList.asStateFlow()
+
     val fabExpanded = MutableStateFlow(false)
+
     private val _drawerState = MutableStateFlow(DrawerState(DrawerValue.Closed))
     val drawerState = _drawerState.asStateFlow()
+
     val filters = listOf("Soon to expire", "Only household items", "High protein", "Low calories", "Personal")
-    var selectedFilters = MutableStateFlow<List<String>>(emptyList())
-    var query = MutableStateFlow<String>("")
 
-    var user = MutableStateFlow<User?>(null)
-    var household = MutableStateFlow<HouseHold?>(null)
+    private val _selectedFilters = MutableStateFlow<List<String>>(emptyList())
+    val selectedFilters = _selectedFilters.asStateFlow()
 
+    private var _query = MutableStateFlow<String>("")
+    val query = _query.asStateFlow()
+
+    var user = userRepository.user
+    var household = userRepository.selectedHousehold
 
 
     init {
-        if(userRepository.user.value != null){
-            userRecipes.value = populateUserRecipes()
+        if(user.value != null){
+            _userRecipes.value = populateUserRecipes()
         }
-        user.value = userRepository.user.value
-        household.value = userRepository.selectedHousehold.value
     }
 
     private fun populateUserRecipes(): List<Recipe> {
@@ -65,7 +72,7 @@ constructor(
     }
 
     fun clickOnFilter(filter : String){
-        selectedFilters.value = if (selectedFilters.value.contains(filter)) {
+        _selectedFilters.value = if (selectedFilters.value.contains(filter)) {
             selectedFilters.value - filter // Remove the filter if it exists
         } else {
             selectedFilters.value + filter // Add the filter if it doesn't exist
@@ -74,29 +81,13 @@ constructor(
     }
 
     fun changeQuery(newQuery : String){
-        query.value = newQuery
+        _query.value = newQuery
         filterRecipes()
     }
 
-    /**
-     * Filters a list of recipes based on selected filters and a search query.
-     *
-     * @param listRecipes The complete list of recipes to be filtered.
-     * @param selectedFilters A list of filter criteria. Each filter is matched against the recipe's
-     *   types. If the list is empty, no filter is applied based on this parameter.
-     * @param query A search string used to filter recipes by their names. If the string is empty, no
-     *   filtering is applied based on this parameter.
-     * @return A list of recipes that match both the selected filters and the search query.
-     *     - Recipes are included if they match at least one filter from `selectedFilters` (if
-     *       provided).
-     *     - Recipes are included if their names contain the `query` string (case-insensitive, if
-     *       provided).
-     *     - If both `selectedFilters` and `query` are empty, the original list is returned without any
-     *       filtering.
-     */
     fun filterRecipes(){
         // Combined filtering based on selected filters and search query
-        filteredRecipeList.value =
+        _filteredRecipeList.value =
             userRecipes.value.filter { recipe ->
                 // Check if recipe matches selected filters
                 (selectedFilters.value.isEmpty() ||
@@ -108,19 +99,6 @@ constructor(
             }
     }
 
-    /**
-     * Converts a string representation of a recipe type into a corresponding
-     * `RecipesRepository.SearchRecipeType` enumeration value.
-     *
-     * @param string A string describing the type of recipe to search for. Possible values include:
-     *     - "Soon to expire": Recipes with ingredients that are nearing expiration.
-     *     - "Only household items": Recipes using only ingredients available in the household.
-     *     - "High protein": Recipes with a high protein content.
-     *     - "Low calories": Recipes with low caloric content.
-     *
-     * @return The corresponding `RecipesRepository.SearchRecipeType` enum value.
-     * @throws IllegalArgumentException If the input string does not match any known recipe type.
-     */
     private fun stringToSearchRecipeType(string: String): RecipeType {
         return when (string) {
             "Soon to expire" -> RecipeType.USE_SOON_TO_EXPIRE
@@ -131,6 +109,4 @@ constructor(
             else -> throw IllegalArgumentException("Unknown filter: $string")
         }
     }
-
-
 }
