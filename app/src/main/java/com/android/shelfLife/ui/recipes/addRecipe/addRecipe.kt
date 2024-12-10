@@ -31,15 +31,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.recipe.Ingredient
-import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
-import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.theme.onSecondaryDark
 import com.android.shelfLife.ui.theme.primaryContainerDark
@@ -49,12 +45,13 @@ import com.android.shelfLife.ui.theme.secondaryContainerLight
 import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.recipes.AddRecipeViewModel
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 @Composable
-fun AddRecipeScreen(navigationActions: NavigationActions) {
-  val addRecipeViewModel = hiltViewModel<AddRecipeViewModel>()
+fun AddRecipeScreen(
+    navigationActions: NavigationActions,
+    addRecipeViewModel: AddRecipeViewModel = hiltViewModel() // default in production
+) {
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
 
@@ -420,17 +417,24 @@ fun ErrorTextBoxNEW(errorMessageId: Int?, testTag: String) {
   }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun AddRecipeScreenPreview() {
-  // Mock navigation actions
-  val navController = rememberNavController()
-  val navigationActions = NavigationActions(navController)
-  val firebaseFirestore = FirebaseFirestore.getInstance()
-  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
-
-  val viewModel = AddRecipeViewModel(recipeRepository, UserRepositoryFirestore(firebaseFirestore))
-
-  // Call the AddRecipeScreen with mocked data
-  AddRecipeScreen(navigationActions = navigationActions)
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun AddRecipeScreenPreview() {
+//    val navController = rememberNavController()
+//    val navigationActions = NavigationActions(navController)
+//
+//    // Create mock or fake repositories for testing
+//    val fakeRecipeRepository = FakeRecipeRepository() // Implement a simple fake
+//    val fakeUserRepository = FakeUserRepository()     // Implement a simple fake
+//
+//    // Manually instantiate your ViewModel with fakes
+//    val viewModel = AddRecipeViewModel(
+//        recipeRepository = fakeRecipeRepository,
+//        userRepository = fakeUserRepository
+//    )
+//
+//    AddRecipeScreen(
+//        navigationActions = navigationActions,
+//        addRecipeViewModel = viewModel
+//    )
+//}

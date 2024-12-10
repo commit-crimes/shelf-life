@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.recipe.RecipePrompt
-import com.android.shelfLife.model.recipe.RecipeRepository
+import com.android.shelfLife.model.newRecipe.RecipeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow

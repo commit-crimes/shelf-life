@@ -12,6 +12,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -22,11 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.FoodFacts
-import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.android.shelfLife.model.foodFacts.SearchStatus
-import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.android.shelfLife.model.household.HouseholdViewModel
-import com.android.shelfLife.ui.navigation.BottomNavigationMenu
+import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
@@ -46,21 +44,18 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BarcodeScannerScreen(
-    navigationActions: NavigationActions,
-    cameraViewModel: BarcodeScannerViewModel = viewModel(),
-    foodFactsViewModel: FoodFactsViewModel,
-    householdViewModel: HouseholdViewModel,
-    foodItemViewModel: ListFoodItemsViewModel
+    navigationActions: NavigationActions
 ) {
+  val cameraViewModel = viewModel(BarcodeScannerViewModel::class.java)
   val context = LocalContext.current
   val permissionGranted = cameraViewModel.permissionGranted
 
   // State variables
-  val isScanningState = remember { mutableStateOf(true) }
-  val foodScanned = remember { mutableStateOf(false) }
-  val barcodeScanned = remember { mutableStateOf<String?>(null) }
-  val foodFacts = remember { mutableStateOf<FoodFacts?>(null) }
-  val searchInProgress = remember { mutableStateOf(false) }
+  val isScanningState = rememberSaveable { mutableStateOf(true) }
+  val foodScanned = rememberSaveable { mutableStateOf(false) }
+  val barcodeScanned = rememberSaveable { mutableStateOf<String?>(null) }
+  val foodFacts = rememberSaveable { mutableStateOf<FoodFacts?>(null) }
+  val searchInProgress = rememberSaveable { mutableStateOf(false) }
 
   val coroutineScope = rememberCoroutineScope()
 
@@ -118,12 +113,11 @@ fun BarcodeScannerScreen(
               if (foodScanned.value && foodFactsValue != null) {
                 FoodInputContent(
                     foodFacts = foodFactsValue,
-                    onSubmit = { newFoodItem ->
-                      // Reset states
+                    onSubmit = {
+                        // Reset states
                       foodScanned.value = false
                       isScanningState.value = true
                       coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
-                      householdViewModel.addFoodItem(newFoodItem)
                       Log.d("BarcodeScanner", "Food item added")
                     },
                     onCancel = {
@@ -132,8 +126,7 @@ fun BarcodeScannerScreen(
                       isScanningState.value = true
                       coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
                       Log.d("BarcodeScanner", "Cancelled")
-                    },
-                    foodItemViewModel = foodItemViewModel,
+                    }
                 )
               }
               Spacer(modifier = Modifier.height(100.dp))
@@ -183,15 +176,15 @@ fun BarcodeScannerScreen(
   // Handle barcode scanning and search
   val currentBarcode = barcodeScanned.value
   if (searchInProgress.value && currentBarcode != null) {
-    LaunchedEffect(currentBarcode) { foodFactsViewModel.searchByBarcode(currentBarcode.toLong()) }
+    LaunchedEffect(currentBarcode) { cameraViewModel.searchByBarcode(currentBarcode.toLong()) }
   }
 
   // Observe searchStatus and update foodScanned.value
-  val searchStatus by foodFactsViewModel.searchStatus.collectAsState()
+  val searchStatus by cameraViewModel.searchStatus.collectAsState()
   LaunchedEffect(searchStatus) {
     when (searchStatus) {
       is SearchStatus.Success -> {
-        val suggestions = foodFactsViewModel.foodFactsSuggestions.value
+        val suggestions = cameraViewModel.foodFactsSuggestions.value
         if (suggestions.isNotEmpty()) {
           foodFacts.value = suggestions[0]
           foodScanned.value = true
@@ -203,14 +196,14 @@ fun BarcodeScannerScreen(
         // Reset states
         barcodeScanned.value = null
         searchInProgress.value = false
-        foodFactsViewModel.resetSearchStatus()
+        cameraViewModel.resetSearchStatus()
       }
       is SearchStatus.Failure -> {
         Toast.makeText(context, "Search failed, check internet connection", Toast.LENGTH_SHORT)
             .show()
         barcodeScanned.value = null
         searchInProgress.value = false
-        foodFactsViewModel.resetSearchStatus()
+        cameraViewModel.resetSearchStatus()
       }
       else -> {
         // Do nothing for Idle or Loading

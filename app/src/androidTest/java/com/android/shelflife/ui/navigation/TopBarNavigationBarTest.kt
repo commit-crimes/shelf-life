@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.navigation
+package com.android.shelfLife.ui.newnavigation
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.mutableStateOf
@@ -9,10 +9,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.foodItem.FoodItem
-import com.android.shelfLife.model.foodItem.FoodStatus
-import com.android.shelfLife.model.foodItem.FoodStorageLocation
-import com.android.shelfLife.model.household.HouseHold
+import com.android.shelfLife.model.newFoodItem.FoodItem
+import com.android.shelfLife.model.newFoodItem.FoodStatus
+import com.android.shelfLife.model.newFoodItem.FoodStorageLocation
+import com.android.shelfLife.model.newhousehold.HouseHold
 import com.google.firebase.Timestamp
 import org.junit.Before
 import org.junit.Rule

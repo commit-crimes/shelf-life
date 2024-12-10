@@ -9,13 +9,26 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
+import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.FoodFactsRepository
+import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
+import com.android.shelfLife.model.foodFacts.SearchStatus
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
 /**
  * ViewModel for managing the barcode scanner screen.
  *
  * @property application The application context
  */
-class BarcodeScannerViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class BarcodeScannerViewModel
+@Inject
+constructor(
+    application: Application,
+    private val foodFactsRepository: FoodFactsRepository
+    ) : AndroidViewModel(application) {
 
   private val sharedPreferences =
       getApplication<Application>()
@@ -31,6 +44,18 @@ class BarcodeScannerViewModel(application: Application) : AndroidViewModel(appli
 
   private var permissionRequested by
       mutableStateOf(sharedPreferences.getBoolean("permissionRequested", false))
+
+  val searchStatus: StateFlow<SearchStatus> = foodFactsRepository.searchStatus
+
+  val foodFactsSuggestions: StateFlow<List<FoodFacts>> = foodFactsRepository.foodFactsSuggestions
+
+  fun searchByBarcode(barcode: Long) {
+    foodFactsRepository.searchByBarcode(barcode)
+  }
+
+  fun resetSearchStatus() {
+    foodFactsRepository.resetSearchStatus()
+  }
 
   /** Checks if the camera permission is granted. */
   fun checkCameraPermission() {

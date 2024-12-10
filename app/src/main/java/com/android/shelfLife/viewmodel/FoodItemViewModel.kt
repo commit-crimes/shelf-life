@@ -9,10 +9,10 @@ import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.foodItem.FoodItem
-import com.android.shelfLife.model.foodItem.FoodItemRepository
-import com.android.shelfLife.model.foodItem.FoodStatus
-import com.android.shelfLife.model.foodItem.FoodStorageLocation
+import com.android.shelfLife.model.newFoodItem.FoodItem
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
+import com.android.shelfLife.model.newFoodItem.FoodStatus
+import com.android.shelfLife.model.newFoodItem.FoodStorageLocation
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.utils.formatDateToTimestamp
 import com.android.shelfLife.ui.utils.formatTimestampToDate
@@ -36,6 +36,8 @@ constructor(
   var selectedFood by mutableStateOf<FoodItem?>(null)
 
   var isSelected by mutableStateOf(false)
+
+  var isScanned by mutableStateOf(false)
 
   var foodName by mutableStateOf("")
   var amount by mutableStateOf("")
@@ -74,12 +76,18 @@ constructor(
     }
   }
 
+  fun isScanned() {
+    isScanned = true
+  }
+
   /** Validates all fields when the submit button is clicked. */
   fun validateAllFieldsWhenSubmitButton() {
-    if (!isSelected) {
+    if (!isSelected && !isScanned) {
       foodNameErrorResId = validateString(foodName)
     }
-    amountErrorResId = validateNumber(amount)
+    if(!isScanned) {
+        amountErrorResId = validateNumber(amount)
+    }
     buyDateErrorResId = validateBuyDate(buyDate)
     expireDateErrorResId = validateExpireDate(expireDate, buyDate, buyDateErrorResId)
     openDateErrorResId =
@@ -141,7 +149,9 @@ constructor(
         validateOpenDate(openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
   }
 
-  suspend fun submitFoodItem(): Boolean {
+  suspend fun submitFoodItem(
+      scannedFoodFacts: FoodFacts? = null
+  ): Boolean {
     validateAllFieldsWhenSubmitButton()
     val isExpireDateValid = expireDateErrorResId == null && expireDate.isNotEmpty()
     val isOpenDateValid = openDateErrorResId == null
@@ -161,6 +171,7 @@ constructor(
         expiryTimestamp != null &&
         buyTimestamp != null) {
       val foodFacts =
+          if(isScanned) scannedFoodFacts!! else
           FoodFacts(
               name = foodName,
               barcode =

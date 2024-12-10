@@ -2,8 +2,8 @@ package com.android.shelfLife.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.shelfLife.model.household.HouseHold
-import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.newhousehold.HouseHold
+import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow

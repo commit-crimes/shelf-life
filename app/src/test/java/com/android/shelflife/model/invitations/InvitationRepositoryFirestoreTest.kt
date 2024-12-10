@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.invitations
+package com.android.shelfLife.model.newInvitations
 
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.Timestamp
@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import javax.inject.Inject
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.runBlocking
@@ -14,23 +15,18 @@ import org.junit.*
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
 import org.robolectric.RobolectricTestRunner
-import javax.inject.Inject
 
 @HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
 class InvitationRepositoryFirestoreTest {
 
-  @get:Rule
-  var hiltRule = HiltAndroidRule(this)
+  @get:Rule var hiltRule = HiltAndroidRule(this)
 
-  @Inject
-  lateinit var invitationRepository: InvitationRepositoryFirestore
+  @Inject lateinit var invitationRepository: InvitationRepositoryFirestore
 
-  @Inject
-  lateinit var mockFirestore: FirebaseFirestore
+  @Inject lateinit var mockFirestore: FirebaseFirestore
 
-  @Inject
-  lateinit var mockAuth: FirebaseAuth
+  @Inject lateinit var mockAuth: FirebaseAuth
 
   private lateinit var mockCollection: CollectionReference
   private lateinit var mockDocument: DocumentReference
@@ -68,7 +64,8 @@ class InvitationRepositoryFirestoreTest {
     `when`(mockDocument2.getTimestamp("timestamp")).thenReturn(Timestamp.now())
 
     `when`(mockSnapshot.documents).thenReturn(listOf(mockDocument1, mockDocument2))
-    `when`(mockCollection.whereIn(FieldPath.documentId(), invitationIds).get().await()).thenReturn(mockSnapshot)
+    `when`(mockCollection.whereIn(FieldPath.documentId(), invitationIds).get().await())
+        .thenReturn(mockSnapshot)
 
     val invitations = invitationRepository.getInvitations(invitationIds)
 
@@ -79,14 +76,14 @@ class InvitationRepositoryFirestoreTest {
 
   @Test
   fun `acceptInvitation updates household members and deletes invitation`() = runBlocking {
-    val invitation = Invitation(
-      invitationId = "inv1",
-      householdId = "house1",
-      householdName = "Household",
-      invitedUserId = "user1",
-      inviterUserId = "user2",
-      timestamp = Timestamp.now()
-    )
+    val invitation =
+        Invitation(
+            invitationId = "inv1",
+            householdId = "house1",
+            householdName = "Household",
+            invitedUserId = "user1",
+            inviterUserId = "user2",
+            timestamp = Timestamp.now())
 
     val householdCollection = mock(CollectionReference::class.java)
     val householdDocument = mock(DocumentReference::class.java)
@@ -104,14 +101,14 @@ class InvitationRepositoryFirestoreTest {
 
   @Test
   fun `declineInvitation deletes invitation from Firestore`() = runBlocking {
-    val invitation = Invitation(
-      invitationId = "inv1",
-      householdId = "house1",
-      householdName = "Household",
-      invitedUserId = "user1",
-      inviterUserId = "user2",
-      timestamp = Timestamp.now()
-    )
+    val invitation =
+        Invitation(
+            invitationId = "inv1",
+            householdId = "house1",
+            householdName = "Household",
+            invitedUserId = "user1",
+            inviterUserId = "user2",
+            timestamp = Timestamp.now())
 
     `when`(mockDocument.delete()).thenReturn(Tasks.forResult(null))
 
