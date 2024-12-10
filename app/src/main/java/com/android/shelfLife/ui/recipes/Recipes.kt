@@ -51,7 +51,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
-import com.android.shelfLife.model.newhousehold.HouseholdViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipeType
@@ -70,137 +69,139 @@ import kotlinx.coroutines.launch
 @Composable
 fun RecipesScreen(
     navigationActions: NavigationActions,
-    listRecipesViewModel: ListRecipesViewModel,
-    householdViewModel: HouseholdViewModel,
+//    listRecipesViewModel: ListRecipesViewModel,
+//    householdViewModel: HouseholdViewModel,
 ) {
-  // Collect the recipes StateFlow as a composable state
-  val recipeList by listRecipesViewModel.recipes.collectAsState()
-
-  // State for the search query
-  var query by remember { mutableStateOf("") }
-  var selectedFilters = remember { mutableStateListOf<String>() }
-
-  val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
-  val userHouseholds = householdViewModel.households.collectAsState().value
-
-  val drawerState = rememberDrawerState(DrawerValue.Closed)
-  val scope = rememberCoroutineScope()
-
-  val filters =
-      listOf("Soon to expire", "Only household items", "High protein", "Low calories", "Personal")
-
-  var fabExpanded = remember { mutableStateOf(false) }
-
-  HouseHoldSelectionDrawer(
-      scope = scope,
-      drawerState = drawerState,
-      householdViewModel = householdViewModel,
-      navigationActions = navigationActions) {
-
-        // filtering recipeList using the filter and the query from the searchBar
-        val filteredRecipes = filterRecipes(recipeList, selectedFilters, query)
-
-        if (selectedHousehold == null) {
-          FirstTimeWelcomeScreen(navigationActions, householdViewModel)
-        } else {
-          Scaffold(
-              modifier = Modifier.testTag("recipesScreen"),
-              topBar = {
-                selectedHousehold?.let {
-                  TopNavigationBar(
-                      houseHold = it,
-                      onHamburgerClick = { scope.launch { drawerState.open() } },
-                      filters = filters,
-                      selectedFilters = selectedFilters,
-                      onFilterChange = { filter, isSelected ->
-                        if (isSelected) {
-                          selectedFilters.add(filter)
-                        } else {
-                          selectedFilters.remove(filter)
-                        }
-                      })
-                }
-              },
-              bottomBar = {
-                BottomNavigationMenu(
-                    onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                    tabList = LIST_TOP_LEVEL_DESTINATION,
-                    selectedItem = Route.RECIPES)
-              },
-              // Floating Action Button to add a new food item
-              floatingActionButton = {
-                Column(
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)) {
-                      // Secondary FAB for "Manual" option
-                      if (fabExpanded.value) {
-                        ExtendedFloatingActionButton(
-                            text = { Text("Generate") },
-                            icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "Add") },
-                            onClick = {
-                              // Navigate to Manual Recipe screen
-                              navigationActions.navigateTo(Screen.GENERATE_RECIPE)
-                            },
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            modifier = Modifier.testTag("generateRecipeFab").width(150.dp))
-                      }
-
-                      // Primary FAB
-                      ExtendedFloatingActionButton(
-                          text = { Text(if (fabExpanded.value) "Manual" else "") },
-                          icon = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                          onClick = {
-                            if (fabExpanded.value) {
-                              // Navigate to Generate Recipe screen
-                              navigationActions.navigateTo(Screen.ADD_RECIPE)
-                            } else {
-                              // Expand the FABs
-                              fabExpanded.value = true
-                            }
-                          },
-                          expanded = fabExpanded.value, // Bind to the state
-                          containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                          modifier =
-                              Modifier.testTag("addRecipeFab")
-                                  .width(if (fabExpanded.value) 150.dp else 56.dp))
-                    }
-              },
-              content = { paddingValues ->
-                Column(
-                    modifier =
-                        Modifier.padding(paddingValues).fillMaxSize().pointerInput(Unit) {
-                          detectTapGestures(
-                              onTap = { if (fabExpanded.value) fabExpanded.value = false })
-                        }) {
-                      CustomSearchBar(
-                          query = query,
-                          onQueryChange = { query = it },
-                          placeholder = "Search recipe",
-                          searchBarTestTag = "searchBar",
-                          onDeleteTextClicked = { query = "" })
-
-                      if (filteredRecipes.isEmpty()) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            content = {
-                              Text(
-                                  text = "No recipes available",
-                                  modifier = Modifier.testTag("noRecipesAvailableText"))
-                            },
-                            contentAlignment = Alignment.Center)
-                      } else {
-                        // LazyColumn for displaying the list of filtered recipes
-                        LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
-                          items(filteredRecipes) { recipe ->
-                            RecipeItem(recipe, navigationActions, listRecipesViewModel)
-                          }
-                        }
-                      }
-                    }
-              })
-        }
-      }
+    Text("recipe screen")
+//
+//  // Collect the recipes StateFlow as a composable state
+//  val recipeList by listRecipesViewModel.recipes.collectAsState()
+//
+//  // State for the search query
+//  var query by remember { mutableStateOf("") }
+//  var selectedFilters = remember { mutableStateListOf<String>() }
+//
+//  val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
+//  val userHouseholds = householdViewModel.households.collectAsState().value
+//
+//  val drawerState = rememberDrawerState(DrawerValue.Closed)
+//  val scope = rememberCoroutineScope()
+//
+//  val filters =
+//      listOf("Soon to expire", "Only household items", "High protein", "Low calories", "Personal")
+//
+//  var fabExpanded = remember { mutableStateOf(false) }
+//
+//  HouseHoldSelectionDrawer(
+//      scope = scope,
+//      drawerState = drawerState,
+//      householdViewModel = householdViewModel,
+//      navigationActions = navigationActions) {
+//
+//        // filtering recipeList using the filter and the query from the searchBar
+//        val filteredRecipes = filterRecipes(recipeList, selectedFilters, query)
+//
+//        if (selectedHousehold == null) {
+//          FirstTimeWelcomeScreen(navigationActions, householdViewModel)
+//        } else {
+//          Scaffold(
+//              modifier = Modifier.testTag("recipesScreen"),
+//              topBar = {
+//                selectedHousehold?.let {
+//                  TopNavigationBar(
+//                      houseHold = it,
+//                      onHamburgerClick = { scope.launch { drawerState.open() } },
+//                      filters = filters,
+//                      selectedFilters = selectedFilters,
+//                      onFilterChange = { filter, isSelected ->
+//                        if (isSelected) {
+//                          selectedFilters.add(filter)
+//                        } else {
+//                          selectedFilters.remove(filter)
+//                        }
+//                      })
+//                }
+//              },
+//              bottomBar = {
+//                BottomNavigationMenu(
+//                    onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+//                    tabList = LIST_TOP_LEVEL_DESTINATION,
+//                    selectedItem = Route.RECIPES)
+//              },
+//              // Floating Action Button to add a new food item
+//              floatingActionButton = {
+//                Column(
+//                    horizontalAlignment = Alignment.End,
+//                    verticalArrangement = Arrangement.spacedBy(16.dp),
+//                    modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)) {
+//                      // Secondary FAB for "Manual" option
+//                      if (fabExpanded.value) {
+//                        ExtendedFloatingActionButton(
+//                            text = { Text("Generate") },
+//                            icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "Add") },
+//                            onClick = {
+//                              // Navigate to Manual Recipe screen
+//                              navigationActions.navigateTo(Screen.GENERATE_RECIPE)
+//                            },
+//                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+//                            modifier = Modifier.testTag("generateRecipeFab").width(150.dp))
+//                      }
+//
+//                      // Primary FAB
+//                      ExtendedFloatingActionButton(
+//                          text = { Text(if (fabExpanded.value) "Manual" else "") },
+//                          icon = { Icon(Icons.Default.Add, contentDescription = "Add") },
+//                          onClick = {
+//                            if (fabExpanded.value) {
+//                              // Navigate to Generate Recipe screen
+//                              navigationActions.navigateTo(Screen.ADD_RECIPE)
+//                            } else {
+//                              // Expand the FABs
+//                              fabExpanded.value = true
+//                            }
+//                          },
+//                          expanded = fabExpanded.value, // Bind to the state
+//                          containerColor = MaterialTheme.colorScheme.secondaryContainer,
+//                          modifier =
+//                              Modifier.testTag("addRecipeFab")
+//                                  .width(if (fabExpanded.value) 150.dp else 56.dp))
+//                    }
+//              },
+//              content = { paddingValues ->
+//                Column(
+//                    modifier =
+//                        Modifier.padding(paddingValues).fillMaxSize().pointerInput(Unit) {
+//                          detectTapGestures(
+//                              onTap = { if (fabExpanded.value) fabExpanded.value = false })
+//                        }) {
+//                      CustomSearchBar(
+//                          query = query,
+//                          onQueryChange = { query = it },
+//                          placeholder = "Search recipe",
+//                          searchBarTestTag = "searchBar",
+//                          onDeleteTextClicked = { query = "" })
+//
+//                      if (filteredRecipes.isEmpty()) {
+//                        Box(
+//                            modifier = Modifier.fillMaxSize(),
+//                            content = {
+//                              Text(
+//                                  text = "No recipes available",
+//                                  modifier = Modifier.testTag("noRecipesAvailableText"))
+//                            },
+//                            contentAlignment = Alignment.Center)
+//                      } else {
+//                        // LazyColumn for displaying the list of filtered recipes
+//                        LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
+//                          items(filteredRecipes) { recipe ->
+//                            RecipeItem(recipe, navigationActions, listRecipesViewModel)
+//                          }
+//                        }
+//                      }
+//                    }
+//              })
+//        }
+//      }
 }
 /**
  * Converts a string representation of a recipe type into a corresponding
