@@ -15,8 +15,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.R
+import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.ui.newutils.*
 import com.android.shelfLife.ui.utils.CustomButtons
@@ -39,7 +41,7 @@ fun FoodInputContent(
     onSubmit: () -> Unit,
     onCancel: () -> Unit
 ) {
-  val foodItemViewModel = viewModel(FoodItemViewModel::class.java)
+  val foodItemViewModel = hiltViewModel<FoodItemViewModel>()
 
   foodItemViewModel.isScanned()
 

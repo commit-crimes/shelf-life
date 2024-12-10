@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.FoodFacts
@@ -46,7 +47,7 @@ import kotlinx.coroutines.launch
 fun BarcodeScannerScreen(
     navigationActions: NavigationActions
 ) {
-  val cameraViewModel = viewModel(BarcodeScannerViewModel::class.java)
+  val cameraViewModel = hiltViewModel<BarcodeScannerViewModel>()
   val context = LocalContext.current
   val permissionGranted = cameraViewModel.permissionGranted
 

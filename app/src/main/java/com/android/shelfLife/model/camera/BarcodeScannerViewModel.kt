@@ -9,11 +9,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodFactsRepository
 import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.android.shelfLife.model.foodFacts.SearchStatus
+import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
@@ -26,21 +29,19 @@ import javax.inject.Inject
 class BarcodeScannerViewModel
 @Inject
 constructor(
-    application: Application,
+    @ApplicationContext private val context: Context,
     private val foodFactsRepository: FoodFactsRepository
-    ) : AndroidViewModel(application) {
+) : ViewModel() {
 
-  private val sharedPreferences =
-      getApplication<Application>()
-          .applicationContext
-          .getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    private val application = context as Application
+    private val sharedPreferences =
+        application.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
-  var permissionGranted by
-      mutableStateOf(
-          ContextCompat.checkSelfPermission(
-              getApplication<Application>().applicationContext, Manifest.permission.CAMERA) ==
-              PackageManager.PERMISSION_GRANTED)
-    private set
+    var permissionGranted by mutableStateOf(
+        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED
+    )
+        private set
 
   private var permissionRequested by
       mutableStateOf(sharedPreferences.getBoolean("permissionRequested", false))
@@ -48,6 +49,12 @@ constructor(
   val searchStatus: StateFlow<SearchStatus> = foodFactsRepository.searchStatus
 
   val foodFactsSuggestions: StateFlow<List<FoodFacts>> = foodFactsRepository.foodFactsSuggestions
+
+  init {
+      if (!permissionRequested) {
+          checkCameraPermission()
+      }
+  }
 
   fun searchByBarcode(barcode: Long) {
     foodFactsRepository.searchByBarcode(barcode)
@@ -59,10 +66,10 @@ constructor(
 
   /** Checks if the camera permission is granted. */
   fun checkCameraPermission() {
-    permissionGranted =
-        ContextCompat.checkSelfPermission(
-            getApplication<Application>().applicationContext, Manifest.permission.CAMERA) ==
-            PackageManager.PERMISSION_GRANTED
+      permissionGranted = ContextCompat.checkSelfPermission(
+          context,
+          Manifest.permission.CAMERA
+      ) == PackageManager.PERMISSION_GRANTED
   }
 
   /**
