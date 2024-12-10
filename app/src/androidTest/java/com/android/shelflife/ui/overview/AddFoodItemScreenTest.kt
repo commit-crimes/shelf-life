@@ -21,10 +21,10 @@ import com.android.shelfLife.model.foodFacts.FoodSearchInput
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.newFoodItem.ListFoodItemsViewModel
+import com.android.shelfLife.model.newhousehold.HouseholdViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.overview.AddFoodItemScreen
+import com.android.shelfLife.ui.newoverview.AddFoodItemScreen
 import com.android.shelfLife.ui.utils.formatTimestampToDate
 import com.google.firebase.Timestamp
 import io.mockk.MockKAnnotations

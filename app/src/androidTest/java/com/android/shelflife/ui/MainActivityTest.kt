@@ -48,7 +48,8 @@ class MainActivityTest {
   fun testNavigateToOverview() {
     composeTestRule.runOnUiThread {
       navigationActions.navigateTo(
-          TopLevelDestination(route = Route.OVERVIEW, icon = mockk(), textId = "Overview"))
+          TopLevelDestination(route = Route.OVERVIEW, icon = mockk(), textId = "Overview")
+      )
     }
 
     composeTestRule.onNodeWithTag("Overview").assertIsDisplayed()

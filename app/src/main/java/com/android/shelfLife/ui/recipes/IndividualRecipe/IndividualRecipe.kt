@@ -33,8 +33,8 @@ import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
-import com.android.shelfLife.ui.navigation.BottomNavigationMenu
+import com.android.shelfLife.model.newRecipe.RecipeRepositoryFirestore
+import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
@@ -68,7 +68,7 @@ fun IndividualRecipeScreen(
     navigationActions: NavigationActions,
 ) {
 
-    val individualRecipeViewModel = hiltViewModel<IndividualRecipeViewModel>()
+  val individualRecipeViewModel = hiltViewModel<IndividualRecipeViewModel>()
   if (individualRecipeViewModel.selectedRecipeIsNonEmpty) {
     // Scaffold that provides the structure for the screen, including top and bottom bars.
     Scaffold(
@@ -198,8 +198,7 @@ private fun IndividualRecipeScreenPreviewEasterEgg() {
   val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
 
   // Render the IndividualRecipeScreen with a null selectedRecipe
-  IndividualRecipeScreen(
-      navigationActions = navigationActions)
+  IndividualRecipeScreen(navigationActions = navigationActions)
 }
 // this preview shows the example where we do have a selected recipe
 @Preview()
@@ -253,6 +252,5 @@ private fun IndividualRecipeScreenPreview() {
   Log.i("AAAAAAAAA", "4")
 
   // Render the IndividualRecipeScreen with a null selectedRecipe
-  IndividualRecipeScreen(
-      navigationActions = navigationActions)
+  IndividualRecipeScreen(navigationActions = navigationActions)
 }

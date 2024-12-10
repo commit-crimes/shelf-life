@@ -51,18 +51,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
-import com.android.shelfLife.model.household.HouseholdViewModel
+import com.android.shelfLife.model.newhousehold.HouseholdViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipeType
-import com.android.shelfLife.ui.navigation.BottomNavigationMenu
-import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
+import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
+import com.android.shelfLife.ui.newnavigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.navigation.TopNavigationBar
-import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
+import com.android.shelfLife.ui.newnavigation.TopNavigationBar
+import com.android.shelfLife.ui.newoverview.FirstTimeWelcomeScreen
 import com.android.shelfLife.ui.utils.CustomSearchBar
 import kotlinx.coroutines.launch
 

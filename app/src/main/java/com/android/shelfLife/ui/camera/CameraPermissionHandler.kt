@@ -28,9 +28,9 @@ import com.android.shelfLife.ui.utils.OnLifecycleEvent
  */
 @Composable
 fun CameraPermissionHandler(
-    navigationActions: NavigationActions,
-    viewModel: BarcodeScannerViewModel = viewModel()
+    navigationActions: NavigationActions
 ) {
+  val viewModel = viewModel(BarcodeScannerViewModel::class.java)
   val context = LocalContext.current
   val activity = context as Activity
 

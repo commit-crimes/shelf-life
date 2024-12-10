@@ -8,32 +8,28 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
-import com.android.shelfLife.ui.invitations.InvitationScreen
+import com.android.shelfLife.ui.newInvitations.InvitationScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.overview.AddFoodItemScreen
-import com.android.shelfLife.ui.overview.EditFoodItemScreen
-import com.android.shelfLife.ui.overview.HouseHoldCreationScreen
-import com.android.shelfLife.ui.overview.IndividualFoodItemScreen
-import com.android.shelfLife.ui.overview.OverviewScreen
-import com.android.shelfLife.ui.profile.ProfileScreen
+import com.android.shelfLife.ui.newoverview.AddFoodItemScreen
+import com.android.shelfLife.ui.newoverview.EditFoodItemScreen
+import com.android.shelfLife.ui.newoverview.HouseHoldCreationScreen
+import com.android.shelfLife.ui.newoverview.IndividualFoodItemScreen
+import com.android.shelfLife.ui.newoverview.OverviewScreen
+import com.android.shelfLife.ui.newProfile.ProfileScreen
 import com.android.shelfLife.ui.recipes.GenerateRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
-import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.recipes.addRecipe.AddRecipeScreen
 import com.example.compose.ShelfLifeTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,8 +52,6 @@ fun ShelfLifeApp(userRepository: UserRepository) {
   val navigationActions = NavigationActions(navController)
 
   val context = LocalContext.current
-
-  val barcodeScannerViewModel: BarcodeScannerViewModel = viewModel()
 
   val isUserLoggedIn = userRepository.isUserLoggedIn.collectAsState().value
 
@@ -87,15 +81,10 @@ fun ShelfLifeApp(userRepository: UserRepository) {
     }
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
       composable(Screen.PERMISSION_HANDLER) {
-        CameraPermissionHandler(navigationActions, barcodeScannerViewModel)
+        CameraPermissionHandler(navigationActions)
       }
       composable(Screen.BARCODE_SCANNER) {
-        BarcodeScannerScreen(
-            navigationActions,
-            barcodeScannerViewModel,
-            foodFactsViewModel,
-            householdViewModel,
-            listFoodItemViewModel)
+        BarcodeScannerScreen(navigationActions)
       }
     }
     navigation(
@@ -103,7 +92,7 @@ fun ShelfLifeApp(userRepository: UserRepository) {
         route = Route.RECIPES,
     ) {
       composable(Screen.RECIPES) {
-        RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
+        //RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
       }
       composable(Screen.INDIVIDUAL_RECIPE) { IndividualRecipeScreen(navigationActions) }
       composable(Screen.ADD_RECIPE) { AddRecipeScreen(navigationActions) }

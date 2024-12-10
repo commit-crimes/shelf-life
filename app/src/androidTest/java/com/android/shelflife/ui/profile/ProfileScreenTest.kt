@@ -5,11 +5,11 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.NavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.shelfLife.model.invitations.InvitationRepositoryFirestore
-import com.android.shelfLife.model.invitations.InvitationViewModel
+import com.android.shelfLife.model.newInvitations.InvitationRepositoryFirestore
+import com.android.shelfLife.model.newInvitations.InvitationViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.profile.ProfileScreen
+import com.android.shelfLife.ui.newProfile.ProfileScreen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import io.mockk.MockKAnnotations

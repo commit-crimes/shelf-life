@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import javax.inject.Inject
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
@@ -13,23 +14,18 @@ import org.junit.*
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
 import org.robolectric.RobolectricTestRunner
-import javax.inject.Inject
 
 @HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
 class UserRepositoryFirestoreTest {
 
-  @get:Rule
-  var hiltRule = HiltAndroidRule(this)
+  @get:Rule var hiltRule = HiltAndroidRule(this)
 
-  @Inject
-  lateinit var userRepository: UserRepositoryFirestore
+  @Inject lateinit var userRepository: UserRepositoryFirestore
 
-  @Inject
-  lateinit var mockFirestore: FirebaseFirestore
+  @Inject lateinit var mockFirestore: FirebaseFirestore
 
-  @Inject
-  lateinit var mockAuth: FirebaseAuth
+  @Inject lateinit var mockAuth: FirebaseAuth
 
   private lateinit var mockCollection: CollectionReference
   private lateinit var mockDocument: DocumentReference
@@ -69,11 +65,10 @@ class UserRepositoryFirestoreTest {
     `when`(mockAuth.currentUser?.uid).thenReturn(null)
 
     // Act
-    val exception = Assert.assertThrows(Exception::class.java) {
-      runBlocking {
-        userRepository.initializeUserData(mock())
-      }
-    }
+    val exception =
+        Assert.assertThrows(Exception::class.java) {
+          runBlocking { userRepository.initializeUserData(mock()) }
+        }
 
     // Assert
     assertEquals("User not logged in", exception.message)
@@ -96,7 +91,8 @@ class UserRepositoryFirestoreTest {
   fun `addHouseholdUID adds household UID to Firestore`() = runBlocking {
     // Arrange
     val mockTask: Task<Void> = Tasks.forResult(null) // Specify Task<Void>
-    `when`(mockDocument.update("householdUIDs", FieldValue.arrayUnion("house1"))).thenReturn(mockTask)
+    `when`(mockDocument.update("householdUIDs", FieldValue.arrayUnion("house1")))
+        .thenReturn(mockTask)
 
     // Act
     userRepository.addHouseholdUID("house1")
@@ -109,7 +105,8 @@ class UserRepositoryFirestoreTest {
   fun `deleteHouseholdUID removes household UID from Firestore`() = runBlocking {
     // Arrange
     val mockTask: Task<Void> = Tasks.forResult(null) // Specify Task<Void>
-    `when`(mockDocument.update("householdUIDs", FieldValue.arrayRemove("house1"))).thenReturn(mockTask)
+    `when`(mockDocument.update("householdUIDs", FieldValue.arrayRemove("house1")))
+        .thenReturn(mockTask)
 
     // Act
     userRepository.deleteHouseholdUID("house1")
