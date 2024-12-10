@@ -59,6 +59,9 @@
     <string name="search_recipes_placeholder">Search recipes</string>
     <string name="icon_for_recipes_search_bar">Icon for recipes search bar</string>
 
+    <!-- Recipe generation -->
+
+
     <!-- Food Item Details -->
     <string name="food_item_no_expiry_date">No Expiry Date</string>
     <string name="food_item_not_opened">Not Opened</string>

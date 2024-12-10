@@ -17,8 +17,8 @@ open class RecipeGenerationViewModel(
     private val recipeGeneratorRepository: RecipeGeneratorRepository
 ) : ViewModel() {
 
-  private val _recipePrompt = MutableStateFlow<RecipePrompt?>(null)
-  open val recipePrompt: StateFlow<RecipePrompt?> = _recipePrompt.asStateFlow()
+  private val _recipePrompt = MutableStateFlow<RecipePrompt>(RecipePrompt(name = ""))
+  open val recipePrompt: StateFlow<RecipePrompt> = _recipePrompt.asStateFlow()
 
   private val _currentGeneratedRecipe = MutableStateFlow<Recipe?>(null)
   open val currentGeneratedRecipe: StateFlow<Recipe?> = _currentGeneratedRecipe.asStateFlow()
@@ -35,6 +35,10 @@ open class RecipeGenerationViewModel(
   }
   fun previousStep() {
     _currentStep.value -= 1
+  }
+
+  fun resetSteps() {
+    _currentStep.value = 0
   }
 
   /** Generates a recipe based on the current prompt. */
