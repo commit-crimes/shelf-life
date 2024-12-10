@@ -13,9 +13,9 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RecipeRepositoryModule {
 
-    @Singleton
-    @Provides
-    fun provideRecipeRepository(db: FirebaseFirestore): RecipeRepository {
-        return RecipeRepositoryFirestore(db)
-    }
+  @Singleton
+  @Provides
+  fun provideRecipeRepository(db: FirebaseFirestore): RecipeRepository {
+    return RecipeRepositoryFirestore(db)
+  }
 }

@@ -13,6 +13,8 @@ import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.newFoodItem.FoodItem
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -28,14 +30,12 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
-class RecipeGeneratorOpenAIRepository @Inject constructor(
-    private val openai: OpenAI,
-    @IoDispatcher private val dispatcher: CoroutineDispatcher
-) : RecipeGeneratorRepository {
+class RecipeGeneratorOpenAIRepository
+@Inject
+constructor(private val openai: OpenAI, @IoDispatcher private val dispatcher: CoroutineDispatcher) :
+    RecipeGeneratorRepository {
 
   companion object {
     const val USER_PROMPT_USE_TOOL_CALL =

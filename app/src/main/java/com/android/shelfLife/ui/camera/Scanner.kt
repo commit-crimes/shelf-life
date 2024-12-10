@@ -24,11 +24,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.SearchStatus
-import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.utils.OnLifecycleEvent
 import kotlinx.coroutines.launch
 
@@ -43,9 +43,7 @@ import kotlinx.coroutines.launch
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BarcodeScannerScreen(
-    navigationActions: NavigationActions
-) {
+fun BarcodeScannerScreen(navigationActions: NavigationActions) {
   val cameraViewModel = viewModel(BarcodeScannerViewModel::class.java)
   val context = LocalContext.current
   val permissionGranted = cameraViewModel.permissionGranted
@@ -114,7 +112,7 @@ fun BarcodeScannerScreen(
                 FoodInputContent(
                     foodFacts = foodFactsValue,
                     onSubmit = {
-                        // Reset states
+                      // Reset states
                       foodScanned.value = false
                       isScanningState.value = true
                       coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
@@ -126,8 +124,7 @@ fun BarcodeScannerScreen(
                       isScanningState.value = true
                       coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
                       Log.d("BarcodeScanner", "Cancelled")
-                    }
-                )
+                    })
               }
               Spacer(modifier = Modifier.height(100.dp))
             },

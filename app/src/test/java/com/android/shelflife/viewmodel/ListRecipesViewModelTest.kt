@@ -1,10 +1,10 @@
 package com.android.shelflife.viewmodel
 
+import com.android.shelfLife.model.newRecipe.RecipeRepository
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.recipe.RecipePrompt
-import com.android.shelfLife.model.newRecipe.RecipeRepository
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import kotlin.time.DurationUnit

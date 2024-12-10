@@ -34,11 +34,7 @@ import kotlinx.coroutines.launch
  * @param foodItemViewModel The ViewModel for the food items.
  */
 @Composable
-fun FoodInputContent(
-    foodFacts: FoodFacts,
-    onSubmit: () -> Unit,
-    onCancel: () -> Unit
-) {
+fun FoodInputContent(foodFacts: FoodFacts, onSubmit: () -> Unit, onCancel: () -> Unit) {
   val foodItemViewModel = viewModel(FoodItemViewModel::class.java)
 
   foodItemViewModel.isScanned()
@@ -80,9 +76,7 @@ fun FoodInputContent(
         // Expire Date Field with Error Handling
         DateField(
             date = foodItemViewModel.expireDate,
-            onDateChange = { newValue ->
-              foodItemViewModel.changeExpiryDate(newValue)
-            },
+            onDateChange = { newValue -> foodItemViewModel.changeExpiryDate(newValue) },
             dateErrorResId = foodItemViewModel.expireDateErrorResId,
             labelResId = R.string.expire_date_hint,
             testTag = "expireDateTextField")
@@ -92,9 +86,7 @@ fun FoodInputContent(
         // Open Date Field with Error Handling
         DateField(
             date = foodItemViewModel.openDate,
-            onDateChange = { newValue ->
-                foodItemViewModel.changeOpenDate(newValue)
-            },
+            onDateChange = { newValue -> foodItemViewModel.changeOpenDate(newValue) },
             dateErrorResId = foodItemViewModel.openDateErrorResId,
             labelResId = R.string.open_date_hint,
             testTag = "openDateTextField")
@@ -104,9 +96,7 @@ fun FoodInputContent(
         // Buy Date Field with Error Handling
         DateField(
             date = foodItemViewModel.buyDate,
-            onDateChange = { newValue ->
-                foodItemViewModel.changeBuyDate(newValue)
-            },
+            onDateChange = { newValue -> foodItemViewModel.changeBuyDate(newValue) },
             dateErrorResId = foodItemViewModel.buyDateErrorResId,
             labelResId = R.string.buy_date_hint,
             testTag = "buyDateTextField")
@@ -118,17 +108,16 @@ fun FoodInputContent(
             button1TestTag = "cancelButton",
             button1Text = stringResource(R.string.cancel_button),
             button2OnClick = {
-                coroutineScope.launch {
-                    val success = foodItemViewModel.submitFoodItem()
-                    if (success) {
-                        // foodFactsViewModel.clearFoodFactsSuggestions()
-                        onSubmit()
-                    } else {
-                        Toast.makeText(
-                            context, R.string.submission_error_message, Toast.LENGTH_SHORT)
-                            .show()
-                    }
+              coroutineScope.launch {
+                val success = foodItemViewModel.submitFoodItem()
+                if (success) {
+                  // foodFactsViewModel.clearFoodFactsSuggestions()
+                  onSubmit()
+                } else {
+                  Toast.makeText(context, R.string.submission_error_message, Toast.LENGTH_SHORT)
+                      .show()
                 }
+              }
             },
             button2TestTag = "submitButton",
             button2Text = stringResource(R.string.submit_button_text),

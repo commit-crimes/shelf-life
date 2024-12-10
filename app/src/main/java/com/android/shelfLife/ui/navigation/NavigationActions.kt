@@ -74,8 +74,7 @@ val LIST_TOP_LEVEL_DESTINATION =
         TopLevelDestinations.OVERVIEW,
         TopLevelDestinations.SCANNER,
         TopLevelDestinations.RECIPES,
-        TopLevelDestinations.PROFILE
-    )
+        TopLevelDestinations.PROFILE)
 
 open class NavigationActions(
     private val navController: NavHostController,

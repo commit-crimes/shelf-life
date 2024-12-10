@@ -7,22 +7,20 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 
 @Module
 @InstallIn(SingletonComponent::class)
 object OpenAIModule {
 
-    @Singleton
-    @Provides
-    fun provideOpenAI(): OpenAI {
-        return OpenAI(token = BuildConfig.OPENAI_API_KEY, timeout = Timeout(socket = 60.seconds))
-    }
+  @Singleton
+  @Provides
+  fun provideOpenAI(): OpenAI {
+    return OpenAI(token = BuildConfig.OPENAI_API_KEY, timeout = Timeout(socket = 60.seconds))
+  }
 
-    @Singleton
-    @Provides
-    fun provideIODispatcher(): CoroutineDispatcher = Dispatchers.IO
+  @Singleton @Provides fun provideIODispatcher(): CoroutineDispatcher = Dispatchers.IO
 }

@@ -21,8 +21,8 @@ sealed class SearchStatus {
 }
 
 class OpenFoodFactsRepository(
-  private val client: OkHttpClient,
-  private val baseUrl: String = "https://world.openfoodfacts.net"
+    private val client: OkHttpClient,
+    private val baseUrl: String = "https://world.openfoodfacts.net"
 ) : FoodFactsRepository {
 
   companion object {
@@ -42,27 +42,27 @@ class OpenFoodFactsRepository(
   // Modified search function
   override fun searchByBarcode(barcode: Long) {
     searchFoodFacts(
-      searchInput = FoodSearchInput.Barcode(barcode),
-      onSuccess = { foodFactsList -> _foodFactsSuggestions.value = foodFactsList },
-      onFailure = {
-        _searchStatus.value = SearchStatus.Failure
-        _foodFactsSuggestions.value = emptyList()
-      })
+        searchInput = FoodSearchInput.Barcode(barcode),
+        onSuccess = { foodFactsList -> _foodFactsSuggestions.value = foodFactsList },
+        onFailure = {
+          _searchStatus.value = SearchStatus.Failure
+          _foodFactsSuggestions.value = emptyList()
+        })
   }
 
   // Function to set a new query and trigger a search using a query string
   override fun searchByQuery(newQuery: String) {
     searchFoodFacts(
-      FoodSearchInput.Query(newQuery),
-      onSuccess = { foodFactsList ->
-        // Filter out items without images
-        val filteredList = foodFactsList.filter { it.imageUrl.isNotEmpty() }
-        _foodFactsSuggestions.value = filteredList
-      },
-      onFailure = {
-        _searchStatus.value = SearchStatus.Failure
-        _foodFactsSuggestions.value = emptyList()
-      })
+        FoodSearchInput.Query(newQuery),
+        onSuccess = { foodFactsList ->
+          // Filter out items without images
+          val filteredList = foodFactsList.filter { it.imageUrl.isNotEmpty() }
+          _foodFactsSuggestions.value = filteredList
+        },
+        onFailure = {
+          _searchStatus.value = SearchStatus.Failure
+          _foodFactsSuggestions.value = emptyList()
+        })
   }
 
   private fun buildUrl(vararg paths: String): String {
@@ -70,54 +70,54 @@ class OpenFoodFactsRepository(
   }
 
   override fun searchFoodFacts(
-    searchInput: FoodSearchInput,
-    onSuccess: (List<FoodFacts>) -> Unit,
-    onFailure: (Exception) -> Unit
+      searchInput: FoodSearchInput,
+      onSuccess: (List<FoodFacts>) -> Unit,
+      onFailure: (Exception) -> Unit
   ) {
     _searchStatus.value = SearchStatus.Loading
     val url =
-      when (searchInput) {
-        is FoodSearchInput.Barcode ->
-          buildUrl(baseUrl, "api/v0/product/${searchInput.barcode}.json")
-        is FoodSearchInput.Query ->
-          buildUrl(
-            baseUrl,
-            "cgi/search.pl?search_terms=${searchInput.searchQuery}&page_size=$MAX_RESULTS&json=true")
-      }
+        when (searchInput) {
+          is FoodSearchInput.Barcode ->
+              buildUrl(baseUrl, "api/v0/product/${searchInput.barcode}.json")
+          is FoodSearchInput.Query ->
+              buildUrl(
+                  baseUrl,
+                  "cgi/search.pl?search_terms=${searchInput.searchQuery}&page_size=$MAX_RESULTS&json=true")
+        }
 
     val request = Request.Builder().url(url).build()
 
     client
-      .newCall(request)
-      .enqueue(
-        object : okhttp3.Callback {
-          override fun onFailure(call: okhttp3.Call, e: IOException) {
-            _searchStatus.value = SearchStatus.Failure
-            onFailure(e)
-          }
+        .newCall(request)
+        .enqueue(
+            object : okhttp3.Callback {
+              override fun onFailure(call: okhttp3.Call, e: IOException) {
+                _searchStatus.value = SearchStatus.Failure
+                onFailure(e)
+              }
 
-          override fun onResponse(call: okhttp3.Call, response: Response) {
-            if (!response.isSuccessful) {
-              _searchStatus.value = SearchStatus.Failure
-              onFailure(
-                IOException("Server error: HTTP ${response.code} - ${response.message}"))
-              return
-            }
+              override fun onResponse(call: okhttp3.Call, response: Response) {
+                if (!response.isSuccessful) {
+                  _searchStatus.value = SearchStatus.Failure
+                  onFailure(
+                      IOException("Server error: HTTP ${response.code} - ${response.message}"))
+                  return
+                }
 
-            val body = response.body?.string() ?: ""
-            val foodFactsList = parseFoodFactsResponse(body, searchInput)
+                val body = response.body?.string() ?: ""
+                val foodFactsList = parseFoodFactsResponse(body, searchInput)
 
-            if(foodFactsList.isEmpty()) {
-              _searchStatus.value = SearchStatus.Failure
-              onFailure(IOException("No results found"))
-              return
-            }
+                if (foodFactsList.isEmpty()) {
+                  _searchStatus.value = SearchStatus.Failure
+                  onFailure(IOException("No results found"))
+                  return
+                }
 
-            Log.d("OpenFoodFactsRepository", "Food Facts: $foodFactsList")
-            _searchStatus.value = SearchStatus.Success
-            onSuccess(foodFactsList)
-          }
-        })
+                Log.d("OpenFoodFactsRepository", "Food Facts: $foodFactsList")
+                _searchStatus.value = SearchStatus.Success
+                onSuccess(foodFactsList)
+              }
+            })
   }
 
   /**
@@ -172,27 +172,27 @@ class OpenFoodFactsRepository(
 
     // Map nutrition facts
     val nutritionFacts =
-      NutritionFacts(
-        energyKcal = productObject.optJSONObject("nutriments")?.optInt("energy-kcal_100g") ?: 0,
-        fat = productObject.optJSONObject("nutriments")?.optDouble("fat_100g") ?: 0.0,
-        saturatedFat =
-        productObject.optJSONObject("nutriments")?.optDouble("saturated-fat_100g") ?: 0.0,
-        carbohydrates =
-        productObject.optJSONObject("nutriments")?.optDouble("carbohydrates_100g") ?: 0.0,
-        sugars = productObject.optJSONObject("nutriments")?.optDouble("sugars_100g") ?: 0.0,
-        proteins = productObject.optJSONObject("nutriments")?.optDouble("proteins_100g") ?: 0.0,
-        salt = productObject.optJSONObject("nutriments")?.optDouble("salt_100g") ?: 0.0)
+        NutritionFacts(
+            energyKcal = productObject.optJSONObject("nutriments")?.optInt("energy-kcal_100g") ?: 0,
+            fat = productObject.optJSONObject("nutriments")?.optDouble("fat_100g") ?: 0.0,
+            saturatedFat =
+                productObject.optJSONObject("nutriments")?.optDouble("saturated-fat_100g") ?: 0.0,
+            carbohydrates =
+                productObject.optJSONObject("nutriments")?.optDouble("carbohydrates_100g") ?: 0.0,
+            sugars = productObject.optJSONObject("nutriments")?.optDouble("sugars_100g") ?: 0.0,
+            proteins = productObject.optJSONObject("nutriments")?.optDouble("proteins_100g") ?: 0.0,
+            salt = productObject.optJSONObject("nutriments")?.optDouble("salt_100g") ?: 0.0)
 
     val foodCategory =
-      FoodCategory.OTHER // You can refine the logic to determine the category if needed
+        FoodCategory.OTHER // You can refine the logic to determine the category if needed
 
     // Create and return the FoodFacts object
     return FoodFacts(
-      name = name,
-      barcode = barcode,
-      quantity = quantity,
-      category = foodCategory,
-      nutritionFacts = nutritionFacts,
-      imageUrl = imageUrl)
+        name = name,
+        barcode = barcode,
+        quantity = quantity,
+        category = foodCategory,
+        nutritionFacts = nutritionFacts,
+        imageUrl = imageUrl)
   }
 }
