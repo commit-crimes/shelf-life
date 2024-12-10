@@ -44,7 +44,10 @@ class OpenFoodFactsRepository(
     searchFoodFacts(
       searchInput = FoodSearchInput.Barcode(barcode),
       onSuccess = { foodFactsList -> _foodFactsSuggestions.value = foodFactsList },
-      onFailure = { _foodFactsSuggestions.value = emptyList() })
+      onFailure = {
+        _searchStatus.value = SearchStatus.Failure
+        _foodFactsSuggestions.value = emptyList()
+      })
   }
 
   // Function to set a new query and trigger a search using a query string
@@ -56,7 +59,10 @@ class OpenFoodFactsRepository(
         val filteredList = foodFactsList.filter { it.imageUrl.isNotEmpty() }
         _foodFactsSuggestions.value = filteredList
       },
-      onFailure = { _foodFactsSuggestions.value = emptyList() })
+      onFailure = {
+        _searchStatus.value = SearchStatus.Failure
+        _foodFactsSuggestions.value = emptyList()
+      })
   }
 
   private fun buildUrl(vararg paths: String): String {
@@ -100,6 +106,12 @@ class OpenFoodFactsRepository(
 
             val body = response.body?.string() ?: ""
             val foodFactsList = parseFoodFactsResponse(body, searchInput)
+
+            if(foodFactsList.isEmpty()) {
+              _searchStatus.value = SearchStatus.Failure
+              onFailure(IOException("No results found"))
+              return
+            }
 
             Log.d("OpenFoodFactsRepository", "Food Facts: $foodFactsList")
             _searchStatus.value = SearchStatus.Success
