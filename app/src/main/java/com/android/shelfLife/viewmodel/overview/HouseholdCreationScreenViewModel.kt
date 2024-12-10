@@ -33,6 +33,7 @@ constructor(
   // TODO Should this be there?
   private var finishedLoading = MutableStateFlow(false)
 
+  // Fetch the list of members for the household to edit and set the email list
   init {
     viewModelScope.launch {
       val members = houseHoldRepository.getHouseholdMembers(householdToEdit.value?.uid ?: "")
@@ -155,12 +156,14 @@ constructor(
       if (oldHousehold != null) {
         val newMemberUids = household.members.toSet() - oldHousehold.members.toSet()
         if (newMemberUids.isNotEmpty()) {
-          newMemberUids.forEach {
-            invitationRepository.sendInvitation(household, it)
+          for (uid in newMemberUids) {
+            invitationRepository.sendInvitation(
+                household = household,
+                invitedUserID = uid,
+            )
           }
         }
       }
-
       if (shouldUpdateRepo) {
         houseHoldRepository.updateHousehold(household)
         if (selectedHousehold.value == null || household.uid == selectedHousehold.value!!.uid) {
