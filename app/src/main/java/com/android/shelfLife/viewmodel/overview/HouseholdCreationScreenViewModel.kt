@@ -30,7 +30,6 @@ constructor(
   val selectedHousehold = userRepository.selectedHousehold
   val households = houseHoldRepository.households
   val currentUser = userRepository.user
-  // TODO Should this be there?
   private var finishedLoading = MutableStateFlow(false)
 
   // Fetch the list of members for the household to edit and set the email list
