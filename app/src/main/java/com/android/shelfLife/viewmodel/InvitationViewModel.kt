@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.newInvitations.Invitation
 import com.android.shelfLife.model.newInvitations.InvitationRepository
-import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,8 +17,7 @@ class InvitationViewModel
 @Inject
 constructor(
   private val invitationRepository: InvitationRepository,
-  private val userRepo: UserRepository,
-  private val houseHoldRepo: HouseHoldRepository,
+  private val userRepo: UserRepository
 ) : ViewModel() {
 
   private val _invitations = MutableStateFlow<List<Invitation>>(emptyList())
