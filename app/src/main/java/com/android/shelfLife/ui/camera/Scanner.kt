@@ -44,8 +44,10 @@ import kotlinx.coroutines.launch
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BarcodeScannerScreen(navigationActions: NavigationActions) {
-  val cameraViewModel = hiltViewModel<BarcodeScannerViewModel>()
+fun BarcodeScannerScreen(
+    navigationActions: NavigationActions,
+    cameraViewModel: BarcodeScannerViewModel = hiltViewModel()
+) {
   val context = LocalContext.current
   val permissionGranted = cameraViewModel.permissionGranted
 

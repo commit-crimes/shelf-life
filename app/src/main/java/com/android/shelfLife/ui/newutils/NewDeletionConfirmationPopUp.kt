@@ -17,9 +17,9 @@ fun DeletionConfirmationPopUp(
     showDeleteDialog: Boolean,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
+    deletionConfirmationViewModel: DeletionConfirmationViewModel = hiltViewModel()
 ) {
-  val deletionConfirmationViewModel: DeletionConfirmationViewModel =
-      hiltViewModel<DeletionConfirmationViewModel>()
+
   val householdToDelete by deletionConfirmationViewModel.householdToEdit.collectAsState()
 
   if (showDeleteDialog) {

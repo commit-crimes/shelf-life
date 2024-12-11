@@ -61,13 +61,13 @@ fun FoodInputContent(
           }
 
           AsyncImage(
-            model = foodFacts.imageUrl,
-            contentDescription = "Food Image",
-            modifier =
-            Modifier.size(80.dp)
-              .clip(RoundedCornerShape(8.dp))
-              .align(Alignment.CenterVertically),
-            contentScale = ContentScale.Crop)
+              model = foodFacts.imageUrl,
+              contentDescription = "Food Image",
+              modifier =
+                  Modifier.size(80.dp)
+                      .clip(RoundedCornerShape(8.dp))
+                      .align(Alignment.CenterVertically),
+              contentScale = ContentScale.Crop)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -116,7 +116,6 @@ fun FoodInputContent(
         CustomButtons(
             button1OnClick = {
                 onCancel()
-                foodItemViewModel.resetForScanner()
                              },
             button1TestTag = "cancelButton",
             button1Text = stringResource(R.string.cancel_button),
@@ -127,7 +126,6 @@ fun FoodInputContent(
                   // foodFactsViewModel.clearFoodFactsSuggestions()
                   Log.d("FoodInputContent", "Food item submitted successfully")
                   onSubmit()
-                  foodItemViewModel.resetForScanner()
                 } else {
                   Toast.makeText(context, R.string.submission_error_message, Toast.LENGTH_SHORT)
                       .show()
