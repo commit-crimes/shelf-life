@@ -1,5 +1,10 @@
 package com.android.shelfLife.ui.newoverview
 
+import android.net.Uri
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import coil3.compose.AsyncImage
 import coil3.compose.rememberAsyncImagePainter
 import com.android.shelfLife.R
@@ -50,10 +56,34 @@ fun ChooseFoodItem(
   val coroutineScope = rememberCoroutineScope()
   val foodItemViewModel = FoodItemViewModel(foodItemRepository, userRepository)
 
+
   val context = LocalContext.current
   // TODO These are temp while we work on the new FoodFactsModel
   val foodFacts by foodFactsViewModel.foodFactsSuggestions.collectAsState()
   val searchStatus by foodFactsViewModel.searchStatus.collectAsState()
+
+    var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
+    val captureImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        if (bitmap != null) {
+            // Save the bitmap URI (you can upload it directly to Firebase here)
+            val uri = MediaStore.Images.Media.insertImage(
+                context.contentResolver,
+                bitmap,
+                "CapturedImage",
+                "Captured by Camera"
+            )?.toUri()
+            capturedImageUri = uri
+        }
+    }
+
+    val selectImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        capturedImageUri = uri
+    }
+
 
   Scaffold(
       topBar = {
@@ -169,6 +199,8 @@ fun ChooseFoodItem(
 
               item { Spacer(modifier = Modifier.height(8.dp)) }
 
+
+
               item {
                 foodItemViewModel.selectedImage?.let {
                   Text(
@@ -191,6 +223,39 @@ fun ChooseFoodItem(
                       Spacer(modifier = Modifier.height(16.dp))
                     }
               }
+
+                item{
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Button(
+                            onClick = { captureImageLauncher.launch() },
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            Text(text = "Take Photo")
+                        }
+                        Button(
+                            onClick = { selectImageLauncher.launch("image/*") },
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            Text(text = "Upload from Gallery")
+                        }
+                    }
+
+                }
+
+            item {
+                capturedImageUri?.let { uri ->
+                    Image(
+                        painter = rememberAsyncImagePainter(uri),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(150.dp)
+                            .padding(8.dp)
+                    )
+                }
+            }
 
               item {
                 CustomButtons(

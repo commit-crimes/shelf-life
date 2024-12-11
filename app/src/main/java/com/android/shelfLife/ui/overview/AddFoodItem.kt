@@ -1,6 +1,11 @@
 package com.android.shelfLife.ui.overview
 
+import android.net.Uri
+import android.provider.MediaStore
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
@@ -11,6 +16,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
+import coil3.compose.AsyncImage
+import coil3.compose.rememberAsyncImagePainter
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.*
 import com.android.shelfLife.model.foodItem.*
@@ -57,6 +65,30 @@ fun AddFoodItemScreen(
   var locationExpanded by remember { mutableStateOf(false) }
 
   val context = LocalContext.current
+    var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    // Launcher for capturing an image
+    val captureImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        if (bitmap != null) {
+            // Save the bitmap URI (you can upload it directly to Firebase here)
+            val uri = MediaStore.Images.Media.insertImage(
+                context.contentResolver,
+                bitmap,
+                "CapturedImage",
+                "Captured by Camera"
+            )?.toUri()
+            capturedImageUri = uri
+        }
+    }
+
+    // Launcher for selecting an image from the gallery
+    val selectImageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        capturedImageUri = uri
+    }
 
   /** Validates all fields when the submit button is clicked. */
   fun validateAllFieldsWhenSubmitButton() {
@@ -202,6 +234,39 @@ fun AddFoodItemScreen(
                     testTag = "inputFoodBuyDate")
                 Spacer(modifier = Modifier.height(32.dp))
               }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Button(
+                        onClick = { captureImageLauncher.launch() },
+                        modifier = Modifier.padding(8.dp)
+                    ) {
+                        Text(text = "Take Photo")
+                    }
+                    Button(
+                        onClick = { selectImageLauncher.launch("image/*") },
+                        modifier = Modifier.padding(8.dp)
+                    ) {
+                        Text(text = "Upload from Gallery")
+                    }
+                }
+            }
+
+            item {
+                capturedImageUri?.let { uri ->
+                    AsyncImage(
+                        model = uri,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(150.dp)
+                            .padding(8.dp)
+                    )
+                }
+            }
+
+
               item(key = "buttons") {
                 CustomButtons(
                     button1OnClick = { navigationActions.goBack() },
