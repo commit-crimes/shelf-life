@@ -48,12 +48,9 @@ fun ShelfLifeApp() {
 
   val context = LocalContext.current
 
-  var startDestination = Route.AUTH
-  if (FirebaseAuth.getInstance().currentUser != null) {
-    startDestination = Route.OVERVIEW
-  }
 
-  NavHost(navController = navController, startDestination = startDestination) {
+
+  NavHost(navController = navController, startDestination = Route.AUTH) {
     // Authentication route
     navigation(
         startDestination = Screen.AUTH,

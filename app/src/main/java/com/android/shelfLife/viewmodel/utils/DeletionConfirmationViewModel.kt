@@ -19,7 +19,7 @@ constructor(
 ) : ViewModel() {
 
   val householdToEdit = houseHoldRepository.householdToEdit
-  val selectedHousehold = userRepository.selectedHousehold
+  val selectedHousehold = houseHoldRepository.selectedHousehold
   val households = houseHoldRepository.households
 
   /**
@@ -43,7 +43,7 @@ constructor(
       userRepository.deleteHouseholdUID(householdId)
       if (selectedHousehold.value == null || householdId == selectedHousehold.value!!.uid) {
         // If the deleted household was selected, deselect it
-        userRepository.selectHousehold(
+        houseHoldRepository.selectHousehold(
             if (households.value.isEmpty()) {
               null
             } else {
@@ -53,6 +53,7 @@ constructor(
                 households.value[households.value.size - 1]
               }
             })
+        userRepository.selectHousehold(houseHoldRepository.selectedHousehold.value?.uid)
         if (selectedHousehold.value != null) {
           foodItemRepository.getFoodItems(selectedHousehold.value!!.uid)
         }
