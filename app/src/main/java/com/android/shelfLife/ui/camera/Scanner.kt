@@ -30,6 +30,7 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.utils.OnLifecycleEvent
+import com.android.shelfLife.viewmodel.FoodItemViewModel
 import kotlinx.coroutines.launch
 
 /**
@@ -55,14 +56,19 @@ fun BarcodeScannerScreen(navigationActions: NavigationActions) {
   val foodFacts = rememberSaveable { mutableStateOf<FoodFacts?>(null) }
   val searchInProgress = rememberSaveable { mutableStateOf(false) }
 
+  val showFailureDialog = rememberSaveable { mutableStateOf(false) }
+
   val coroutineScope = rememberCoroutineScope()
 
   // Bottom sheet scaffold state with initial state as Hidden
-  val sheetScaffoldState =
-      rememberBottomSheetScaffoldState(
-          bottomSheetState =
-              rememberStandardBottomSheetState(
-                  initialValue = SheetValue.Hidden, skipHiddenState = false))
+    val sheetScaffoldState =
+        rememberBottomSheetScaffoldState(
+            bottomSheetState =
+            rememberStandardBottomSheetState(
+                initialValue = SheetValue.Hidden,
+                skipHiddenState = false
+            )
+        )
 
   OnLifecycleEvent(
       onResume = {
@@ -84,7 +90,7 @@ fun BarcodeScannerScreen(navigationActions: NavigationActions) {
   LaunchedEffect(sheetScaffoldState.bottomSheetState) {
     snapshotFlow { sheetScaffoldState.bottomSheetState.currentValue }
         .collect { sheetState ->
-          if (sheetState == SheetValue.Hidden || sheetState == SheetValue.PartiallyExpanded) {
+          if (sheetState == SheetValue.Hidden) {
             // Resume scanning when the sheet is hidden
             isScanningState.value = true
             foodScanned.value = false
@@ -109,7 +115,10 @@ fun BarcodeScannerScreen(navigationActions: NavigationActions) {
             sheetContent = {
               val foodFactsValue = foodFacts.value
               if (foodScanned.value && foodFactsValue != null) {
+                val foodItemViewModel = hiltViewModel<FoodItemViewModel>()
+                foodItemViewModel.resetForScanner()
                 FoodInputContent(
+                    foodItemViewModel = foodItemViewModel,
                     foodFacts = foodFactsValue,
                     onSubmit = {
                       // Reset states
@@ -124,10 +133,15 @@ fun BarcodeScannerScreen(navigationActions: NavigationActions) {
                       isScanningState.value = true
                       coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
                       Log.d("BarcodeScanner", "Cancelled")
+                    },
+                    onExpandRequested = {
+                        // When the partially expanded content is clicked, expand the sheet fully
+                        coroutineScope.launch { sheetScaffoldState.bottomSheetState.expand() }
                     })
               }
               Spacer(modifier = Modifier.height(100.dp))
             },
+            sheetPeekHeight = 250.dp,
             modifier =
                 Modifier.padding(innerPadding) // Apply the inner padding from the parent Scaffold
             ) {
@@ -198,6 +212,7 @@ fun BarcodeScannerScreen(navigationActions: NavigationActions) {
       is SearchStatus.Failure -> {
         Toast.makeText(context, "Search failed, check internet connection", Toast.LENGTH_SHORT)
             .show()
+        showFailureDialog.value = true
         barcodeScanned.value = null
         searchInProgress.value = false
         cameraViewModel.resetSearchStatus()
@@ -207,6 +222,34 @@ fun BarcodeScannerScreen(navigationActions: NavigationActions) {
       }
     }
   }
+
+    if (showFailureDialog.value) {
+        AlertDialog(
+            onDismissRequest = {
+                // User tapped outside or back button
+                // Handle similarly to pressing OK or X: reset scanning
+                showFailureDialog.value = false
+                foodScanned.value = false
+                isScanningState.value = true
+            },
+            title = {
+                Text(text = "Search Failed")
+            },
+            text = {
+                Text("Check your internet connection and try again later.")
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    // OK button pressed: reset scanning and hide dialog
+                    showFailureDialog.value = false
+                    foodScanned.value = false
+                    isScanningState.value = true
+                }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
 }
 
 /**
