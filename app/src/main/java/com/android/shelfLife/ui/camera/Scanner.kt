@@ -38,9 +38,6 @@ import kotlinx.coroutines.launch
  *
  * @param navigationActions Actions for navigation.
  * @param cameraViewModel ViewModel for the camera.
- * @param foodFactsViewModel ViewModel for food facts.
- * @param householdViewModel ViewModel for household.
- * @param foodItemViewModel ViewModel for food items.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -143,7 +140,7 @@ fun BarcodeScannerScreen(
               }
               Spacer(modifier = Modifier.height(100.dp))
             },
-            sheetPeekHeight = 250.dp,
+            sheetPeekHeight = 240.dp,
             modifier =
                 Modifier.padding(innerPadding) // Apply the inner padding from the parent Scaffold
             ) {
@@ -201,7 +198,7 @@ fun BarcodeScannerScreen(
         if (suggestions.isNotEmpty()) {
           foodFacts.value = suggestions[0]
           foodScanned.value = true
-          coroutineScope.launch { sheetScaffoldState.bottomSheetState.expand() }
+          coroutineScope.launch { sheetScaffoldState.bottomSheetState.partialExpand() }
         } else {
           Toast.makeText(context, "Food Not Found in Database", Toast.LENGTH_SHORT).show()
           navigationActions.navigateTo(Screen.ADD_FOOD)
