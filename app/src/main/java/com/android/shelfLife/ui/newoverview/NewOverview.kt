@@ -40,10 +40,9 @@ import kotlinx.coroutines.launch
  * @param navigationActions The actions to handle navigation
  */
 @Composable
-fun OverviewScreen(
-    navigationActions: NavigationActions,
-) {
+fun OverviewScreen(navigationActions: NavigationActions) {
   val overviewScreenViewModel = hiltViewModel<OverviewScreenViewModel>()
+  Log.d("OverviewScreen", overviewScreenViewModel.hashCode().toString())
 
   val selectedHousehold by overviewScreenViewModel.selectedHousehold.collectAsState()
   val foodItems by overviewScreenViewModel.foodItems.collectAsState()

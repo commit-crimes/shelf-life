@@ -91,6 +91,8 @@ class HouseholdRepositoryFirestore(
             "members" to household.members,
             "sharedRecipes" to household.sharedRecipes)
     try {
+      // Update local cache
+      Log.d("HouseholdRepository", "Added household: $household")
       val currentHouseholds = _households.value.toMutableList()
       currentHouseholds.add(household)
       _households.value = currentHouseholds
@@ -99,8 +101,6 @@ class HouseholdRepositoryFirestore(
           .document(household.uid) // Use the household UID as the document ID
           .set(householdData)
           .await()
-      // Update local cache
-      Log.d("HouseholdRepository", "Added household: $household")
     } catch (e: Exception) {
       val updatedHouseHolds = _households.value.filterNot { it.uid == household.uid }
       _households.value = updatedHouseHolds
@@ -135,18 +135,18 @@ class HouseholdRepositoryFirestore(
 
       db.collection(collectionPath).document(household.uid).set(householdData).await()
     } catch (e: Exception) {
-        // Rollback: Restore the original item in the local cache
-        originalItem?.let {
-          val currentHouseholds = _households.value.toMutableList()
-          val index = currentHouseholds.indexOfFirst { it.uid == household.uid }
-          if (index != -1) {
-            currentHouseholds[index] = it
-            _households.value = currentHouseholds
-          } else if (index == currentHouseholds.lastIndex) {
-            currentHouseholds.removeAt(index)
-            _households.value = currentHouseholds
-          }
+      // Rollback: Restore the original item in the local cache
+      originalItem?.let {
+        val currentHouseholds = _households.value.toMutableList()
+        val index = currentHouseholds.indexOfFirst { it.uid == household.uid }
+        if (index != -1) {
+          currentHouseholds[index] = it
+          _households.value = currentHouseholds
+        } else if (index == currentHouseholds.lastIndex) {
+          currentHouseholds.removeAt(index)
+          _households.value = currentHouseholds
         }
+      }
       Log.e("HouseholdRepository", "Error updating household", e)
     }
   }
@@ -154,20 +154,20 @@ class HouseholdRepositoryFirestore(
   override suspend fun deleteHouseholdById(id: String) {
     var deletedHouseHold: HouseHold? = null
     try {
-        // Find the household to be deleted
-        deletedHouseHold = _households.value.find { it.uid == id }
+      // Find the household to be deleted
+      deletedHouseHold = _households.value.find { it.uid == id }
       // Update local cache
       val currentHouseholds = _households.value.filterNot { it.uid == id }
       _households.value = currentHouseholds
 
       db.collection(collectionPath).document(id).delete().await()
     } catch (e: Exception) {
-        // Rollback: Restore the deleted household in the local cache
-        deletedHouseHold?.let {
-          val currentHouseholds = _households.value.toMutableList()
-          currentHouseholds.add(it)
-          _households.value = currentHouseholds
-        }
+      // Rollback: Restore the deleted household in the local cache
+      deletedHouseHold?.let {
+        val currentHouseholds = _households.value.toMutableList()
+        currentHouseholds.add(it)
+        _households.value = currentHouseholds
+      }
       Log.e("HouseholdRepository", "Error deleting household", e)
     }
   }

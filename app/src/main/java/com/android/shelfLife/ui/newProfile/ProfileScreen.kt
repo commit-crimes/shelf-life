@@ -1,6 +1,7 @@
 package com.android.shelfLife.ui.newProfile
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -40,6 +41,7 @@ import com.example.compose.ThemeMode
 @Composable
 fun ProfileScreen(navigationActions: NavigationActions, context: Context) {
   val profileViewModel = hiltViewModel<ProfileScreenViewModel>()
+  Log.d("ProfileScreen", profileViewModel.hashCode().toString())
   val currentUser = profileViewModel.currentUser.collectAsState()
   val invitations by profileViewModel.invitations.collectAsState()
   // Get the current theme mode and the theme toggler from ShelfLifeTheme
