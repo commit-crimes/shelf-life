@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.TopLevelDestination
+import com.android.shelfLife.ui.navigation.TopLevelDestinations
 import com.android.shelfLife.viewmodel.authentication.SignInState
 import com.android.shelfLife.viewmodel.authentication.SignInViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -58,7 +60,7 @@ fun SignInScreen(navigationActions: NavigationActions) {
     when (signInState) {
       is SignInState.Success -> {
         Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-        // Navigation is handled in ShelfLifeApp based on isUserLoggedIn
+        navigationActions.navigateTo(TopLevelDestinations.OVERVIEW)
       }
       is SignInState.Error -> {
         val message = (signInState as SignInState.Error).message
