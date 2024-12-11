@@ -69,7 +69,7 @@ constructor(
             (householdToEdit.value == null || householdName != householdToEdit.value!!.name)))
   }
 
-  suspend fun getEmailToUserId(emails: Set<String>): Map<String, String> {
+  private suspend fun getEmailToUserId(emails: Set<String>): Map<String, String> {
     return userRepository.getUserIds(emails)
   }
 

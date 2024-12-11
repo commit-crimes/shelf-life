@@ -52,7 +52,7 @@ fun InvitationScreen(navigationActions: NavigationActions) {
       // Show list of invitations
       LazyColumn(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
         items(invitations) { invitation ->
-          InvitationCard(invitation, viewModel)
+          InvitationCard(invitation, viewModel, navigationActions)
           Spacer(modifier = Modifier.height(8.dp))
         }
       }
@@ -64,6 +64,7 @@ fun InvitationScreen(navigationActions: NavigationActions) {
 fun InvitationCard(
     invitation: Invitation,
     invitationViewModel: InvitationViewModel,
+    navigationActions: NavigationActions
 ) {
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
@@ -80,6 +81,7 @@ fun InvitationCard(
                 invitationViewModel.acceptInvitation(invitation)
                 Toast.makeText(context, "Invitation accepted", Toast.LENGTH_SHORT).show()
               }
+                navigationActions.goBack()
             },
             modifier = Modifier.weight(1f)) {
               Text("Accept")
@@ -90,6 +92,7 @@ fun InvitationCard(
               coroutineScope.launch {
                 invitationViewModel.declineInvitation(invitation)
                 Toast.makeText(context, "Invitation declined", Toast.LENGTH_SHORT).show()
+                  navigationActions.goBack()
               }
             },
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),

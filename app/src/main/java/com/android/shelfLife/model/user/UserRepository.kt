@@ -2,6 +2,7 @@ package com.android.shelfLife.model.user
 
 import android.content.Context
 import com.android.shelfLife.model.newhousehold.HouseHold
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {
@@ -23,15 +24,6 @@ interface UserRepository {
    * at startup to load initial data.
    */
   suspend fun initializeUserData(context: Context)
-
-  /** Starts listening for changes to the invitations field. */
-  fun startListeningForInvitations()
-
-  /**
-   * Stops listening for changes to the invitations field. Call this when the listener is no longer
-   * needed to avoid memory leaks.
-   */
-  fun stopListeningForInvitations()
 
   /**
    * Sets the user's logged-in status. This is used to determine whether to show the sign-in screen
@@ -67,6 +59,7 @@ interface UserRepository {
   /** @param userIds - The list of user IDs to get the emails for. */
   suspend fun getUserEmails(userIds: List<String>): Map<String, String>
 
+   suspend fun addCurrentUserToHouseHold(householdUID: String, userUID: String)
   /**
    * Selects a household and saves it to the user's data. VIEW MODELS NEED TO MANUALLY SELECT THE
    * LIST OF FOOD ITEMS!!!

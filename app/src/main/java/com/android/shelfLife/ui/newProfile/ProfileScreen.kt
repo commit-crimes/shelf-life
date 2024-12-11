@@ -44,8 +44,7 @@ fun ProfileScreen(navigationActions: NavigationActions, context: Context) {
   val profileViewModel = hiltViewModel<ProfileScreenViewModel>()
   Log.d("ProfileScreen", profileViewModel.hashCode().toString())
   val currentUser = profileViewModel.currentUser.collectAsState()
-  val invitations by profileViewModel.invitations.collectAsState()
-  // Get the current theme mode and the theme toggler from ShelfLifeTheme
+  val invitations by profileViewModel.invitationUIDS.collectAsState()
   val currentThemeMode = LocalThemeMode.current
   val themeToggler = LocalThemeTogglerProvider.current
 
