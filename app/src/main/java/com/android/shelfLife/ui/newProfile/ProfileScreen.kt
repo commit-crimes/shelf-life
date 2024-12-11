@@ -31,6 +31,7 @@ import coil3.compose.AsyncImage
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.utils.DropdownFields
 import com.android.shelfLife.viewmodel.ProfileScreenViewModel
@@ -141,7 +142,10 @@ fun ProfileScreen(navigationActions: NavigationActions, context: Context) {
 
               // Logout button
               OutlinedButton(
-                  onClick = { profileViewModel.signOut(context) },
+                  onClick = {
+                      profileViewModel.signOut(context)
+                      navigationActions.navigateToAndClearBackStack(Screen.AUTH)
+                            },
                   modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
                   border = BorderStroke(1.dp, Color.Red) // Outline color matches the current status
                   ) {
