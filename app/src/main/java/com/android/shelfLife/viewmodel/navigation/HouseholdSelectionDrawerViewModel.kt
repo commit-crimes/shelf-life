@@ -9,6 +9,7 @@ import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -21,9 +22,9 @@ constructor(
     private val foodItemRepository: FoodItemRepository
 ) : ViewModel() {
   val households =
-      houseHoldRepository.households.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+      houseHoldRepository.households
   val selectedHousehold =
-      userRepository.selectedHousehold.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+      userRepository.selectedHousehold
 
   fun selectHousehold(household: HouseHold?) {
     viewModelScope.launch {

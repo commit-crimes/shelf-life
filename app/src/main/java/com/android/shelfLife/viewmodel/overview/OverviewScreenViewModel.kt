@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -45,11 +46,11 @@ constructor(
   val finishedLoading = MutableStateFlow(false)
 
   val selectedHousehold =
-      userRepository.selectedHousehold.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+      userRepository.selectedHousehold
   val households =
-      houseHoldRepository.households.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+      houseHoldRepository.households
   val foodItems =
-      listFoodItemsRepository.foodItems.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+      listFoodItemsRepository.foodItems
 
   val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
 
