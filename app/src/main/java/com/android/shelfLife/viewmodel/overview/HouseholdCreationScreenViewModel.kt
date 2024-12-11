@@ -11,8 +11,10 @@ import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -28,10 +30,20 @@ constructor(
   private val _emailList = MutableStateFlow<Set<String>>(emptySet())
   val emailList: StateFlow<Set<String>> = _emailList.asStateFlow()
 
-  val householdToEdit = houseHoldRepository.householdToEdit
-  val selectedHousehold = userRepository.selectedHousehold
-  val households = houseHoldRepository.households
-  val currentUser = userRepository.user
+  val householdToEdit: StateFlow<HouseHold?> =
+      houseHoldRepository.householdToEdit.stateIn(
+          viewModelScope, started = SharingStarted.Eagerly, null)
+
+  val selectedHousehold =
+      userRepository.selectedHousehold.stateIn(
+          viewModelScope, started = SharingStarted.Eagerly, null)
+
+  val households =
+      houseHoldRepository.households.stateIn(
+          viewModelScope, started = SharingStarted.Eagerly, emptyList())
+  val currentUser =
+      userRepository.user.stateIn(viewModelScope, started = SharingStarted.Eagerly, null)
+
   private var finishedLoading = MutableStateFlow(false)
 
   // Fetch the list of members for the household to edit and set the email list
@@ -114,6 +126,7 @@ constructor(
   }
 
   private fun addNewHousehold(householdName: String, friendEmails: Set<String?> = emptySet()) {
+    Log.d("HouseholdViewModel", "Adding new household")
     viewModelScope.launch {
       val user =
           currentUser.value
@@ -123,7 +136,7 @@ constructor(
               }
 
       val householdUid = houseHoldRepository.getNewUid()
-      var household = HouseHold(householdUid, householdName, listOf(user.uid), emptyList())
+      val household = HouseHold(householdUid, householdName, listOf(user.uid), emptyList())
 
       houseHoldRepository.addHousehold(household)
       userRepository.addHouseholdUID(household.uid)

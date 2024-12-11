@@ -21,8 +21,10 @@ import kotlinx.coroutines.tasks.await
 @Singleton
 class UserRepositoryFirestore
 @Inject
-constructor(private val db: FirebaseFirestore, private val firebaseAuth: FirebaseAuth) :
-    UserRepository {
+constructor(
+    private val db: FirebaseFirestore,
+    private val firebaseAuth: FirebaseAuth,
+) : UserRepository {
 
   private val userCollection = db.collection("users")
 

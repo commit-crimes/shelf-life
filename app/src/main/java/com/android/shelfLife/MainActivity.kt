@@ -1,20 +1,16 @@
 package com.android.shelfLife
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navigation
-import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
@@ -33,41 +29,32 @@ import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.recipes.addRecipe.AddRecipeScreen
 import com.example.compose.ShelfLifeTheme
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-  @Inject lateinit var userRepositoryFirestore: UserRepository
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
-    setContent { ShelfLifeTheme { Surface { ShelfLifeApp(userRepositoryFirestore) } } }
+    setContent { ShelfLifeTheme { Surface { ShelfLifeApp() } } }
   }
 }
 
 @Composable
-fun ShelfLifeApp(userRepository: UserRepository) {
+fun ShelfLifeApp() {
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 
   val context = LocalContext.current
 
-  val isUserLoggedIn = userRepository.isUserLoggedIn.collectAsState().value
-
-  // Observe authentication state changes
-  LaunchedEffect(isUserLoggedIn) {
-    if (isUserLoggedIn) {
-      Log.d("ShelfLifeApp", "User is logged in, calling initializeUserData")
-      userRepository.initializeUserData(context)
-      navigationActions.navigateToAndClearBackStack(Screen.OVERVIEW)
-    } else {
-      navigationActions.navigateToAndClearBackStack(Screen.AUTH)
-    }
+  var startDestination = Route.AUTH
+  if (FirebaseAuth.getInstance().currentUser != null) {
+    startDestination = Route.OVERVIEW
   }
 
-  NavHost(navController = navController, startDestination = Route.AUTH) {
+  NavHost(navController = navController, startDestination = startDestination) {
     // Authentication route
     navigation(
         startDestination = Screen.AUTH,
