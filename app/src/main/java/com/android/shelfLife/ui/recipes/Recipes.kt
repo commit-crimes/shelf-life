@@ -157,7 +157,7 @@ fun RecipesScreen(navigationActions: NavigationActions) {
                       searchBarTestTag = "searchBar",
                       onDeleteTextClicked = { recipesViewModel.changeQuery("") })
 
-                  if (recipesViewModel.selectedFilters.value.isEmpty()) {
+                  if (filteredRecipeList.isEmpty()) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         content = {

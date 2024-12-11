@@ -7,6 +7,7 @@ import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.Recipe
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.tasks.await
 
 @Singleton
 class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFirestore) :
@@ -48,22 +50,58 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
    * @param onFailure - Called when there is an error retrieving the recipes.
    */
   override fun getRecipes(onSuccess: (List<Recipe>) -> Unit, onFailure: (Exception) -> Unit) {
-    db.collection(COLLECTION_PATH)
-        .get()
-        .addOnSuccessListener { result ->
-          val recipeList = mutableListOf<Recipe>()
-          for (document in result) {
-            val recipe = convertToRecipe(document)
-            if (recipe != null) recipeList.add(recipe)
+      db.collection(COLLECTION_PATH)
+          .get()
+          .addOnSuccessListener { result ->
+              val recipeList = mutableListOf<Recipe>()
+              for (document in result) {
+                  val recipe = convertToRecipe(document)
+                  if (recipe != null) recipeList.add(recipe)
+              }
+              _recipes.value = recipeList
+              onSuccess(recipeList)
           }
-          _recipes.value = recipeList
-          onSuccess(recipeList)
-        }
-        .addOnFailureListener { exception ->
-          Log.e("RecipeRepository", "Error fetching recipes", exception)
-          onFailure(exception)
-        }
+          .addOnFailureListener { exception ->
+              Log.e("RecipeRepository", "Error fetching recipes", exception)
+              onFailure(exception)
+          }
   }
+
+
+
+
+
+    /**
+     * Fetches recipes from the database whose document IDs match the provided list of user recipe UIDs.
+     *
+     * @param listUserRecipeUid A list of recipe UIDs belonging to the user. If the list is empty, the function sets `_recipes` to an empty list.
+     *
+     * This function performs the following steps:
+     * 1. Queries the database collection specified by `COLLECTION_PATH` for documents with IDs in `listUserRecipeUid`.
+     * 2. Converts the resulting documents into `Recipe` objects using the `convertToRecipe` function.
+     * 3. Updates the `_recipes` state with the fetched recipes or an empty list if no matches are found.
+     *
+     * If an exception occurs during the database operation, it logs the error and sets `_recipes` to an empty list.
+     *
+     * This is a `suspend` function and should be called within a coroutine.
+     */
+  override suspend fun getRecipes(listUserRecipeUid : List<String>) {
+      if(listUserRecipeUid.isEmpty()){
+          _recipes.value = emptyList()
+      }
+      try{
+          val querySnapshot = db.collection(COLLECTION_PATH)
+              .whereIn(FieldPath.documentId(), listUserRecipeUid)
+              .get()
+              .await()
+          _recipes.value = querySnapshot.documents.mapNotNull { convertToRecipe(it) }
+      }catch(e : Exception){
+          Log.e("RecipesRepository", "Error fetching recipes", e)
+          _recipes.value = emptyList()
+      }
+  }
+
+
 
   /**
    * Fetches a single recipe by its ID.
