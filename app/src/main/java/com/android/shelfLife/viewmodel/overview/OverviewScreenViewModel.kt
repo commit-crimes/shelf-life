@@ -1,5 +1,6 @@
 package com.android.shelfLife.viewmodel.overview
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -12,10 +13,14 @@ import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -25,7 +30,8 @@ class OverviewScreenViewModel
 constructor(
     private val houseHoldRepository: HouseHoldRepository,
     private val listFoodItemsRepository: FoodItemRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
   private val _selectedFilters = MutableStateFlow<List<String>>(emptyList())
   val selectedFilters = _selectedFilters.asStateFlow()
@@ -39,9 +45,12 @@ constructor(
 
   val finishedLoading = MutableStateFlow(false)
 
-  val selectedHousehold = userRepository.selectedHousehold
-  val households = houseHoldRepository.households
-  val foodItems = listFoodItemsRepository.foodItems
+  val selectedHousehold =
+      userRepository.selectedHousehold
+  val households =
+      houseHoldRepository.households
+  val foodItems =
+      listFoodItemsRepository.foodItems
 
   val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
 
@@ -55,7 +64,10 @@ constructor(
         Log.d(
             "OverviewScreenViewModel",
             "User logged in, loading: ${firebaseAuth.currentUser}, user: ${userRepository.user.value}")
-        loadHouseholds()
+        viewModelScope.launch {
+          userRepository.initializeUserData(context)
+          loadHouseholds()
+        }
       }
     }
   }

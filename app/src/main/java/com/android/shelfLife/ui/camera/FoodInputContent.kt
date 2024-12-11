@@ -2,13 +2,17 @@
 
 package com.android.shelfLife.ui.camera
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -16,9 +20,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImage
 import com.android.shelfLife.R
-import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.ui.newutils.*
 import com.android.shelfLife.ui.utils.CustomButtons
@@ -36,11 +39,7 @@ import kotlinx.coroutines.launch
  * @param foodItemViewModel The ViewModel for the food items.
  */
 @Composable
-fun FoodInputContent(
-    foodFacts: FoodFacts,
-    onSubmit: () -> Unit,
-    onCancel: () -> Unit
-) {
+fun FoodInputContent(foodFacts: FoodFacts, onSubmit: () -> Unit, onCancel: () -> Unit) {
   val foodItemViewModel = hiltViewModel<FoodItemViewModel>()
 
   foodItemViewModel.isScanned()
@@ -60,10 +59,14 @@ fun FoodInputContent(
             Text(text = foodFacts.category.name, style = TextStyle(fontSize = 13.sp))
           }
 
-          Image(
-              painter = painterResource(id = R.drawable.app_logo),
-              contentDescription = "Food Image",
-              modifier = Modifier.size(60.dp).padding(end = 8.dp))
+          AsyncImage(
+            model = foodFacts.imageUrl,
+            contentDescription = "Food Image",
+            modifier =
+            Modifier.size(80.dp)
+              .clip(RoundedCornerShape(8.dp))
+              .align(Alignment.CenterVertically),
+            contentScale = ContentScale.Crop)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -82,9 +85,7 @@ fun FoodInputContent(
         // Expire Date Field with Error Handling
         DateField(
             date = foodItemViewModel.expireDate,
-            onDateChange = { newValue ->
-              foodItemViewModel.changeExpiryDate(newValue)
-            },
+            onDateChange = { newValue -> foodItemViewModel.changeExpiryDate(newValue) },
             dateErrorResId = foodItemViewModel.expireDateErrorResId,
             labelResId = R.string.expire_date_hint,
             testTag = "expireDateTextField")
@@ -94,9 +95,7 @@ fun FoodInputContent(
         // Open Date Field with Error Handling
         DateField(
             date = foodItemViewModel.openDate,
-            onDateChange = { newValue ->
-                foodItemViewModel.changeOpenDate(newValue)
-            },
+            onDateChange = { newValue -> foodItemViewModel.changeOpenDate(newValue) },
             dateErrorResId = foodItemViewModel.openDateErrorResId,
             labelResId = R.string.open_date_hint,
             testTag = "openDateTextField")
@@ -106,9 +105,7 @@ fun FoodInputContent(
         // Buy Date Field with Error Handling
         DateField(
             date = foodItemViewModel.buyDate,
-            onDateChange = { newValue ->
-                foodItemViewModel.changeBuyDate(newValue)
-            },
+            onDateChange = { newValue -> foodItemViewModel.changeBuyDate(newValue) },
             dateErrorResId = foodItemViewModel.buyDateErrorResId,
             labelResId = R.string.buy_date_hint,
             testTag = "buyDateTextField")
@@ -120,17 +117,17 @@ fun FoodInputContent(
             button1TestTag = "cancelButton",
             button1Text = stringResource(R.string.cancel_button),
             button2OnClick = {
-                coroutineScope.launch {
-                    val success = foodItemViewModel.submitFoodItem()
-                    if (success) {
-                        // foodFactsViewModel.clearFoodFactsSuggestions()
-                        onSubmit()
-                    } else {
-                        Toast.makeText(
-                            context, R.string.submission_error_message, Toast.LENGTH_SHORT)
-                            .show()
-                    }
+              coroutineScope.launch {
+                val success = foodItemViewModel.submitFoodItem(foodFacts)
+                if (success) {
+                  // foodFactsViewModel.clearFoodFactsSuggestions()
+                  Log.d("FoodInputContent", "Food item submitted successfully")
+                  onSubmit()
+                } else {
+                  Toast.makeText(context, R.string.submission_error_message, Toast.LENGTH_SHORT)
+                      .show()
                 }
+              }
             },
             button2TestTag = "submitButton",
             button2Text = stringResource(R.string.submit_button_text),
