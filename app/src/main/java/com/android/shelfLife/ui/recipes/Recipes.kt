@@ -62,14 +62,13 @@ import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import com.android.shelfLife.viewmodel.recipes.RecipesViewModel
 import kotlinx.coroutines.launch
 
-@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun RecipesScreen(navigationActions: NavigationActions) {
   val recipesViewModel = hiltViewModel<RecipesViewModel>()
   val overviewScreenViewModel = hiltViewModel<OverviewScreenViewModel>()
 
-  val user = recipesViewModel.user
-  val selectedHousehold = recipesViewModel.household
+  val user = recipesViewModel.user.collectAsState()
+  val selectedHousehold = recipesViewModel.household.collectAsState()
 
   val isFabExpanded by recipesViewModel.fabExpanded.collectAsState()
   val query by recipesViewModel.query.collectAsState()
