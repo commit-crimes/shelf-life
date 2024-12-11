@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,16 +20,7 @@ open class InvitationRepositoryFirestore(
     private val auth: FirebaseAuth
 ) : InvitationRepository {
 
-  internal var listenerRegistration: ListenerRegistration? = null
-  private val _invitations: MutableStateFlow<List<Invitation>> = MutableStateFlow(emptyList())
-  override val invitations: StateFlow<List<Invitation>> = _invitations.asStateFlow()
   private val invitationPath = "invitations"
-
-  /** Removes the real-time listener for invitations. */
-  override fun removeInvitationListener() {
-    listenerRegistration?.remove()
-    listenerRegistration = null
-  }
 
   /**
    * Sends an invitation to a user to join a household.
@@ -36,47 +28,23 @@ open class InvitationRepositoryFirestore(
    * @param household The household to invite the user to.
    */
   override fun sendInvitation(household: HouseHold, invitedUserID: String) {
-    val inviterUserId =
-        auth.currentUser?.uid ?: throw IllegalStateException("User not authenticated")
-    val invitationId = db.collection(invitationPath).document().id
-    val invitationData =
-        Invitation(
-                invitationId = invitationId,
-                householdId = household.uid,
-                householdName = household.name,
-                invitedUserId = invitedUserID,
-                inviterUserId = inviterUserId,
-                timestamp = Timestamp.now())
-            .toMap()
-    db.collection("invitations").document(invitationId).set(invitationData)
-    db.collection("users")
-        .document(invitedUserID)
-        .update("invitationUIDs", FieldValue.arrayUnion(invitationId))
-  }
-
-  /**
-   * Fetches all invitations for the current user.
-   *
-   * @param listOfInvitationUids The list of invitation UIDs to fetch.
-   * @return The list of invitations.
-   */
-  override suspend fun getInvitations(listOfInvitationUids: List<String>): List<Invitation> {
-    if (listOfInvitationUids.isEmpty()) {
-      return emptyList()
-    }
-    return try {
-      _invitations.value =
-          db.collection(invitationPath)
-              .whereIn(FieldPath.documentId(), listOfInvitationUids)
-              .get()
-              .await()
-              .documents
-              .mapNotNull { convertToInvitation(it) }
-      invitations.value
-    } catch (e: Exception) {
-      Log.e("HouseholdRepository", "Error fetching households", e)
-      emptyList()
-    }
+      val inviterUserId =
+          auth.currentUser?.uid ?: throw IllegalStateException("User not authenticated")
+      val invitationId = db.collection(invitationPath).document().id
+      val invitationData =
+          Invitation(
+              invitationId = invitationId,
+              householdId = household.uid,
+              householdName = household.name,
+              invitedUserId = invitedUserID,
+              inviterUserId = inviterUserId,
+              timestamp = Timestamp.now()
+          )
+              .toMap()
+      db.collection("invitations").document(invitationId).set(invitationData)
+      db.collection("users")
+          .document(invitedUserID)
+          .update("invitationUIDs", FieldValue.arrayUnion(invitationId))
   }
 
   /**
@@ -101,13 +69,27 @@ open class InvitationRepositoryFirestore(
     db.collection(invitationPath).document(invitation.invitationId).delete()
   }
 
+    override suspend fun getInvitationsBatch(invitationUIDs: List<String>): QuerySnapshot {
+        return db.collection("invitations")
+            .whereIn(FieldPath.documentId(), invitationUIDs)
+            .get()
+            .await()
+    }
+
+    override suspend fun getInvitation(uid : String) : Invitation? {
+        return convertToInvitation(db.collection("invitations")
+            .document(uid)
+            .get()
+            .await())
+    }
+
   /**
    * Converts a Firestore document to an Invitation object.
    *
    * @param doc The Firestore document to convert.
    * @return The corresponding Invitation object, or null if the document is invalid.
    */
-  private fun convertToInvitation(doc: DocumentSnapshot): Invitation? {
+   override fun convertToInvitation(doc: DocumentSnapshot): Invitation? {
     return try {
       Invitation(
           invitationId = doc.getString("invitationId") ?: return null,
