@@ -54,6 +54,9 @@ constructor(
   private val _ingredientQuantityUnit = MutableStateFlow(FoodUnit.GRAM)
   val ingredientQuantityUnit: StateFlow<FoodUnit> = _ingredientQuantityUnit.asStateFlow()
 
+    private val _unitDropDownExpanded = MutableStateFlow(false)
+    val unitDropDownExpanded : StateFlow<Boolean> = _unitDropDownExpanded.asStateFlow()
+
   private val _showIngredientDialog = MutableStateFlow(false)
   val showIngredientDialog: StateFlow<Boolean> = _showIngredientDialog.asStateFlow()
 
@@ -273,4 +276,8 @@ constructor(
         },
         onFailure = { showToast(1) })
   }
+
+    fun changeUnitDropDownExpanded(){
+        _unitDropDownExpanded.value = if(unitDropDownExpanded.value) false else true
+    }
 }
