@@ -45,50 +45,17 @@ constructor(
 
   val finishedLoading = MutableStateFlow(false)
 
-  val selectedHousehold =
-      userRepository.selectedHousehold
-  val households =
-      houseHoldRepository.households
-  val foodItems =
-      listFoodItemsRepository.foodItems
+  val households = houseHoldRepository.households
+  val selectedHousehold = houseHoldRepository.selectedHousehold
+  val foodItems = listFoodItemsRepository.foodItems
 
   val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
 
-  /**
-   * Initializes the OverviewScreenViewModel by loading the list of households from the repository.
-   */
   init {
-    Log.d("OverviewScreenViewModel", "Initialized")
-    FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
-      if (firebaseAuth.currentUser != null) {
-        Log.d(
-            "OverviewScreenViewModel",
-            "User logged in, loading: ${firebaseAuth.currentUser}, user: ${userRepository.user.value}")
-        viewModelScope.launch {
-          userRepository.initializeUserData(context)
-          loadHouseholds()
-        }
-      }
-    }
+    Log.d("OverviewScreenViewModel", "Init")
   }
 
-  /** Loads the list of households from the repository and updates the [_households] flow. */
-  private fun loadHouseholds() {
-    viewModelScope.launch {
-      Log.d("OverviewScreenViewModel", "Loading households for user: ${userRepository.user.value}")
-      userRepository.user.value?.let { user ->
-        houseHoldRepository.initializeHouseholds(user.householdUIDs, user.selectedHouseholdUID!!)
-        userRepository.selectHousehold(
-            households.value.find { it.uid == user.selectedHouseholdUID }
-                ?: households.value.firstOrNull())
-        if (selectedHousehold.value != null) {
-          listFoodItemsRepository.getFoodItems(selectedHousehold.value!!.uid)
-        }
-      }
-      Log.d("OverviewScreenViewModel", "Households loaded: ${households.value}")
-      finishedLoading.value = true
-    }
-  }
+
 
   /**
    * Selects a household to edit

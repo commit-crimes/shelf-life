@@ -24,13 +24,15 @@ constructor(
   val households =
       houseHoldRepository.households
   val selectedHousehold =
-      userRepository.selectedHousehold
+      houseHoldRepository.selectedHousehold
 
   fun selectHousehold(household: HouseHold?) {
     viewModelScope.launch {
-      userRepository.selectHousehold(household)
+
       if (household != null) {
-        foodItemRepository.getFoodItems(household.uid)
+          houseHoldRepository.selectHousehold(household)
+          userRepository.selectHousehold(household.uid)
+          foodItemRepository.getFoodItems(household.uid)
       }
     }
   }

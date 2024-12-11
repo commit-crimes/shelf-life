@@ -40,8 +40,11 @@ import com.example.compose.LocalThemeTogglerProvider
 import com.example.compose.ThemeMode
 
 @Composable
-fun ProfileScreen(navigationActions: NavigationActions, context: Context) {
-  val profileViewModel = hiltViewModel<ProfileScreenViewModel>()
+fun ProfileScreen(
+    navigationActions: NavigationActions,
+    context: Context,
+    profileViewModel: ProfileScreenViewModel = hiltViewModel()
+) {
   Log.d("ProfileScreen", profileViewModel.hashCode().toString())
   val currentUser = profileViewModel.currentUser.collectAsState()
   val invitations by profileViewModel.invitations.collectAsState()
@@ -143,9 +146,9 @@ fun ProfileScreen(navigationActions: NavigationActions, context: Context) {
               // Logout button
               OutlinedButton(
                   onClick = {
-                      profileViewModel.signOut(context)
-                      navigationActions.navigateToAndClearBackStack(Screen.AUTH)
-                            },
+                    profileViewModel.signOut(context)
+                    navigationActions.navigateToAndClearBackStack(Screen.AUTH)
+                  },
                   modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
                   border = BorderStroke(1.dp, Color.Red) // Outline color matches the current status
                   ) {

@@ -4,7 +4,7 @@ package com.android.shelfLife.ui.camera
 
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -14,16 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodFacts
-import com.android.shelfLife.ui.newutils.*
 import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.DateField
 import com.android.shelfLife.ui.utils.LocationDropdownField
@@ -39,16 +36,20 @@ import kotlinx.coroutines.launch
  * @param foodItemViewModel The ViewModel for the food items.
  */
 @Composable
-fun FoodInputContent(foodFacts: FoodFacts, onSubmit: () -> Unit, onCancel: () -> Unit) {
-  val foodItemViewModel = hiltViewModel<FoodItemViewModel>()
-
+fun FoodInputContent(
+    foodItemViewModel: FoodItemViewModel,
+    foodFacts: FoodFacts,
+    onSubmit: () -> Unit,
+    onCancel: () -> Unit,
+    onExpandRequested: () -> Unit
+) {
   foodItemViewModel.isScanned()
 
   val coroutineScope = rememberCoroutineScope()
   val context = LocalContext.current
 
   Column(
-      modifier = Modifier.fillMaxWidth().padding(16.dp),
+      modifier = Modifier.fillMaxWidth().padding(16.dp).clickable { onExpandRequested() },
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Top) {
         // Food information
@@ -60,13 +61,13 @@ fun FoodInputContent(foodFacts: FoodFacts, onSubmit: () -> Unit, onCancel: () ->
           }
 
           AsyncImage(
-            model = foodFacts.imageUrl,
-            contentDescription = "Food Image",
-            modifier =
-            Modifier.size(80.dp)
-              .clip(RoundedCornerShape(8.dp))
-              .align(Alignment.CenterVertically),
-            contentScale = ContentScale.Crop)
+              model = foodFacts.imageUrl,
+              contentDescription = "Food Image",
+              modifier =
+                  Modifier.size(80.dp)
+                      .clip(RoundedCornerShape(8.dp))
+                      .align(Alignment.CenterVertically),
+              contentScale = ContentScale.Crop)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -113,7 +114,9 @@ fun FoodInputContent(foodFacts: FoodFacts, onSubmit: () -> Unit, onCancel: () ->
         Spacer(modifier = Modifier.height(16.dp))
 
         CustomButtons(
-            button1OnClick = { onCancel() },
+            button1OnClick = {
+                onCancel()
+                             },
             button1TestTag = "cancelButton",
             button1Text = stringResource(R.string.cancel_button),
             button2OnClick = {

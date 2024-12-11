@@ -38,11 +38,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun EditFoodItemScreen(
     navigationActions: NavigationActions,
-    paddingValues: PaddingValues = PaddingValues(16.dp)
+    paddingValues: PaddingValues = PaddingValues(16.dp),
+    foodItemViewModel: FoodItemViewModel = hiltViewModel()
 ) {
 
   val context = LocalContext.current
-  val foodItemViewModel = hiltViewModel<FoodItemViewModel>()
   val coroutineScope = rememberCoroutineScope()
 
   Scaffold(

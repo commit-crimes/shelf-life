@@ -17,6 +17,9 @@ class HouseholdRepositoryFirestore(
   private val _households = MutableStateFlow<List<HouseHold>>(emptyList())
   override val households: StateFlow<List<HouseHold>> = _households.asStateFlow()
 
+  private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
+  override val selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
+
   private val _householdToEdit = MutableStateFlow<HouseHold?>(null)
   override val householdToEdit: StateFlow<HouseHold?> = _householdToEdit.asStateFlow()
 
@@ -25,6 +28,10 @@ class HouseholdRepositoryFirestore(
 
   override fun getNewUid(): String {
     return db.collection(collectionPath).document().id
+  }
+
+  override fun selectHousehold(household: HouseHold?) {
+    _selectedHousehold.value = household
   }
 
   override fun selectHouseholdToEdit(household: HouseHold?) {
@@ -56,11 +63,12 @@ class HouseholdRepositoryFirestore(
 
   override suspend fun initializeHouseholds(
       householdIds: List<String>,
-      selectedHouseholdUid: String
+      selectedHouseholdUid: String?
   ) {
     if (householdIds.isEmpty()) {
       Log.d("HouseholdRepository", "No household IDs provided")
       _households.value = emptyList()
+      _selectedHousehold.value = null
       return
     }
     try {
@@ -72,11 +80,11 @@ class HouseholdRepositoryFirestore(
       val fetchedHouseholds = querySnapshot.documents.mapNotNull { convertToHousehold(it) }
       _households.value = fetchedHouseholds
       Log.d("HouseholdRepository", "Households: ${_households.value}")
-
-      Log.d("HouseholdRepositoryFirestore", "Selected household UID: $selectedHouseholdUid")
+      selectHousehold(_households.value.find { it.uid == selectedHouseholdUid })
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error initializing households", e)
     }
+
   }
 
   /**
