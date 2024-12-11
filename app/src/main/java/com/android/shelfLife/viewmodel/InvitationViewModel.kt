@@ -53,6 +53,7 @@ constructor(
     userRepo.addCurrentUserToHouseHold(selectedInvitation.householdId
       ,selectedInvitation.invitedUserId)
     Log.d("InvitationViewModel", "before adding new household to user : ${userRepo.user.value}")
+    refreshInvitations()
   }
 
   suspend fun declineInvitation(selectedInvitation: Invitation) {
@@ -71,7 +72,7 @@ constructor(
         }
         _invitations.value = updatedInvitations
       } catch (e: Exception) {
-        // Handle exceptions appropriately
+        Log.e("InvitationViewModel", "Error while refreshing invitations", e)
       }
     } else {
       _invitations.value = emptyList()
