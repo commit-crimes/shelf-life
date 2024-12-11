@@ -53,6 +53,7 @@ class RecipeRepositoryFirestore @Inject constructor(
      * @param selectedRecipeId An optional ID to pre-select a recipe.
      */
     override suspend fun initializeRecipes(recipeIds: List<String>, selectedRecipeId: String?) {
+        Log.d("RecipeRepository", "Initializing recipes with IDs: $recipeIds")
         if (recipeIds.isEmpty()) {
             _recipes.value = emptyList()
             _selectedRecipe.value = null
@@ -255,6 +256,7 @@ class RecipeRepositoryFirestore @Inject constructor(
             val time = timeMillis.toDuration(DurationUnit.SECONDS)
             val ingredients = doc["ingredients"] as? List<Map<String, Any>> ?: return null
 
+            Log.d("RecipeRepository", "Name of recipe: $name")
             Recipe(
                 uid = uid,
                 name = name,
@@ -263,6 +265,7 @@ class RecipeRepositoryFirestore @Inject constructor(
                 time = time,
                 ingredients = ingredients.map { convertToIngredient(it) }
             )
+
         } catch (e: Exception) {
             Log.e("RecipeRepository", "Error converting document to Recipe", e)
             null

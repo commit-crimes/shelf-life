@@ -68,15 +68,6 @@ class RecipesViewModel @Inject constructor(
   val user = userRepository.user
   val household = houseHoldRepository.selectedHousehold
 
-  init {
-    viewModelScope.launch {
-      val currentUser = user.value
-      if (currentUser != null && currentUser.recipeUIDs.isNotEmpty()) {
-        recipeRepository.initializeRecipes(currentUser.recipeUIDs, null)
-      }
-    }
-  }
-
   fun selectRecipe(recipe: Recipe?) {
     recipeRepository.selectRecipe(recipe)
   }
