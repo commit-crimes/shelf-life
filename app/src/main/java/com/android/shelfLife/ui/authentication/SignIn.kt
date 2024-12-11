@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.TopLevelDestination
 import com.android.shelfLife.ui.navigation.TopLevelDestinations
 import com.android.shelfLife.viewmodel.authentication.SignInState
 import com.android.shelfLife.viewmodel.authentication.SignInViewModel

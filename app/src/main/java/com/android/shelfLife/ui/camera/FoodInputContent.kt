@@ -4,7 +4,6 @@ package com.android.shelfLife.ui.camera
 
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -14,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -60,13 +58,13 @@ fun FoodInputContent(foodFacts: FoodFacts, onSubmit: () -> Unit, onCancel: () ->
           }
 
           AsyncImage(
-            model = foodFacts.imageUrl,
-            contentDescription = "Food Image",
-            modifier =
-            Modifier.size(80.dp)
-              .clip(RoundedCornerShape(8.dp))
-              .align(Alignment.CenterVertically),
-            contentScale = ContentScale.Crop)
+              model = foodFacts.imageUrl,
+              contentDescription = "Food Image",
+              modifier =
+                  Modifier.size(80.dp)
+                      .clip(RoundedCornerShape(8.dp))
+                      .align(Alignment.CenterVertically),
+              contentScale = ContentScale.Crop)
         }
 
         Spacer(modifier = Modifier.height(16.dp))

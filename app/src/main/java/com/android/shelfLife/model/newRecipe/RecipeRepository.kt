@@ -21,13 +21,12 @@ interface RecipeRepository {
    */
   fun getRecipes(onSuccess: (List<Recipe>) -> Unit, onFailure: (Exception) -> Unit)
 
-
   /**
    * fetches all the recipes whose UID is in the list
    *
    * @param listUserRecipeUid - the list of recipes uid that belong to the user
    */
-  suspend fun getRecipes(listUserRecipeUid:List<String>)
+  suspend fun getRecipes(listUserRecipeUid: List<String>)
 
   /**
    * Fetches a recipe by its unique ID.

@@ -17,12 +17,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -47,12 +44,9 @@ constructor(
 
   val finishedLoading = MutableStateFlow(false)
 
-  val selectedHousehold =
-      userRepository.selectedHousehold
-  val households =
-      houseHoldRepository.households
-  val foodItems =
-      listFoodItemsRepository.foodItems
+  val selectedHousehold = userRepository.selectedHousehold
+  val households = houseHoldRepository.households
+  val foodItems = listFoodItemsRepository.foodItems
 
   private val _filteredFoodItems = MutableStateFlow<List<FoodItem>>(emptyList())
   val filteredFoodItems = _filteredFoodItems.asStateFlow()

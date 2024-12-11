@@ -143,9 +143,9 @@ fun ProfileScreen(navigationActions: NavigationActions, context: Context) {
               // Logout button
               OutlinedButton(
                   onClick = {
-                      profileViewModel.signOut(context)
-                      navigationActions.navigateToAndClearBackStack(Screen.AUTH)
-                            },
+                    profileViewModel.signOut(context)
+                    navigationActions.navigateToAndClearBackStack(Screen.AUTH)
+                  },
                   modifier = Modifier.fillMaxWidth().testTag("logoutButton"),
                   border = BorderStroke(1.dp, Color.Red) // Outline color matches the current status
                   ) {
