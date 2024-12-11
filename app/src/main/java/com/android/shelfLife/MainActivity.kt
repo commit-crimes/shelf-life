@@ -51,7 +51,7 @@ import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.recipes.addRecipe.AddRecipeScreen
 import com.android.shelfLife.viewmodel.authentication.SignInViewModel
-import com.android.shelfLife.viewmodel.recipe.RecipeGenerationViewModel
+import com.android.shelfLife.viewmodel.recipes.RecipeGenerationViewModel
 import com.example.compose.ShelfLifeTheme
 import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.OkHttpClient

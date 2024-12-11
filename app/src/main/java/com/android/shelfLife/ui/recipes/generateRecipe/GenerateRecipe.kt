@@ -2,7 +2,6 @@ package com.android.shelfLife.ui.recipes.generateRecipe
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -18,9 +17,11 @@ import com.android.shelfLife.R
 import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
-import com.android.shelfLife.viewmodel.recipe.RecipeGenerationViewModel
+import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
+import com.android.shelfLife.viewmodel.recipes.RecipeGenerationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,7 +38,7 @@ fun GenerateRecipeScreen(
   Scaffold(
     topBar = {
       CustomTopAppBar(
-        onClick = { if (currentStep == 0) navigationActions.goBack() else viewModel.previousStep() },
+        onClick = { if (currentStep == 0 || viewModel.isLastStep() ) navigationActions.goBack() else viewModel.previousStep() },
         title = "Generate your AI recipe",
         titleTestTag = "addRecipeTitle")
     }
@@ -54,7 +55,7 @@ fun GenerateRecipeScreen(
         0 -> RecipeInputStep(viewModel = viewModel, navigationActions = navigationActions)
         1 -> FoodSelectionStep(viewModel = viewModel)
         2 -> ReviewStep(viewModel = viewModel)
-        else -> CompletionStep(onRestart = { viewModel.resetSteps() })
+        else -> CompletionStep(viewModel, navigationActions = navigationActions, recipeRepository = recipeRepository)
       }
     }
   }
@@ -87,7 +88,7 @@ fun RecipeInputStep(
             }
           },
           button2TestTag = "recipeSubmitButton",
-          button2Text = stringResource(id = R.string.submit_button_text)
+          button2Text = stringResource(id = R.string.next_button_text)
         )
       }
     }
@@ -129,7 +130,7 @@ fun FoodSelectionStep(viewModel: RecipeGenerationViewModel) {
         CustomButtons(
           button1OnClick = { viewModel.previousStep() },// Cancel button
           button1TestTag = "cancelButton",
-          button1Text = stringResource(id = R.string.cancel_button),
+          button1Text = stringResource(id = R.string.back_button),
 
           button2OnClick = {
             // Validate the recipe name
@@ -140,7 +141,7 @@ fun FoodSelectionStep(viewModel: RecipeGenerationViewModel) {
             }
           },
           button2TestTag = "recipeSubmitButton",
-          button2Text = stringResource(id = R.string.submit_button_text)
+          button2Text = stringResource(id = R.string.next_button_text)
         )
       }
     }
@@ -214,8 +215,8 @@ fun ReviewStep(viewModel: RecipeGenerationViewModel) {
         // Buttons Section
         CustomButtons(
           button1OnClick = { viewModel.previousStep() },// Cancel button
-          button1TestTag = "cancelButton",
-          button1Text = stringResource(id = R.string.cancel_button),
+          button1TestTag = "cancelButton2",
+          button1Text = stringResource(id = R.string.back_button),
 
           button2OnClick = {
             // Validate the recipe name
@@ -225,8 +226,8 @@ fun ReviewStep(viewModel: RecipeGenerationViewModel) {
               Toast.makeText(context, R.string.recipe_title_empty_error, Toast.LENGTH_SHORT).show()
             }
           },
-          button2TestTag = "recipeSubmitButton",
-          button2Text = stringResource(id = R.string.submit_button_text)
+          button2TestTag = "generateButton",
+          button2Text = stringResource(id = R.string.generate_button)
         )
       }
     }
@@ -247,36 +248,51 @@ fun ReviewStep(viewModel: RecipeGenerationViewModel) {
       Text("Food Items: ${recipePrompt.ingredients.joinToString()}")
 
       Spacer(modifier = Modifier.height(16.dp))
-
-      Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-        Button(onClick = { viewModel.previousStep() }) {
-          Text("Back")
-        }
-        Button(onClick = { viewModel.nextStep() }) {
-          Text("Finish")
-        }
-      }
     }
   }
 }
 
 @Composable
-fun CompletionStep(onRestart: () -> Unit) {
-  Column(
-    modifier = Modifier
-      .fillMaxSize()
-      .padding(16.dp),
-    horizontalAlignment = Alignment.CenterHorizontally
-  ) {
-    Text(
-      text = "Recipe Generation Complete!",
-      fontSize = 24.sp,
-      fontWeight = FontWeight.Bold,
-      modifier = Modifier.padding(bottom = 16.dp)
-    )
+fun CompletionStep(viewModel: RecipeGenerationViewModel, navigationActions: NavigationActions, recipeRepository: RecipeRepository) {
+  val context = LocalContext.current
+  val recipePrompt by viewModel.recipePrompt.collectAsState()
 
-    Button(onClick = onRestart) {
-      Text("Start Over")
+  Scaffold(
+    bottomBar = {
+      // Fixed buttons at the bottom
+      Row(verticalAlignment = Alignment.Bottom) {
+        // Buttons Section
+        CustomButtons(
+          button1OnClick = {
+
+          },// Cancel button
+          button1TestTag = "regenerateButton",
+          button1Text = stringResource(id = R.string.regenerate_button),
+
+          button2OnClick = {
+
+          },
+          button2TestTag = "recipeSubmitButton",
+          button2Text = stringResource(id = R.string.save_button)
+        )
+      }
+    }
+  ) { paddingValues ->
+    Column(
+      modifier = Modifier.fillMaxSize()
+        .padding(paddingValues)
+        .padding(16.dp)
+    ) {
+      Text(
+        text = "Recipe Generation Complete!",
+        fontSize = 24.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(bottom = 16.dp)
+      )
+      IndividualRecipeScreen(
+        navigationActions = navigationActions,
+        individualRecipeViewModel = IndividualRecipeViewModel(recipeRepository)
+      )
     }
   }
 }

@@ -24,9 +24,14 @@
 
     <!-- Buttons -->
     <string name="submit_button_text">Submit</string>
+    <string name="next_button_text">Next</string>
     <string name="cancel_button">Cancel</string>
+    <string name="back_button">Back</string>
     <string name="add_button">Add</string>
     <string name="save_button">Save</string>
+    <string name="regenerate_button">Regenerate</string>
+    <string name="generate_button">Generate</string>
+
 
     <!-- Error Messages -->
     <string name="submission_error_message">Please correct the errors before submitting</string>
