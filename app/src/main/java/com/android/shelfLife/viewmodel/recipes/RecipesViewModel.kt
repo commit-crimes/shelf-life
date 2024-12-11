@@ -22,8 +22,7 @@ constructor(
     private val recipeRepository: RecipeRepository
 ) : ViewModel() {
 
-  private val _userRecipes = MutableStateFlow<List<Recipe>>(emptyList())
-  val userRecipes = _userRecipes.asStateFlow()
+  val userRecipes = recipeRepository.recipes
 
   private val _filteredRecipeList = MutableStateFlow<List<Recipe>>(emptyList())
   val filteredRecipeList = _filteredRecipeList.asStateFlow()
@@ -55,7 +54,6 @@ constructor(
     viewModelScope.launch {
       if (user.value != null) {
         recipeRepository.getRecipes(userRepository.user.value!!.recipeUIDs)
-        _userRecipes.value = recipeRepository.recipes.value
         filterRecipes()
       }
     }

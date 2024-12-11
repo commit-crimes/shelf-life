@@ -172,7 +172,7 @@ constructor(
 
   fun filterFoodItems() {
     foodItems.value.filter { item ->
-      item.foodFacts.name.contains(query.value, ignoreCase = true) &&
+      item.foodFacts.name.contains(_query.value, ignoreCase = true) &&
           (_selectedFilters.value.isEmpty()) ||
           _selectedFilters.value.contains(item.foodFacts.category.name)
     }
