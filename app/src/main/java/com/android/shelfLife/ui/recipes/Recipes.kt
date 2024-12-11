@@ -1,7 +1,6 @@
 package com.android.shelfLife.ui.recipes
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -72,10 +71,10 @@ fun RecipesScreen(navigationActions: NavigationActions) {
   val user = recipesViewModel.user
   val selectedHousehold = recipesViewModel.household
 
-    val isFabExpanded by recipesViewModel.fabExpanded.collectAsState()
-    val query by recipesViewModel.query.collectAsState()
-    val filteredRecipeList by recipesViewModel.filteredRecipeList.collectAsState()
-    val selectedFilters by recipesViewModel.selectedFilters.collectAsState()
+  val isFabExpanded by recipesViewModel.fabExpanded.collectAsState()
+  val query by recipesViewModel.query.collectAsState()
+  val filteredRecipeList by recipesViewModel.filteredRecipeList.collectAsState()
+  val selectedFilters by recipesViewModel.selectedFilters.collectAsState()
 
   if (selectedHousehold == null) {
     FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel)
@@ -117,7 +116,7 @@ fun RecipesScreen(navigationActions: NavigationActions) {
                         onClick = {
                           // Navigate to Manual Recipe screen
                           navigationActions.navigateTo(Screen.GENERATE_RECIPE)
-                            recipesViewModel.shrinkFab()
+                          recipesViewModel.shrinkFab()
                         },
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
                         modifier = Modifier.testTag("generateRecipeFab").width(150.dp))
@@ -131,7 +130,7 @@ fun RecipesScreen(navigationActions: NavigationActions) {
                         if (isFabExpanded) {
                           // Navigate to Generate Recipe screen
                           navigationActions.navigateTo(Screen.ADD_RECIPE)
-                            recipesViewModel.shrinkFab()
+                          recipesViewModel.shrinkFab()
                         } else {
                           // Expand the FABs
                           recipesViewModel.expandFab()

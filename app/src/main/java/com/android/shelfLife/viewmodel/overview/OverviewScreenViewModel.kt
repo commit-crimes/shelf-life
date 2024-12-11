@@ -48,18 +48,17 @@ constructor(
   private val _filteredFoodItems = MutableStateFlow<List<FoodItem>>(emptyList())
   val filteredFoodItems = _filteredFoodItems.asStateFlow()
 
-
-  private var FILTERS = mapOf(
-    "Dairy" to FoodCategory.DAIRY,
-    "Meat" to FoodCategory.MEAT,
-    "Fish" to FoodCategory.FISH,
-    "Fruit" to FoodCategory.FRUIT,
-    "Vegetables" to FoodCategory.VEGETABLE,
-    "Grain" to FoodCategory.GRAIN,
-    "Beverage" to FoodCategory.BEVERAGE,
-    "Snack" to FoodCategory.SNACK,
-    "Other" to FoodCategory.OTHER
-  )
+  private var FILTERS =
+      mapOf(
+          "Dairy" to FoodCategory.DAIRY,
+          "Meat" to FoodCategory.MEAT,
+          "Fish" to FoodCategory.FISH,
+          "Fruit" to FoodCategory.FRUIT,
+          "Vegetables" to FoodCategory.VEGETABLE,
+          "Grain" to FoodCategory.GRAIN,
+          "Beverage" to FoodCategory.BEVERAGE,
+          "Snack" to FoodCategory.SNACK,
+          "Other" to FoodCategory.OTHER)
 
   var filters = FILTERS.keys.toList()
 
@@ -160,16 +159,16 @@ constructor(
     listFoodItemsRepository.selectFoodItem(foodItem)
   }
 
-  fun changeQuery(newQuery : String){
+  fun changeQuery(newQuery: String) {
     _query.value = newQuery
     filterFoodItems()
   }
 
-  fun filterFoodItems(){
-    foodItems.value.filter{ item ->
+  fun filterFoodItems() {
+    foodItems.value.filter { item ->
       item.foodFacts.name.contains(query.value, ignoreCase = true) &&
-              (_selectedFilters.value.isEmpty()) ||
-              _selectedFilters.value.contains(item.foodFacts.category.name)
+          (_selectedFilters.value.isEmpty()) ||
+          _selectedFilters.value.contains(item.foodFacts.category.name)
     }
   }
 }

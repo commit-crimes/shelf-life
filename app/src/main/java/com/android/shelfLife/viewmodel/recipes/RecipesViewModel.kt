@@ -32,13 +32,13 @@ constructor(
   private val _drawerState = MutableStateFlow(DrawerState(DrawerValue.Closed))
   val drawerState = _drawerState.asStateFlow()
 
-  private val FILTERS = mapOf(
-    "Soon to expire" to RecipeType.USE_SOON_TO_EXPIRE,
-    "Only household items" to RecipeType.USE_ONLY_HOUSEHOLD_ITEMS,
-    "High protein" to RecipeType.HIGH_PROTEIN,
-    "Low calories" to RecipeType.LOW_CALORIE,
-    "Personal" to RecipeType.PERSONAL
-  ) // cannot make a map const
+  private val FILTERS =
+      mapOf(
+          "Soon to expire" to RecipeType.USE_SOON_TO_EXPIRE,
+          "Only household items" to RecipeType.USE_ONLY_HOUSEHOLD_ITEMS,
+          "High protein" to RecipeType.HIGH_PROTEIN,
+          "Low calories" to RecipeType.LOW_CALORIE,
+          "Personal" to RecipeType.PERSONAL) // cannot make a map const
   var filters = FILTERS.keys.toList()
 
   private val _selectedFilters = MutableStateFlow<List<String>>(emptyList())
@@ -54,7 +54,7 @@ constructor(
     if (user.value != null) {
       populateUserRecipes()
     }
-    Log.i("AAAAAAAAAA" , "user : ${user.value.toString()}")
+    Log.i("AAAAAAAAAA", "user : ${user.value.toString()}")
     Log.i("AAAAAAAAAA", "recipes : ${recipeRepository.recipes.value.toString()}")
     Log.i("AAAAAAAAAAAAA", "user's Recipes : ${_userRecipes.value.toString()}")
   }
@@ -64,12 +64,13 @@ constructor(
    *
    * @return A list of recipes that belong to the current user.
    */
-  private fun populateUserRecipes(){
-    recipeRepository.getRecipes({
-      recipeList->
-      _userRecipes.value = recipeList.filter { recipe ->
-      (recipe.uid in userRepository.user.value!!.recipeUIDs) }
-    }, {})
+  private fun populateUserRecipes() {
+    recipeRepository.getRecipes(
+        { recipeList ->
+          _userRecipes.value =
+              recipeList.filter { recipe -> (recipe.uid in userRepository.user.value!!.recipeUIDs) }
+        },
+        {})
   }
 
   /**
@@ -128,9 +129,7 @@ constructor(
         userRecipes.value.filter { recipe ->
           // Check if recipe matches selected filters
           (selectedFilters.value.isEmpty() ||
-              selectedFilters.value.any { filter ->
-                recipe.recipeType == FILTERS.get(filter)
-              }) &&
+              selectedFilters.value.any { filter -> recipe.recipeType == FILTERS.get(filter) }) &&
               // Check if recipe matches the search query
               (query.value.isEmpty() || recipe.name.contains(query.value, ignoreCase = true))
         }

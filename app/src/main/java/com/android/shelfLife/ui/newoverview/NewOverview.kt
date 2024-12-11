@@ -15,9 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,8 +47,9 @@ fun OverviewScreen(
   val households by overviewScreenViewModel.households.collectAsState()
   val householdViewModelIsLoaded by overviewScreenViewModel.finishedLoading.collectAsState()
   val selectedFilters by overviewScreenViewModel.selectedFilters.collectAsState()
-  val multipleSelectedFoodItems by overviewScreenViewModel.multipleSelectedFoodItems.collectAsState()
-    val filteredFoodItems by overviewScreenViewModel.filteredFoodItems.collectAsState()
+  val multipleSelectedFoodItems by
+      overviewScreenViewModel.multipleSelectedFoodItems.collectAsState()
+  val filteredFoodItems by overviewScreenViewModel.filteredFoodItems.collectAsState()
   val searchQuery by overviewScreenViewModel.query.collectAsState()
 
   val drawerState by overviewScreenViewModel.drawerState.collectAsState()
@@ -58,7 +57,6 @@ fun OverviewScreen(
 
   HouseHoldSelectionDrawer(
       scope = scope, drawerState = drawerState, navigationActions = navigationActions) {
-
         if (!householdViewModelIsLoaded) {
           Column(
               modifier = Modifier.fillMaxSize(),
@@ -110,7 +108,7 @@ fun OverviewScreen(
             ) {
               CustomSearchBar(
                   query = searchQuery,
-                  onQueryChange ={newQuery -> overviewScreenViewModel.changeQuery(newQuery)},
+                  onQueryChange = { newQuery -> overviewScreenViewModel.changeQuery(newQuery) },
                   placeholder = "Search food item",
                   onDeleteTextClicked = { overviewScreenViewModel.changeQuery("") },
                   searchBarTestTag = "foodSearchBar")
