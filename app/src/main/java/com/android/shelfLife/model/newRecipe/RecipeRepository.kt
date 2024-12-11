@@ -5,61 +5,60 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface RecipeRepository {
 
-  // local cache for recipes list (keep data integrity between screens)
+  /** A `StateFlow` that emits the current list of recipes in the repository. */
   val recipes: StateFlow<List<Recipe>>
 
+  /** A `StateFlow` that emits the currently selected recipe, or `null` if none is selected. */
   val selectedRecipe: StateFlow<Recipe?>
 
-  /** Generates a new unique ID for a recipe. */
+  /**
+   * Generates a new unique ID for a recipe.
+   *
+   * @return A new unique ID as a String.
+   */
   fun getUid(): String
 
   /**
-   * fetches all the recipes whose UID is in the list
+   * Initializes recipes by fetching them from Firestore and updating the local cache.
    *
-   * @param listUserRecipeUid - the list of recipes uid that belong to the user
+   * @param recipeIds List of recipe IDs to fetch.
+   * @param selectedRecipeId An optional ID of a recipe to select after initialization.
    */
-  suspend fun getRecipes(listUserRecipeUid: List<String>)
+  suspend fun initializeRecipes(recipeIds: List<String>, selectedRecipeId: String?)
 
   /**
-   * Fetches a recipe by its unique ID.
+   * Fetches recipes by their UIDs.
    *
-   * @param recipeId - The unique ID of the recipe to retrieve.
-   * @param onSuccess - Called when the recipe is successfully retrieved.
-   * @param onFailure - Called when there is an error retrieving the recipe.
+   * @param listUserRecipeUid A list of recipe UIDs to fetch.
+   * @return A list of `Recipe` objects corresponding to the provided UIDs.
    */
-  fun getRecipe(recipeId: String)
+  suspend fun getRecipes(listUserRecipeUid: List<String>): List<Recipe>
 
   /**
-   * Adds a new recipe to the repository.
+   * Adds a new recipe to the repository. Updates the local cache and Firestore.
    *
-   * @param recipe - The recipe to be added.
-   * @param onSuccess - Called when the recipe is successfully added.
-   * @param onFailure - Called when there is an error adding the recipe.
+   * @param recipe The `Recipe` object to add.
    */
   suspend fun addRecipe(recipe: Recipe)
 
   /**
-   * Updates an existing recipe in the repository.
+   * Updates an existing recipe in the repository and Firestore.
    *
-   * @param recipe - The recipe with updated data.
-   * @param onSuccess - Called when the recipe is successfully updated.
-   * @param onFailure - Called when there is an error updating the recipe.
+   * @param recipe The `Recipe` object with updated data.
    */
-  fun updateRecipe(recipe: Recipe)
+  suspend fun updateRecipe(recipe: Recipe)
 
   /**
-   * Deletes a recipe by its unique ID.
+   * Deletes a recipe from the repository and Firestore by its unique ID.
    *
-   * @param recipeId - The unique ID of the recipe to delete.
-   * @param onSuccess - Called when the recipe is successfully deleted.
-   * @param onFailure - Called when there is an error deleting the recipe.
+   * @param recipeId The unique ID of the recipe to delete.
    */
-  fun deleteRecipe(recipeId: String)
+  suspend fun deleteRecipe(recipeId: String)
 
   /**
-   * Selects a recipe
+   * Selects a recipe in the local state. This does not affect Firestore.
    *
-   * @param recipe - The recipe we want to select
+   * @param recipe The recipe to select, or `null` to deselect.
    */
-  fun selectRecipe(recipe: Recipe)
+  fun selectRecipe(recipe: Recipe?)
 }

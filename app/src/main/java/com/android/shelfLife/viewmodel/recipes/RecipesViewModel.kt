@@ -5,6 +5,7 @@ import androidx.compose.material3.DrawerValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.newRecipe.RecipeRepository
+import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.model.user.UserRepository
@@ -23,7 +24,8 @@ class RecipesViewModel
 @Inject
 constructor(
     private val userRepository: UserRepository,
-    private val recipeRepository: RecipeRepository
+    private val recipeRepository: RecipeRepository,
+    private val houseHoldRepository: HouseHoldRepository
 ) : ViewModel() {
 
   val userRecipes = recipeRepository.recipes
@@ -68,7 +70,7 @@ constructor(
   )
 
   var user = userRepository.user
-  var household = userRepository.selectedHousehold
+  var household = houseHoldRepository.selectedHousehold
 
   init {
     viewModelScope.launch {
