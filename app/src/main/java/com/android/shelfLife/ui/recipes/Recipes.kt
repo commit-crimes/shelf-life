@@ -73,7 +73,7 @@ fun RecipesScreen(navigationActions: NavigationActions) {
 
   val isFabExpanded by recipesViewModel.fabExpanded.collectAsState()
   val query by recipesViewModel.query.collectAsState()
-  val filteredRecipeList by recipesViewModel.filteredRecipeList.collectAsState()
+  val filteredRecipeList by recipesViewModel.filteredRecipes.collectAsState()
   val selectedFilters by recipesViewModel.selectedFilters.collectAsState()
 
   if (selectedHousehold == null) {

@@ -14,14 +14,6 @@ interface RecipeRepository {
   fun getUid(): String
 
   /**
-   * Fetches all recipes from the repository.
-   *
-   * @param onSuccess - Called when the list of recipes is successfully retrieved.
-   * @param onFailure - Called when there is an error retrieving the recipes.
-   */
-  fun getRecipes(onSuccess: (List<Recipe>) -> Unit, onFailure: (Exception) -> Unit)
-
-  /**
    * fetches all the recipes whose UID is in the list
    *
    * @param listUserRecipeUid - the list of recipes uid that belong to the user
@@ -35,7 +27,7 @@ interface RecipeRepository {
    * @param onSuccess - Called when the recipe is successfully retrieved.
    * @param onFailure - Called when there is an error retrieving the recipe.
    */
-  fun getRecipe(recipeId: String, onSuccess: (Recipe) -> Unit, onFailure: (Exception) -> Unit)
+  fun getRecipe(recipeId: String)
 
   /**
    * Adds a new recipe to the repository.
@@ -44,7 +36,7 @@ interface RecipeRepository {
    * @param onSuccess - Called when the recipe is successfully added.
    * @param onFailure - Called when there is an error adding the recipe.
    */
-  fun addRecipe(recipe: Recipe, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  suspend fun addRecipe(recipe: Recipe)
 
   /**
    * Updates an existing recipe in the repository.
@@ -53,7 +45,7 @@ interface RecipeRepository {
    * @param onSuccess - Called when the recipe is successfully updated.
    * @param onFailure - Called when there is an error updating the recipe.
    */
-  fun updateRecipe(recipe: Recipe, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  fun updateRecipe(recipe: Recipe)
 
   /**
    * Deletes a recipe by its unique ID.
@@ -62,7 +54,7 @@ interface RecipeRepository {
    * @param onSuccess - Called when the recipe is successfully deleted.
    * @param onFailure - Called when there is an error deleting the recipe.
    */
-  fun deleteRecipe(recipeId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit)
+  fun deleteRecipe(recipeId: String)
 
   /**
    * Selects a recipe

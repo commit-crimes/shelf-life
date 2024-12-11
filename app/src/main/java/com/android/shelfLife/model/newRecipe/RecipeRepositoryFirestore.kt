@@ -33,6 +33,7 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
   private val _selectedRecipe = MutableStateFlow<Recipe?>(null)
   override val selectedRecipe: StateFlow<Recipe?> = _selectedRecipe.asStateFlow()
 
+
   /**
    * Generates a new unique ID for a recipe.
    *
@@ -103,7 +104,7 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
     }
   }
 
-  /**
+    /**
    * Fetches a single recipe by its ID.
    *
    * @param recipeId - The ID of the recipe to retrieve.
@@ -111,10 +112,7 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
    * @param onFailure - Called when there is an error retrieving the recipe.
    */
   override fun getRecipe(
-      recipeId: String,
-      onSuccess: (Recipe) -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
+      recipeId: String) {
     db.collection(COLLECTION_PATH)
         .document(recipeId)
         .get()
@@ -139,21 +137,31 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
    * @param onSuccess - Called when the recipe is successfully added.
    * @param onFailure - Called when there is an error adding the recipe.
    */
-  override fun addRecipe(recipe: Recipe, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-    db.collection(COLLECTION_PATH)
-        .document(recipe.uid)
-        .set(recipe)
-        .addOnSuccessListener {
-          _recipes.update { currentRecipes -> currentRecipes + recipe }
-          onSuccess()
-        }
-        .addOnFailureListener { exception ->
-          Log.e("RecipeRepository", "Error adding recipe", exception)
-          onFailure(exception)
-        }
+  override suspend fun addRecipe(recipe: Recipe) {
+      try{
+          Log.i("AAAAAAAAAAAA", "_recipes.value : ${_recipes.value.toString()}")
+          _recipes.value += recipe
+          Log.i("AAAAAAAAAAAA", "_recipes.value : ${_recipes.value.toString()}")
+          db.collection(COLLECTION_PATH)
+              .document(recipe.uid)
+              .set(recipe)
+              .await()
+      }catch (e: Exception){
+          _recipes.value -= recipe
+          Log.e("RecipeRepository", "Error adding recipe", e)
+      }
   }
 
-  /**
+    override fun updateRecipe(recipe: Recipe) {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteRecipe(recipeId: String) {
+        TODO("Not yet implemented")
+    }
+
+
+    /**
    * Updates an existing recipe in the repository.
    *
    * @param recipe - The recipe with updated data.
@@ -257,6 +265,9 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
       Ingredient(name = "", quantity = Quantity(0.0, FoodUnit.GRAM), macros = NutritionFacts())
     }
   }
+
+
+
 
   /**
    * Converts a Recipe object to a Firestore document.

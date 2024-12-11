@@ -264,13 +264,13 @@ constructor(
             time = time.value.toDouble().minutes,
             ingredients = ingredients.value)
     recipeRepository.addRecipe(
-        recipe = newRecipe.copy(uid = newRecipeUid),
-        onSuccess = {
-          viewModelScope.launch {
-            userRepository.addRecipeUID(newRecipeUid)
+        recipe = newRecipe.copy(uid = newRecipeUid))
+//        onSuccess = {
+//          viewModelScope.launch {
+//            userRepository.addRecipeUID(newRecipeUid)
             onSuccess()
-          }
-        },
-        onFailure = { showToast(1) })
+//          }
+//        },
+//        onFailure = { showToast(1) })
   }
 }

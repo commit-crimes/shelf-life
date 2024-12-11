@@ -11,7 +11,11 @@ import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -24,8 +28,7 @@ constructor(
 
   val userRecipes = recipeRepository.recipes
 
-  private val _filteredRecipeList = MutableStateFlow<List<Recipe>>(emptyList())
-  val filteredRecipeList = _filteredRecipeList.asStateFlow()
+
 
   val fabExpanded = MutableStateFlow(false)
 
@@ -46,6 +49,23 @@ constructor(
 
   private var _query = MutableStateFlow<String>("")
   val query = _query.asStateFlow()
+
+  val filteredRecipes: StateFlow<List<Recipe>> = combine(
+    userRecipes,
+    selectedFilters,
+    query
+  ) { recipes, filters, currentQuery ->
+    recipes.filter { recipe ->
+      // Check if the recipe matches selected filters
+      (filters.isEmpty() || filters.any { filter -> recipe.recipeType == FILTERS[filter] }) &&
+              // Check if the recipe matches the search query
+              (currentQuery.isEmpty() || recipe.name.contains(currentQuery, ignoreCase = true))
+    }
+  }.stateIn(
+    scope = viewModelScope,
+    started = SharingStarted.WhileSubscribed(5000),
+    initialValue = emptyList()
+  )
 
   var user = userRepository.user
   var household = userRepository.selectedHousehold
@@ -93,7 +113,7 @@ constructor(
         } else {
           selectedFilters.value + filter // Add the filter if it doesn't exist
         }
-    filterRecipes()
+    //filterRecipes()
   }
 
   /**
@@ -103,7 +123,7 @@ constructor(
    */
   fun changeQuery(newQuery: String) {
     _query.value = newQuery
-    filterRecipes()
+    //filterRecipes()
   }
 
   /**
@@ -111,13 +131,6 @@ constructor(
    * and search criteria to generate the final filtered list.
    */
   private fun filterRecipes() {
-    _filteredRecipeList.value =
-        userRecipes.value.filter { recipe ->
-          // Check if recipe matches selected filters
-          (selectedFilters.value.isEmpty() ||
-              selectedFilters.value.any { filter -> recipe.recipeType == FILTERS.get(filter) }) &&
-              // Check if recipe matches the search query
-              (query.value.isEmpty() || recipe.name.contains(query.value, ignoreCase = true))
-        }
+
   }
 }
