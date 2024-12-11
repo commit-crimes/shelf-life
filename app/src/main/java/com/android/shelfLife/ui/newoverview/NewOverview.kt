@@ -15,7 +15,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +45,7 @@ fun OverviewScreen(navigationActions: NavigationActions) {
   Log.d("OverviewScreen", overviewScreenViewModel.hashCode().toString())
 
   val selectedHousehold by overviewScreenViewModel.selectedHousehold.collectAsState()
+  val foodItems by overviewScreenViewModel.foodItems.collectAsState()
   val households by overviewScreenViewModel.households.collectAsState()
   val householdViewModelIsLoaded by overviewScreenViewModel.finishedLoading.collectAsState()
   val selectedFilters by overviewScreenViewModel.selectedFilters.collectAsState()
@@ -56,15 +59,7 @@ fun OverviewScreen(navigationActions: NavigationActions) {
 
   HouseHoldSelectionDrawer(
       scope = scope, drawerState = drawerState, navigationActions = navigationActions) {
-        if (!householdViewModelIsLoaded) {
-          Column(
-              modifier = Modifier.fillMaxSize(),
-              horizontalAlignment = Alignment.CenterHorizontally,
-              verticalArrangement = Arrangement.Center,
-          ) {
-            CircularProgressIndicator()
-          }
-        } else if (selectedHousehold == null && households.isEmpty()) {
+        if (selectedHousehold == null && households.isEmpty()) {
           Log.d("OverviewScreen", households.toString())
           FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel)
         } else {

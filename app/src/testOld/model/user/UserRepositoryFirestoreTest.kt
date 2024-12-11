@@ -130,9 +130,7 @@ class UserRepositoryFirestoreTest {
     `when`(mockSnapshot.documents).thenReturn(listOf(mockDoc1, mockDoc2))
     `when`(mockCollection.whereIn("email", emails.toList()).get().await()).thenReturn(mockSnapshot)
 
-    // Act
-    val userIds = mutableMapOf<String, String>()
-    userRepository.getUserIds(emails) { result -> userIds.putAll(result) }
+    val userIds = userRepository.getUserIds(emails)
 
     // Assert
     assertEquals(2, userIds.size)

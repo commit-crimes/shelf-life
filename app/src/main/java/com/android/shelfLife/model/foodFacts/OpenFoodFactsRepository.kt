@@ -107,12 +107,6 @@ class OpenFoodFactsRepository(
                 val body = response.body?.string() ?: ""
                 val foodFactsList = parseFoodFactsResponse(body, searchInput)
 
-                if (foodFactsList.isEmpty()) {
-                  _searchStatus.value = SearchStatus.Failure
-                  onFailure(IOException("No results found"))
-                  return
-                }
-
                 Log.d("OpenFoodFactsRepository", "Food Facts: $foodFactsList")
                 _searchStatus.value = SearchStatus.Success
                 onSuccess(foodFactsList)

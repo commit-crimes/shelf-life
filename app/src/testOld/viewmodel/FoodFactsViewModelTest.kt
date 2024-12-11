@@ -5,11 +5,11 @@ import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodFactsRepository
 import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
-import com.android.shelfLife.model.foodFacts.FoodSearchInput
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodFacts.SearchStatus
+import javax.inject.Inject
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.fail
 import kotlinx.coroutines.Dispatchers
@@ -33,35 +33,15 @@ class MainDispatcherRule(private val dispatcher: TestDispatcher = UnconfinedTest
   }
 }
 
-class FakeFoodFactsRepository : FoodFactsRepository {
-
-  var shouldReturnError = false
-  var foodFactsList = listOf<FoodFacts>()
-
-  override fun searchFoodFacts(
-      searchInput: FoodSearchInput,
-      onSuccess: (List<FoodFacts>) -> Unit,
-      onFailure: (Exception) -> Unit
-  ) {
-    if (shouldReturnError) {
-      onFailure(Exception("Test exception"))
-    } else {
-      onSuccess(foodFactsList)
-    }
-  }
-}
-
-@OptIn(ExperimentalCoroutinesApi::class)
 class FoodFactsViewModelTest {
 
   @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
   private lateinit var viewModel: FoodFactsViewModel
-  private lateinit var repository: FakeFoodFactsRepository
+  @Inject lateinit var repository: FoodFactsRepository
 
   @Before
   fun setup() {
-    repository = FakeFoodFactsRepository()
     viewModel = FoodFactsViewModel(repository)
   }
 
@@ -83,8 +63,6 @@ class FoodFactsViewModelTest {
                         carbohydrates = 14.0,
                         proteins = 0.3,
                         salt = 0.0)))
-    repository.foodFactsList = foodFactsList
-    repository.shouldReturnError = false
 
     // Act
     viewModel.searchByBarcode(barcode)
@@ -98,7 +76,6 @@ class FoodFactsViewModelTest {
   fun `searchByBarcode failure`() = runTest {
     // Given
     val barcode = 123456789L
-    repository.shouldReturnError = true
 
     // Act
     viewModel.searchByBarcode(barcode)
@@ -135,8 +112,6 @@ class FoodFactsViewModelTest {
                         carbohydrates = 14.0,
                         proteins = 0.3,
                         salt = 0.0)))
-    repository.foodFactsList = foodFactsList
-    repository.shouldReturnError = false
 
     // Act
     viewModel.searchByQuery(query)
@@ -150,7 +125,6 @@ class FoodFactsViewModelTest {
   fun `searchByQuery failure`() = runTest {
     // Given
     val query = "Unknown"
-    repository.shouldReturnError = true
 
     // Act
     viewModel.searchByQuery(query)
