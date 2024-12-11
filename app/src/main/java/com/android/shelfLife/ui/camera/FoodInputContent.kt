@@ -2,13 +2,17 @@
 
 package com.android.shelfLife.ui.camera
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -16,6 +20,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil3.compose.AsyncImage
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.ui.newutils.*
@@ -54,10 +59,14 @@ fun FoodInputContent(foodFacts: FoodFacts, onSubmit: () -> Unit, onCancel: () ->
             Text(text = foodFacts.category.name, style = TextStyle(fontSize = 13.sp))
           }
 
-          Image(
-              painter = painterResource(id = R.drawable.app_logo),
-              contentDescription = "Food Image",
-              modifier = Modifier.size(60.dp).padding(end = 8.dp))
+          AsyncImage(
+            model = foodFacts.imageUrl,
+            contentDescription = "Food Image",
+            modifier =
+            Modifier.size(80.dp)
+              .clip(RoundedCornerShape(8.dp))
+              .align(Alignment.CenterVertically),
+            contentScale = ContentScale.Crop)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -109,9 +118,10 @@ fun FoodInputContent(foodFacts: FoodFacts, onSubmit: () -> Unit, onCancel: () ->
             button1Text = stringResource(R.string.cancel_button),
             button2OnClick = {
               coroutineScope.launch {
-                val success = foodItemViewModel.submitFoodItem()
+                val success = foodItemViewModel.submitFoodItem(foodFacts)
                 if (success) {
                   // foodFactsViewModel.clearFoodFactsSuggestions()
+                  Log.d("FoodInputContent", "Food item submitted successfully")
                   onSubmit()
                 } else {
                   Toast.makeText(context, R.string.submission_error_message, Toast.LENGTH_SHORT)

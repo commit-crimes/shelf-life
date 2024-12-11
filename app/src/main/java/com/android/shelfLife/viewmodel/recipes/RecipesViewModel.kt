@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.newRecipe.RecipeRepository
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipeType
@@ -12,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class RecipesViewModel
@@ -51,26 +53,13 @@ constructor(
   var household = userRepository.selectedHousehold
 
   init {
-    if (user.value != null) {
-      populateUserRecipes()
+    viewModelScope.launch {
+      if (user.value != null) {
+        recipeRepository.getRecipes(userRepository.user.value!!.recipeUIDs)
+        _userRecipes.value = recipeRepository.recipes.value
+        filterRecipes()
+      }
     }
-    Log.i("AAAAAAAAAA", "user : ${user.value.toString()}")
-    Log.i("AAAAAAAAAA", "recipes : ${recipeRepository.recipes.value.toString()}")
-    Log.i("AAAAAAAAAAAAA", "user's Recipes : ${_userRecipes.value.toString()}")
-  }
-
-  /**
-   * Filters and returns a list of recipes belonging to the current user based on their recipe UIDs.
-   *
-   * @return A list of recipes that belong to the current user.
-   */
-  private fun populateUserRecipes() {
-    recipeRepository.getRecipes(
-        { recipeList ->
-          _userRecipes.value =
-              recipeList.filter { recipe -> (recipe.uid in userRepository.user.value!!.recipeUIDs) }
-        },
-        {})
   }
 
   /**
