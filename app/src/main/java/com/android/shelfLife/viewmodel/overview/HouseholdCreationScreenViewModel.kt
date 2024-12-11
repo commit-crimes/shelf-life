@@ -35,7 +35,7 @@ constructor(
           viewModelScope, started = SharingStarted.Eagerly, null)
 
   val selectedHousehold =
-      userRepository.selectedHousehold.stateIn(
+      houseHoldRepository.selectedHousehold.stateIn(
           viewModelScope, started = SharingStarted.Eagerly, null)
 
   val households =
@@ -126,7 +126,6 @@ constructor(
   }
 
   private fun addNewHousehold(householdName: String, friendEmails: Set<String?> = emptySet()) {
-    Log.d("HouseholdViewModel", "Adding new household")
     viewModelScope.launch {
       val user =
           currentUser.value
@@ -140,6 +139,11 @@ constructor(
 
       houseHoldRepository.addHousehold(household)
       userRepository.addHouseholdUID(household.uid)
+      Log.d("HouseholdViewModel", "Adding new household: ${household.name}")
+      houseHoldRepository.selectHousehold(household)
+      userRepository.selectHousehold(household.uid)
+      Log.d("HouseholdViewModel", "Selected new household: ${household.name}")
+
 
       if (friendEmails.isNotEmpty()) {
         val emailToUid = userRepository.getUserIds(friendEmails)
@@ -151,13 +155,6 @@ constructor(
             .filterKeys { it != user.email }
             .values
             .forEach { invitationRepository.sendInvitation(household, it) }
-      }
-      if (selectedHousehold.value == null) {
-        Log.d("HouseholdViewModel", "Selected household is null")
-        userRepository.selectHousehold(households.value.firstOrNull())
-        if (selectedHousehold.value != null) {
-          foodItemRepository.getFoodItems(selectedHousehold.value!!.uid)
-        }
       }
     }
   }
@@ -179,7 +176,8 @@ constructor(
       if (shouldUpdateRepo) {
         houseHoldRepository.updateHousehold(household)
         if (selectedHousehold.value == null || household.uid == selectedHousehold.value!!.uid) {
-          userRepository.selectHousehold(household)
+          houseHoldRepository.selectHousehold(household)
+          userRepository.selectHousehold(household.uid)
           foodItemRepository.getFoodItems(household.uid)
         }
       }

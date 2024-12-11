@@ -42,12 +42,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun OverviewScreen(navigationActions: NavigationActions) {
   val overviewScreenViewModel = hiltViewModel<OverviewScreenViewModel>()
-  Log.d("OverviewScreen", overviewScreenViewModel.hashCode().toString())
 
   val selectedHousehold by overviewScreenViewModel.selectedHousehold.collectAsState()
   val foodItems by overviewScreenViewModel.foodItems.collectAsState()
   val households by overviewScreenViewModel.households.collectAsState()
-  val householdViewModelIsLoaded by overviewScreenViewModel.finishedLoading.collectAsState()
   val selectedFilters by overviewScreenViewModel.selectedFilters.collectAsState()
   val multipleSelectedFoodItems by
       overviewScreenViewModel.multipleSelectedFoodItems.collectAsState()
@@ -66,15 +64,7 @@ fun OverviewScreen(navigationActions: NavigationActions) {
                       selectedFilters.contains(item.foodFacts.category.name))
             }
 
-        if (!householdViewModelIsLoaded) {
-          Column(
-              modifier = Modifier.fillMaxSize(),
-              horizontalAlignment = Alignment.CenterHorizontally,
-              verticalArrangement = Arrangement.Center,
-          ) {
-            CircularProgressIndicator()
-          }
-        } else if (selectedHousehold == null && households.isEmpty()) {
+        if (selectedHousehold == null && households.isEmpty()) {
           Log.d("OverviewScreen", households.toString())
           FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel)
         } else {

@@ -6,6 +6,7 @@ interface HouseHoldRepository {
 
   val householdToEdit: StateFlow<HouseHold?>
   val households: StateFlow<List<HouseHold>>
+  val selectedHousehold: StateFlow<HouseHold?>
 
   /** Generates a new unique ID for a household. */
   fun getNewUid(): String
@@ -16,6 +17,10 @@ interface HouseHoldRepository {
    * @param household - The household to edit.
    */
   fun selectHouseholdToEdit(household: HouseHold?)
+
+
+  fun selectHousehold(household: HouseHold?)
+
 
   /**
    * Fetches households by their UIDs.
@@ -47,7 +52,7 @@ interface HouseHoldRepository {
    *
    * @param householdIds List of household IDs to fetch.
    */
-  suspend fun initializeHouseholds(householdIds: List<String>)
+  suspend fun initializeHouseholds(householdIds: List<String>, selectedHouseholdUid: String?)
 
   /**
    * Checks if a household name already exists in the list of households.
