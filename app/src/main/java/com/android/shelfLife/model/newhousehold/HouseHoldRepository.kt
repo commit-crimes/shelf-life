@@ -46,9 +46,8 @@ interface HouseHoldRepository {
    * Initializes households by fetching them from Firestore and updating the local cache.
    *
    * @param householdIds List of household IDs to fetch.
-   * @param selectedHouseholdId The ID of the selected household.
    */
-  suspend fun initializeHouseholds(householdIds: List<String>, selectedHouseholdUid: String)
+  suspend fun initializeHouseholds(householdIds: List<String>)
 
   /**
    * Checks if a household name already exists in the list of households.

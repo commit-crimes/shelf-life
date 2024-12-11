@@ -56,7 +56,6 @@ class HouseholdRepositoryFirestore(
 
   override suspend fun initializeHouseholds(
       householdIds: List<String>,
-      selectedHouseholdUid: String
   ) {
     if (householdIds.isEmpty()) {
       Log.d("HouseholdRepository", "No household IDs provided")
@@ -73,7 +72,6 @@ class HouseholdRepositoryFirestore(
       _households.value = fetchedHouseholds
       Log.d("HouseholdRepository", "Households: ${_households.value}")
 
-      Log.d("HouseholdRepositoryFirestore", "Selected household UID: $selectedHouseholdUid")
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error initializing households", e)
     }

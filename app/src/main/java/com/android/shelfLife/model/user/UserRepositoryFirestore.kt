@@ -191,7 +191,6 @@ constructor(
           ArrayOperation.ADD -> FieldValue.arrayUnion(value)
           ArrayOperation.REMOVE -> FieldValue.arrayRemove(value)
         }
-    userCollection.document(currentUser.uid).update(fieldName, updateValue).await()
 
     val currentUserData =
         _user.value
@@ -216,6 +215,7 @@ constructor(
           else -> currentUserData
         }
     _user.value = updatedUserData
+    userCollection.document(currentUser.uid).update(fieldName, updateValue).await()
   }
 
   override fun setUserLoggedInStatus(isLoggedIn: Boolean) {
