@@ -249,7 +249,7 @@ constructor(
     }
   }
 
-  suspend fun addNewRecipe(onSuccess: () -> Unit, showToast: (Int) -> Unit) {
+  suspend fun addNewRecipe(showToast: (Int) -> Unit) {
     validateAllFieldsWhenSubmitButton()
     if (_error.value) {
       return showToast(0)
@@ -263,14 +263,7 @@ constructor(
             servings = servings.value.toFloat(),
             time = time.value.toDouble().minutes,
             ingredients = ingredients.value)
-    recipeRepository.addRecipe(
-        recipe = newRecipe.copy(uid = newRecipeUid))
-//        onSuccess = {
-//          viewModelScope.launch {
-//            userRepository.addRecipeUID(newRecipeUid)
-            onSuccess()
-//          }
-//        },
-//        onFailure = { showToast(1) })
+      recipeRepository.addRecipe(recipe = newRecipe.copy(uid = newRecipeUid))
+      userRepository.addRecipeUID(newRecipeUid)
   }
 }

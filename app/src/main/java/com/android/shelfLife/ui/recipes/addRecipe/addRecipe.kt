@@ -184,7 +184,6 @@ fun AddRecipeScreen(
                     button2OnClick = {
                       coroutineScope.launch {
                         addRecipeViewModel.addNewRecipe(
-                            onSuccess = { navigationActions.goBack() },
                             showToast = { messageId ->
                               val message =
                                   if (messageId == 0) {
@@ -198,6 +197,7 @@ fun AddRecipeScreen(
                                   .show()
                             })
                       }
+                        navigationActions.goBack()
                     },
                     button2TestTag = "addButton",
                     button2Text = stringResource(R.string.add_button))
