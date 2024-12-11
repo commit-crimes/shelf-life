@@ -44,9 +44,9 @@ fun HouseHoldSelectionDrawer(
     scope: CoroutineScope,
     drawerState: DrawerState,
     navigationActions: NavigationActions,
+    householdSelectionDrawerViewModel: HouseholdSelectionDrawerViewModel = hiltViewModel(),
     content: @Composable () -> Unit
 ) {
-  val householdSelectionDrawerViewModel = hiltViewModel<HouseholdSelectionDrawerViewModel>()
   val userHouseholds by householdSelectionDrawerViewModel.households.collectAsState()
   val selectedHousehold by householdSelectionDrawerViewModel.selectedHousehold.collectAsState()
   var editMode by remember { mutableStateOf(false) }

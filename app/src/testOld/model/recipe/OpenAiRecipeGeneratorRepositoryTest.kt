@@ -52,11 +52,13 @@ class OpenAiRecipeRepositoryTest {
           FoodItem(
               uid = "1",
               foodFacts =
-                  FoodFacts(name = "Ingredient 1", quantity = Quantity(1.0, FoodUnit.COUNT))),
+                  FoodFacts(name = "Ingredient 1", quantity = Quantity(1.0, FoodUnit.COUNT)),
+              owner = "test_owner"),
           FoodItem(
               uid = "2",
               foodFacts =
-                  FoodFacts(name = "Ingredient 2", quantity = Quantity(1.0, FoodUnit.COUNT))))
+                  FoodFacts(name = "Ingredient 2", quantity = Quantity(1.0, FoodUnit.COUNT)),
+              owner = "test_owner"))
 
   @Before
   fun setUp() {
