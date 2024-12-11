@@ -14,9 +14,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.R
+import com.android.shelfLife.model.overview.OverviewScreenViewModel
 import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.newoverview.ListFoodItems
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
@@ -53,7 +56,7 @@ fun GenerateRecipeScreen(
       // Step Content
       when (currentStep) {
         0 -> RecipeInputStep(viewModel = viewModel, navigationActions = navigationActions)
-        1 -> FoodSelectionStep(viewModel = viewModel)
+        1 -> FoodSelectionStep(viewModel = viewModel, navigationActions)
         2 -> ReviewStep(viewModel = viewModel)
         else -> CompletionStep(viewModel, navigationActions = navigationActions, recipeRepository = recipeRepository)
       }
@@ -117,10 +120,11 @@ fun RecipeInputStep(
 
 
 @Composable
-fun FoodSelectionStep(viewModel: RecipeGenerationViewModel) {
+fun FoodSelectionStep(viewModel: RecipeGenerationViewModel, navigationActions: NavigationActions) {
   var newFoodItem by rememberSaveable { mutableStateOf("") }
   val recipePrompt by viewModel.recipePrompt.collectAsState()
   val context = LocalContext.current
+  val overviewScreenViewModel: com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel = viewModel()
 
   Scaffold(
     bottomBar = {
@@ -155,26 +159,17 @@ fun FoodSelectionStep(viewModel: RecipeGenerationViewModel) {
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(bottom = 16.dp)
       )
-
-      Row(verticalAlignment = Alignment.CenterVertically) {
-        OutlinedTextField(
-          value = newFoodItem,
-          onValueChange = { newFoodItem = it },
-          label = { Text("Add Food Item") },
-          modifier = Modifier.weight(1f)
-        )
-
-        Button(
-          onClick = {
-            if (newFoodItem.isNotBlank()) {
-              viewModel.updateRecipePrompt(recipePrompt.copy(ingredients = recipePrompt.ingredients /*+ newFoodItem.trim()*/))
-              newFoodItem = ""
-            }
+       /* ListFoodItems(
+          foodItems = filteredFoodItems,
+          overviewScreenViewModel = overviewScreenViewModel,
+          onFoodItemClick = { selectedFoodItem ->
+            overviewScreenViewModel.selectFoodItem(selectedFoodItem)
+            navigationActions.navigateTo(Screen.INDIVIDUAL_FOOD_ITEM)
           },
-          modifier = Modifier.padding(start = 8.dp)
-        ) {
-          Text("Add")
-        }
+          onFoodItemLongHold = { selectedFoodItem ->
+            overviewScreenViewModel.selectMultipleFoodItems(selectedFoodItem)
+          })*/
+
       }
 
       Spacer(modifier = Modifier.height(8.dp))
