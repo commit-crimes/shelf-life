@@ -46,26 +46,18 @@ fun OverviewScreen(
   val overviewScreenViewModel = hiltViewModel<OverviewScreenViewModel>()
 
   val selectedHousehold by overviewScreenViewModel.selectedHousehold.collectAsState()
-  val foodItems by overviewScreenViewModel.foodItems.collectAsState()
   val households by overviewScreenViewModel.households.collectAsState()
   val householdViewModelIsLoaded by overviewScreenViewModel.finishedLoading.collectAsState()
   val selectedFilters by overviewScreenViewModel.selectedFilters.collectAsState()
-  val multipleSelectedFoodItems by
-      overviewScreenViewModel.multipleSelectedFoodItems.collectAsState()
-
-  var searchQuery by rememberSaveable { mutableStateOf("") }
+  val multipleSelectedFoodItems by overviewScreenViewModel.multipleSelectedFoodItems.collectAsState()
+    val filteredFoodItems by overviewScreenViewModel.filteredFoodItems.collectAsState()
+  val searchQuery by overviewScreenViewModel.query.collectAsState()
 
   val drawerState by overviewScreenViewModel.drawerState.collectAsState()
   val scope = rememberCoroutineScope()
 
   HouseHoldSelectionDrawer(
       scope = scope, drawerState = drawerState, navigationActions = navigationActions) {
-        val filteredFoodItems =
-            foodItems.filter { item ->
-              item.foodFacts.name.contains(searchQuery, ignoreCase = true) &&
-                  (selectedFilters.isEmpty() ||
-                      selectedFilters.contains(item.foodFacts.category.name))
-            }
 
         if (!householdViewModelIsLoaded) {
           Column(
@@ -118,9 +110,9 @@ fun OverviewScreen(
             ) {
               CustomSearchBar(
                   query = searchQuery,
-                  onQueryChange = { searchQuery = it },
+                  onQueryChange ={newQuery -> overviewScreenViewModel.changeQuery(newQuery)},
                   placeholder = "Search food item",
-                  onDeleteTextClicked = { searchQuery = "" },
+                  onDeleteTextClicked = { overviewScreenViewModel.changeQuery("") },
                   searchBarTestTag = "foodSearchBar")
               ListFoodItems(
                   foodItems = filteredFoodItems,

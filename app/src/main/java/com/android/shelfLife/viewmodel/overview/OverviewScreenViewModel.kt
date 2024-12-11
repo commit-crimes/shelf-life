@@ -17,6 +17,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -44,6 +45,10 @@ constructor(
   val households = houseHoldRepository.households
   val foodItems = listFoodItemsRepository.foodItems
 
+  private val _filteredFoodItems = MutableStateFlow<List<FoodItem>>(emptyList())
+  val filteredFoodItems = _filteredFoodItems.asStateFlow()
+
+
   private var FILTERS = mapOf(
     "Dairy" to FoodCategory.DAIRY,
     "Meat" to FoodCategory.MEAT,
@@ -56,7 +61,10 @@ constructor(
     "Other" to FoodCategory.OTHER
   )
 
-  val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
+  var filters = FILTERS.keys.toList()
+
+  private var _query = MutableStateFlow<String>("")
+  val query = _query.asStateFlow()
 
   /**
    * Initializes the OverviewScreenViewModel by loading the list of households from the repository.
@@ -71,6 +79,7 @@ constructor(
         loadHouseholds()
       }
     }
+    filterFoodItems()
   }
 
   /** Loads the list of households from the repository and updates the [_households] flow. */
@@ -121,6 +130,7 @@ constructor(
     } else {
       _selectedFilters.update { it + filter }
     }
+    filterFoodItems()
   }
 
   /** Selects multiple FoodItem documents for bulk actions */
@@ -148,5 +158,18 @@ constructor(
   /** Selects a FoodItem document for individual view */
   fun selectFoodItem(foodItem: FoodItem?) {
     listFoodItemsRepository.selectFoodItem(foodItem)
+  }
+
+  fun changeQuery(newQuery : String){
+    _query.value = newQuery
+    filterFoodItems()
+  }
+
+  fun filterFoodItems(){
+    foodItems.value.filter{ item ->
+      item.foodFacts.name.contains(query.value, ignoreCase = true) &&
+              (_selectedFilters.value.isEmpty()) ||
+              _selectedFilters.value.contains(item.foodFacts.category.name)
+    }
   }
 }
