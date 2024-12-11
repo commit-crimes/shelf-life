@@ -50,12 +50,10 @@ constructor(
   }
 
   /** Accepts the current generated recipe and saves it to the repository. */
-  fun acceptGeneratedRecipe(onSuccess: () -> Unit) {
+  suspend fun acceptGeneratedRecipe(onSuccess: () -> Unit) {
     val recipe = _currentGeneratedRecipe.value
     if (recipe != null) {
-      recipeRepository.addRecipe(recipe.copy(uid = recipeRepository.getUid()), onSuccess) {
-        Log.e("RecipeGenerationViewModel", "Failed to save the recipe")
-      }
+      recipeRepository.addRecipe(recipe.copy(uid = recipeRepository.getUid()))
     } else {
       Log.e("RecipeGenerationViewModel", "No generated recipe to accept")
     }

@@ -42,28 +42,23 @@ import kotlinx.coroutines.launch
 @Composable
 fun OverviewScreen(navigationActions: NavigationActions) {
   val overviewScreenViewModel = hiltViewModel<OverviewScreenViewModel>()
+  Log.d("OverviewScreen", overviewScreenViewModel.hashCode().toString())
 
   val selectedHousehold by overviewScreenViewModel.selectedHousehold.collectAsState()
   val foodItems by overviewScreenViewModel.foodItems.collectAsState()
   val households by overviewScreenViewModel.households.collectAsState()
+  val householdViewModelIsLoaded by overviewScreenViewModel.finishedLoading.collectAsState()
   val selectedFilters by overviewScreenViewModel.selectedFilters.collectAsState()
   val multipleSelectedFoodItems by
       overviewScreenViewModel.multipleSelectedFoodItems.collectAsState()
-
-  var searchQuery by rememberSaveable { mutableStateOf("") }
+  val filteredFoodItems by overviewScreenViewModel.filteredFoodItems.collectAsState()
+  val searchQuery by overviewScreenViewModel.query.collectAsState()
 
   val drawerState by overviewScreenViewModel.drawerState.collectAsState()
   val scope = rememberCoroutineScope()
 
   HouseHoldSelectionDrawer(
       scope = scope, drawerState = drawerState, navigationActions = navigationActions) {
-        val filteredFoodItems =
-            foodItems.filter { item ->
-              item.foodFacts.name.contains(searchQuery, ignoreCase = true) &&
-                  (selectedFilters.isEmpty() ||
-                      selectedFilters.contains(item.foodFacts.category.name))
-            }
-
         if (selectedHousehold == null && households.isEmpty()) {
           Log.d("OverviewScreen", households.toString())
           FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel)
@@ -107,9 +102,9 @@ fun OverviewScreen(navigationActions: NavigationActions) {
             ) {
               CustomSearchBar(
                   query = searchQuery,
-                  onQueryChange = { searchQuery = it },
+                  onQueryChange = { newQuery -> overviewScreenViewModel.changeQuery(newQuery) },
                   placeholder = "Search food item",
-                  onDeleteTextClicked = { searchQuery = "" },
+                  onDeleteTextClicked = { overviewScreenViewModel.changeQuery("") },
                   searchBarTestTag = "foodSearchBar")
               ListFoodItems(
                   foodItems = filteredFoodItems,
