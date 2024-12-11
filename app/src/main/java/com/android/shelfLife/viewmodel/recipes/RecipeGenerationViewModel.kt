@@ -1,4 +1,4 @@
-package com.android.shelfLife.viewmodel.recipe
+package com.android.shelfLife.viewmodel.recipes
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -17,6 +17,10 @@ open class RecipeGenerationViewModel(
     private val recipeGeneratorRepository: RecipeGeneratorRepository
 ) : ViewModel() {
 
+  companion object {
+    private const val CREATION_STEP_COUNT = 3
+  }
+
   private val _recipePrompt = MutableStateFlow<RecipePrompt>(RecipePrompt(name = ""))
   open val recipePrompt: StateFlow<RecipePrompt> = _recipePrompt.asStateFlow()
 
@@ -33,6 +37,7 @@ open class RecipeGenerationViewModel(
   fun nextStep() {
     _currentStep.value += 1
   }
+
   fun previousStep() {
     _currentStep.value -= 1
   }
@@ -41,29 +46,30 @@ open class RecipeGenerationViewModel(
     _currentStep.value = 0
   }
 
+  fun isLastStep(): Boolean {
+    return _currentStep.value == (CREATION_STEP_COUNT-1)
+  }
+
   /** Generates a recipe based on the current prompt. */
   fun generateRecipe(onSuccess: (Recipe) -> Unit, onFailure: (String) -> Unit) {
     val prompt = _recipePrompt.value
-    if (prompt != null) {
-      recipeGeneratorRepository.generateRecipe(
-          prompt,
-          onSuccess = { recipe ->
-            // Update the state with the generated recipe
-            viewModelScope.launch { _currentGeneratedRecipe.emit(recipe) }
-            onSuccess(recipe)
-          },
-          onFailure = { onFailure("Failed to generate recipe") })
-    } else {
-      onFailure("Failed to generate recipe, no prompt provided")
-    }
+    recipeGeneratorRepository.generateRecipe(
+        prompt,
+        onSuccess = { recipe ->
+          // Update the state with the generated recipe
+          recipeRepository.selectRecipe(recipe) //select the recipe so individual recipe view can show it
+          viewModelScope.launch { _currentGeneratedRecipe.emit(recipe) }
+          onSuccess(recipe)
+        },
+        onFailure = { onFailure("Failed to generate recipe") })
   }
 
   /** Accepts the current generated recipe and saves it to the repository. */
   fun acceptGeneratedRecipe(onSuccess: () -> Unit) {
     val recipe = _currentGeneratedRecipe.value
     if (recipe != null) {
-      recipeRepository.addRecipe(recipe.copy(uid = recipeRepository.getUid()), onSuccess) {
-        Log.e("RecipeGenerationViewModel", "Failed to save the recipe")
+      recipeRepository.addRecipe(recipe.copy(uid = recipeRepository.getUid(), workInProgress = false),
+        onSuccess) { Log.e("RecipeGenerationViewModel", "Failed to save the recipe")
       }
     } else {
       Log.e("RecipeGenerationViewModel", "No generated recipe to accept")

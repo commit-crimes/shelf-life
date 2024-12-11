@@ -192,6 +192,7 @@ class RecipeGeneratorOpenAIRepository(
                   instructions = toolResponse["instructions"] as List<String>,
                   servings = (toolResponse["servings"] as Int).toFloat(),
                   time = (toolResponse["time"] as Long).minutes,
+                  workInProgress = true,
                   ingredients =
                       (toolResponse["ingredients"] as List<Map<String, Any>>).map { ingredient ->
                         Ingredient(

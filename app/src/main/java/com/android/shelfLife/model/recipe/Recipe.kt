@@ -13,7 +13,8 @@ data class Recipe(
     val servings: Float, // total number of servings
     val time: Duration, // time it takes to cook
     val ingredients: List<Ingredient> = listOf(), // ingredients in recipe
-    val recipeType: RecipeType = RecipeType.USE_SOON_TO_EXPIRE
+    val recipeType: RecipeType = RecipeType.USE_SOON_TO_EXPIRE,
+    val workInProgress: Boolean = false, // if the recipe is currently being worked on
 )
 
 /** Data class representing a recipe prompt, that we use to query the Recipe generation model */
