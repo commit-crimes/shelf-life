@@ -76,7 +76,7 @@ fun RecipesScreen(navigationActions: NavigationActions) {
   val selectedFilters by recipesViewModel.selectedFilters.collectAsState()
 
   if (selectedHousehold == null) {
-    FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel)
+    FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel) //TODO("kill yourself")
   } else {
     if (user != null) {
       Scaffold(

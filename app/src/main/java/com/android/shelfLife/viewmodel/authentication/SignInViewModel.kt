@@ -65,7 +65,7 @@ constructor(
       userRepository.user.value?.selectedHouseholdUID
     )
     userRepository.user.value?.selectedHouseholdUID?.let { foodItemRepository.getFoodItems(it) }
-    //TODO("Populate user recipes")
+    userRepository.user.value?.let { recipeRepository.getRecipes(it.recipeUIDs) }
   }
 
   override fun onCleared() {
