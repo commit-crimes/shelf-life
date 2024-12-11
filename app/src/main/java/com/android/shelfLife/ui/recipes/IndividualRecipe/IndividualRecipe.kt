@@ -66,9 +66,9 @@ import kotlin.time.Duration.Companion.minutes
  */
 fun IndividualRecipeScreen(
     navigationActions: NavigationActions,
+    individualRecipeViewModel: IndividualRecipeViewModel = hiltViewModel()
 ) {
 
-  val individualRecipeViewModel = hiltViewModel<IndividualRecipeViewModel>()
   if (individualRecipeViewModel.selectedRecipeIsNonEmpty) {
     // Scaffold that provides the structure for the screen, including top and bottom bars.
     Scaffold(

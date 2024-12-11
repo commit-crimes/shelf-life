@@ -37,12 +37,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddFoodItemScreen(
     navigationActions: NavigationActions,
-    paddingValues: PaddingValues = PaddingValues(16.dp)
+    paddingValues: PaddingValues = PaddingValues(16.dp),
+    foodItemViewModel: FoodItemViewModel = hiltViewModel()
 ) {
   // val foodFacts by foodFactsViewModel.foodFactsSuggestions.collectAsState()
 
   val coroutineScope = rememberCoroutineScope()
-  val foodItemViewModel = hiltViewModel<FoodItemViewModel>()
 
   val context = LocalContext.current
 

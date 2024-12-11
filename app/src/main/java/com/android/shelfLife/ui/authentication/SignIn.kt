@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.TopLevelDestination
 import com.android.shelfLife.ui.navigation.TopLevelDestinations
 import com.android.shelfLife.viewmodel.authentication.SignInState
 import com.android.shelfLife.viewmodel.authentication.SignInViewModel
@@ -32,8 +31,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 @Composable
-fun SignInScreen(navigationActions: NavigationActions) {
-  val signInViewModel = hiltViewModel<SignInViewModel>()
+fun SignInScreen(
+    navigationActions: NavigationActions,
+    signInViewModel: SignInViewModel = hiltViewModel()
+) {
   val context = LocalContext.current
   val signInState by signInViewModel.signInState.collectAsState()
 
