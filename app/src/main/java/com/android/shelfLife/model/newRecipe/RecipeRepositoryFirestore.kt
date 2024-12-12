@@ -117,7 +117,6 @@ class RecipeRepositoryFirestore @Inject constructor(
             db.collection(COLLECTION_PATH)
                 .document(recipe.uid)
                 .set(recipe)
-                .await()
         } catch (e: Exception) {
             Log.e("RecipeRepository", "Error adding recipe", e)
             // Rollback
@@ -151,7 +150,6 @@ class RecipeRepositoryFirestore @Inject constructor(
             db.collection(COLLECTION_PATH)
                 .document(recipe.uid)
                 .set(recipe)
-                .await()
         } catch (e: Exception) {
             Log.e("RecipeRepository", "Error updating recipe", e)
             // Rollback changes
@@ -185,7 +183,6 @@ class RecipeRepositoryFirestore @Inject constructor(
             db.collection(COLLECTION_PATH)
                 .document(recipeId)
                 .delete()
-                .await()
         } catch (e: Exception) {
             Log.e("RecipeRepository", "Error deleting recipe", e)
             // Rollback

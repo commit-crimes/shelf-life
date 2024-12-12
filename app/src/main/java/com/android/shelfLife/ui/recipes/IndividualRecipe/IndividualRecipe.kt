@@ -14,6 +14,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +42,7 @@ import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
@@ -85,6 +91,20 @@ fun IndividualRecipeScreen(
               onTabSelect = { destination -> navigationActions.navigateTo(destination) },
               tabList = LIST_TOP_LEVEL_DESTINATION,
               selectedItem = Route.RECIPES)
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    navigationActions.navigateTo(Screen.SERVINGS_SCREEN)
+                },
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                modifier = Modifier.testTag("startButton")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow, // Replace with a suitable icon
+                    contentDescription = "Start Recipe"
+                )
+            }
         },
         content = { paddingValues ->
           Column(modifier = Modifier.padding(paddingValues).fillMaxSize().testTag("recipe")) {

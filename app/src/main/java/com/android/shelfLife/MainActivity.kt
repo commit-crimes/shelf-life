@@ -27,9 +27,10 @@ import com.android.shelfLife.ui.newoverview.OverviewScreen
 import com.android.shelfLife.ui.recipes.GenerateRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
+import com.android.shelfLife.ui.recipes.execution.ServingsScreen
 import com.android.shelfLife.ui.recipes.addRecipe.AddRecipeScreen
+import com.android.shelfLife.ui.recipes.execution.SelectFoodItemsForIngredientScreen
 import com.example.compose.ShelfLifeTheme
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -79,6 +80,16 @@ fun ShelfLifeApp() {
       composable(Screen.ADD_RECIPE) { AddRecipeScreen(navigationActions) }
       composable(Screen.GENERATE_RECIPE) { GenerateRecipeScreen(navigationActions) }
     }
+
+    navigation(startDestination = Screen.SERVINGS_SCREEN, route = Route.RECIPE_EXECUTION){
+      composable(Screen.SERVINGS_SCREEN){
+        ServingsScreen(navigationActions)
+      }
+      composable(Screen.FOOD_ITEM_SELECTION){
+        SelectFoodItemsForIngredientScreen(navigationActions)
+      }
+    }
+
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
       composable(Screen.PROFILE) { ProfileScreen(navigationActions, context) }
       composable(Route.INVITATIONS) { InvitationScreen(navigationActions) }

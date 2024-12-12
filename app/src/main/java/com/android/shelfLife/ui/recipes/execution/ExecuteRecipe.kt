@@ -1,0 +1,162 @@
+package com.android.shelfLife.ui.recipes.execution
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
+import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
+import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ServingsScreen(
+    navigationActions: NavigationActions,
+    executeRecipeViewModel: ExecuteRecipeViewModel = hiltViewModel()
+) {
+    val servings by executeRecipeViewModel.servings.collectAsState()
+
+    Scaffold(
+        modifier = Modifier.testTag("servingsScreen"),
+        topBar = {
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                ),
+                modifier = Modifier.testTag("topBar"),
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navigationActions.goBack() },
+                        modifier = Modifier.testTag("goBackArrow")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Go back Icon"
+                        )
+                    }
+                },
+                title = {
+                    Text(
+                        text = "Choose number of servings",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                }
+            )
+        },
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                tabList = LIST_TOP_LEVEL_DESTINATION,
+                selectedItem = Route.RECIPES
+            )
+        },
+        floatingActionButton = {
+            androidx.compose.material3.FloatingActionButton(
+                onClick = {
+                    navigationActions.navigateTo(Screen.FOOD_ITEM_SELECTION)
+                },
+                modifier = Modifier
+                    .testTag("nextFab")
+                    .padding(horizontal = 16.dp)
+                    .height(48.dp)
+                    .width(120.dp),
+                shape = MaterialTheme.shapes.medium,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ) {
+                Text(
+                    text = "Next",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            }
+        },
+        content = { paddingValues ->
+            ServingsSelector(
+                servings = servings,
+                onIncrease = { executeRecipeViewModel.updateServings(servings + 1) },
+                onDecrease = { if (servings > 1) executeRecipeViewModel.updateServings(servings - 1) },
+                modifier = Modifier.padding(paddingValues)
+            )
+        }
+    )
+}
+@Composable
+fun ServingsSelector(
+    servings: Float,
+    onIncrease: () -> Unit,
+    onDecrease: () -> Unit,
+    modifier: Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Select Servings",
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(vertical = 8.dp)
+        ) {
+            IconButton(onClick = onDecrease) {
+                Icon(
+                    imageVector = Icons.Default.Remove,
+                    contentDescription = "Decrease Servings"
+                )
+            }
+
+            Text(
+                text = servings.toString(),
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+
+            IconButton(onClick = onIncrease) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Increase Servings"
+                )
+            }
+        }
+    }
+}
