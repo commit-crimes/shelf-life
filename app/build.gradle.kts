@@ -244,7 +244,9 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.hilt.android.testing)
+    implementation(libs.hilt.android.testing){
+        exclude(group = "androidx.test", module = "core")
+    }
     implementation(libs.core)
 
     // Global test implementation
@@ -308,12 +310,15 @@ dependencies {
 
     // Hilt Testing
     kapt(libs.hilt.android.compiler)
-    implementation(libs.hilt.android.testing)
 
-    testImplementation(libs.hilt.android.testing)
+    testImplementation(libs.hilt.android.testing){
+        exclude(group = "androidx.test", module = "core")
+    }
     kaptTest(libs.hilt.android.compiler)
 
-    androidTestImplementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.hilt.android.testing){
+        exclude(group = "androidx.test", module = "core")
+    }
     kaptAndroidTest(libs.hilt.android.compiler)
 
     // Unit Testing
@@ -351,6 +356,19 @@ dependencies {
     androidTestImplementation(libs.kaspresso)
     androidTestImplementation(libs.kaspresso.allure.support)
     androidTestImplementation(libs.kaspresso.compose.support)
+
+    testImplementation(libs.hamcrest.hamcrest)
+    androidTestImplementation(libs.hamcrest.hamcrest)
+    androidTestImplementation(libs.androidx.core){
+        version {
+            strictly("1.6.1")
+        }
+    }
+    testImplementation(libs.androidx.core){
+        version {
+            strictly("1.6.1")
+        }
+    }
 
     // Coroutine Testing
     testImplementation(libs.kotlinx.coroutines.test)
