@@ -24,10 +24,10 @@ import com.android.shelfLife.ui.newoverview.EditFoodItemScreen
 import com.android.shelfLife.ui.newoverview.HouseHoldCreationScreen
 import com.android.shelfLife.ui.newoverview.IndividualFoodItemScreen
 import com.android.shelfLife.ui.newoverview.OverviewScreen
-import com.android.shelfLife.ui.recipes.GenerateRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.recipes.addRecipe.AddRecipeScreen
+import com.android.shelfLife.ui.recipes.generateRecipe.GenerateRecipeScreen
 import com.example.compose.ShelfLifeTheme
 import dagger.hilt.android.AndroidEntryPoint
 

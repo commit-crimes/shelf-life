@@ -12,11 +12,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.R
-import com.android.shelfLife.model.overview.OverviewScreenViewModel
-import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
-import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.newoverview.ListFoodItems
@@ -30,12 +28,8 @@ import com.android.shelfLife.viewmodel.recipes.RecipeGenerationViewModel
 @Composable
 fun GenerateRecipeScreen(
   navigationActions: NavigationActions,
-  recipeRepository: RecipeRepository,
-  recipeGeneratorRepository: RecipeGeneratorRepository
+  viewModel: RecipeGenerationViewModel = hiltViewModel(),
 ) {
-  val viewModel: RecipeGenerationViewModel = viewModel {
-    RecipeGenerationViewModel(recipeRepository, recipeGeneratorRepository)
-  }
   val currentStep by viewModel.currentStep.collectAsState()
 
   Scaffold(
@@ -58,7 +52,7 @@ fun GenerateRecipeScreen(
         0 -> RecipeInputStep(viewModel = viewModel, navigationActions = navigationActions)
         1 -> FoodSelectionStep(viewModel = viewModel, navigationActions)
         2 -> ReviewStep(viewModel = viewModel)
-        else -> CompletionStep(viewModel, navigationActions = navigationActions, recipeRepository = recipeRepository)
+        else -> CompletionStep(viewModel, navigationActions = navigationActions)
       }
     }
   }
@@ -124,7 +118,6 @@ fun FoodSelectionStep(viewModel: RecipeGenerationViewModel, navigationActions: N
   var newFoodItem by rememberSaveable { mutableStateOf("") }
   val recipePrompt by viewModel.recipePrompt.collectAsState()
   val context = LocalContext.current
-  val overviewScreenViewModel: com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel = viewModel()
 
   Scaffold(
     bottomBar = {
@@ -195,7 +188,6 @@ fun FoodSelectionStep(viewModel: RecipeGenerationViewModel, navigationActions: N
       }
       Spacer(modifier = Modifier.height(16.dp))
     }
-  }
 }
 
 @Composable
@@ -248,7 +240,7 @@ fun ReviewStep(viewModel: RecipeGenerationViewModel) {
 }
 
 @Composable
-fun CompletionStep(viewModel: RecipeGenerationViewModel, navigationActions: NavigationActions, recipeRepository: RecipeRepository) {
+fun CompletionStep(viewModel: RecipeGenerationViewModel, navigationActions: NavigationActions) {
   val context = LocalContext.current
   val recipePrompt by viewModel.recipePrompt.collectAsState()
 
@@ -259,7 +251,12 @@ fun CompletionStep(viewModel: RecipeGenerationViewModel, navigationActions: Navi
         // Buttons Section
         CustomButtons(
           button1OnClick = {
-
+            viewModel.generateRecipe(onSuccess = {
+              Toast.makeText(context, "Recipe Generated!", Toast.LENGTH_SHORT).show()
+              navigationActions.navigateTo(Screen.INDIVIDUAL_RECIPE)
+            }, onFailure = {
+              Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            })
           },// Cancel button
           button1TestTag = "regenerateButton",
           button1Text = stringResource(id = R.string.regenerate_button),
@@ -284,10 +281,10 @@ fun CompletionStep(viewModel: RecipeGenerationViewModel, navigationActions: Navi
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(bottom = 16.dp)
       )
-      IndividualRecipeScreen(
-        navigationActions = navigationActions,
-        individualRecipeViewModel = IndividualRecipeViewModel(recipeRepository)
-      )
+//      IndividualRecipeScreen(
+//        navigationActions = navigationActions,
+//        individualRecipeViewModel = IndividualRecipeViewModel(recipeRepository)
+//      )
     }
   }
 }
