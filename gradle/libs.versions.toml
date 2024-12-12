@@ -49,8 +49,6 @@ firebaseBom = "33.5.1"
 
 # Google Service and Maps
 playServicesAuth = "21.2.0"
-mapsCompose = "4.3.3"
-mapsComposeUtils = "4.3.0"
 
 # Networking
 okhttp = "4.12.0"
