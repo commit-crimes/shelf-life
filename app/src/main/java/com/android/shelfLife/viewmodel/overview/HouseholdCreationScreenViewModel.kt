@@ -41,7 +41,7 @@ constructor(
   val households =
       houseHoldRepository.households.stateIn(
           viewModelScope, started = SharingStarted.Eagerly, emptyList())
-  val currentUser =
+  private val currentUser =
       userRepository.user.stateIn(viewModelScope, started = SharingStarted.Eagerly, null)
 
   private var finishedLoading = MutableStateFlow(false)
@@ -162,9 +162,9 @@ constructor(
     viewModelScope.launch {
       val oldHousehold = houseHoldRepository.households.value.find { it.uid == household.uid }
       if (oldHousehold != null) {
-        val newMemberUids = household.members.toSet() - oldHousehold.members.toSet()
-        if (newMemberUids.isNotEmpty()) {
-          for (uid in newMemberUids) {
+        val newMemberUIDs = household.members.toSet() - oldHousehold.members.toSet()
+        if (newMemberUIDs.isNotEmpty()) {
+          for (uid in newMemberUIDs) {
             invitationRepository.sendInvitation(
                 household = household,
                 invitedUserID = uid,
