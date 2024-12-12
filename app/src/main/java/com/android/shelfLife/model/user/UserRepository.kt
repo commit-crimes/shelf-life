@@ -65,11 +65,12 @@ interface UserRepository {
   /** @param userIds - The list of user IDs to get the emails for. */
   suspend fun getUserEmails(userIds: List<String>): Map<String, String>
 
+  suspend fun addCurrentUserToHouseHold(householdUID: String, userUID: String)
   /**
    * Selects a household and saves it to the user's data. VIEW MODELS NEED TO MANUALLY SELECT THE
    * LIST OF FOOD ITEMS!!!
    *
-   * @param household - The household to select.
+   * @param householdUid - The household to select.
    */
   suspend fun selectHousehold(householdUid: String?)
 
