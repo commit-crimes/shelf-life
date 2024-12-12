@@ -185,6 +185,7 @@ fun BarcodeScannerScreen(
 
   // Handle barcode scanning and search
   val currentBarcode = barcodeScanned.value
+  //TODO check if barcode can be converted to long before passing to searchByBarcode
   if (searchInProgress.value && currentBarcode != null) {
     LaunchedEffect(currentBarcode) { cameraViewModel.searchByBarcode(currentBarcode.toLong()) }
   }
