@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.recipes.addRecipe
+package com.android.shelfLife.ui.recipes
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column

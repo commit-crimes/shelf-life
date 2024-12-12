@@ -1,4 +1,4 @@
-package com.android.shelfLife.viewmodel.recipe
+package com.android.shelfLife.viewmodel.recipes
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
