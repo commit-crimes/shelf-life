@@ -44,9 +44,10 @@ object TestFirestoreModule {
         val mockQuerySnapshot = mock(QuerySnapshot::class.java)
         val mockSnapshot = mock(DocumentSnapshot::class.java)
 
-        // More explicit mocking
+
         `when`(mockFirestore.collection("users")).thenReturn(mockCollection)
         `when`(mockFirestore.collection("invitations")).thenReturn(mockCollection)
+        `when`(mockFirestore.collection("households")).thenReturn(mockCollection)
 
         `when`(mockCollection.document(anyString())).thenReturn(mockDocument)
         `when`(mockCollection.document()).thenAnswer {
@@ -55,12 +56,12 @@ object TestFirestoreModule {
             `when`(mockNewDocument.set(any())).thenReturn(Tasks.forResult(null))
             mockNewDocument
         }
+
         `when`(mockCollection.whereIn(eq(FieldPath.documentId()), anyList())).thenReturn(mockQuery)
 
         `when`(mockQuery.get()).thenReturn(Tasks.forResult(mockQuerySnapshot))
         `when`(mockQuerySnapshot.documents).thenReturn(listOf(mockSnapshot))
 
-        // Use doReturn instead of when for more reliable mocking
         doReturn(Tasks.forResult(mockSnapshot)).`when`(mockDocument).get()
         `when`(mockDocument.id).thenReturn("mockDocId")
 
@@ -75,7 +76,6 @@ object TestFirestoreModule {
         val mockUpdateTask = Tasks.forResult<Void>(null)
         `when`(mockDocument.update(anyString(), any())).thenReturn(mockUpdateTask)
         `when`(mockDocument.set(any(), any())).thenReturn(mockUpdateTask)
-        // Ensure snapshot returns expected values
         `when`(mockSnapshot.exists()).thenReturn(true)
         `when`(mockSnapshot.getData()).thenReturn(mapOf(
             "username" to "Test User",

@@ -8,8 +8,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
-class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemRepository {
+class FoodItemRepositoryFirestore
+@Inject
+constructor
+  (private val db: FirebaseFirestore) : FoodItemRepository {
 
   private val collectionPath = "foodItems"
 
@@ -183,7 +187,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
    * @param doc The Firestore document to convert.
    * @return A FoodItem object or null if conversion fails.
    */
-  private fun convertToFoodItem(doc: DocumentSnapshot): FoodItem? {
+  internal fun convertToFoodItem(doc: DocumentSnapshot): FoodItem? {
     return try {
       doc.toFoodItem()
     } catch (e: Exception) {

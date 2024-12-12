@@ -6,8 +6,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
 
-class HouseholdRepositoryFirestore(
+class HouseholdRepositoryFirestore
+@Inject
+constructor(
     private val db: FirebaseFirestore,
 ) : HouseHoldRepository {
 
