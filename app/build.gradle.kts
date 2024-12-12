@@ -34,7 +34,7 @@ android {
         versionName = "1.0"
 
         // Use HiltTestRunner for instrumentation tests
-        testInstrumentationRunner = "com.android.shelfLife.HiltTestRunnerCustom"
+        testInstrumentationRunner = "com.android.shelfLife.HiltTestRunner"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -245,6 +245,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.hilt.android.testing)
 
     // Global test implementation
     androidTestImplementation(libs.compose.test.junit)
