@@ -37,7 +37,7 @@ data class FoodFacts(
 }
 
 data class Quantity(
-    val amount: Double, // Amount of the quantity
+    var amount: Double, // Amount of the quantity
     val unit: FoodUnit = FoodUnit.GRAM // Unit of the quantity
 ) {
   override fun toString(): String {

@@ -40,8 +40,6 @@ import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.theme.onSecondaryDark
 import com.android.shelfLife.ui.theme.primaryContainerDark
-import com.android.shelfLife.ui.theme.primaryContainerLight
-import com.android.shelfLife.ui.theme.secondaryContainerDark
 import com.android.shelfLife.ui.theme.secondaryContainerLight
 import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
@@ -57,7 +55,7 @@ fun AddRecipeScreen(
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
 
-    val ingredients by addRecipeViewModel.ingredients.collectAsState()
+  val ingredients by addRecipeViewModel.ingredients.collectAsState()
   val instructions by addRecipeViewModel.instructions.collectAsState()
 
   Scaffold(
@@ -260,11 +258,7 @@ fun InstructionItem(
       addRecipeViewModel.instructionError.collectAsState().value[index], "instructionErrorMessage")
 }
 
-val UNITS = mapOf(
-    FoodUnit.GRAM to "gram",
-    FoodUnit.ML to "mL",
-    FoodUnit.COUNT to ""
-)
+val UNITS = mapOf(FoodUnit.GRAM to "gram", FoodUnit.ML to "mL", FoodUnit.COUNT to "")
 
 /**
  * A composable function that displays a single ingredient in a recipe.
@@ -290,10 +284,13 @@ fun IngredientItemNEW(index: Int, ingredient: Ingredient, onRemoveClick: () -> U
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
     // title of ingredient
     Text(
-        text = stringResource(R.string.ingredient_item, index + 1,
-            ingredient.quantity.amount,
-            UNITS.get(ingredient.quantity.unit)!!,
-            ingredient.name),
+        text =
+            stringResource(
+                R.string.ingredient_item,
+                index + 1,
+                ingredient.quantity.amount,
+                UNITS.get(ingredient.quantity.unit)!!,
+                ingredient.name),
         modifier = Modifier.testTag("ingredientItem"))
     // delete button
     IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteIngredientButton")) {
@@ -316,7 +313,7 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
 
-    val ingredientUnit = addRecipeViewModel.ingredientQuantityUnit.collectAsState()
+  val ingredientUnit = addRecipeViewModel.ingredientQuantityUnit.collectAsState()
 
   androidx.compose.material3.AlertDialog(
       onDismissRequest = { addRecipeViewModel.createNewIngredient() },
@@ -349,13 +346,15 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
               addRecipeViewModel.ingredientQuantityAmountError.collectAsState().value,
               "ingredientQuantityErrorMessage")
 
-            Spacer(Modifier.padding(8.dp))
+          Spacer(Modifier.padding(8.dp))
 
           // Quantity Unit Dropdown
           Row {
             UnitDropdownField(
                 unit = ingredientUnit.value,
-                onUnitChange = {newUnit -> addRecipeViewModel.changeIngredientQuantityUnit(newUnit)},
+                onUnitChange = { newUnit ->
+                  addRecipeViewModel.changeIngredientQuantityUnit(newUnit)
+                },
                 unitExpanded = addRecipeViewModel.unitExpanded,
                 onUnitExpandedChange = { addRecipeViewModel.changeUnitExpanded() },
                 modifier = Modifier.weight(1f),

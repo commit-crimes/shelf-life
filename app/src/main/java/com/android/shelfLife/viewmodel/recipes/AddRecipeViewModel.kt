@@ -33,7 +33,7 @@ constructor(
   val title: StateFlow<String> = _title.asStateFlow()
 
   private val _servings = MutableStateFlow("")
-  val servings: StateFlow<String> = _servings.asStateFlow()
+  var servings: StateFlow<String> = _servings.asStateFlow()
 
   private val _time = MutableStateFlow("")
   val time: StateFlow<String> = _time.asStateFlow()
@@ -59,7 +59,7 @@ constructor(
   private val _showIngredientDialog = MutableStateFlow(false)
   val showIngredientDialog: StateFlow<Boolean> = _showIngredientDialog.asStateFlow()
 
-    var unitExpanded by mutableStateOf(false)
+  var unitExpanded by mutableStateOf(false)
 
   // Error Properties
   private val _error = MutableStateFlow(false)
@@ -276,12 +276,15 @@ constructor(
       return showToast(0)
     }
     val newRecipeUid = recipeRepository.getUid()
+    ingredients.value.forEach { ingredient ->
+      ingredient.quantity.amount = ingredient.quantity.amount / servings.value.toFloat()
+    }
     val newRecipe =
         Recipe(
             uid = newRecipeUid,
             name = title.value,
             instructions = instructions.value,
-            servings = servings.value.toFloat(),
+            servings = 1F,
             time = time.value.toDouble().minutes,
             ingredients = ingredients.value,
             recipeType = RecipeType.PERSONAL)
@@ -289,7 +292,7 @@ constructor(
     userRepository.addRecipeUID(newRecipeUid)
   }
 
-    fun changeUnitExpanded(){
-        unitExpanded = if(unitExpanded) false else true
-    }
+  fun changeUnitExpanded() {
+    unitExpanded = if (unitExpanded) false else true
+  }
 }

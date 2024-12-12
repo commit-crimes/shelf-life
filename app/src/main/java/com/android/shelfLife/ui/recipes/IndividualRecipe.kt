@@ -27,14 +27,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
-import com.android.shelfLife.model.newRecipe.RecipeRepositoryFirestore
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -42,9 +38,8 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.launch
 import kotlin.math.floor
+import kotlinx.coroutines.launch
 
 @Composable
 /**
@@ -71,7 +66,7 @@ fun IndividualRecipeScreen(
     individualRecipeViewModel: IndividualRecipeViewModel = hiltViewModel()
 ) {
 
-    val coroutineScope = rememberCoroutineScope()
+  val coroutineScope = rememberCoroutineScope()
 
   if (individualRecipeViewModel.selectedRecipeIsNonEmpty) {
     // Scaffold that provides the structure for the screen, including top and bottom bars.
@@ -83,16 +78,16 @@ fun IndividualRecipeScreen(
               title = individualRecipeViewModel.getRecipeName(),
               titleTestTag = "individualRecipeTitle",
               actions = {
-                  IconButton(
-                      onClick = {
-                          coroutineScope.launch {
-                              individualRecipeViewModel.deleteSelectedRecipe()
-                              navigationActions.goBack()
-                          }
-                      },
-                      modifier = Modifier.testTag("deleteFoodItem")) {
+                IconButton(
+                    onClick = {
+                      coroutineScope.launch {
+                        individualRecipeViewModel.deleteSelectedRecipe()
+                        navigationActions.goBack()
+                      }
+                    },
+                    modifier = Modifier.testTag("deleteFoodItem")) {
                       Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
-                  }
+                    }
               })
         },
         bottomBar = {
@@ -204,9 +199,9 @@ fun DisplayInstructionNew(instruction: String) {
 }
 
 // this preview function allows us to see the easter egg screen
-//@Preview()
-//@Composable
-//private fun IndividualRecipeScreenPreviewEasterEgg() {
+// @Preview()
+// @Composable
+// private fun IndividualRecipeScreenPreviewEasterEgg() {
 //  val navController = rememberNavController()
 //  val navigationActions = NavigationActions(navController)
 //  val firebaseFirestore = FirebaseFirestore.getInstance()
@@ -215,7 +210,7 @@ fun DisplayInstructionNew(instruction: String) {
 //
 //  // Render the IndividualRecipeScreen with a null selectedRecipe
 //  IndividualRecipeScreen(navigationActions = navigationActions)
-//}
+// }
 // this preview shows the example where we do have a selected recipe
 // @Preview()
 // @Composable

@@ -16,7 +16,7 @@ class IndividualRecipeViewModel
 @Inject
 constructor(
     private val recipeRepository: RecipeRepository,
-  private val userRepository: UserRepository
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
   var selectedRecipe by mutableStateOf<Recipe?>(null)
@@ -78,10 +78,10 @@ constructor(
     return selectedRecipe!!.instructions
   }
 
-  suspend fun deleteSelectedRecipe(){
-    if (selectedRecipe != null){
+  suspend fun deleteSelectedRecipe() {
+    if (selectedRecipe != null) {
       val isDeleted = recipeRepository.deleteRecipe(selectedRecipe!!.uid)
-      if (isDeleted){
+      if (isDeleted) {
         userRepository.deleteRecipeUID(selectedRecipe!!.uid)
       }
     }

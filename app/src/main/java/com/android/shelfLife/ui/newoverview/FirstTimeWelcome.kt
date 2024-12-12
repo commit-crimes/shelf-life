@@ -29,10 +29,8 @@ import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
  * @param navigationActions The actions to navigate between screens.
  */
 @Composable
-fun FirstTimeWelcomeScreen(
-    navigationActions: NavigationActions
-) {
-    val overviewScreenViewModel = hiltViewModel<OverviewScreenViewModel>()
+fun FirstTimeWelcomeScreen(navigationActions: NavigationActions) {
+  val overviewScreenViewModel = hiltViewModel<OverviewScreenViewModel>()
   val currentContext = LocalContext.current
   Column(
       modifier = Modifier.fillMaxSize().padding(16.dp).testTag("firstTimeWelcomeScreen"),
