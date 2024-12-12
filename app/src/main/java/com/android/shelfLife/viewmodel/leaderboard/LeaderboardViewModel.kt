@@ -3,9 +3,7 @@ package com.android.shelfLife.viewmodel.leaderboard
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.newhousehold.HouseHold
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
@@ -25,39 +23,33 @@ enum class LeaderboardMode {
 @HiltViewModel
 class LeaderboardViewModel @Inject constructor(
     private val houseHoldRepository: HouseHoldRepository,
-    private val userRepository: UserRepository,
-    private val savedStateHandle: SavedStateHandle
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private val _mode = savedStateHandle.getLiveData("mode", LeaderboardMode.RAT)
-    val mode: StateFlow<LeaderboardMode> = _mode.asFlow().stateIn(
-        viewModelScope, SharingStarted.Eagerly, LeaderboardMode.RAT
-    )
+    private val _mode = MutableStateFlow(LeaderboardMode.RAT)
+    val mode: StateFlow<LeaderboardMode> = _mode.asStateFlow()
 
     val selectedHousehold = houseHoldRepository.selectedHousehold
+
     val currentUserId: String? = userRepository.user.value?.uid
 
+
+    // Top leaders state
     private val _topLeaders = MutableStateFlow<List<Pair<String, Long>>>(emptyList())
     val topLeaders: StateFlow<List<Pair<String, Long>>> = _topLeaders.asStateFlow()
 
-    // State variables stored in SavedStateHandle
-    var isAudioPlaying: Boolean
-        get() = savedStateHandle.get("isAudioPlaying") ?: false
-        set(value) = savedStateHandle.set("isAudioPlaying", value)
-
-    var currentAudioMode: LeaderboardMode?
-        get() = savedStateHandle.get("currentAudioMode")
-        set(value) = savedStateHandle.set("currentAudioMode", value)
-
-    var buttonText: String
-        get() = savedStateHandle.get("buttonText") ?: "Receive Your Prize"
-        set(value) = savedStateHandle.set("buttonText", value)
-
-
     var kingUID = _topLeaders.value.firstOrNull()?.first
 
+    // Audio playing state
+    private var isAudioPlaying = userRepository.isAudioPlaying
+    private var currentAudioMode = userRepository.currentAudioMode
+
+    val buttonText = mutableStateOf( "Receive Your Prize")
 
     init {
+        buttonText.value =
+            if (!isAudioPlaying.value || currentAudioMode.value != mode.value) "Receive Your Prize"
+            else "Stop"
         viewModelScope.launch {
             combine(selectedHousehold, mode) { household, currentMode ->
                 if (household == null) {
@@ -78,9 +70,9 @@ class LeaderboardViewModel @Inject constructor(
 
         if (!userIsKing) return // Not king, do nothing
 
-        if (!isAudioPlaying || currentAudioMode != mode.value) {
+        if (!isAudioPlaying.value || currentAudioMode.value != mode.value) {
             // Start audio and change theme
-            buttonText = "Stop"
+            buttonText.value = "Stop"
             when (mode.value) {
                 LeaderboardMode.RAT -> {
                     AudioPlayer.startRatAudio(context)
@@ -91,14 +83,15 @@ class LeaderboardViewModel @Inject constructor(
                     ThemeManager.updateScheme(LeaderboardMode.STINKY, isDarkMode)
                 }
             }
-            currentAudioMode = mode.value
-            isAudioPlaying = true
+            userRepository.setCurrentAudioMode(mode.value)
+            userRepository.setAudioPlaying(true)
         } else {
             // Stop audio and revert theme
-            buttonText = "Receive Your Prize"
+            buttonText.value = "Receive Your Prize"
             AudioPlayer.stopAudio()
             ThemeManager.resetMode()
-            isAudioPlaying = false
+            userRepository.setCurrentAudioMode(null)
+            userRepository.setAudioPlaying(false)
         }
     }
 
@@ -130,7 +123,7 @@ class LeaderboardViewModel @Inject constructor(
     fun switchMode(newMode: LeaderboardMode) {
         // Switching mode does not affect currently playing audio
         // If audio is playing RAT and user switches to STINKY, audio remains RAT until user toggles off and on again.
-        buttonText = if(currentAudioMode != newMode) "Receive Your Prize" else "Stop"
+        buttonText.value = if(currentAudioMode.value != newMode) "Receive Your Prize" else "Stop"
         _mode.value = newMode
     }
 

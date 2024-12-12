@@ -133,7 +133,7 @@ fun HighlightFirstPlace(
         // Prize Button
         if (userIsKing) {
             Spacer(modifier = Modifier.height(16.dp))
-            val buttonText = viewModel.buttonText
+            val buttonText = viewModel.buttonText.value
             Button(onClick = onTogglePrize) {
                 Text(buttonText)
             }

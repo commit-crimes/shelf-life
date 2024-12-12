@@ -3,6 +3,7 @@ package com.android.shelfLife.model.user
 import android.content.Context
 import android.util.Log
 import com.android.shelfLife.model.newhousehold.HouseHold
+import com.android.shelfLife.viewmodel.leaderboard.LeaderboardMode
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -38,6 +39,13 @@ constructor(
 
   // Listener for invitations
   private var invitationsListenerRegistration: ListenerRegistration? = null
+
+
+  private val _isAudioPlaying = MutableStateFlow<Boolean>(true)
+  override var isAudioPlaying : StateFlow<Boolean> = _isAudioPlaying.asStateFlow()
+
+  private val _currentAudioMode = MutableStateFlow<LeaderboardMode?>(null)
+  override var currentAudioMode: StateFlow<LeaderboardMode?> = _currentAudioMode.asStateFlow()
 
   override fun getNewUid(): String {
     return userCollection.document().id
@@ -173,7 +181,15 @@ constructor(
     invitationsListenerRegistration = null
   }
 
-  private suspend fun updateUserField(fieldName: String, value: Any) {
+    override fun setAudioPlaying(isPlaying: Boolean) {
+        _isAudioPlaying.value = isPlaying
+    }
+
+    override fun setCurrentAudioMode(mode: LeaderboardMode?) {
+        _currentAudioMode.value = mode
+    }
+
+    private suspend fun updateUserField(fieldName: String, value: Any) {
     val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
     userCollection.document(currentUser.uid).update(fieldName, value)
 
