@@ -46,17 +46,8 @@ class MainActivity : ComponentActivity() {
   }
 }
 
-enum class ThemeMode { NORMAL, RAT, STINKY }
-
 @Composable
 fun ShelfLifeApp() {
-  var themeMode by remember { mutableStateOf(ThemeMode.NORMAL) }
-
-//  val colorScheme = when (themeMode) {
-//    ThemeMode.NORMAL -> NormalColorScheme
-//    ThemeMode.RAT -> RatColorScheme
-//    ThemeMode.STINKY -> StinkyColorScheme
-//  }
   val navController = rememberNavController()
   val navigationActions = NavigationActions(navController)
 

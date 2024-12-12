@@ -1,6 +1,8 @@
 package com.android.shelfLife.model.newhousehold
 
+import AudioPlayer
 import android.util.Log
+import com.android.shelfLife.ui.leaderboard.ThemeManager
 import com.google.firebase.firestore.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,6 +33,8 @@ class HouseholdRepositoryFirestore(
   }
 
   override fun selectHousehold(household: HouseHold?) {
+    AudioPlayer.stopAudio()
+    ThemeManager.resetMode()
     _selectedHousehold.value = household
   }
 

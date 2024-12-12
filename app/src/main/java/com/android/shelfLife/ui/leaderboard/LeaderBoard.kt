@@ -3,6 +3,7 @@ package com.android.shelfLife.ui.leaderboard
 import AudioPlayer
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material3.ButtonDefaults
@@ -23,6 +24,8 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.leaderboard.LeaderboardMode
 import com.android.shelfLife.viewmodel.leaderboard.LeaderboardViewModel
+import com.example.compose.LocalThemeMode
+import com.example.compose.ThemeMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,6 +67,7 @@ fun LeaderboardScreen(
                 val kingUID = viewModel.kingUID
                 Log.d("LeaderboardScreen", "First leader: ${firstLeader.first}")
                 val userIsKing = kingUID == currentUserId
+                val isDark = isSystemInDarkTheme()
 
                 HighlightFirstPlace(
                     viewModel = viewModel,
@@ -71,7 +75,7 @@ fun LeaderboardScreen(
                     mode = mode,
                     userIsKing = userIsKing,
                     onTogglePrize = {
-                        viewModel.togglePrize(context)
+                        viewModel.togglePrize(context, isDark)
                     }
                 )
 
@@ -85,46 +89,12 @@ fun LeaderboardScreen(
 }
 
 @Composable
-fun ModeToggle(currentMode: LeaderboardMode, onModeChange: (LeaderboardMode) -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Button(
-            onClick = { onModeChange(LeaderboardMode.RAT) },
-            colors = if (currentMode == LeaderboardMode.RAT) {
-                ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
-            } else {
-                ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surfaceVariant)
-            },
-            modifier = Modifier.weight(1f)
-        ) {
-            Text("Rat Leaderboard")
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Button(
-            onClick = { onModeChange(LeaderboardMode.STINKY) },
-            colors = if (currentMode == LeaderboardMode.STINKY) {
-                ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
-            } else {
-                ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surfaceVariant)
-            },
-            modifier = Modifier.weight(1f)
-        ) {
-            Text("Stinky Leaderboard")
-        }
-    }
-}
-
-@Composable
 fun HighlightFirstPlace(
     viewModel: LeaderboardViewModel,
     leader: Pair<String, Long>,
     mode: LeaderboardMode,
     userIsKing: Boolean,
-    onTogglePrize:  () -> Unit
+    onTogglePrize: () -> Unit
 ) {
     val (username, points) = leader
 
@@ -137,43 +107,35 @@ fun HighlightFirstPlace(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box(
+        // Display the image
+        AsyncImage(
+            model = kingGif,
+            contentDescription = "${mode.name} King GIF",
             modifier = Modifier
                 .fillMaxWidth()
-                .height(200.dp)
-        ) {
-            AsyncImage(
-                model = kingGif,
-                contentDescription = "${mode.name} King GIF",
-                modifier = Modifier.fillMaxSize(),
-            )
+                .height(200.dp),
+        )
 
-            Column(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "$username 👑",
-                    style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
-                    color = Color.White,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = "${points.toInt()} points",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    color = Color.White
-                )
+        // King info below the image
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "$username 👑",
+            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Text(
+            text = "${points.toInt()} points",
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface
+        )
 
-                if (userIsKing) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    val buttonText = viewModel.buttonText
-                    Button(onClick = onTogglePrize) {
-                        Text(buttonText.value)
-                    }
-                }
+        // Prize Button
+        if (userIsKing) {
+            Spacer(modifier = Modifier.height(16.dp))
+            val buttonText = viewModel.buttonText
+            Button(onClick = onTogglePrize) {
+                Text(buttonText)
             }
         }
     }
@@ -209,9 +171,45 @@ fun LeaderboardItem(rank: Int, memberId: String, points: Int) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("$rank. ", style = MaterialTheme.typography.bodyLarge)
-            Text("$memberId $emoji", style = MaterialTheme.typography.bodyLarge)
+            Text("$rank. ", style = MaterialTheme.typography.headlineSmall)
+            Text("$memberId $emoji", style = MaterialTheme.typography.headlineSmall)
         }
-        Text("$points", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+        Text("$points", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+    }
+}
+
+
+
+@Composable
+fun ModeToggle(currentMode: LeaderboardMode, onModeChange: (LeaderboardMode) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Button(
+            onClick = { onModeChange(LeaderboardMode.RAT) },
+            colors = if (currentMode == LeaderboardMode.RAT) {
+                ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
+            } else {
+                ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surfaceVariant)
+            },
+            modifier = Modifier.weight(1f)
+        ) {
+            Text("Rat Leaderboard")
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Button(
+            onClick = { onModeChange(LeaderboardMode.STINKY) },
+            colors = if (currentMode == LeaderboardMode.STINKY) {
+                ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
+            } else {
+                ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surfaceVariant)
+            },
+            modifier = Modifier.weight(1f)
+        ) {
+            Text("Stinky Leaderboard")
+        }
     }
 }
