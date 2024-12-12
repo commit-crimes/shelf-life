@@ -13,8 +13,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
+import javax.inject.Inject
+import javax.inject.Singleton
 
-open class InvitationRepositoryFirestore(
+@Singleton
+open class InvitationRepositoryFirestore
+@Inject
+constructor(
     private val db: FirebaseFirestore,
     private val auth: FirebaseAuth
 ) : InvitationRepository {
@@ -107,7 +112,7 @@ open class InvitationRepositoryFirestore(
    * @param doc The Firestore document to convert.
    * @return The corresponding Invitation object, or null if the document is invalid.
    */
-  private fun convertToInvitation(doc: DocumentSnapshot): Invitation? {
+  internal fun convertToInvitation(doc: DocumentSnapshot): Invitation? {
     return try {
       Invitation(
           invitationId = doc.getString("invitationId") ?: return null,
