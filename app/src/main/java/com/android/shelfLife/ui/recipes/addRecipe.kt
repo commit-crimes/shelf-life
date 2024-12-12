@@ -58,6 +58,7 @@ fun AddRecipeScreen(
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
 
+    val ingredients by addRecipeViewModel.ingredients.collectAsState()
   val instructions by addRecipeViewModel.instructions.collectAsState()
 
   Scaffold(
@@ -138,7 +139,7 @@ fun AddRecipeScreen(
                 }
               }
 
-              itemsIndexed(addRecipeViewModel.ingredients.value) { index, ingredient ->
+              itemsIndexed(ingredients) { index, ingredient ->
                 IngredientItemNEW(
                     index = index,
                     ingredient = ingredient,
@@ -260,6 +261,12 @@ fun InstructionItem(
       addRecipeViewModel.instructionError.collectAsState().value[index], "instructionErrorMessage")
 }
 
+val UNITS = mapOf(
+    FoodUnit.GRAM to "gram",
+    FoodUnit.ML to "mL",
+    FoodUnit.COUNT to ""
+)
+
 /**
  * A composable function that displays a single ingredient in a recipe.
  *
@@ -284,7 +291,10 @@ fun IngredientItemNEW(index: Int, ingredient: Ingredient, onRemoveClick: () -> U
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
     // title of ingredient
     Text(
-        text = stringResource(R.string.ingredient_item, index + 1, ingredient.name),
+        text = stringResource(R.string.ingredient_item, index + 1,
+            ingredient.quantity.amount,
+            UNITS.get(ingredient.quantity.unit)!!,
+            ingredient.name),
         modifier = Modifier.testTag("ingredientItem"))
     // delete button
     IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteIngredientButton")) {
