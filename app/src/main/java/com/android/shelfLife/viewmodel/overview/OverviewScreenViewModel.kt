@@ -12,7 +12,6 @@ import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.newhousehold.HouseHold
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -34,7 +33,6 @@ constructor(
   private val userRepository: UserRepository,
   @ApplicationContext private val context: Context
 ) : ViewModel() {
-
   private val _selectedFilters = MutableStateFlow<List<String>>(emptyList())
   val selectedFilters = _selectedFilters.asStateFlow()
 
@@ -98,6 +96,11 @@ constructor(
     Log.d("OverviewScreenViewModel", "Init")
   }
 
+  /**
+   * Selects a household to edit
+   *
+   * @param household - The household to edit.
+   */
   fun selectHouseholdToEdit(household: HouseHold?) {
     houseHoldRepository.selectHouseholdToEdit(household)
   }
@@ -111,6 +114,11 @@ constructor(
     }
   }
 
+  /**
+   * Toggles the filter on or off
+   *
+   * @param filter The filter to toggle
+   */
   fun toggleFilter(filter: String) {
     if (_selectedFilters.value.contains(filter)) {
       _selectedFilters.update { it - filter }
@@ -119,6 +127,7 @@ constructor(
     }
   }
 
+  /** Selects multiple FoodItem documents for bulk actions */
   fun selectMultipleFoodItems(foodItem: FoodItem) {
     if (_multipleSelectedFoodItems.value.contains(foodItem)) {
       _multipleSelectedFoodItems.value = _multipleSelectedFoodItems.value.minus(foodItem)
@@ -140,6 +149,7 @@ constructor(
     }
   }
 
+  /** Selects a FoodItem document for individual view */
   fun selectFoodItem(foodItem: FoodItem?) {
     listFoodItemsRepository.selectFoodItem(foodItem)
   }

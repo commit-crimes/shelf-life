@@ -60,14 +60,11 @@ fun BarcodeScannerScreen(
   val coroutineScope = rememberCoroutineScope()
 
   // Bottom sheet scaffold state with initial state as Hidden
-    val sheetScaffoldState =
-        rememberBottomSheetScaffoldState(
-            bottomSheetState =
-            rememberStandardBottomSheetState(
-                initialValue = SheetValue.Hidden,
-                skipHiddenState = false
-            )
-        )
+  val sheetScaffoldState =
+      rememberBottomSheetScaffoldState(
+          bottomSheetState =
+              rememberStandardBottomSheetState(
+                  initialValue = SheetValue.Hidden, skipHiddenState = false))
 
   OnLifecycleEvent(
       onResume = {
@@ -134,8 +131,8 @@ fun BarcodeScannerScreen(
                       Log.d("BarcodeScanner", "Cancelled")
                     },
                     onExpandRequested = {
-                        // When the partially expanded content is clicked, expand the sheet fully
-                        coroutineScope.launch { sheetScaffoldState.bottomSheetState.expand() }
+                      // When the partially expanded content is clicked, expand the sheet fully
+                      coroutineScope.launch { sheetScaffoldState.bottomSheetState.expand() }
                     })
               }
               Spacer(modifier = Modifier.height(100.dp))
@@ -185,6 +182,7 @@ fun BarcodeScannerScreen(
 
   // Handle barcode scanning and search
   val currentBarcode = barcodeScanned.value
+  // TODO check if barcode can be converted to long before passing to searchByBarcode
   if (searchInProgress.value && currentBarcode != null) {
     LaunchedEffect(currentBarcode) { cameraViewModel.searchByBarcode(currentBarcode.toLong()) }
   }
@@ -222,33 +220,29 @@ fun BarcodeScannerScreen(
     }
   }
 
-    if (showFailureDialog.value) {
-        AlertDialog(
-            onDismissRequest = {
-                // User tapped outside or back button
-                // Handle similarly to pressing OK or X: reset scanning
+  if (showFailureDialog.value) {
+    AlertDialog(
+        onDismissRequest = {
+          // User tapped outside or back button
+          // Handle similarly to pressing OK or X: reset scanning
+          showFailureDialog.value = false
+          foodScanned.value = false
+          isScanningState.value = true
+        },
+        title = { Text(text = "Search Failed") },
+        text = { Text("Check your internet connection and try again later.") },
+        confirmButton = {
+          TextButton(
+              onClick = {
+                // OK button pressed: reset scanning and hide dialog
                 showFailureDialog.value = false
                 foodScanned.value = false
                 isScanningState.value = true
-            },
-            title = {
-                Text(text = "Search Failed")
-            },
-            text = {
-                Text("Check your internet connection and try again later.")
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    // OK button pressed: reset scanning and hide dialog
-                    showFailureDialog.value = false
-                    foodScanned.value = false
-                    isScanningState.value = true
-                }) {
-                    Text("OK")
-                }
-            }
-        )
-    }
+              }) {
+                Text("OK")
+              }
+        })
+  }
 }
 
 /**

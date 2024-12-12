@@ -26,6 +26,7 @@ import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.model.newFoodItem.FoodStorageLocation
 import com.android.shelfLife.model.recipe.RecipePrompt
+import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.viewmodel.recipe.RecipeGenerationViewModel

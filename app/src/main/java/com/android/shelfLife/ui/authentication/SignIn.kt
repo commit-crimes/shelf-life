@@ -25,13 +25,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.navigation.TopLevelDestination
 import com.android.shelfLife.ui.navigation.TopLevelDestinations
 import com.android.shelfLife.viewmodel.authentication.SignInState
 import com.android.shelfLife.viewmodel.authentication.SignInViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import kotlinx.coroutines.coroutineScope
 
 @Composable
 fun SignInScreen(navigationActions: NavigationActions) {
@@ -39,32 +37,32 @@ fun SignInScreen(navigationActions: NavigationActions) {
   val signInViewModel = hiltViewModel<SignInViewModel>()
   val isUserLoggedIn by signInViewModel.isUserLoggedIn.collectAsState()
   val signInState by signInViewModel.signInState.collectAsState()
-    LaunchedEffect(isUserLoggedIn) {
-        if (isUserLoggedIn) {
-            navigationActions.navigateTo(Route.OVERVIEW)
-        }
+  LaunchedEffect(isUserLoggedIn) {
+    if (isUserLoggedIn) {
+      navigationActions.navigateTo(Route.OVERVIEW)
     }
+  }
 
-    // Handle sign-in states
-    LaunchedEffect(signInState) {
-        when (signInState) {
-            is SignInState.Success -> {
-                Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-                Log.d("SignInScreen", "Login successful!, navigating to overview")
-                navigationActions.navigateTo(TopLevelDestinations.OVERVIEW)
-            }
-            is SignInState.Error -> {
-                val message = (signInState as SignInState.Error).message
-                Toast.makeText(context, "Login failed: $message", Toast.LENGTH_LONG).show()
-            }
-            is SignInState.Loading -> {
-                // Do nothing
-            }
-            else -> {
-                Log.e("SignInScreen", "Unexpected sign-in state: $signInState")
-            }
-        }
+  // Handle sign-in states
+  LaunchedEffect(signInState) {
+    when (signInState) {
+      is SignInState.Success -> {
+        Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
+        Log.d("SignInScreen", "Login successful!, navigating to overview")
+        navigationActions.navigateTo(TopLevelDestinations.OVERVIEW)
+      }
+      is SignInState.Error -> {
+        val message = (signInState as SignInState.Error).message
+        Toast.makeText(context, "Login failed: $message", Toast.LENGTH_LONG).show()
+      }
+      is SignInState.Loading -> {
+        // Do nothing
+      }
+      else -> {
+        Log.e("SignInScreen", "Unexpected sign-in state: $signInState")
+      }
     }
+  }
 
   val launcher =
       rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result
@@ -83,8 +81,6 @@ fun SignInScreen(navigationActions: NavigationActions) {
       }
 
   val token = stringResource(R.string.default_web_client_id)
-
-
 
   Scaffold(modifier = Modifier.fillMaxSize().testTag("signInScreen")) { padding ->
     Column(
