@@ -125,7 +125,6 @@ firebase-firestore = { module = "com.google.firebase:firebase-firestore", versio
 firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
-hilt-android-compiler-v2511 = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompilerVersion" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroidTesting" }
 json = { module = "org.json:json", version.ref = "json" }
 junit = { module = "junit:junit", version.ref = "junit" }

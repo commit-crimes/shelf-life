@@ -311,10 +311,9 @@ dependencies {
     // Hilt Testing
     kaptAndroidTest(libs.hilt.android.compiler)
     testImplementation(libs.hilt.android.testing)
-    kaptTest(libs.hilt.android.compiler.v2511)
+    kaptTest(libs.hilt.android.compiler)
 
     androidTestImplementation(libs.hilt.android.testing)
-    kaptAndroidTest(libs.hilt.android.compiler.v2511)
     kaptAndroidTest(libs.hilt.android.compiler)
 
     // Unit Testing
