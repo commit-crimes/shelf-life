@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.recipes
 
-import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
