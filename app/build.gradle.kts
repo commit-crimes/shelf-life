@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.sonar)
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
+    kotlin("kapt")
 }
 
 android {
@@ -33,8 +34,7 @@ android {
         versionName = "1.0"
 
         // Use HiltTestRunner for instrumentation tests
-        testInstrumentationRunner = "com.android.shelfLife.HiltTestRunner"
-        //testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.android.shelfLife.HiltTestRunnerCustom"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -95,7 +95,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.15"
+        kotlinCompilerExtensionVersion = "1.5.7"
     }
 
     packaging {
@@ -237,6 +237,7 @@ tasks.register<Copy>("copyApks") {
 // Dependencies
 dependencies {
     // Core dependencies
+    implementation(libs.core.ktx)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -244,6 +245,10 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.kotlinx.serialization.json)
+
+    // Global test implementation
+    androidTestImplementation(libs.compose.test.junit)
+    testImplementation(libs.compose.test.junit)
 
     // Jetpack Compose UI
     implementation(libs.androidx.ui)
@@ -254,14 +259,14 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.camera.core)
-    implementation(libs.androidx.navigation.testing)
     implementation(libs.androidx.datastore.core.android)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.material)
+    implementation(libs.androidx.material.icons.extended)
+
     testImplementation(libs.test.core.ktx)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation(libs.material)
-    implementation(libs.androidx.material.icons.extended)
 
     // OpenAI
     implementation(libs.aallam.openai.client)
@@ -299,15 +304,17 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
     kapt(libs.hilt.android.compiler)
 
     // Hilt Testing
-    androidTestImplementation(libs.hilt.android.testing)
     kaptAndroidTest(libs.hilt.android.compiler)
     testImplementation(libs.hilt.android.testing)
-    kaptTest(libs.hilt.android.compiler)
-    implementation(libs.androidx.runner)
-    implementation(libs.hilt.android.testing)
+    kaptTest(libs.hilt.android.compiler.v2511)
+
+    androidTestImplementation(libs.hilt.android.testing)
+    kaptAndroidTest(libs.hilt.android.compiler.v2511)
+    kaptAndroidTest(libs.hilt.android.compiler)
 
     // Unit Testing
     testImplementation(libs.junit)
@@ -320,28 +327,33 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.mockk)
 
-    // Test UI
-    androidTestImplementation(libs.androidx.junit)
+    // AndroidJUnitRunner and JUnit Rules
+    androidTestImplementation(libs.androidx.runner.v120)
+    testImplementation(libs.androidx.runner.v120)
+    implementation(libs.androidx.runner.v120)
+    androidTestImplementation(libs.androidx.rules)
+    testImplementation(libs.androidx.rules)
+    implementation(libs.androidx.rules)
+
+
+    // UI tests
     androidTestImplementation(libs.androidx.espresso.core)
-    //androidTestImplementation(libs.androidx.espresso.intents)
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.androidx.espresso.intents)
     androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.androidx.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.mockito.kotlin)
     androidTestImplementation(libs.mockito.android)
     androidTestImplementation(libs.mockito.kotlin)
     testImplementation(libs.robolectric)
-    //androidTestImplementation(libs.kaspresso)
-    //androidTestImplementation(libs.kaspresso.allure.support)
-    //androidTestImplementation(libs.kaspresso.compose.support)
+    androidTestImplementation(libs.kaspresso)
+    androidTestImplementation(libs.kaspresso.allure.support)
+    androidTestImplementation(libs.kaspresso.compose.support)
 
     // Coroutine Testing
     testImplementation(libs.kotlinx.coroutines.test)
-
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
-    implementation(libs.androidx.hilt.navigation.compose)
 }
 
 kapt {

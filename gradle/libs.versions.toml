@@ -3,33 +3,33 @@
 agp = "8.4.2"
 coilCompose = "3.0.0-rc01"
 coilNetworkOkhttp = "3.0.0-rc01"
+core = "1.6.1"
 datastorePreferences = "1.1.1"
-hiltAndroid = "2.51.1"
-hiltAndroidCompiler = "2.51.1"
-hiltAndroidTesting = "2.51.1"
+hiltAndroid = "2.48"
+hiltAndroidCompiler = "2.48"
+hiltAndroidCompilerVersion = "2.51.1"
+hiltAndroidTesting = "2.53.1"
 hiltNavigationFragment = "1.2.0"
 json = "20240303"
-kotlin = "1.9.25"
+kotlin = "1.9.21"
 gms = "4.4.2"
 ktfmt = "0.17.0"
 
 # Barcode Scanner
 ktorClientApache5 = "2.3.7"
-ktorClientAuth = "2.3.7"
-ktorClientCore = "2.3.7"
-ktorClientLogging = "2.3.2"
 mlkit-barcode-scanning = "17.0.2"
 camerax = "1.0.2"
 guava = "31.1-jre"
 
 # Sonar
+runnerVersion = "1.2.0"
 sonar = "5.1.0.4882"
 
 # UI Compose
 mockitoAndroid = "5.13.0"
 mockwebserver = "4.12.0"
 openaiClient = "3.8.2"
-ui = "1.7.6"
+ui = "1.7.2"
 uiTestJunit4 = "1.7.6"
 uiTestManifest = "1.7.6"
 uiTooling = "1.7.6"
@@ -90,6 +90,8 @@ datastoreCoreAndroid = "1.1.1"
 runner = "1.6.2"
 
 [libraries]
+core-ktx = { module = "com.google.android.play:core-ktx", version.ref = "coreKtxVersion" }
+compose-test-junit = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 aallam-openai-client = { module = "com.aallam.openai:openai-client", version.ref = "openaiClient" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
@@ -101,15 +103,17 @@ androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", vers
 androidx-espresso-intents = { module = "androidx.test.espresso:espresso-intents", version.ref = "espressoCore" }
 androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationFragment" }
-androidx-junit = { module = "androidx.test.ext:junit", version.ref = "junitVersion" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-material = { module = "androidx.compose.material:material", version.ref = "material" }
 androidx-material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-navigation-fragment-ktx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigationCompose" }
 androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigationCompose" }
+androidx-rules = { module = "androidx.test:rules", version.ref = "core" }
+androidx-runner-v120 = { module = "androidx.test:runner", version.ref = "runnerVersion" }
 androidx-ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 androidx-ui-graphics = { module = "androidx.compose.ui:ui-graphics" }
+androidx-junit = { module = "androidx.test.ext:junit", version.ref = "junitVersion" }
 androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTestJunit4" }
 androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "uiTestManifest" }
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
@@ -123,6 +127,7 @@ firebase-firestore = { module = "com.google.firebase:firebase-firestore", versio
 firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
+hilt-android-compiler-v2511 = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompilerVersion" }
 hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "hiltAndroidTesting" }
 json = { module = "org.json:json", version.ref = "json" }
 junit = { module = "junit:junit", version.ref = "junit" }
@@ -156,7 +161,6 @@ guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 androidx-camera-core = { group = "androidx.camera", name = "camera-core", version.ref = "cameraCore" }
 androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationTesting" }
 androidx-datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "datastoreCoreAndroid" }
-androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
