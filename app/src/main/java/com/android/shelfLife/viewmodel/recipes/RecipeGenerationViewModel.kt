@@ -58,24 +58,24 @@ constructor(
   /** Generates a recipe based on the current prompt. */
   fun generateRecipe(onSuccess: (Recipe) -> Unit, onFailure: (String) -> Unit) {
     val prompt = _recipePrompt.value
-    recipeGeneratorRepository.generateRecipe(
-        prompt,
-        onSuccess = { recipe ->
-          // Update the state with the generated recipe
-          recipeRepository.selectRecipe(recipe) //select the recipe so individual recipe view can show it
-          viewModelScope.launch { _currentGeneratedRecipe.emit(recipe) }
-          onSuccess(recipe)
-        },
-        onFailure = { onFailure("Failed to generate recipe") })
+    viewModelScope.launch {
+      val recipe = recipeGeneratorRepository.generateRecipe(prompt)
+      if (recipe == null) {
+          onFailure("Failed to generate recipe")
+          return@launch
+      }
+      // Update the state with the generated recipe
+      recipeRepository.selectRecipe(recipe) //select the recipe so individual recipe view can show it
+      viewModelScope.launch { _currentGeneratedRecipe.emit(recipe) }
+      onSuccess(recipe)
+    }
   }
 
   /** Accepts the current generated recipe and saves it to the repository. */
   fun acceptGeneratedRecipe(onSuccess: () -> Unit) {
     val recipe = _currentGeneratedRecipe.value
     if (recipe != null) {
-      recipeRepository.addRecipe(recipe.copy(uid = recipeRepository.getUid(), workInProgress = false),
-        onSuccess) { Log.e("RecipeGenerationViewModel", "Failed to save the recipe")
-      }
+      viewModelScope.launch { recipeRepository.addRecipe(recipe.copy(uid = recipeRepository.getUid(), workInProgress = false))}
     } else {
       Log.e("RecipeGenerationViewModel", "No generated recipe to accept")
     }
