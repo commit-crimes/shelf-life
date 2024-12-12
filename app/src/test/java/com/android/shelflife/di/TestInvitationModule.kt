@@ -1,4 +1,4 @@
-package com.android.shelfLife.di
+package com.android.shelflife.di
 
 import com.android.shelfLife.model.newInvitations.InvitationRepository
 import com.android.shelfLife.model.newInvitations.InvitationRepositoryFirestore

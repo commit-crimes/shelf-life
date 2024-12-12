@@ -1,3 +1,5 @@
+package com.android.shelflife.di
+
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.newFoodItem.FoodItemRepositoryFirestore
 import com.google.firebase.firestore.FirebaseFirestore

@@ -1,3 +1,5 @@
+package com.android.shelflife.di
+
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.newhousehold.HouseholdRepositoryFirestore
 import com.google.firebase.firestore.FirebaseFirestore
