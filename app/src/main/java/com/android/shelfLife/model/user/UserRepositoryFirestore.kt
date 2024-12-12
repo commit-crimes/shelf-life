@@ -158,7 +158,7 @@ constructor(
 
   private suspend fun updateUserField(fieldName: String, value: Any) {
     val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
-    userCollection.document(currentUser.uid).update(fieldName, value).await()
+    userCollection.document(currentUser.uid).update(fieldName, value)
 
     val currentUserData =
         _user.value
@@ -209,7 +209,7 @@ constructor(
           else -> currentUserData
         }
     _user.value = updatedUserData
-    userCollection.document(currentUser.uid).update(fieldName, updateValue).await()
+    userCollection.document(currentUser.uid).update(fieldName, updateValue)
   }
 
 
@@ -252,7 +252,7 @@ constructor(
 
   override suspend fun updateEmail(email: String) {
     val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
-    currentUser.updateEmail(email).await()
+    currentUser.updateEmail(email)
     updateUserField("email", email)
   }
 

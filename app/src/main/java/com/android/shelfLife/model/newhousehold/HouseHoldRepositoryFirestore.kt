@@ -97,7 +97,9 @@ class HouseholdRepositoryFirestore(
         mapOf(
             "name" to household.name,
             "members" to household.members,
-            "sharedRecipes" to household.sharedRecipes)
+            "sharedRecipes" to household.sharedRecipes,
+            "ratPoints" to household.ratPoints,
+            "stinkyPoints" to household.stinkyPoints)
     try {
       // Update local cache
       Log.d("HouseholdRepository", "Added household: $household")
@@ -108,7 +110,7 @@ class HouseholdRepositoryFirestore(
       db.collection(collectionPath)
           .document(household.uid) // Use the household UID as the document ID
           .set(householdData)
-          .await()
+
     } catch (e: Exception) {
       val updatedHouseHolds = _households.value.filterNot { it.uid == household.uid }
       _households.value = updatedHouseHolds
@@ -127,7 +129,9 @@ class HouseholdRepositoryFirestore(
         mapOf(
             "name" to household.name,
             "members" to household.members,
-            "sharedRecipes" to household.sharedRecipes)
+            "sharedRecipes" to household.sharedRecipes,
+            "ratPoints" to household.ratPoints,
+            "stinkyPoints" to household.stinkyPoints)
     try {
       // Update local cache
       val currentHouseholds = _households.value.toMutableList()
@@ -141,7 +145,7 @@ class HouseholdRepositoryFirestore(
       Log.d("HouseholdRepository", "Updated household: $household")
       _households.value = currentHouseholds
 
-      db.collection(collectionPath).document(household.uid).set(householdData).await()
+      db.collection(collectionPath).document(household.uid).set(householdData)
     } catch (e: Exception) {
       // Rollback: Restore the original item in the local cache
       originalItem?.let {
@@ -168,7 +172,7 @@ class HouseholdRepositoryFirestore(
       val currentHouseholds = _households.value.filterNot { it.uid == id }
       _households.value = currentHouseholds
 
-      db.collection(collectionPath).document(id).delete().await()
+      db.collection(collectionPath).document(id).delete()
     } catch (e: Exception) {
       // Rollback: Restore the deleted household in the local cache
       deletedHouseHold?.let {
@@ -233,8 +237,16 @@ class HouseholdRepositoryFirestore(
       val name = doc.getString("name") ?: return null
       val members = doc.get("members") as? List<String> ?: emptyList()
       val sharedRecipes = doc.get("sharedRecipes") as? List<String> ?: emptyList()
+      val ratPoints = doc.get("ratPoints") as? Map<String, Int> ?: emptyMap()
+      val stinkyPoints = doc.get("stinkyPoints") as? Map<String, Int> ?: emptyMap()
 
-      HouseHold(uid = uid, name = name, members = members, sharedRecipes = sharedRecipes)
+      HouseHold(
+        uid = uid,
+        name = name,
+        members = members,
+        sharedRecipes = sharedRecipes,
+        ratPoints = ratPoints,
+        stinkyPoints = stinkyPoints)
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error converting document to HouseHold", e)
       null
