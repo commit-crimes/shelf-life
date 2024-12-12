@@ -1,22 +1,21 @@
 package com.android.shelflife.di
 
+import com.android.shelfLife.di.FoodItemRepositoryModule
+import com.android.shelfLife.di.HouseholdRepositoryModule
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.newFoodItem.FoodItemRepositoryFirestore
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import org.mockito.Mockito
+import dagger.hilt.testing.TestInstallIn
 
 @Module
-@InstallIn(SingletonComponent::class)
+@TestInstallIn(
+  components = [SingletonComponent::class],
+  replaces = [FoodItemRepositoryModule::class]
+)
 object TestFoodItemModule {
-
-  @Provides
-  fun provideMockFirestore(): FirebaseFirestore {
-    return Mockito.mock(FirebaseFirestore::class.java)
-  }
 
   @Provides
   fun provideFoodItemRepository(db: FirebaseFirestore): FoodItemRepository {
