@@ -38,8 +38,10 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InvitationScreen(navigationActions: NavigationActions) {
-  val viewModel = hiltViewModel<InvitationViewModel>()
+fun InvitationScreen(
+    navigationActions: NavigationActions,
+    viewModel: InvitationViewModel = hiltViewModel()
+) {
   val invitations by viewModel.invitations.collectAsState()
   Scaffold(topBar = { TopAppBar(title = { Text("Invitations") }) }) { paddingValues ->
     if (invitations.isEmpty()) {

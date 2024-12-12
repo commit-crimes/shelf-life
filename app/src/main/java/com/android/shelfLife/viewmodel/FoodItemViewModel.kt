@@ -205,4 +205,15 @@ constructor(
       return false
     }
   }
+
+  fun resetForScanner() {
+    location = FoodStorageLocation.PANTRY
+    expireDate = ""
+    openDate = ""
+    buyDate = formatTimestampToDate(Timestamp.now())
+    expireDateErrorResId = null
+    openDateErrorResId = null
+    buyDateErrorResId = null
+    locationExpanded = false
+  }
 }

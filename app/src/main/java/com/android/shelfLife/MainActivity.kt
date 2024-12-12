@@ -28,7 +28,6 @@ import com.android.shelfLife.ui.recipes.GenerateRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.addRecipe.AddRecipeScreen
 import com.example.compose.ShelfLifeTheme
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -47,12 +46,7 @@ fun ShelfLifeApp() {
 
   val context = LocalContext.current
 
-  var startDestination = Route.AUTH
-  if (FirebaseAuth.getInstance().currentUser != null) {
-    startDestination = Route.OVERVIEW
-  }
-
-  NavHost(navController = navController, startDestination = startDestination) {
+  NavHost(navController = navController, startDestination = Route.AUTH) {
     // Authentication route
     navigation(
         startDestination = Screen.AUTH,

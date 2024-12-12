@@ -34,6 +34,7 @@ android {
 
         // Use HiltTestRunner for instrumentation tests
         testInstrumentationRunner = "com.android.shelfLife.HiltTestRunner"
+        //testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -322,7 +323,7 @@ dependencies {
     // Test UI
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.espresso.intents)
+    //androidTestImplementation(libs.androidx.espresso.intents)
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     testImplementation(libs.mockito.core)
@@ -331,9 +332,9 @@ dependencies {
     androidTestImplementation(libs.mockito.android)
     androidTestImplementation(libs.mockito.kotlin)
     testImplementation(libs.robolectric)
-    androidTestImplementation(libs.kaspresso)
-    androidTestImplementation(libs.kaspresso.allure.support)
-    androidTestImplementation(libs.kaspresso.compose.support)
+    //androidTestImplementation(libs.kaspresso)
+    //androidTestImplementation(libs.kaspresso.allure.support)
+    //androidTestImplementation(libs.kaspresso.compose.support)
 
     // Coroutine Testing
     testImplementation(libs.kotlinx.coroutines.test)

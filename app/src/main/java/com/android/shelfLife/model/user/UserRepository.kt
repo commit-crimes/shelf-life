@@ -6,15 +6,12 @@ import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {
-  val isUserLoggedIn: StateFlow<Boolean>
 
   /** Exposes the user data as a StateFlow. */
   val user: StateFlow<User?>
 
   /** Exposes the invitations list as a StateFlow. */
   val invitations: StateFlow<List<String>>
-
-  val selectedHousehold: StateFlow<HouseHold?>
 
   /** Generates a new unique ID for a user. */
   fun getNewUid(): String
@@ -24,13 +21,6 @@ interface UserRepository {
    * at startup to load initial data.
    */
   suspend fun initializeUserData(context: Context)
-
-  /**
-   * Sets the user's logged-in status. This is used to determine whether to show the sign-in screen
-   *
-   * @param isLoggedIn - The new logged-in status.
-   */
-  fun setUserLoggedInStatus(isLoggedIn: Boolean)
 
   // Other suspend functions for updating user data
   suspend fun addHouseholdUID(householdUID: String)
@@ -66,5 +56,5 @@ interface UserRepository {
    *
    * @param household - The household to select.
    */
-  suspend fun selectHousehold(household: HouseHold?)
+  suspend fun selectHousehold(householdUid: String?)
 }

@@ -2,7 +2,6 @@ package com.android.shelfLife.model.user
 
 import android.content.Context
 import android.util.Log
-import com.android.shelfLife.model.newhousehold.HouseHold
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -41,14 +40,9 @@ constructor(
   private val _user = MutableStateFlow<User?>(null)
   override val user: StateFlow<User?> = _user.asStateFlow()
 
-  private val _isUserLoggedIn = MutableStateFlow(firebaseAuth.currentUser != null)
-  override val isUserLoggedIn: StateFlow<Boolean> = _isUserLoggedIn
-
   override val invitations: StateFlow<List<String>> =
     invitationListener().stateIn(externalScope, SharingStarted.Eagerly, emptyList())
 
-  private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
-  override var selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
 
   override fun getNewUid(): String {
     return userCollection.document().id
@@ -210,11 +204,6 @@ constructor(
     userCollection.document(currentUser.uid).update(fieldName, updateValue).await()
   }
 
-  override fun setUserLoggedInStatus(isLoggedIn: Boolean) {
-    Log.d("UserRepository", "Setting user logged in status to $isLoggedIn")
-    _isUserLoggedIn.value = isLoggedIn
-  }
-
   private enum class ArrayOperation {
     ADD,
     REMOVE
@@ -262,9 +251,8 @@ constructor(
     updateUserField("selectedHouseholdUID", selectedHouseholdUID)
   }
 
-  override suspend fun selectHousehold(household: HouseHold?) {
-    _selectedHousehold.value = household
-    household?.let { updateSelectedHousehold(it.uid) }
+  override suspend fun selectHousehold(householdUid: String?) {
+    householdUid?.let { updateSelectedHousehold(it) }
   }
 
   override suspend fun addCurrentUserToHouseHold(householdUID: String, userUID: String) {

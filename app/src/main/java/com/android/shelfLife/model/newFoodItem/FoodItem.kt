@@ -21,7 +21,7 @@ data class FoodItem(
     val buyDate: Timestamp? = Timestamp.now(),
     val expiryDate: Timestamp? = null,
     val openDate: Timestamp? = null,
-    val location: FoodStorageLocation,
+    val location: FoodStorageLocation = FoodStorageLocation.OTHER,
     val status: FoodStatus = FoodStatus.UNOPENED,
     val owner: String
 )

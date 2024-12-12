@@ -1,13 +1,10 @@
 package com.android.shelfLife.ui.newoverview
 
 import android.util.Log
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -19,7 +16,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,12 +38,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun OverviewScreen(navigationActions: NavigationActions) {
   val overviewScreenViewModel = hiltViewModel<OverviewScreenViewModel>()
-  Log.d("OverviewScreen", overviewScreenViewModel.hashCode().toString())
 
   val selectedHousehold by overviewScreenViewModel.selectedHousehold.collectAsState()
   val foodItems by overviewScreenViewModel.foodItems.collectAsState()
   val households by overviewScreenViewModel.households.collectAsState()
-  val householdViewModelIsLoaded by overviewScreenViewModel.finishedLoading.collectAsState()
   val selectedFilters by overviewScreenViewModel.selectedFilters.collectAsState()
   val multipleSelectedFoodItems by
       overviewScreenViewModel.multipleSelectedFoodItems.collectAsState()
@@ -66,15 +60,7 @@ fun OverviewScreen(navigationActions: NavigationActions) {
                       selectedFilters.contains(item.foodFacts.category.name))
             }
 
-        if (!householdViewModelIsLoaded) {
-          Column(
-              modifier = Modifier.fillMaxSize(),
-              horizontalAlignment = Alignment.CenterHorizontally,
-              verticalArrangement = Arrangement.Center,
-          ) {
-            CircularProgressIndicator()
-          }
-        } else if (selectedHousehold == null && households.isEmpty()) {
+        if (selectedHousehold == null && households.isEmpty()) {
           Log.d("OverviewScreen", households.toString())
           FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel)
         } else {

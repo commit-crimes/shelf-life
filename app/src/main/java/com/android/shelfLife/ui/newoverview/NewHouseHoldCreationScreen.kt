@@ -40,8 +40,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun HouseHoldCreationScreen(
     navigationActions: NavigationActions,
+    viewModel: HouseholdCreationScreenViewModel = hiltViewModel()
 ) {
-  val viewModel: HouseholdCreationScreenViewModel = hiltViewModel()
   val householdToEdit by viewModel.householdToEdit.collectAsState()
 
   var isError by rememberSaveable { mutableStateOf(false) }
