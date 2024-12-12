@@ -144,7 +144,6 @@ constructor(
       userRepository.selectHousehold(household.uid)
       Log.d("HouseholdViewModel", "Selected new household: ${household.name}")
 
-
       if (friendEmails.isNotEmpty()) {
         val emailToUid = userRepository.getUserIds(friendEmails)
         val emailsNotFound = friendEmails.filter { it !in emailToUid.keys }

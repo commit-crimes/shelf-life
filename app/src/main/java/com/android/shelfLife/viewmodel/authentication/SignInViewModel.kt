@@ -24,18 +24,16 @@ import kotlinx.coroutines.tasks.await
 class SignInViewModel
 @Inject
 constructor(
-  private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance(),
-  private val userRepository: UserRepository,
-  private val householdRepository: HouseHoldRepository,
-  private val recipeRepository: RecipeRepository,
-  private val foodItemRepository: FoodItemRepository,
-  @ApplicationContext private val appContext: Context
-
+    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val userRepository: UserRepository,
+    private val householdRepository: HouseHoldRepository,
+    private val recipeRepository: RecipeRepository,
+    private val foodItemRepository: FoodItemRepository,
+    @ApplicationContext private val appContext: Context
 ) : ViewModel() {
 
   private val _signInState = MutableStateFlow<SignInState>(SignInState.Idle)
   val signInState: StateFlow<SignInState> = _signInState
-
 
   private val _isUserLoggedIn = MutableStateFlow(false)
   val isUserLoggedIn: StateFlow<Boolean> = _isUserLoggedIn
@@ -61,11 +59,10 @@ constructor(
   private suspend fun populateModelData(context: Context) {
     userRepository.initializeUserData(context)
     householdRepository.initializeHouseholds(
-      userRepository.user.value?.householdUIDs ?: emptyList(),
-      userRepository.user.value?.selectedHouseholdUID
-    )
+        userRepository.user.value?.householdUIDs ?: emptyList(),
+        userRepository.user.value?.selectedHouseholdUID)
     userRepository.user.value?.selectedHouseholdUID?.let { foodItemRepository.getFoodItems(it) }
-    //TODO("Populate user recipes")
+    // TODO("Populate user recipes")
   }
 
   override fun onCleared() {
@@ -73,8 +70,6 @@ constructor(
     super.onCleared()
     firebaseAuth.removeAuthStateListener(authStateListener)
   }
-
-
 
   fun signInWithGoogle(idToken: String, context: Context) {
     Log.d("SignInViewModel", "signInWithGoogle called")

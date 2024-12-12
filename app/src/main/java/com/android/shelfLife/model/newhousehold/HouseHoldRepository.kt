@@ -18,9 +18,7 @@ interface HouseHoldRepository {
    */
   fun selectHouseholdToEdit(household: HouseHold?)
 
-
   fun selectHousehold(household: HouseHold?)
-
 
   /**
    * Fetches households by their UIDs.

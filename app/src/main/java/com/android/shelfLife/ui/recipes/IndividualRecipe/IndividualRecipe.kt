@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.recipes.IndividualRecipe
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -208,7 +207,6 @@ private fun IndividualRecipeScreenPreview() {
   val navigationActions = NavigationActions(navController)
   val firebaseFirestore = FirebaseFirestore.getInstance()
   val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
-  Log.i("AAAAAAAAA", "1")
   val recipe =
       Recipe(
           uid = "21",
@@ -242,14 +240,11 @@ private fun IndividualRecipeScreenPreview() {
                   Ingredient("lemon", Quantity(1.0, FoodUnit.COUNT)),
                   Ingredient("garlic cloves", Quantity(4.0, FoodUnit.COUNT)),
               ))
-  Log.i("AAAAAAAAA", "2")
 
   recipeRepository.addRecipe(recipe, {}, {})
   recipeRepository.selectRecipe(recipe)
-  Log.i("AAAAAAAAA", "3")
 
   val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
-  Log.i("AAAAAAAAA", "4")
 
   // Render the IndividualRecipeScreen with a null selectedRecipe
   IndividualRecipeScreen(navigationActions = navigationActions)

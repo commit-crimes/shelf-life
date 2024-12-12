@@ -1,7 +1,6 @@
 package com.android.shelfLife.model.user
 
 import android.content.Context
-import com.android.shelfLife.model.newhousehold.HouseHold
 import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {
@@ -29,7 +28,6 @@ interface UserRepository {
    * needed to avoid memory leaks.
    */
   fun stopListeningForInvitations()
-
 
   // Other suspend functions for updating user data
   suspend fun addHouseholdUID(householdUID: String)
