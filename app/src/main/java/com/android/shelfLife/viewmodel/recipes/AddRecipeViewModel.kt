@@ -5,19 +5,24 @@ import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
+import com.android.shelfLife.model.newRecipe.RecipeRepository
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.utils.validateNumber
 import com.android.shelfLife.ui.utils.validateString
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class AddRecipeViewModel(
+@HiltViewModel
+class AddRecipeViewModel
+@Inject
+constructor(
     private val recipeRepository: RecipeRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
@@ -72,7 +77,6 @@ class AddRecipeViewModel(
   val instructionError: StateFlow<List<Int?>> = _instructionError.asStateFlow()
 
   private val _instructionsError = MutableStateFlow(false)
-
   private val _ingredientsError = MutableStateFlow(false)
 
   private val _ingredientNameError = MutableStateFlow<Int?>(null)
@@ -81,7 +85,6 @@ class AddRecipeViewModel(
   private val _ingredientQuantityAmountError = MutableStateFlow<Int?>(null)
   val ingredientQuantityAmountError: StateFlow<Int?> = _ingredientQuantityAmountError.asStateFlow()
 
-  // Helper function to validate if any instruction is empty
   fun validateInstructions() {
     _instructionsError.value =
         instructions.value.any {
@@ -90,12 +93,10 @@ class AddRecipeViewModel(
         }
   }
 
-  // Checks that no ingredient inside the list of ingredients is empty
   fun validateIngredients() {
     _ingredientsError.value = ingredients.value.any { it.name.isBlank() }
   }
 
-  // Function that allows us to change the title
   fun changeTitle(newRecipeTitle: String) {
     _title.value = newRecipeTitle
     _titleError.value =
@@ -103,7 +104,6 @@ class AddRecipeViewModel(
             newRecipeTitle, R.string.recipe_title_empty_error, R.string.recipe_title_invalid_error)
   }
 
-  // Function that allows us to change the number of servings
   fun changeServings(newServings: String) {
     _servings.value = newServings
     _servingsError.value =
@@ -114,7 +114,6 @@ class AddRecipeViewModel(
             R.string.amount_negative_error)
   }
 
-  // Function that allows us to change the time
   fun changeTime(newTime: String) {
     _time.value = newTime
     _timeError.value =
@@ -125,7 +124,6 @@ class AddRecipeViewModel(
             R.string.time_negative_error)
   }
 
-  // Function that allows us to change the ingredient name
   fun changeIngredientName(newIngredientName: String) {
     _ingredientName.value = newIngredientName
     _ingredientNameError.value =
@@ -135,7 +133,6 @@ class AddRecipeViewModel(
             R.string.ingredient_name_invalid_error)
   }
 
-  // Function that allows us to change the amount of an ingredient
   fun changeIngredientQuantityAmount(newIngredientQuantityAmount: String) {
     _ingredientQuantityAmount.value = newIngredientQuantityAmount
     _ingredientQuantityAmountError.value =
@@ -146,12 +143,10 @@ class AddRecipeViewModel(
             R.string.ingredient_quantity_negative_error)
   }
 
-  // Function that allows us to change the unit of the ingredient
   fun changeIngredientQuantityUnit(newUnit: FoodUnit) {
     _ingredientQuantityUnit.value = newUnit
   }
 
-  // Function to validate all ingredient fields when the Add button is clicked
   fun validateAllIngredientFieldsWhenAddButton() {
     _ingredientNameError.value =
         validateString(
@@ -168,7 +163,6 @@ class AddRecipeViewModel(
         (_ingredientNameError.value != null) || (_ingredientQuantityAmountError.value != null)
   }
 
-  // Function to validate all fields when the Submit button is clicked
   fun validateAllFieldsWhenSubmitButton() {
     _titleError.value =
         validateString(
@@ -196,7 +190,6 @@ class AddRecipeViewModel(
             _ingredientsError.value
   }
 
-  // Function to create a new ingredient
   fun createNewIngredient() {
     _showIngredientDialog.value = true
     _ingredientName.value = ""
@@ -204,12 +197,10 @@ class AddRecipeViewModel(
     _ingredientQuantityUnit.value = FoodUnit.GRAM
   }
 
-  // Function to close the pop-up dialog
   fun closeIngredientDialog() {
     _showIngredientDialog.value = false
   }
 
-  // Function to add a new ingredient to the list
   fun addNewIngredient(): Boolean {
     validateAllIngredientFieldsWhenAddButton()
     if (!_errorIngredient.value) {
@@ -224,20 +215,17 @@ class AddRecipeViewModel(
     return false
   }
 
-  // Function to remove an ingredient from the list
   fun removeIngredient(index: Int) {
     if (ingredients.value.isNotEmpty() && index < ingredients.value.size) {
       _ingredients.value = ingredients.value.toMutableList().apply { removeAt(index) }
     }
   }
 
-  // Function to create a new instruction
   fun createNewInstruction() {
     _instructions.value = instructions.value + ""
     _instructionError.value = instructionError.value + null
   }
 
-  // Function to modify an instruction
   fun changeInstruction(index: Int, newInstruction: String) {
     val updatedInstructions =
         instructions.value.toMutableList().apply { this[index] = newInstruction }
@@ -254,7 +242,6 @@ class AddRecipeViewModel(
     validateInstructions()
   }
 
-  // Function to remove an instruction
   fun removeInstruction(index: Int) {
     if (instructions.value.size > index) {
       _instructions.value = instructions.value.toMutableList().apply { removeAt(index) }
@@ -262,7 +249,6 @@ class AddRecipeViewModel(
     }
   }
 
-  // Function to add the new recipe to the database
   suspend fun addNewRecipe(onSuccess: () -> Unit, showToast: (Int) -> Unit) {
     validateAllFieldsWhenSubmitButton()
     if (_error.value) {

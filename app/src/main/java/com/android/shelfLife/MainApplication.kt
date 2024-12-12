@@ -1,0 +1,6 @@
+package com.android.shelfLife
+
+import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
+
+@HiltAndroidApp class MainApplication : Application() {}

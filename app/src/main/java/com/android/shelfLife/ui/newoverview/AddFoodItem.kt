@@ -11,11 +11,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
-import com.android.shelfLife.model.newFoodItem.FoodItemRepository
-import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.utils.*
+import com.android.shelfLife.ui.newutils.*
+import com.android.shelfLife.ui.utils.AmountField
+import com.android.shelfLife.ui.utils.CategoryDropdownField
+import com.android.shelfLife.ui.utils.CustomButtons
+import com.android.shelfLife.ui.utils.CustomTopAppBar
+import com.android.shelfLife.ui.utils.DateField
+import com.android.shelfLife.ui.utils.FoodNameField
+import com.android.shelfLife.ui.utils.NewLocationDropdownField
+import com.android.shelfLife.ui.utils.UnitDropdownField
 import com.android.shelfLife.viewmodel.FoodItemViewModel
 import kotlinx.coroutines.launch
 
@@ -27,18 +34,15 @@ import kotlinx.coroutines.launch
  * @param userRepository The user model.
  * @param paddingValues The padding values to be applied to the screen.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddFoodItemScreen(
     navigationActions: NavigationActions,
-    foodItemRepository: FoodItemRepository,
-    userRepository: UserRepository,
-    paddingValues: PaddingValues = PaddingValues(16.dp)
+    paddingValues: PaddingValues = PaddingValues(16.dp),
+    foodItemViewModel: FoodItemViewModel = hiltViewModel()
 ) {
   // val foodFacts by foodFactsViewModel.foodFactsSuggestions.collectAsState()
 
   val coroutineScope = rememberCoroutineScope()
-  val foodItemViewModel = FoodItemViewModel(foodItemRepository, userRepository)
 
   val context = LocalContext.current
 
