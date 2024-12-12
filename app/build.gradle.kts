@@ -281,6 +281,10 @@ dependencies {
     // Google Service
     implementation(libs.play.services.auth)
 
+    // Gifs
+    implementation ("io.coil-kt:coil:2.4.0")
+    implementation ("io.coil-kt:coil-gif:2.4.0")
+
     // Firebase
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.firestore)

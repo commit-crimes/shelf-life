@@ -65,4 +65,5 @@ interface UserRepository {
    * @param household - The household to select.
    */
   suspend fun selectHousehold(householdUid: String?)
+    suspend fun getUserNames(userIds: List<String>): Map<String, String>
 }

@@ -119,6 +119,23 @@ constructor(
     return uidToEmail
   }
 
+    override suspend fun getUserNames(userIds: List<String>): Map<String, String> {
+        if (userIds.isEmpty()) return emptyMap()
+
+        val uidToName = mutableMapOf<String, String>()
+        val chunks = userIds.chunked(10)
+
+        for (chunk in chunks) {
+            val query = db.collection("users").whereIn(FieldPath.documentId(), chunk).get().await()
+            for (doc in query.documents) {
+                val username = doc.getString("username")
+                val userId = doc.id
+                if (username != null) uidToName[userId] = username
+            }
+        }
+        return uidToName
+    }
+
   override fun startListeningForInvitations() {
     val currentUser = firebaseAuth.currentUser
     if (currentUser != null) {

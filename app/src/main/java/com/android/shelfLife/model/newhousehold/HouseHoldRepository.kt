@@ -61,4 +61,20 @@ interface HouseHoldRepository {
    * @return True if the household name already exists, false otherwise.
    */
   fun checkIfHouseholdNameExists(houseHoldName: String): Boolean
+
+    /**
+     * Updates the stinky points for a household.
+     *
+     * @param householdId The ID of the household.
+     * @param stinkyPoints The updated stinky points.
+     */
+  suspend fun updateStinkyPoints(householdId: String, stinkyPoints: Map<String, Long>)
+
+  /**
+   * Updates the rat points for a household.
+   *
+   * @param householdId The ID of the household.
+   * @param ratPoints The updated stinky points.
+   */
+  suspend fun updateRatPoints(householdId: String, ratPoints: Map<String, Long>)
 }

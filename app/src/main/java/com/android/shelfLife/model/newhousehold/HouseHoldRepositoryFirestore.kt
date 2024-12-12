@@ -219,6 +219,24 @@ class HouseholdRepositoryFirestore(
             }
   }
 
+  override suspend fun updateStinkyPoints(householdId: String, stinkyPoints: Map<String, Long>) {
+    try {
+      _selectedHousehold.value = _selectedHousehold.value?.copy(stinkyPoints = stinkyPoints)
+      db.collection(collectionPath).document(householdId).update("stinkyPoints", stinkyPoints)
+    } catch (e: Exception) {
+      Log.e("HouseholdRepository", "Error updating stinky points", e)
+    }
+  }
+
+  override suspend fun updateRatPoints(householdId: String, ratPoints: Map<String, Long>) {
+    try {
+      _selectedHousehold.value = _selectedHousehold.value?.copy(ratPoints = ratPoints)
+      db.collection(collectionPath).document(householdId).update("ratPoints", ratPoints)
+    } catch (e: Exception) {
+      Log.e("HouseholdRepository", "Error updating rat points", e)
+    }
+  }
+
   /** Stops listening for real-time updates. */
   fun stopListeningForHouseholds() {
     householdsListenerRegistration?.remove()
@@ -237,8 +255,8 @@ class HouseholdRepositoryFirestore(
       val name = doc.getString("name") ?: return null
       val members = doc.get("members") as? List<String> ?: emptyList()
       val sharedRecipes = doc.get("sharedRecipes") as? List<String> ?: emptyList()
-      val ratPoints = doc.get("ratPoints") as? Map<String, Int> ?: emptyMap()
-      val stinkyPoints = doc.get("stinkyPoints") as? Map<String, Int> ?: emptyMap()
+      val ratPoints = doc.get("ratPoints") as? Map<String, Long> ?: emptyMap()
+      val stinkyPoints = doc.get("stinkyPoints") as? Map<String, Long> ?: emptyMap()
 
       HouseHold(
         uid = uid,
