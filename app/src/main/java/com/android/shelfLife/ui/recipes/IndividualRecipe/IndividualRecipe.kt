@@ -29,10 +29,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
-import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.newRecipe.RecipeRepositoryFirestore
 import com.android.shelfLife.model.recipe.Ingredient
-import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
@@ -41,7 +39,6 @@ import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.math.floor
-import kotlin.time.Duration.Companion.minutes
 
 @Composable
 /**
@@ -200,52 +197,65 @@ private fun IndividualRecipeScreenPreviewEasterEgg() {
   IndividualRecipeScreen(navigationActions = navigationActions)
 }
 // this preview shows the example where we do have a selected recipe
-@Preview()
-@Composable
-private fun IndividualRecipeScreenPreview() {
-  val navController = rememberNavController()
-  val navigationActions = NavigationActions(navController)
-  val firebaseFirestore = FirebaseFirestore.getInstance()
-  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
-  val recipe =
-      Recipe(
-          uid = "21",
-          name = "Roast chicken",
-          instructions =
-              listOf(
-                  "Preheat your oven to 425°F (220°C). Position a rack in the center.",
-                  "Remove the chicken giblets (if present) and pat the chicken dry with paper towels. Dry skin crisps better during roasting.",
-                  "In a small bowl, mix the salt, pepper, garlic powder, onion powder, paprika, and dried thyme.",
-                  "Rub the olive oil or melted butter all over the chicken, including under the skin if possible.",
-                  "Generously sprinkle the seasoning mixture over the chicken, rubbing it into the skin and inside the cavity.",
-                  "Stuff the cavity with the lemon halves, smashed garlic cloves, and optional fresh herb sprigs.",
-                  "Tie the chicken legs together with kitchen twine to ensure even cooking.",
-                  "Place the chicken breast-side up in a roasting pan or oven-safe skillet.",
-                  "Roast for 75–90 minutes (approximately 40 minutes per kg), or until a meat thermometer inserted into the thickest part of the thigh (without touching the bone) reads 75°C.",
-                  "For extra crispy skin, baste the chicken with pan drippings every 30 minutes.",
-                  "Remove the chicken from the oven and let it rest for 10–15 minutes to allow the juices to redistribute.",
-                  "Carve the chicken and serve with your favorite sides, such as roasted vegetables, mashed potatoes, or a fresh salad."),
-          servings = 5.0F,
-          time = 120.minutes,
-          ingredients =
-              listOf(
-                  Ingredient("whole chicken", Quantity(1.0, FoodUnit.COUNT)),
-                  Ingredient("olive oil", Quantity(30.0, FoodUnit.ML)),
-                  Ingredient("salt", Quantity(5.0)),
-                  Ingredient("balck peppet", Quantity(2.0)),
-                  Ingredient("garlic powder", Quantity(3.0)),
-                  Ingredient("onion powder", Quantity(3.0)),
-                  Ingredient("paprika", Quantity(3.0)),
-                  Ingredient("dried thyme", Quantity(3.0)),
-                  Ingredient("lemon", Quantity(1.0, FoodUnit.COUNT)),
-                  Ingredient("garlic cloves", Quantity(4.0, FoodUnit.COUNT)),
-              ))
-
-  recipeRepository.addRecipe(recipe, {}, {})
-  recipeRepository.selectRecipe(recipe)
-
-  val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
-
-  // Render the IndividualRecipeScreen with a null selectedRecipe
-  IndividualRecipeScreen(navigationActions = navigationActions)
-}
+// @Preview()
+// @Composable
+// private fun IndividualRecipeScreenPreview() {
+//  val navController = rememberNavController()
+//  val navigationActions = NavigationActions(navController)
+//  val firebaseFirestore = FirebaseFirestore.getInstance()
+//  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
+//  Log.i("AAAAAAAAA", "1")
+//  val recipe =
+//      Recipe(
+//          uid = "21",
+//          name = "Roast chicken",
+//          instructions =
+//              listOf(
+//                  "Preheat your oven to 425°F (220°C). Position a rack in the center.",
+//                  "Remove the chicken giblets (if present) and pat the chicken dry with paper
+// towels. Dry skin crisps better during roasting.",
+//                  "In a small bowl, mix the salt, pepper, garlic powder, onion powder, paprika,
+// and dried thyme.",
+//                  "Rub the olive oil or melted butter all over the chicken, including under the
+// skin if possible.",
+//                  "Generously sprinkle the seasoning mixture over the chicken, rubbing it into the
+// skin and inside the cavity.",
+//                  "Stuff the cavity with the lemon halves, smashed garlic cloves, and optional
+// fresh herb sprigs.",
+//                  "Tie the chicken legs together with kitchen twine to ensure even cooking.",
+//                  "Place the chicken breast-side up in a roasting pan or oven-safe skillet.",
+//                  "Roast for 75–90 minutes (approximately 40 minutes per kg), or until a meat
+// thermometer inserted into the thickest part of the thigh (without touching the bone) reads
+// 75°C.",
+//                  "For extra crispy skin, baste the chicken with pan drippings every 30 minutes.",
+//                  "Remove the chicken from the oven and let it rest for 10–15 minutes to allow the
+// juices to redistribute.",
+//                  "Carve the chicken and serve with your favorite sides, such as roasted
+// vegetables, mashed potatoes, or a fresh salad."),
+//          servings = 5.0F,
+//          time = 120.minutes,
+//          ingredients =
+//              listOf(
+//                  Ingredient("whole chicken", Quantity(1.0, FoodUnit.COUNT)),
+//                  Ingredient("olive oil", Quantity(30.0, FoodUnit.ML)),
+//                  Ingredient("salt", Quantity(5.0)),
+//                  Ingredient("balck peppet", Quantity(2.0)),
+//                  Ingredient("garlic powder", Quantity(3.0)),
+//                  Ingredient("onion powder", Quantity(3.0)),
+//                  Ingredient("paprika", Quantity(3.0)),
+//                  Ingredient("dried thyme", Quantity(3.0)),
+//                  Ingredient("lemon", Quantity(1.0, FoodUnit.COUNT)),
+//                  Ingredient("garlic cloves", Quantity(4.0, FoodUnit.COUNT)),
+//              ))
+//  Log.i("AAAAAAAAA", "2")
+//
+//  recipeRepository.addRecipe(recipe, {}, {})
+//  recipeRepository.selectRecipe(recipe)
+//  Log.i("AAAAAAAAA", "3")
+//
+//  val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
+//  Log.i("AAAAAAAAA", "4")
+//
+//  // Render the IndividualRecipeScreen with a null selectedRecipe
+//  IndividualRecipeScreen(navigationActions = navigationActions)
+// }
