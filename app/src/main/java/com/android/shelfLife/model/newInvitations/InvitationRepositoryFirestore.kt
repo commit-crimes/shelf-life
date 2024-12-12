@@ -65,11 +65,12 @@ open class InvitationRepositoryFirestore(
     db.collection(invitationPath).document(invitation.invitationId).delete()
   }
 
-    override suspend fun getInvitationsBatch(invitationUIDs: List<String>): QuerySnapshot {
-        return db.collection("invitations")
+    override suspend fun getInvitationsBatch(invitationUIDs: List<String>): List<Invitation> {
+        val querySnapshot = db.collection("invitations")
             .whereIn(FieldPath.documentId(), invitationUIDs)
             .get()
             .await()
+        return querySnapshot.documents.mapNotNull { doc -> convertToInvitation(doc) }
     }
 
     override suspend fun getInvitation(uid : String) : Invitation? {

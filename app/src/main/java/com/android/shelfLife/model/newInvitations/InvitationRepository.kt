@@ -34,7 +34,7 @@ interface InvitationRepository {
    *
    * @param uid The uid of the invitation to get.
    */
-  suspend fun getInvitationsBatch(invitationUIDs: List<String>): QuerySnapshot
+  suspend fun getInvitationsBatch(invitationUIDs: List<String>): List<Invitation>
 
   suspend fun getInvitation(uid: String): Invitation?
 

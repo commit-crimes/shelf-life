@@ -64,7 +64,7 @@ constructor(
   }
 
 
-  fun newHouseholdNameIsInvalid(householdName: String): Boolean {
+  private fun isNewHouseholdNameIsInvalid(householdName: String): Boolean {
     return (householdName.isBlank() ||
         (houseHoldRepository.checkIfHouseholdNameExists(householdName) &&
             (householdToEdit.value == null || householdName != householdToEdit.value!!.name)))
@@ -93,7 +93,7 @@ constructor(
    * - true if the operation succeeded
    */
   suspend fun confirmHouseholdActions(householdName: String): Boolean {
-    if (newHouseholdNameIsInvalid(householdName)) {
+    if (isNewHouseholdNameIsInvalid(householdName)) {
       return false
     }
 

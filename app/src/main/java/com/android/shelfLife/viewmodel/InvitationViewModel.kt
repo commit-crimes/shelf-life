@@ -25,22 +25,8 @@ constructor(
 
   init {
     viewModelScope.launch {
-      val invitationList = mutableListOf<Invitation>()
       userRepo.invitations.collect { invitationUIDs ->
-        invitationList.clear()
-        invitationUIDs.forEach { uid ->
-          try {
-            val invitation = invitationRepository.getInvitation(uid)
-            if (invitation != null) {
-              invitationList.add(invitation)
-            } else {
-              Log.e("InvitationViewModel", "Error getting that invitation uid")
-            }
-          } catch (e: Exception) {
-            Log.e("InvitationViewModel", "Error getting invitation", e)
-          }
-        }
-        _invitations.value = invitationList
+        _invitations.value = invitationRepository.getInvitationsBatch(invitationUIDs)
       }
     }
   }
@@ -64,11 +50,7 @@ constructor(
     val invitationUIDs = userRepo.invitations.value
     if (invitationUIDs.isNotEmpty()) {
       try {
-        val querySnapshot = invitationRepository.getInvitationsBatch(invitationUIDs)
-        val updatedInvitations = querySnapshot.documents.mapNotNull { doc ->
-          invitationRepository.convertToInvitation(doc)
-        }
-        _invitations.value = updatedInvitations
+        _invitations.value = invitationRepository.getInvitationsBatch(invitationUIDs)
       } catch (e: Exception) {
         Log.e("InvitationViewModel", "Error while refreshing invitations", e)
       }
