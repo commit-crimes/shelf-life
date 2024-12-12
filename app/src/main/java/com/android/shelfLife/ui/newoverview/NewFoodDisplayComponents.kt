@@ -54,13 +54,15 @@ fun ListFoodItems(
     foodItems: List<FoodItem>,
     overviewScreenViewModel: OverviewScreenViewModel,
     onFoodItemClick: (FoodItem) -> Unit,
-    onFoodItemLongHold: (FoodItem) -> Unit
+    onFoodItemLongHold: (FoodItem) -> Unit,
+    isSelectedItemsList: Boolean = false
 ) {
   if (foodItems.isEmpty()) {
+    val text = if (isSelectedItemsList) "None selected" else "No food available"
     Box(
         modifier = Modifier.fillMaxSize().testTag("NoFoodItems"),
         contentAlignment = Alignment.Center) {
-          Text(text = "No food available")
+          Text(text = text)
         }
   } else {
     // Display the full list
@@ -71,7 +73,8 @@ fun ListFoodItems(
             foodItem = item,
             overviewScreenViewModel = overviewScreenViewModel,
             onClick = { onFoodItemClick(item) },
-            onLongPress = { onFoodItemLongHold(item) })
+            onLongPress = { onFoodItemLongHold(item) },
+            isSelectedItemsList = isSelectedItemsList)
       }
     }
   }
@@ -83,12 +86,14 @@ fun FoodItemCard(
     foodItem: FoodItem,
     overviewScreenViewModel: OverviewScreenViewModel,
     onClick: () -> Unit = {},
-    onLongPress: () -> Unit = {}
+    onLongPress: () -> Unit = {},
+    isSelectedItemsList: Boolean = false
 ) {
   val selectedItems by overviewScreenViewModel.multipleSelectedFoodItems.collectAsState()
   val isSelected = selectedItems.contains(foodItem)
   val cardColor =
       if (isSelected) MaterialTheme.colorScheme.primaryContainer
+      else if (isSelectedItemsList) MaterialTheme.colorScheme.surfaceVariant
       else MaterialTheme.colorScheme.background
   val elevation = if (isSelected) 16.dp else 8.dp
   val expiryDate = foodItem.expiryDate
@@ -124,6 +129,12 @@ fun FoodItemCard(
     overviewScreenViewModel.selectFoodItem(newFoodItem)
   }
 
+  val cardHeight = if (isSelectedItemsList) 3.dp else 8.dp
+  val unit = when (foodItem.foodFacts.quantity.unit) {
+    FoodUnit.GRAM -> "g"
+    FoodUnit.ML -> "ml"
+    FoodUnit.COUNT -> "in stock"
+  }
   // Composable UI
   ElevatedCard(
       colors = CardDefaults.elevatedCardColors(containerColor = cardColor),
@@ -139,31 +150,27 @@ fun FoodItemCard(
           Row {
             Column(modifier = Modifier.weight(1f)) {
               Text(text = foodItem.foodFacts.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-
-              when (foodItem.foodFacts.quantity.unit) {
-                FoodUnit.GRAM ->
-                    Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}g", fontSize = 12.sp)
-                FoodUnit.ML ->
-                    Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}ml", fontSize = 12.sp)
-                FoodUnit.COUNT ->
-                    Text(
-                        text = "${foodItem.foodFacts.quantity.amount.toInt()} in stock",
-                        fontSize = 12.sp)
+              if(!isSelectedItemsList) {
+                  Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}$unit", fontSize = 12.sp)
               }
-
               Text(text = expiryDateMessage, fontSize = 12.sp)
+            }
+            if(isSelectedItemsList) {
+              Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}$unit", fontSize = 12.sp)
             }
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            AsyncImage(
-                model = foodItem.foodFacts.imageUrl,
-                contentDescription = "Food Image",
-                modifier =
-                    Modifier.size(80.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .align(Alignment.CenterVertically),
-                contentScale = ContentScale.Crop)
+            if(!isSelectedItemsList) {
+              AsyncImage(
+                  model = foodItem.foodFacts.imageUrl,
+                  contentDescription = "Food Image",
+                  modifier =
+                      Modifier.size(80.dp)
+                          .clip(RoundedCornerShape(8.dp))
+                          .align(Alignment.CenterVertically),
+                  contentScale = ContentScale.Crop)
+              }
           }
 
           // Progress bar
