@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,6 +22,7 @@ import com.android.shelfLife.ui.newInvitations.InvitationScreen
 import com.android.shelfLife.ui.newProfile.ProfileScreen
 import com.android.shelfLife.ui.newoverview.AddFoodItemScreen
 import com.android.shelfLife.ui.newoverview.EditFoodItemScreen
+import com.android.shelfLife.ui.newoverview.FirstTimeWelcomeScreen
 import com.android.shelfLife.ui.newoverview.HouseHoldCreationScreen
 import com.android.shelfLife.ui.newoverview.IndividualFoodItemScreen
 import com.android.shelfLife.ui.newoverview.OverviewScreen
@@ -62,6 +64,7 @@ fun ShelfLifeApp() {
       composable(Screen.EDIT_FOOD) { EditFoodItemScreen(navigationActions) }
       composable(Screen.HOUSEHOLD_CREATION) { HouseHoldCreationScreen(navigationActions) }
       composable(Screen.INDIVIDUAL_FOOD_ITEM) { IndividualFoodItemScreen(navigationActions) }
+      composable(Screen.FIRST_TIME_USER){ FirstTimeWelcomeScreen(navigationActions) }
     }
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
       composable(Screen.PERMISSION_HANDLER) { CameraPermissionHandler(navigationActions) }
