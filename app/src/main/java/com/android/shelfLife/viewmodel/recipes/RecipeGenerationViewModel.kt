@@ -50,20 +50,20 @@ constructor(
   private val _selectedFoodItems = MutableStateFlow<List<FoodItem>>(emptyList()) //food items that have been selected
   open val selectedFoodItems: StateFlow<List<FoodItem>> = _selectedFoodItems.asStateFlow()
 
-
   fun selectFoodItem(foodItem: FoodItem) {
     _selectedFoodItemsUids.value += listOf(foodItem.uid)
-    _updateAvailableFoodItems()
+    _updateFoodItemSelection()
   }
 
   fun deselectFoodItem(foodItem: FoodItem) {
     _selectedFoodItemsUids.value = _selectedFoodItemsUids.value.filter { it != foodItem.uid }
-    _updateAvailableFoodItems()
+    _updateFoodItemSelection()
   }
 
-  fun _updateAvailableFoodItems() {
+  fun _updateFoodItemSelection() { //update our lists of selected and available food items, and update the recipe prompt aswell
     _availableFoodItems.value = foodItemRepository.foodItems.value.filter { it.uid !in _selectedFoodItemsUids.value }
     _selectedFoodItems.value = foodItemRepository.foodItems.value.filter { it.uid in _selectedFoodItemsUids.value }
+    _recipePrompt.value = _recipePrompt.value.copy(ingredients = _selectedFoodItems.value.toMutableStateList())
   }
 
   fun updateRecipePrompt(prompt: RecipePrompt) {

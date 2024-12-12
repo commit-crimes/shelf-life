@@ -1,6 +1,12 @@
 package com.android.shelfLife.ui.recipes.generateRecipe
 
 import android.widget.Toast
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -122,6 +128,16 @@ fun FoodSelectionStep(viewModel: RecipeGenerationViewModel, navigationActions: N
   val availableFoodItems by viewModel.availableFoodItems.collectAsState()
   val selectedFoodItems by viewModel.selectedFoodItems.collectAsState()
 
+  // Calculate the height dynamically based on whether the list is empty
+  val targetHeight = if (selectedFoodItems.isEmpty()) 0.dp else 200.dp // Adjust height as needed
+
+// Animate the height using a spring animation
+  val animatedWeight by animateFloatAsState(
+    targetValue = if (selectedFoodItems.isEmpty()) 0.1f else 0.55f,
+    animationSpec = tween(durationMillis = 1500, easing = LinearOutSlowInEasing)) // Adjust the duration for smoothness
+
+
+
   Scaffold(
     bottomBar = {
       // Fixed buttons at the bottom
@@ -151,9 +167,6 @@ fun FoodSelectionStep(viewModel: RecipeGenerationViewModel, navigationActions: N
         .fillMaxSize()
         .padding(paddingValues)
     ) {
-
-
-
       // "Household" Section
       Text(
         text = "Household",
@@ -173,15 +186,18 @@ fun FoodSelectionStep(viewModel: RecipeGenerationViewModel, navigationActions: N
       }
       Spacer(modifier = Modifier.height(8.dp))
 
-
       // "Selected" Section
       Text(
-        text = "Selected ingredients (${selectedFoodItems.size})",
-        fontSize = 16.sp,
+        text = "Ingredients (${selectedFoodItems.size})",
+        fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(bottom = 8.dp)
+        modifier = Modifier.padding(bottom = 8.dp, top = 4.dp)
       )
-      Box(modifier = Modifier.weight(0.5f)) {
+      Box(
+        modifier = Modifier
+          .fillMaxWidth()
+          .weight(animatedWeight)// Smooth height animation
+      ) {
         ListFoodItems(
           foodItems = selectedFoodItems,
           overviewScreenViewModel = overviewViewModel,
