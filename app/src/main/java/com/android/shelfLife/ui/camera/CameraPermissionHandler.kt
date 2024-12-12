@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -29,7 +30,7 @@ import com.android.shelfLife.ui.utils.OnLifecycleEvent
 @Composable
 fun CameraPermissionHandler(
     navigationActions: NavigationActions,
-    viewModel: BarcodeScannerViewModel = viewModel()
+    viewModel: BarcodeScannerViewModel = hiltViewModel()
 ) {
   val context = LocalContext.current
   val activity = context as Activity

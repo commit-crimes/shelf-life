@@ -7,8 +7,13 @@ import androidx.lifecycle.ViewModel
 import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.user.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class IndividualFoodItemViewModel(
+@HiltViewModel
+class IndividualFoodItemViewModel
+@Inject
+constructor(
     private val foodItemRepository: FoodItemRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
