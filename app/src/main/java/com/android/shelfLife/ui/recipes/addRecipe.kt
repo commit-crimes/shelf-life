@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.recipes
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,6 +46,7 @@ import com.android.shelfLife.ui.theme.secondaryContainerDark
 import com.android.shelfLife.ui.theme.secondaryContainerLight
 import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
+import com.android.shelfLife.ui.utils.UnitDropdownField
 import com.android.shelfLife.viewmodel.recipes.AddRecipeViewModel
 import kotlinx.coroutines.launch
 
@@ -300,6 +302,7 @@ fun IngredientItemNEW(index: Int, ingredient: Ingredient, onRemoveClick: () -> U
  * @param onAddIngredient A callback function that is called when a new ingredient is successfully
  *   added.
  */
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
   val context = LocalContext.current
@@ -336,28 +339,17 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
               addRecipeViewModel.ingredientQuantityAmountError.collectAsState().value,
               "ingredientQuantityErrorMessage")
 
+            Spacer(Modifier.padding(8.dp))
+
           // Quantity Unit Dropdown
           Row {
-            FoodUnit.values().forEach { unit ->
-              Button(
-                  onClick = { addRecipeViewModel.changeIngredientQuantityUnit(unit) },
-                  modifier = Modifier.testTag("ingredientUnitButton"),
-                  // colour of button changes if selected
-                  colors =
-                      ButtonDefaults.buttonColors(
-                          containerColor =
-                              if (addRecipeViewModel.ingredientQuantityUnit.value == unit)
-                                  primaryContainerDark
-                              else primaryContainerLight,
-                          contentColor =
-                              if (addRecipeViewModel.ingredientQuantityUnit.value == unit)
-                                  secondaryContainerLight
-                              else secondaryContainerDark),
-              ) {
-                Text(text = unit.name)
-              }
-              Spacer(Modifier.padding(2.dp))
-            }
+            UnitDropdownField(
+                unit = addRecipeViewModel.ingredientQuantityUnit.value,
+                onUnitChange = {newUnit -> addRecipeViewModel.changeIngredientQuantityUnit(newUnit)},
+                unitExpanded = addRecipeViewModel.unitExpanded,
+                onUnitExpandedChange = { addRecipeViewModel.changeUnitExpanded() },
+                modifier = Modifier.weight(1f),
+                testTag = "inputIngredientUnit")
           }
         }
       },

@@ -1,5 +1,8 @@
 package com.android.shelfLife.viewmodel.recipes
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
@@ -54,6 +57,8 @@ constructor(
 
   private val _showIngredientDialog = MutableStateFlow(false)
   val showIngredientDialog: StateFlow<Boolean> = _showIngredientDialog.asStateFlow()
+
+    var unitExpanded by mutableStateOf(false)
 
   // Error Properties
   private val _error = MutableStateFlow(false)
@@ -281,4 +286,8 @@ constructor(
     recipeRepository.addRecipe(recipe = newRecipe.copy(uid = newRecipeUid))
     userRepository.addRecipeUID(newRecipeUid)
   }
+
+    fun changeUnitExpanded(){
+        unitExpanded = if(unitExpanded) false else true
+    }
 }

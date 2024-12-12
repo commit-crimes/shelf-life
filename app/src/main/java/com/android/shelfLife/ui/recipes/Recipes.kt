@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.recipes
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -61,6 +62,7 @@ import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import com.android.shelfLife.viewmodel.recipes.RecipesViewModel
 import kotlinx.coroutines.launch
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun RecipesScreen(navigationActions: NavigationActions) {
   val recipesViewModel = hiltViewModel<RecipesViewModel>()
