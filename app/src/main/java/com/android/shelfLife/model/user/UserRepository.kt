@@ -1,8 +1,6 @@
 package com.android.shelfLife.model.user
 
 import android.content.Context
-import com.android.shelfLife.model.newhousehold.HouseHold
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {
@@ -21,6 +19,15 @@ interface UserRepository {
    * at startup to load initial data.
    */
   suspend fun initializeUserData(context: Context)
+
+  /** Starts listening for changes to the invitations field. */
+  fun startListeningForInvitations()
+
+  /**
+   * Stops listening for changes to the invitations field. Call this when the listener is no longer
+   * needed to avoid memory leaks.
+   */
+  fun stopListeningForInvitations()
 
   // Other suspend functions for updating user data
   suspend fun addHouseholdUID(householdUID: String)

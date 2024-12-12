@@ -1,5 +1,6 @@
 package com.android.shelfLife.viewmodel.overview
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -9,7 +10,9 @@ import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.newhousehold.HouseHold
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
+import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +25,9 @@ class OverviewScreenViewModel
 @Inject
 constructor(
     private val houseHoldRepository: HouseHoldRepository,
-    private val listFoodItemsRepository: FoodItemRepository
+    private val listFoodItemsRepository: FoodItemRepository,
+    private val userRepository: UserRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
   private val _selectedFilters = MutableStateFlow<List<String>>(emptyList())
   val selectedFilters = _selectedFilters.asStateFlow()
@@ -33,6 +38,7 @@ constructor(
   private val _multipleSelectedFoodItems = MutableStateFlow<List<FoodItem>>(emptyList())
   val multipleSelectedFoodItems: StateFlow<List<FoodItem>> =
       _multipleSelectedFoodItems.asStateFlow()
+
 
   val households = houseHoldRepository.households
   val selectedHousehold = houseHoldRepository.selectedHousehold
