@@ -63,7 +63,6 @@ constructor(
     _emailList.value -= email
   }
 
-
   private fun isNewHouseholdNameIsInvalid(householdName: String): Boolean {
     return (householdName.isBlank() ||
         (houseHoldRepository.checkIfHouseholdNameExists(householdName) &&

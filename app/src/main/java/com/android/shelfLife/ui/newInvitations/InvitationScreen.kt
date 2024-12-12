@@ -83,7 +83,7 @@ fun InvitationCard(
                 invitationViewModel.acceptInvitation(invitation)
                 Toast.makeText(context, "Invitation accepted", Toast.LENGTH_SHORT).show()
               }
-                navigationActions.goBack()
+              navigationActions.goBack()
             },
             modifier = Modifier.weight(1f)) {
               Text("Accept")
@@ -94,7 +94,7 @@ fun InvitationCard(
               coroutineScope.launch {
                 invitationViewModel.declineInvitation(invitation)
                 Toast.makeText(context, "Invitation declined", Toast.LENGTH_SHORT).show()
-                  navigationActions.goBack()
+                navigationActions.goBack()
               }
             },
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),

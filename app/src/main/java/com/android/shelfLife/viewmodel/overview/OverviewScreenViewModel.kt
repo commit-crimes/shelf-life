@@ -43,7 +43,6 @@ constructor(
   val multipleSelectedFoodItems: StateFlow<List<FoodItem>> =
       _multipleSelectedFoodItems.asStateFlow()
 
-
   val households = houseHoldRepository.households
   val selectedHousehold = houseHoldRepository.selectedHousehold
   val foodItems = listFoodItemsRepository.foodItems

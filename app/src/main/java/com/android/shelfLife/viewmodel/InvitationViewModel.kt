@@ -16,8 +16,8 @@ import kotlinx.coroutines.launch
 class InvitationViewModel
 @Inject
 constructor(
-  private val invitationRepository: InvitationRepository,
-  private val userRepo: UserRepository
+    private val invitationRepository: InvitationRepository,
+    private val userRepo: UserRepository
 ) : ViewModel() {
 
   private val _invitations = MutableStateFlow<List<Invitation>>(emptyList())
@@ -34,8 +34,8 @@ constructor(
   suspend fun acceptInvitation(selectedInvitation: Invitation) {
     userRepo.deleteInvitationUID(selectedInvitation.invitationId)
     invitationRepository.acceptInvitation(selectedInvitation)
-    userRepo.addCurrentUserToHouseHold(selectedInvitation.householdId
-      ,selectedInvitation.invitedUserId)
+    userRepo.addCurrentUserToHouseHold(
+        selectedInvitation.householdId, selectedInvitation.invitedUserId)
     Log.d("InvitationViewModel", "before adding new household to user : ${userRepo.user.value}")
     refreshInvitations()
   }

@@ -2,8 +2,6 @@ package com.android.shelfLife.model.newInvitations
 
 import com.android.shelfLife.model.newhousehold.HouseHold
 import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.QuerySnapshot
-import kotlinx.coroutines.flow.StateFlow
 
 interface InvitationRepository {
 

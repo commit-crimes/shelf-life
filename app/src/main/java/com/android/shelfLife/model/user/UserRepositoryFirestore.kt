@@ -9,10 +9,10 @@ import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.awaitClose
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -38,37 +38,38 @@ constructor(
   override val user: StateFlow<User?> = _user.asStateFlow()
 
   override val invitations: StateFlow<List<String>> =
-    invitationListener().stateIn(externalScope, SharingStarted.Eagerly, emptyList())
-
+      invitationListener().stateIn(externalScope, SharingStarted.Eagerly, emptyList())
 
   override fun getNewUid(): String {
     return userCollection.document().id
   }
 
-  private fun invitationListener() = firebaseAuth.currentUser?.let { user ->
-    callbackFlow<List<String>> {
-      val listener = userCollection.document(user.uid).addSnapshotListener { snapshot, error ->
-        if (error != null) {
-          Log.e("UserRepository", "Firestore listener error: ", error)
-          trySend(emptyList())
-          return@addSnapshotListener
+  private fun invitationListener() =
+      firebaseAuth.currentUser?.let { user ->
+        callbackFlow<List<String>> {
+          val listener =
+              userCollection.document(user.uid).addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                  Log.e("UserRepository", "Firestore listener error: ", error)
+                  trySend(emptyList())
+                  return@addSnapshotListener
+                }
+                if (snapshot != null && snapshot.exists()) {
+                  val updatedUser = convertToUser(snapshot)
+                  if (updatedUser != null) {
+                    Log.d("UserRepository", "Updated invitationUIDs: ${updatedUser.invitationUIDs}")
+                    _user.value = updatedUser
+                    trySend(updatedUser.invitationUIDs)
+                  } else {
+                    trySend(emptyList())
+                  }
+                } else {
+                  trySend(emptyList())
+                }
+              }
+          awaitClose(listener::remove)
         }
-        if (snapshot != null && snapshot.exists()) {
-          val updatedUser = convertToUser(snapshot)
-          if (updatedUser != null) {
-            Log.d("UserRepository", "Updated invitationUIDs: ${updatedUser.invitationUIDs}")
-            _user.value = updatedUser
-            trySend(updatedUser.invitationUIDs)
-          } else {
-            trySend(emptyList())
-          }
-        } else {
-          trySend(emptyList())
-        }
-      }
-      awaitClose(listener::remove)
-    }
-  } ?: flowOf(emptyList())
+      } ?: flowOf(emptyList())
 
   override suspend fun initializeUserData(context: Context) {
     val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
@@ -144,7 +145,6 @@ constructor(
     return uidToEmail
   }
 
-
   private suspend fun updateUserField(fieldName: String, value: Any) {
     val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
     userCollection.document(currentUser.uid).update(fieldName, value).await()
@@ -174,7 +174,6 @@ constructor(
           ArrayOperation.ADD -> FieldValue.arrayUnion(value)
           ArrayOperation.REMOVE -> FieldValue.arrayRemove(value)
         }
-
 
     val currentUserData =
         _user.value
@@ -253,8 +252,10 @@ constructor(
   }
 
   override suspend fun addCurrentUserToHouseHold(householdUID: String, userUID: String) {
-    db.collection("users").document(userUID)
-      .update("householdUIDs", FieldValue.arrayUnion(householdUID)).await()
+    db.collection("users")
+        .document(userUID)
+        .update("householdUIDs", FieldValue.arrayUnion(householdUID))
+        .await()
     _user.value?.householdUIDs?.plus(householdUID)
   }
 
