@@ -1,20 +1,20 @@
-package com.android.shelfLife.viewmodel.recipes;
+package com.android.shelfLife.viewmodel.recipes
 
-
-import android.content.Context;
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.android.shelfLife.model.newFoodItem.FoodItem
-
-import com.android.shelfLife.model.newFoodItem.FoodItemRepository;
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.newRecipe.RecipeRepository
-import com.android.shelfLife.model.newhousehold.HouseHoldRepository;
+import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.model.user.UserRepository;
-import dagger.hilt.android.lifecycle.HiltViewModel;
-import dagger.hilt.android.qualifiers.ApplicationContext;
+import com.android.shelfLife.model.user.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
+
 @HiltViewModel
 class ExecuteRecipeViewModel @Inject constructor(
     private val houseHoldRepository: HouseHoldRepository,
@@ -23,6 +23,10 @@ class ExecuteRecipeViewModel @Inject constructor(
     private val userRepository: UserRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    companion object {
+        private const val TAG = "ExecuteRecipeViewModel"
+    }
 
     val households = houseHoldRepository.households
     val selectedHousehold = houseHoldRepository.selectedHousehold
@@ -36,15 +40,14 @@ class ExecuteRecipeViewModel @Inject constructor(
     private val _executingRecipe = MutableStateFlow(originalSelectedRecipe.value!!)
     val executingRecipe = _executingRecipe.asStateFlow()
 
-    // Tracks the current ingredient index we are selecting items for
     private val _currentIngredientIndex = MutableStateFlow(0)
     val currentIngredientIndex = _currentIngredientIndex.asStateFlow()
 
-    // The user's selections: {"Tomatoes" -> [FoodItem1, FoodItem2]}
     private val _selectedFoodItemsForIngredients = MutableStateFlow<Map<String, List<FoodItem>>>(emptyMap())
     val selectedFoodItemsForIngredients = _selectedFoodItemsForIngredients.asStateFlow()
 
     fun updateServings(newServings: Float) {
+        Log.d(TAG, "Updating servings to $newServings")
         _servings.value = newServings
         val recipe = originalSelectedRecipe.value
         val updatedRecipe = recipe?.copy(servings = newServings)
@@ -54,24 +57,23 @@ class ExecuteRecipeViewModel @Inject constructor(
     }
 
     fun selectFoodItemsForIngredient(ingredientName: String, selectedItems: List<FoodItem>) {
+        Log.d(TAG, "Selecting food items for ingredient: $ingredientName, Items: $selectedItems")
         val currentSelections = _selectedFoodItemsForIngredients.value.toMutableMap()
         currentSelections[ingredientName] = selectedItems
         _selectedFoodItemsForIngredients.value = currentSelections
     }
 
-    fun setFoodItemAmountForIngredient(ingredientName: String, foodItem: FoodItem, newAmount: Float) {
-        // TODO: Implement if needed. This would store amounts if you decide to represent them differently.
-    }
-
     suspend fun consumeSelectedItems() {
         val allSelectedItems = _selectedFoodItemsForIngredients.value.values.flatten()
+        Log.d(TAG, "Consuming selected items: $allSelectedItems")
         if (allSelectedItems.isNotEmpty()) {
             consumeFoodItems(allSelectedItems)
         }
     }
 
     private suspend fun consumeFoodItems(foodItems: List<FoodItem>) {
-        TODO()
+        Log.d(TAG, "Consuming food items: $foodItems")
+        // Implementation needed
     }
 
     fun nextIngredient() {
@@ -79,20 +81,27 @@ class ExecuteRecipeViewModel @Inject constructor(
         val ingredientCount = executingRecipe.value.ingredients.size
         if (currentIndex < ingredientCount - 1) {
             _currentIngredientIndex.value = currentIndex + 1
+            Log.d(TAG, "Moved to next ingredient, current index: ${_currentIngredientIndex.value}")
+        } else {
+            Log.d(TAG, "No more ingredients to process.")
         }
     }
 
     fun hasMoreIngredients(): Boolean {
         val currentIndex = _currentIngredientIndex.value
         val ingredientCount = executingRecipe.value.ingredients.size
-        return currentIndex < ingredientCount - 1
+        val hasMore = currentIndex < ingredientCount - 1
+        Log.d(TAG, "Has more ingredients: $hasMore")
+        return hasMore
     }
 
     fun currentIngredientName(): String? {
         val index = _currentIngredientIndex.value
         val ingredients = executingRecipe.value.ingredients
-        return if (index in ingredients.indices) {
+        val ingredientName = if (index in ingredients.indices) {
             ingredients[index].name
         } else null
+        Log.d(TAG, "Current ingredient name at index $index: $ingredientName")
+        return ingredientName
     }
 }

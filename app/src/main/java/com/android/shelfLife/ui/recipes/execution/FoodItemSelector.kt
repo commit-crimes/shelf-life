@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.recipes.execution
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,7 +33,6 @@ import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
-import io.ktor.websocket.Frame
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,8 +45,12 @@ fun SelectFoodItemsForIngredientScreen(
     val selectedMap by viewModel.selectedFoodItemsForIngredients.collectAsState()
     val currentlySelectedItems = selectedMap[ingredientName] ?: emptyList()
 
+    Log.d("SelectFoodItemsScreen", "Current ingredient: $ingredientName")
+    Log.d("SelectFoodItemsScreen", "Available food items: ${availableFoodItems.forEach { it.foodFacts.name }}")
+    Log.d("SelectFoodItemsScreen", "Currently selected items: $currentlySelectedItems")
+
     if (ingredientName == null) {
-        // No ingredient found, just navigate back or show an error
+        Log.e("SelectFoodItemsScreen", "Ingredient name is null. Navigating back.")
         navigationActions.goBack()
         return
     }
@@ -56,7 +60,10 @@ fun SelectFoodItemsForIngredientScreen(
             TopAppBar(
                 title = { Text("Select Items for $ingredientName") },
                 navigationIcon = {
-                    IconButton(onClick = { navigationActions.goBack() }) {
+                    IconButton(onClick = {
+                        Log.d("SelectFoodItemsScreen", "Back button clicked.")
+                        navigationActions.goBack()
+                    }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
@@ -68,16 +75,14 @@ fun SelectFoodItemsForIngredientScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    // Once user is happy with their selection for this ingredient, go to next ingredient if any
+                    Log.d("SelectFoodItemsScreen", "Floating action button clicked.")
                     if (viewModel.hasMoreIngredients()) {
+                        Log.d("SelectFoodItemsScreen", "Navigating to the next ingredient.")
                         viewModel.nextIngredient()
-                        // Navigate to the same screen to show the next ingredient
                         navigationActions.navigateTo(Screen.FOOD_ITEM_SELECTION)
                     } else {
-                        // No more ingredients, navigate to a done screen or consume items
-                        // For example:
-                        // viewModel.consumeSelectedItems()
-                        navigationActions.goBack() // or navigate to a "Done" screen
+                        Log.d("SelectFoodItemsScreen", "No more ingredients. Navigating back.")
+                        navigationActions.goBack()
                     }
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -87,7 +92,6 @@ fun SelectFoodItemsForIngredientScreen(
             }
         }
     ) { paddingValues ->
-
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -110,21 +114,13 @@ fun SelectFoodItemsForIngredientScreen(
                         amount = currentAmount.toFloat(),
                         maxAmount = maxAmount,
                         expanded = expanded,
-                        onCardClick = { expanded = !expanded },
+                        onCardClick = {
+                            expanded = !expanded
+                            Log.d("FoodItemSelectionCard", "Card clicked for food item: ${foodItem.foodFacts.name}. Expanded: $expanded")
+                        },
                         onAmountChange = { newAmount ->
-                            // Here, you'd actually need to update your data structure that holds
-                            // the exact amount per food item. For now, the code is incomplete.
-                            // If you need a more detailed data structure (e.g. per item amount),
-                            // you can implement that in the ViewModel.
-                            // For now, just simulate selecting the item by adding it to the list.
+                            Log.d("FoodItemSelectionCard", "Amount changed for ${foodItem.foodFacts.name} to $newAmount")
                             val updatedList = currentlySelectedItems.toMutableList()
-                            // Replace or add the new item with updated amount.
-                            // This requires that the FoodItem or your model reflect the chosen amount.
-                            // Consider storing a separate structure or a custom data class with FoodItem + chosenAmount.
-
-                            // Since the current viewModel stores only List<FoodItem>,
-                            // you'd have to create a new FoodItem with adjusted quantity or a different structure.
-                            // We'll just call selectFoodItemsForIngredient with the existing items for demonstration.
                             viewModel.selectFoodItemsForIngredient(ingredientName, updatedList)
                         }
                     )
@@ -143,7 +139,6 @@ fun FoodItemSelectionCard(
     onCardClick: () -> Unit,
     onAmountChange: (Float) -> Unit
 ) {
-    // A simple card that expands to show a slider
     androidx.compose.material3.Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -151,13 +146,10 @@ fun FoodItemSelectionCard(
             .clickable { onCardClick() }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Top row with basic info
             Text(
                 text = foodItem.foodFacts.name,
                 style = MaterialTheme.typography.titleMedium
             )
-
-            // If expanded, show slider for amount selection
             if (expanded) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -166,7 +158,10 @@ fun FoodItemSelectionCard(
                     Text(text = "Amount selected: ${amount}g")
                     androidx.compose.material3.Slider(
                         value = amount,
-                        onValueChange = { newVal -> onAmountChange(newVal) },
+                        onValueChange = { newVal ->
+                            Log.d("FoodItemSelectionCard", "Slider value changed to $newVal for ${foodItem.foodFacts.name}")
+                            onAmountChange(newVal) // This will now trigger state updates.
+                        },
                         valueRange = 0f..maxAmount,
                         steps = 0
                     )

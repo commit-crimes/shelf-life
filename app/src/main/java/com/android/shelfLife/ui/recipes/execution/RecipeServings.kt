@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.recipes.execution
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,7 +37,6 @@ import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ServingsScreen(
@@ -44,6 +44,8 @@ fun ServingsScreen(
     executeRecipeViewModel: ExecuteRecipeViewModel = hiltViewModel()
 ) {
     val servings by executeRecipeViewModel.servings.collectAsState()
+
+    Log.d("ServingsScreen", "Current servings: $servings")
 
     Scaffold(
         modifier = Modifier.testTag("servingsScreen"),
@@ -57,7 +59,10 @@ fun ServingsScreen(
                 modifier = Modifier.testTag("topBar"),
                 navigationIcon = {
                     IconButton(
-                        onClick = { navigationActions.goBack() },
+                        onClick = {
+                            Log.d("ServingsScreen", "Back button clicked")
+                            navigationActions.goBack()
+                        },
                         modifier = Modifier.testTag("goBackArrow")
                     ) {
                         Icon(
@@ -79,7 +84,10 @@ fun ServingsScreen(
         },
         bottomBar = {
             BottomNavigationMenu(
-                onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                onTabSelect = { destination ->
+                    Log.d("ServingsScreen", "Navigating to $destination")
+                    navigationActions.navigateTo(destination)
+                },
                 tabList = LIST_TOP_LEVEL_DESTINATION,
                 selectedItem = Route.RECIPES
             )
@@ -87,6 +95,7 @@ fun ServingsScreen(
         floatingActionButton = {
             androidx.compose.material3.FloatingActionButton(
                 onClick = {
+                    Log.d("ServingsScreen", "FloatingActionButton clicked: navigating to FOOD_ITEM_SELECTION")
                     navigationActions.navigateTo(Screen.FOOD_ITEM_SELECTION)
                 },
                 modifier = Modifier
@@ -109,13 +118,24 @@ fun ServingsScreen(
         content = { paddingValues ->
             ServingsSelector(
                 servings = servings,
-                onIncrease = { executeRecipeViewModel.updateServings(servings + 1) },
-                onDecrease = { if (servings > 1) executeRecipeViewModel.updateServings(servings - 1) },
+                onIncrease = {
+                    Log.d("ServingsScreen", "Increasing servings from $servings to ${servings + 1}")
+                    executeRecipeViewModel.updateServings(servings + 1)
+                },
+                onDecrease = {
+                    if (servings > 1) {
+                        Log.d("ServingsScreen", "Decreasing servings from $servings to ${servings - 1}")
+                        executeRecipeViewModel.updateServings(servings - 1)
+                    } else {
+                        Log.d("ServingsScreen", "Servings cannot be decreased below 1")
+                    }
+                },
                 modifier = Modifier.padding(paddingValues)
             )
         }
     )
 }
+
 @Composable
 fun ServingsSelector(
     servings: Float,
@@ -139,7 +159,10 @@ fun ServingsSelector(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.padding(vertical = 8.dp)
         ) {
-            IconButton(onClick = onDecrease) {
+            IconButton(onClick = {
+                Log.d("ServingsSelector", "Decrease button clicked")
+                onDecrease()
+            }) {
                 Icon(
                     imageVector = Icons.Default.Remove,
                     contentDescription = "Decrease Servings"
@@ -151,7 +174,10 @@ fun ServingsSelector(
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
-            IconButton(onClick = onIncrease) {
+            IconButton(onClick = {
+                Log.d("ServingsSelector", "Increase button clicked")
+                onIncrease()
+            }) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Increase Servings"
