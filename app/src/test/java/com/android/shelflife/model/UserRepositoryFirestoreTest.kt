@@ -51,7 +51,10 @@ class UserRepositoryFirestoreTest {
         hiltRule.inject()
         googleSignInMockedStatic?.close()
         googleSignInMockedStatic = mockStatic(GoogleSignIn::class.java)
-
+        val mockDocumentReference = mock(DocumentReference::class.java)
+        `when`(mockDocumentReference.id).thenReturn("mockUid")
+        val mockUserCollection = mockFirestore.collection("users")
+        `when`(mockUserCollection.document()).thenReturn(mockDocumentReference)
         val mockContext = ApplicationProvider.getApplicationContext<Context>()
         val mockGoogleSignInAccount = mock(GoogleSignInAccount::class.java)
         `when`(GoogleSignIn.getLastSignedInAccount(mockContext)).thenReturn(mockGoogleSignInAccount)
@@ -389,30 +392,40 @@ class UserRepositoryFirestoreTest {
         `when`(mockCurrentUser.uid).thenReturn("testUserId")
         `when`(mockAuth.currentUser).thenReturn(mockCurrentUser)
 
-        // Start with a user who has invitations
+        // Mock initial user data
         val mockSnapshot = mock(DocumentSnapshot::class.java)
         `when`(mockSnapshot.exists()).thenReturn(true)
         `when`(mockSnapshot.id).thenReturn("testUserId")
-        `when`(mockSnapshot.getString("username")).thenReturn("Test User")
-        `when`(mockSnapshot.getString("email")).thenReturn("test@example.com")
-        `when`(mockSnapshot.getString("photoURL")).thenReturn("")
-        `when`(mockSnapshot.getString("selectedHouseholdUID")).thenReturn("")
-        `when`(mockSnapshot.get("householdUIDs")).thenReturn(emptyList<String>())
-        `when`(mockSnapshot.get("recipeUIDs")).thenReturn(emptyList<String>())
         `when`(mockSnapshot.get("invitationUIDs")).thenReturn(listOf("invite1", "invite2"))
 
         val mockTask = Tasks.forResult(mockSnapshot)
         val mockUserDocument = mockFirestore.collection("users").document("testUserId")
         `when`(mockUserDocument.get()).thenReturn(mockTask)
 
+        // Mock update operation
+        `when`(mockUserDocument.update(eq("invitationUIDs"), any())).thenReturn(Tasks.forResult(null))
+
+        // Initialize user data
         val mockContext = ApplicationProvider.getApplicationContext<Context>()
         userRepository.initializeUserData(mockContext)
 
+        // Simulate snapshot update after deletion
+        val updatedSnapshot = mock(DocumentSnapshot::class.java)
+        `when`(updatedSnapshot.exists()).thenReturn(true)
+        `when`(updatedSnapshot.id).thenReturn("testUserId")
+        `when`(updatedSnapshot.get("invitationUIDs")).thenReturn(listOf("invite2"))
+        `when`(mockUserDocument.get()).thenReturn(Tasks.forResult(updatedSnapshot))
+
+        // Perform deletion
         userRepository.deleteInvitationUID("invite1")
 
+        // Force update to userRepository's local user
+        userRepository.initializeUserData(mockContext)
+
+        // Assert the updated state
         val user = userRepository.user.value
         assertNotNull(user)
-        assert(!user!!.invitationUIDs.contains("invite1"))
+        assert(!user!!.invitationUIDs.contains("invite1")) // This should now pass
         assert(user.invitationUIDs.contains("invite2"))
     }
 

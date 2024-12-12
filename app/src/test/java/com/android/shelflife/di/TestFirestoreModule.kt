@@ -14,6 +14,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
+import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.doReturn
 import org.mockito.Mockito.mock
@@ -41,7 +42,10 @@ object TestFirestoreModule {
 
         // Use doReturn instead of when for more reliable mocking
         doReturn(Tasks.forResult(mockSnapshot)).`when`(mockDocument).get()
-
+        `when`(mockDocument.id).thenReturn("mockDocId")
+        val mockUpdateTask = Tasks.forResult<Void>(null)
+        `when`(mockDocument.update(anyString(), any())).thenReturn(mockUpdateTask)
+        `when`(mockDocument.set(any(), any())).thenReturn(mockUpdateTask)
         // Ensure snapshot returns expected values
         `when`(mockSnapshot.exists()).thenReturn(true)
         `when`(mockSnapshot.getData()).thenReturn(mapOf(
