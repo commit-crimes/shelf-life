@@ -21,6 +21,7 @@ import com.android.shelfLife.ui.newoverview.ListFoodItems
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
+import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
 import com.android.shelfLife.viewmodel.recipes.RecipeGenerationViewModel
 
@@ -31,12 +32,18 @@ fun GenerateRecipeScreen(
   viewModel: RecipeGenerationViewModel = hiltViewModel(),
 ) {
   val currentStep by viewModel.currentStep.collectAsState()
+  val title = when (currentStep) {
+    0 -> "Name your AI recipe"
+    1 -> "Select your ingredients"
+    2 -> "Chose your options"
+    else -> "Recipe Generation Complete!"
+  }
 
   Scaffold(
     topBar = {
       CustomTopAppBar(
         onClick = { if (currentStep == 0 || viewModel.isLastStep() ) navigationActions.goBack() else viewModel.previousStep() },
-        title = "Generate your AI recipe",
+        title = title,
         titleTestTag = "addRecipeTitle")
     }
   ) { paddingValues ->
@@ -93,12 +100,6 @@ fun RecipeInputStep(
     Column(modifier = Modifier.fillMaxSize()
       .padding(paddingValues)
       .padding(16.dp)) {
-      Text(
-        text = "Step 1: Recipe Details",
-        fontSize = 24.sp,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(bottom = 16.dp)
-      )
 
       OutlinedTextField(
         value = recipePrompt.name,
@@ -114,10 +115,12 @@ fun RecipeInputStep(
 
 
 @Composable
-fun FoodSelectionStep(viewModel: RecipeGenerationViewModel, navigationActions: NavigationActions) {
+fun FoodSelectionStep(viewModel: RecipeGenerationViewModel, navigationActions: NavigationActions, overviewViewModel: OverviewScreenViewModel = hiltViewModel()) {
   var newFoodItem by rememberSaveable { mutableStateOf("") }
   val recipePrompt by viewModel.recipePrompt.collectAsState()
   val context = LocalContext.current
+  val availableFoodItems by viewModel.availableFoodItems.collectAsState()
+  val selectedFoodItems by viewModel.selectedFoodItems.collectAsState()
 
   Scaffold(
     bottomBar = {
@@ -143,51 +146,56 @@ fun FoodSelectionStep(viewModel: RecipeGenerationViewModel, navigationActions: N
       }
     }
   ) { paddingValues ->
-    Column(modifier = Modifier.fillMaxSize()
-      .padding(paddingValues)
-      .padding(16.dp)) {
+    Column(
+      modifier = Modifier
+        .fillMaxSize()
+        .padding(paddingValues)
+    ) {
+
+
+
+      // "Household" Section
       Text(
-        text = "Step 2: Select Food Items",
+        text = "Household",
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(bottom = 16.dp)
+        modifier = Modifier.padding(bottom = 8.dp)
       )
-       /* ListFoodItems(
-          foodItems = filteredFoodItems,
-          overviewScreenViewModel = overviewScreenViewModel,
+      Box(modifier = Modifier.weight(1f)) {
+        ListFoodItems(
+          foodItems = availableFoodItems,
+          overviewScreenViewModel = overviewViewModel,
           onFoodItemClick = { selectedFoodItem ->
-            overviewScreenViewModel.selectFoodItem(selectedFoodItem)
-            navigationActions.navigateTo(Screen.INDIVIDUAL_FOOD_ITEM)
+            viewModel.selectFoodItem(selectedFoodItem)
           },
-          onFoodItemLongHold = { selectedFoodItem ->
-            overviewScreenViewModel.selectMultipleFoodItems(selectedFoodItem)
-          })*/
-
+          onFoodItemLongHold = { selectedFoodItem -> viewModel.selectFoodItem(selectedFoodItem) }
+        )
       }
-
       Spacer(modifier = Modifier.height(8.dp))
 
-      recipePrompt.ingredients.forEachIndexed { index, foodItem ->
-        Row(
-          verticalAlignment = Alignment.CenterVertically,
-          modifier = Modifier.fillMaxWidth()
-        ) {
-          Text(text = "${index + 1}. $foodItem", modifier = Modifier.weight(1f))
-          Button(onClick = {
-            viewModel.updateRecipePrompt(
-              recipePrompt.copy(
-                ingredients = recipePrompt.ingredients.minus(
-                  foodItem
-                )
-              )
-            )
-          }) {
-            Text("Remove")
-          }
-        }
+
+      // "Selected" Section
+      Text(
+        text = "Selected ingredients (${selectedFoodItems.size})",
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(bottom = 8.dp)
+      )
+      Box(modifier = Modifier.weight(0.5f)) {
+        ListFoodItems(
+          foodItems = selectedFoodItems,
+          overviewScreenViewModel = overviewViewModel,
+          onFoodItemClick = { selectedFoodItem ->
+            viewModel.deselectFoodItem(selectedFoodItem)
+          },
+          onFoodItemLongHold = { selectedFoodItem ->  viewModel.deselectFoodItem(selectedFoodItem)},
+          isSelectedItemsList = true
+        )
       }
-      Spacer(modifier = Modifier.height(16.dp))
+
     }
+  }
+
 }
 
 @Composable

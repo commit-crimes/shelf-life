@@ -1,8 +1,11 @@
 package com.android.shelfLife.viewmodel.recipes
 
 import android.util.Log
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.shelfLife.model.newFoodItem.FoodItem
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.newRecipe.RecipeRepository
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
@@ -10,8 +13,11 @@ import com.android.shelfLife.model.recipe.RecipePrompt
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -19,7 +25,8 @@ open class RecipeGenerationViewModel
 @Inject
 constructor(
     private val recipeRepository: RecipeRepository,
-    private val recipeGeneratorRepository: RecipeGeneratorRepository
+    private val recipeGeneratorRepository: RecipeGeneratorRepository,
+    private val foodItemRepository: FoodItemRepository
 ) : ViewModel() {
 
   companion object {
@@ -34,6 +41,30 @@ constructor(
 
   private val _currentStep = MutableStateFlow(0)
   open val currentStep: StateFlow<Int> = _currentStep.asStateFlow()
+
+  private val _selectedFoodItemsUids = MutableStateFlow<List<String>>(emptyList())
+
+  private val _availableFoodItems = MutableStateFlow<List<FoodItem>>(foodItemRepository.foodItems.value) //food items that are still available to be selected
+  open val availableFoodItems: StateFlow<List<FoodItem>> = _availableFoodItems.asStateFlow()
+
+  private val _selectedFoodItems = MutableStateFlow<List<FoodItem>>(emptyList()) //food items that have been selected
+  open val selectedFoodItems: StateFlow<List<FoodItem>> = _selectedFoodItems.asStateFlow()
+
+
+  fun selectFoodItem(foodItem: FoodItem) {
+    _selectedFoodItemsUids.value += listOf(foodItem.uid)
+    _updateAvailableFoodItems()
+  }
+
+  fun deselectFoodItem(foodItem: FoodItem) {
+    _selectedFoodItemsUids.value = _selectedFoodItemsUids.value.filter { it != foodItem.uid }
+    _updateAvailableFoodItems()
+  }
+
+  fun _updateAvailableFoodItems() {
+    _availableFoodItems.value = foodItemRepository.foodItems.value.filter { it.uid !in _selectedFoodItemsUids.value }
+    _selectedFoodItems.value = foodItemRepository.foodItems.value.filter { it.uid in _selectedFoodItemsUids.value }
+  }
 
   fun updateRecipePrompt(prompt: RecipePrompt) {
     _recipePrompt.value = prompt
