@@ -20,15 +20,6 @@ interface UserRepository {
    */
   suspend fun initializeUserData(context: Context)
 
-  /** Starts listening for changes to the invitations field. */
-  fun startListeningForInvitations()
-
-  /**
-   * Stops listening for changes to the invitations field. Call this when the listener is no longer
-   * needed to avoid memory leaks.
-   */
-  fun stopListeningForInvitations()
-
   // Other suspend functions for updating user data
   suspend fun addHouseholdUID(householdUID: String)
 
@@ -61,7 +52,7 @@ interface UserRepository {
    * Selects a household and saves it to the user's data. VIEW MODELS NEED TO MANUALLY SELECT THE
    * LIST OF FOOD ITEMS!!!
    *
-   * @param household - The household to select.
+   * @param householdUid - The household to select.
    */
   suspend fun selectHousehold(householdUid: String?)
 }
