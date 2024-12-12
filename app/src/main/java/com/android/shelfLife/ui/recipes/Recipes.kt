@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.recipes
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -76,7 +75,7 @@ fun RecipesScreen(navigationActions: NavigationActions) {
   val selectedFilters by recipesViewModel.selectedFilters.collectAsState()
 
   if (selectedHousehold == null) {
-    FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel) //TODO("kill yourself")
+    FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel) // TODO("kill yourself")
   } else {
     if (user != null) {
       Scaffold(

@@ -197,7 +197,7 @@ fun AddRecipeScreen(
                                   .show()
                             })
                       }
-                        navigationActions.goBack()
+                      navigationActions.goBack()
                     },
                     button2TestTag = "addButton",
                     button2Text = stringResource(R.string.add_button))

@@ -26,7 +26,6 @@ import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.model.newFoodItem.FoodStorageLocation
 import com.android.shelfLife.model.recipe.RecipePrompt
-import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.viewmodel.recipe.RecipeGenerationViewModel
@@ -39,7 +38,7 @@ fun GenerateRecipeScreen(
 ) {
   val context = LocalContext.current
 
-    val coroutineScope = rememberCoroutineScope()
+  val coroutineScope = rememberCoroutineScope()
 
   // States for recipe name and food items
   var recipeName by rememberSaveable { mutableStateOf("") }
@@ -140,11 +139,14 @@ fun GenerateRecipeScreen(
                     recipeType = RecipeType.HIGH_PROTEIN))
             generationViewModel.generateRecipe(
                 onSuccess = { recipe ->
-                coroutineScope.launch { generationViewModel.acceptGeneratedRecipe {
-                    Handler(Looper.getMainLooper()).post {
-                        Toast.makeText(context, "Recipe generated successfully.", Toast.LENGTH_SHORT)
+                  coroutineScope.launch {
+                    generationViewModel.acceptGeneratedRecipe {
+                      Handler(Looper.getMainLooper()).post {
+                        Toast.makeText(
+                                context, "Recipe generated successfully.", Toast.LENGTH_SHORT)
                             .show()
-                    } }
+                      }
+                    }
 
                     navigationActions.goBack()
                   }

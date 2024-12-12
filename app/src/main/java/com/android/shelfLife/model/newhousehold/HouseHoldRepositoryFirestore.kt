@@ -84,7 +84,6 @@ class HouseholdRepositoryFirestore(
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error initializing households", e)
     }
-
   }
 
   /**

@@ -1,7 +1,6 @@
 package com.android.shelfLife.viewmodel.recipes
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
@@ -17,7 +16,6 @@ import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 @HiltViewModel
 class AddRecipeViewModel
@@ -280,7 +278,7 @@ constructor(
             servings = servings.value.toFloat(),
             time = time.value.toDouble().minutes,
             ingredients = ingredients.value)
-      recipeRepository.addRecipe(recipe = newRecipe.copy(uid = newRecipeUid))
-      userRepository.addRecipeUID(newRecipeUid)
+    recipeRepository.addRecipe(recipe = newRecipe.copy(uid = newRecipeUid))
+    userRepository.addRecipeUID(newRecipeUid)
   }
 }
