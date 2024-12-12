@@ -89,10 +89,7 @@ fun ShelfLifeApp() {
       composable(Screen.RECIPE_EXECUTION){
         RecipeExecutionScreen(navigationActions)
       }
-//      composable(Screen.FOOD_ITEM_SELECTION){
-//        SelectFoodItemsForIngredientScreen(navigationActions)
-//      }
-//      composable(Screen.INSTRUCTION_SCREEN){ InstructionScreen(navigationActions) }
+
     }
 
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {

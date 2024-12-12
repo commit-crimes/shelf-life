@@ -38,7 +38,7 @@ fun GenerateRecipeScreen(
 ) {
   val context = LocalContext.current
 
-    val coroutineScope = rememberCoroutineScope()
+  val coroutineScope = rememberCoroutineScope()
 
   // States for recipe name and food items
   var recipeName by rememberSaveable { mutableStateOf("") }
@@ -139,11 +139,14 @@ fun GenerateRecipeScreen(
                     recipeType = RecipeType.HIGH_PROTEIN))
             generationViewModel.generateRecipe(
                 onSuccess = { recipe ->
-                coroutineScope.launch { generationViewModel.acceptGeneratedRecipe {
-                    Handler(Looper.getMainLooper()).post {
-                        Toast.makeText(context, "Recipe generated successfully.", Toast.LENGTH_SHORT)
+                  coroutineScope.launch {
+                    generationViewModel.acceptGeneratedRecipe {
+                      Handler(Looper.getMainLooper()).post {
+                        Toast.makeText(
+                                context, "Recipe generated successfully.", Toast.LENGTH_SHORT)
                             .show()
-                    } }
+                      }
+                    }
 
                     navigationActions.goBack()
                   }

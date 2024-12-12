@@ -12,7 +12,6 @@ import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.newhousehold.HouseHold
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -29,12 +28,11 @@ import kotlinx.coroutines.launch
 class OverviewScreenViewModel
 @Inject
 constructor(
-  private val houseHoldRepository: HouseHoldRepository,
-  private val listFoodItemsRepository: FoodItemRepository,
-  private val userRepository: UserRepository,
-  @ApplicationContext private val context: Context
+    private val houseHoldRepository: HouseHoldRepository,
+    private val listFoodItemsRepository: FoodItemRepository,
+    private val userRepository: UserRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
-
   private val _selectedFilters = MutableStateFlow<List<String>>(emptyList())
   val selectedFilters = _selectedFilters.asStateFlow()
 
@@ -43,25 +41,23 @@ constructor(
 
   private val _multipleSelectedFoodItems = MutableStateFlow<List<FoodItem>>(emptyList())
   val multipleSelectedFoodItems: StateFlow<List<FoodItem>> =
-    _multipleSelectedFoodItems.asStateFlow()
-
-  val finishedLoading = MutableStateFlow(false)
+      _multipleSelectedFoodItems.asStateFlow()
 
   val households = houseHoldRepository.households
   val selectedHousehold = houseHoldRepository.selectedHousehold
   val foodItems = listFoodItemsRepository.foodItems
 
-  private var FILTERS = mapOf(
-    "Dairy" to FoodCategory.DAIRY,
-    "Meat" to FoodCategory.MEAT,
-    "Fish" to FoodCategory.FISH,
-    "Fruit" to FoodCategory.FRUIT,
-    "Vegetables" to FoodCategory.VEGETABLE,
-    "Grain" to FoodCategory.GRAIN,
-    "Beverage" to FoodCategory.BEVERAGE,
-    "Snack" to FoodCategory.SNACK,
-    "Other" to FoodCategory.OTHER
-  )
+  private var FILTERS =
+      mapOf(
+          "Dairy" to FoodCategory.DAIRY,
+          "Meat" to FoodCategory.MEAT,
+          "Fish" to FoodCategory.FISH,
+          "Fruit" to FoodCategory.FRUIT,
+          "Vegetables" to FoodCategory.VEGETABLE,
+          "Grain" to FoodCategory.GRAIN,
+          "Beverage" to FoodCategory.BEVERAGE,
+          "Snack" to FoodCategory.SNACK,
+          "Other" to FoodCategory.OTHER)
 
   var filters = FILTERS.keys.toList()
 
@@ -69,35 +65,39 @@ constructor(
   val query = _query.asStateFlow()
 
   // Automatically filtered list of food items based on selected filters and query
-  val filteredFoodItems = combine(
-    foodItems,
-    selectedFilters,
-    query
-  ) { foods, currentFilters, currentQuery ->
-    foods.filter { item ->
-      // Check filters:
-      // Matches if no filters are selected OR if the item's category is one of the selected filters
-      val matchesFilters = currentFilters.isEmpty() || currentFilters.any { filter ->
-        item.foodFacts.category == FILTERS[filter]
-      }
+  val filteredFoodItems =
+      combine(foodItems, selectedFilters, query) { foods, currentFilters, currentQuery ->
+            foods.filter { item ->
+              // Check filters:
+              // Matches if no filters are selected OR if the item's category is one of the selected
+              // filters
+              val matchesFilters =
+                  currentFilters.isEmpty() ||
+                      currentFilters.any { filter -> item.foodFacts.category == FILTERS[filter] }
 
-      // Check query:
-      // Matches if the query is empty OR if the item's name contains the query
-      val matchesQuery = currentQuery.isEmpty() ||
-              item.foodFacts.name.contains(currentQuery, ignoreCase = true)
+              // Check query:
+              // Matches if the query is empty OR if the item's name contains the query
+              val matchesQuery =
+                  currentQuery.isEmpty() ||
+                      item.foodFacts.name.contains(currentQuery, ignoreCase = true)
 
-      matchesFilters && matchesQuery
-    }
-  }.stateIn(
-    scope = viewModelScope,
-    started = SharingStarted.WhileSubscribed(5000),
-    initialValue = emptyList()
-  )
+              matchesFilters && matchesQuery
+            }
+          }
+          .stateIn(
+              scope = viewModelScope,
+              started = SharingStarted.WhileSubscribed(5000),
+              initialValue = emptyList())
 
   init {
     Log.d("OverviewScreenViewModel", "Init")
   }
 
+  /**
+   * Selects a household to edit
+   *
+   * @param household - The household to edit.
+   */
   fun selectHouseholdToEdit(household: HouseHold?) {
     houseHoldRepository.selectHouseholdToEdit(household)
   }
@@ -111,6 +111,11 @@ constructor(
     }
   }
 
+  /**
+   * Toggles the filter on or off
+   *
+   * @param filter The filter to toggle
+   */
   fun toggleFilter(filter: String) {
     if (_selectedFilters.value.contains(filter)) {
       _selectedFilters.update { it - filter }
@@ -119,6 +124,7 @@ constructor(
     }
   }
 
+  /** Selects multiple FoodItem documents for bulk actions */
   fun selectMultipleFoodItems(foodItem: FoodItem) {
     if (_multipleSelectedFoodItems.value.contains(foodItem)) {
       _multipleSelectedFoodItems.value = _multipleSelectedFoodItems.value.minus(foodItem)
@@ -131,7 +137,7 @@ constructor(
     _multipleSelectedFoodItems.value = emptyList()
   }
 
-  fun editFoodItem(newFoodItem: FoodItem, oldFoodItem: FoodItem) {
+  fun editFoodItem(newFoodItem: FoodItem) {
     val selectedHousehold = selectedHousehold.value
     if (selectedHousehold != null) {
       viewModelScope.launch {
@@ -140,6 +146,7 @@ constructor(
     }
   }
 
+  /** Selects a FoodItem document for individual view */
   fun selectFoodItem(foodItem: FoodItem?) {
     listFoodItemsRepository.selectFoodItem(foodItem)
   }
@@ -148,5 +155,4 @@ constructor(
     _query.value = newQuery
     // No need to manually call filterFoodItems(), as filteredFoodItems is now reactive.
   }
-
 }

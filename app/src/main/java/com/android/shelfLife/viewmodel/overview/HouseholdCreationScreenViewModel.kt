@@ -41,7 +41,7 @@ constructor(
   val households =
       houseHoldRepository.households.stateIn(
           viewModelScope, started = SharingStarted.Eagerly, emptyList())
-  val currentUser =
+  private val currentUser =
       userRepository.user.stateIn(viewModelScope, started = SharingStarted.Eagerly, null)
 
   private var finishedLoading = MutableStateFlow(false)
@@ -63,13 +63,13 @@ constructor(
     _emailList.value -= email
   }
 
-  private fun newHouseholdNameIsInvalid(householdName: String): Boolean {
+  private fun isNewHouseholdNameIsInvalid(householdName: String): Boolean {
     return (householdName.isBlank() ||
         (houseHoldRepository.checkIfHouseholdNameExists(householdName) &&
             (householdToEdit.value == null || householdName != householdToEdit.value!!.name)))
   }
 
-  suspend fun getEmailToUserId(emails: Set<String>): Map<String, String> {
+  private suspend fun getEmailToUserId(emails: Set<String>): Map<String, String> {
     return userRepository.getUserIds(emails)
   }
 
@@ -92,7 +92,7 @@ constructor(
    * - true if the operation succeeded
    */
   suspend fun confirmHouseholdActions(householdName: String): Boolean {
-    if (newHouseholdNameIsInvalid(householdName)) {
+    if (isNewHouseholdNameIsInvalid(householdName)) {
       return false
     }
 
@@ -144,7 +144,6 @@ constructor(
       userRepository.selectHousehold(household.uid)
       Log.d("HouseholdViewModel", "Selected new household: ${household.name}")
 
-
       if (friendEmails.isNotEmpty()) {
         val emailToUid = userRepository.getUserIds(friendEmails)
         val emailsNotFound = friendEmails.filter { it !in emailToUid.keys }
@@ -163,9 +162,9 @@ constructor(
     viewModelScope.launch {
       val oldHousehold = houseHoldRepository.households.value.find { it.uid == household.uid }
       if (oldHousehold != null) {
-        val newMemberUids = household.members.toSet() - oldHousehold.members.toSet()
-        if (newMemberUids.isNotEmpty()) {
-          for (uid in newMemberUids) {
+        val newMemberUIDs = household.members.toSet() - oldHousehold.members.toSet()
+        if (newMemberUIDs.isNotEmpty()) {
+          for (uid in newMemberUIDs) {
             invitationRepository.sendInvitation(
                 household = household,
                 invitedUserID = uid,
