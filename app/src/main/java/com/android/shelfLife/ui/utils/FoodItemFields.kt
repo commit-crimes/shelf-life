@@ -12,7 +12,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodUnit
-import com.android.shelfLife.model.foodItem.FoodStorageLocation
+import com.android.shelfLife.model.newFoodItem.FoodStorageLocation
 
 /**
  * Composable function to display a text field for entering the food name.
@@ -181,7 +181,7 @@ fun NewLocationDropdownField(
 ) {
   DropdownFields(
       label = stringResource(id = R.string.location_label),
-      options = com.android.shelfLife.model.newFoodItem.FoodStorageLocation.entries.toTypedArray(),
+      options = FoodStorageLocation.entries.toTypedArray(),
       selectedOption = location,
       onOptionSelected = onLocationChange,
       expanded = locationExpanded,

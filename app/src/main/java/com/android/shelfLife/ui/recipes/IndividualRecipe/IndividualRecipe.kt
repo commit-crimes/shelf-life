@@ -25,18 +25,19 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
+import com.android.shelfLife.model.newRecipe.RecipeRepositoryFirestore
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
-import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
 import com.google.firebase.firestore.FirebaseFirestore
@@ -53,8 +54,6 @@ import kotlin.time.Duration.Companion.minutes
  *
  * @param navigationActions The navigation actions for handling navigation events, such as going
  *   back.
- * @param individualRecipeViewModel The ViewModel for managing and providing data related to the
- *   selected recipe.
  *
  * Structure:
  * - Displays a top bar with the recipe name and a back button.
@@ -67,7 +66,7 @@ import kotlin.time.Duration.Companion.minutes
  */
 fun IndividualRecipeScreen(
     navigationActions: NavigationActions,
-    individualRecipeViewModel: IndividualRecipeViewModel,
+    individualRecipeViewModel: IndividualRecipeViewModel = hiltViewModel()
 ) {
 
   if (individualRecipeViewModel.selectedRecipeIsNonEmpty) {
@@ -199,8 +198,7 @@ private fun IndividualRecipeScreenPreviewEasterEgg() {
   val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
 
   // Render the IndividualRecipeScreen with a null selectedRecipe
-  IndividualRecipeScreen(
-      navigationActions = navigationActions, individualRecipeViewModel = individualRecipeViewModel)
+  IndividualRecipeScreen(navigationActions = navigationActions)
 }
 // this preview shows the example where we do have a selected recipe
 @Preview()
@@ -254,6 +252,5 @@ private fun IndividualRecipeScreenPreview() {
   Log.i("AAAAAAAAA", "4")
 
   // Render the IndividualRecipeScreen with a null selectedRecipe
-  IndividualRecipeScreen(
-      navigationActions = navigationActions, individualRecipeViewModel = individualRecipeViewModel)
+  IndividualRecipeScreen(navigationActions = navigationActions)
 }

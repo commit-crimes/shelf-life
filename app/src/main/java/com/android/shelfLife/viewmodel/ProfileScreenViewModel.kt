@@ -12,9 +12,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.StateFlow
 
-class ProfileScreenViewModel(
+@HiltViewModel
+class ProfileScreenViewModel
+@Inject
+constructor(
     private val invitationRepository: InvitationRepository,
     private val userRepository: UserRepository,
 ) : ViewModel() {

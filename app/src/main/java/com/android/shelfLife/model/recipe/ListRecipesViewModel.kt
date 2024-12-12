@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
+import com.android.shelfLife.model.newRecipe.RecipeRepository
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,7 +43,7 @@ open class ListRecipesViewModel(
   open val selectedRecipe: StateFlow<Recipe?> = _selectedRecipe.asStateFlow()
 
   init {
-    recipeRepository.init(onSuccess = { observeRecipes() })
+    // recipeRepository.init(onSuccess = { observeRecipes() })
   }
 
   private fun observeRecipes() {

@@ -2,17 +2,24 @@ package com.android.shelfLife.viewmodel.utils
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.launch
 
-class DeletionConfirmationViewModel(
+@HiltViewModel
+class DeletionConfirmationViewModel
+@Inject
+constructor(
     private val houseHoldRepository: HouseHoldRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val foodItemRepository: FoodItemRepository
 ) : ViewModel() {
 
   val householdToEdit = houseHoldRepository.householdToEdit
-  val selectedHousehold = userRepository.selectedHousehold
+  val selectedHousehold = houseHoldRepository.selectedHousehold
   val households = houseHoldRepository.households
 
   /**
@@ -36,7 +43,7 @@ class DeletionConfirmationViewModel(
       userRepository.deleteHouseholdUID(householdId)
       if (selectedHousehold.value == null || householdId == selectedHousehold.value!!.uid) {
         // If the deleted household was selected, deselect it
-        userRepository.selectHousehold(
+        houseHoldRepository.selectHousehold(
             if (households.value.isEmpty()) {
               null
             } else {
@@ -46,6 +53,10 @@ class DeletionConfirmationViewModel(
                 households.value[households.value.size - 1]
               }
             })
+        userRepository.selectHousehold(houseHoldRepository.selectedHousehold.value?.uid)
+        if (selectedHousehold.value != null) {
+          foodItemRepository.getFoodItems(selectedHousehold.value!!.uid)
+        }
       }
     }
   }

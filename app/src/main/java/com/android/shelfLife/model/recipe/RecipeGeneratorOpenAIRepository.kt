@@ -6,20 +6,20 @@ import com.aallam.openai.api.chat.ToolCall
 import com.aallam.openai.api.chat.ToolChoice
 import com.aallam.openai.api.chat.chatCompletionRequest
 import com.aallam.openai.api.core.Parameters
-import com.aallam.openai.api.http.Timeout
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
-import com.android.shelfLife.BuildConfig
+import com.android.shelfLife.di.IoDispatcher
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.newFoodItem.FoodItem
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.doubleOrNull
@@ -31,11 +31,11 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 
-class RecipeGeneratorOpenAIRepository(
-    private val openai: OpenAI =
-        OpenAI(token = BuildConfig.OPENAI_API_KEY, timeout = Timeout(socket = 60.seconds)),
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
-) : RecipeGeneratorRepository {
+@Singleton
+class RecipeGeneratorOpenAIRepository
+@Inject
+constructor(private val openai: OpenAI, @IoDispatcher private val dispatcher: CoroutineDispatcher) :
+    RecipeGeneratorRepository {
 
   companion object {
     const val USER_PROMPT_USE_TOOL_CALL =

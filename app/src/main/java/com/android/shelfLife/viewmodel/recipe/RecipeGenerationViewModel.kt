@@ -3,16 +3,21 @@ package com.android.shelfLife.viewmodel.recipe
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.shelfLife.model.newRecipe.RecipeRepository
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.recipe.RecipePrompt
-import com.android.shelfLife.model.recipe.RecipeRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-open class RecipeGenerationViewModel(
+@HiltViewModel
+open class RecipeGenerationViewModel
+@Inject
+constructor(
     private val recipeRepository: RecipeRepository,
     private val recipeGeneratorRepository: RecipeGeneratorRepository
 ) : ViewModel() {

@@ -2,28 +2,30 @@
 
 package com.android.shelfLife.ui.camera
 
+import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodFacts
-import com.android.shelfLife.model.foodItem.FoodItem
-import com.android.shelfLife.model.foodItem.FoodStorageLocation
-import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.android.shelfLife.ui.utils.*
-import com.google.firebase.Timestamp
+import com.android.shelfLife.ui.utils.CustomButtons
+import com.android.shelfLife.ui.utils.DateField
+import com.android.shelfLife.ui.utils.LocationDropdownField
+import com.android.shelfLife.viewmodel.FoodItemViewModel
+import kotlinx.coroutines.launch
 
 /**
  * Composable function to display the food input content.
@@ -35,33 +37,19 @@ import com.google.firebase.Timestamp
  */
 @Composable
 fun FoodInputContent(
+    foodItemViewModel: FoodItemViewModel,
     foodFacts: FoodFacts,
-    onSubmit: (FoodItem) -> Unit,
+    onSubmit: () -> Unit,
     onCancel: () -> Unit,
-    foodItemViewModel: ListFoodItemsViewModel,
+    onExpandRequested: () -> Unit
 ) {
+  foodItemViewModel.isScanned()
+
+  val coroutineScope = rememberCoroutineScope()
   val context = LocalContext.current
-  var location by remember { mutableStateOf(FoodStorageLocation.PANTRY) }
-  var expireDate by rememberSaveable { mutableStateOf("") }
-  var openDate by rememberSaveable { mutableStateOf("") }
-  var buyDate by rememberSaveable { mutableStateOf(formatTimestampToDate(Timestamp.now())) }
-
-  var expireDateErrorResId by remember { mutableStateOf<Int?>(null) }
-  var openDateErrorResId by remember { mutableStateOf<Int?>(null) }
-  var buyDateErrorResId by remember { mutableStateOf<Int?>(null) }
-
-  var locationExpanded by remember { mutableStateOf(false) }
-
-  /** Validates all fields when the submit button is clicked. */
-  fun validateAllFieldsWhenSubmitButton() {
-    buyDateErrorResId = validateBuyDate(buyDate)
-    expireDateErrorResId = validateExpireDate(expireDate, buyDate, buyDateErrorResId)
-    openDateErrorResId =
-        validateOpenDate(openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
-  }
 
   Column(
-      modifier = Modifier.fillMaxWidth().padding(16.dp),
+      modifier = Modifier.fillMaxWidth().padding(16.dp).clickable { onExpandRequested() },
       horizontalAlignment = Alignment.CenterHorizontally,
       verticalArrangement = Arrangement.Top) {
         // Food information
@@ -72,20 +60,24 @@ fun FoodInputContent(
             Text(text = foodFacts.category.name, style = TextStyle(fontSize = 13.sp))
           }
 
-          Image(
-              painter = painterResource(id = R.drawable.app_logo),
+          AsyncImage(
+              model = foodFacts.imageUrl,
               contentDescription = "Food Image",
-              modifier = Modifier.size(60.dp).padding(end = 8.dp))
+              modifier =
+                  Modifier.size(80.dp)
+                      .clip(RoundedCornerShape(8.dp))
+                      .align(Alignment.CenterVertically),
+              contentScale = ContentScale.Crop)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Location Dropdown
         LocationDropdownField(
-            location = location,
-            onLocationChange = { location = it },
-            locationExpanded = locationExpanded,
-            onExpandedChange = { locationExpanded = it },
+            location = foodItemViewModel.location,
+            onLocationChange = { foodItemViewModel.location = it },
+            locationExpanded = foodItemViewModel.locationExpanded,
+            onExpandedChange = { foodItemViewModel.locationExpanded = it },
             modifier = Modifier,
             testTag = "locationDropdown")
 
@@ -93,16 +85,9 @@ fun FoodInputContent(
 
         // Expire Date Field with Error Handling
         DateField(
-            date = expireDate,
-            onDateChange = { newValue ->
-              expireDate = newValue.filter { it.isDigit() }
-              expireDateErrorResId = validateExpireDate(expireDate, buyDate, buyDateErrorResId)
-              // Re-validate Open Date since it depends on Expire Date
-              openDateErrorResId =
-                  validateOpenDate(
-                      openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
-            },
-            dateErrorResId = expireDateErrorResId,
+            date = foodItemViewModel.expireDate,
+            onDateChange = { newValue -> foodItemViewModel.changeExpiryDate(newValue) },
+            dateErrorResId = foodItemViewModel.expireDateErrorResId,
             labelResId = R.string.expire_date_hint,
             testTag = "expireDateTextField")
 
@@ -110,14 +95,9 @@ fun FoodInputContent(
 
         // Open Date Field with Error Handling
         DateField(
-            date = openDate,
-            onDateChange = { newValue ->
-              openDate = newValue.filter { it.isDigit() }
-              openDateErrorResId =
-                  validateOpenDate(
-                      openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
-            },
-            dateErrorResId = openDateErrorResId,
+            date = foodItemViewModel.openDate,
+            onDateChange = { newValue -> foodItemViewModel.changeOpenDate(newValue) },
+            dateErrorResId = foodItemViewModel.openDateErrorResId,
             labelResId = R.string.open_date_hint,
             testTag = "openDateTextField")
 
@@ -125,56 +105,31 @@ fun FoodInputContent(
 
         // Buy Date Field with Error Handling
         DateField(
-            date = buyDate,
-            onDateChange = { newValue ->
-              buyDate = newValue.filter { it.isDigit() }
-              buyDateErrorResId = validateBuyDate(buyDate)
-              // Re-validate Expire Date and Open Date since they depend on Buy Date
-              expireDateErrorResId = validateExpireDate(expireDate, buyDate, buyDateErrorResId)
-              openDateErrorResId =
-                  validateOpenDate(
-                      openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
-            },
-            dateErrorResId = buyDateErrorResId,
+            date = foodItemViewModel.buyDate,
+            onDateChange = { newValue -> foodItemViewModel.changeBuyDate(newValue) },
+            dateErrorResId = foodItemViewModel.buyDateErrorResId,
             labelResId = R.string.buy_date_hint,
             testTag = "buyDateTextField")
 
         Spacer(modifier = Modifier.height(16.dp))
 
         CustomButtons(
-            button1OnClick = { onCancel() },
+            button1OnClick = {
+                onCancel()
+                             },
             button1TestTag = "cancelButton",
             button1Text = stringResource(R.string.cancel_button),
             button2OnClick = {
-              validateAllFieldsWhenSubmitButton()
-              val isExpireDateValid = expireDateErrorResId == null && expireDate.isNotEmpty()
-              val isOpenDateValid = openDateErrorResId == null
-              val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
-
-              val expiryTimestamp = formatDateToTimestamp(expireDate)
-              val openTimestamp =
-                  if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
-              val buyTimestamp = formatDateToTimestamp(buyDate)
-
-              if (isExpireDateValid &&
-                  isOpenDateValid &&
-                  isBuyDateValid &&
-                  expiryTimestamp != null &&
-                  buyTimestamp != null) {
-                val newFoodItem =
-                    FoodItem(
-                        uid = foodItemViewModel.getUID(),
-                        foodFacts = foodFacts,
-                        location = location,
-                        expiryDate = expiryTimestamp,
-                        openDate = openTimestamp,
-                        buyDate = buyTimestamp)
-
-                Toast.makeText(context, R.string.food_added_message, Toast.LENGTH_SHORT).show()
-                onSubmit(newFoodItem)
-              } else {
-                Toast.makeText(context, R.string.submission_error_message, Toast.LENGTH_SHORT)
-                    .show()
+              coroutineScope.launch {
+                val success = foodItemViewModel.submitFoodItem(foodFacts)
+                if (success) {
+                  // foodFactsViewModel.clearFoodFactsSuggestions()
+                  Log.d("FoodInputContent", "Food item submitted successfully")
+                  onSubmit()
+                } else {
+                  Toast.makeText(context, R.string.submission_error_message, Toast.LENGTH_SHORT)
+                      .show()
+                }
               }
             },
             button2TestTag = "submitButton",

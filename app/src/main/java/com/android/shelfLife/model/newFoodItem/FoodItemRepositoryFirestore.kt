@@ -57,7 +57,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
       val snapshot =
           db.collection(collectionPath).document(householdId).collection("items").get().await()
 
-      val fetchedFoodItems = snapshot.documents.mapNotNull { it.toObject(FoodItem::class.java) }
+      val fetchedFoodItems = snapshot.documents.mapNotNull { convertToFoodItem(it) }
       _foodItems.value = fetchedFoodItems
       fetchedFoodItems
     } catch (e: Exception) {
