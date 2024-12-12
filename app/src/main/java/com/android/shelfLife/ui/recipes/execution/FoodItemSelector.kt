@@ -40,14 +40,20 @@ fun SelectFoodItemsForIngredientScreen(
     navigationActions: NavigationActions,
     viewModel: ExecuteRecipeViewModel = hiltViewModel()
 ) {
-    val ingredientName = viewModel.currentIngredientName()
+    val ingredientName by viewModel.currentIngredientName.collectAsState()
     val availableFoodItems by viewModel.foodItems.collectAsState()
     val selectedMap by viewModel.selectedFoodItemsForIngredients.collectAsState()
     val currentlySelectedItems = selectedMap[ingredientName] ?: emptyList()
 
     Log.d("SelectFoodItemsScreen", "Current ingredient: $ingredientName")
-    Log.d("SelectFoodItemsScreen", "Available food items: ${availableFoodItems.forEach { it.foodFacts.name }}")
-    Log.d("SelectFoodItemsScreen", "Currently selected items: $currentlySelectedItems")
+    Log.d(
+        "SelectFoodItemsScreen",
+        "Available food items: ${availableFoodItems.joinToString { it.foodFacts.name }}"
+    )
+    Log.d(
+        "SelectFoodItemsScreen",
+        "Currently selected items: $currentlySelectedItems"
+    )
 
     if (ingredientName == null) {
         Log.e("SelectFoodItemsScreen", "Ingredient name is null. Navigating back.")
@@ -79,10 +85,10 @@ fun SelectFoodItemsForIngredientScreen(
                     if (viewModel.hasMoreIngredients()) {
                         Log.d("SelectFoodItemsScreen", "Navigating to the next ingredient.")
                         viewModel.nextIngredient()
-                        navigationActions.navigateTo(Screen.FOOD_ITEM_SELECTION)
                     } else {
-                        Log.d("SelectFoodItemsScreen", "No more ingredients. Navigating back.")
-                        navigationActions.goBack()
+                        Log.d("SelectFoodItemsScreen", "No more ingredients. Navigating to instructions.")
+                        //TODO(viewModel.consumeSelectedItems())
+                        navigationActions.navigateTo(Screen.INSTRUCTION_SCREEN)
                     }
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -107,7 +113,7 @@ fun SelectFoodItemsForIngredientScreen(
                         .filter { it.uid == foodItem.uid }
                         .sumOf { it.foodFacts.quantity.amount }
 
-                    val maxAmount = 300f
+                    val maxAmount = foodItem.foodFacts.quantity.amount.toFloat()
 
                     FoodItemSelectionCard(
                         foodItem = foodItem,
@@ -116,12 +122,17 @@ fun SelectFoodItemsForIngredientScreen(
                         expanded = expanded,
                         onCardClick = {
                             expanded = !expanded
-                            Log.d("FoodItemSelectionCard", "Card clicked for food item: ${foodItem.foodFacts.name}. Expanded: $expanded")
+                            Log.d(
+                                "FoodItemSelectionCard",
+                                "Card clicked for food item: ${foodItem.foodFacts.name}. Expanded: $expanded"
+                            )
                         },
                         onAmountChange = { newAmount ->
-                            Log.d("FoodItemSelectionCard", "Amount changed for ${foodItem.foodFacts.name} to $newAmount")
-                            val updatedList = currentlySelectedItems.toMutableList()
-                            viewModel.selectFoodItemsForIngredient(ingredientName, updatedList)
+                            Log.d(
+                                "FoodItemSelectionCard",
+                                "Amount changed for ${foodItem.foodFacts.name} to $newAmount"
+                            )
+                            viewModel.selectFoodItemForIngredient(ingredientName!!, foodItem, newAmount)
                         }
                     )
                 }
@@ -129,6 +140,8 @@ fun SelectFoodItemsForIngredientScreen(
         }
     }
 }
+
+
 
 @Composable
 fun FoodItemSelectionCard(
@@ -146,21 +159,34 @@ fun FoodItemSelectionCard(
             .clickable { onCardClick() }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
+            // Display the name of the food item
             Text(
                 text = foodItem.foodFacts.name,
                 style = MaterialTheme.typography.titleMedium
             )
+
+            // Display the amount selected and the total available quantity
+            Text(
+                text = "Selected: ${amount} ${foodItem.foodFacts.quantity.unit.name.lowercase()} of ${foodItem.foodFacts.quantity}",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+
+            // If the card is expanded, show the slider for adjusting the amount
             if (expanded) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(top = 16.dp)
                 ) {
-                    Text(text = "Amount selected: ${amount}g")
+                    Text(text = "Adjust amount:")
                     androidx.compose.material3.Slider(
                         value = amount,
                         onValueChange = { newVal ->
-                            Log.d("FoodItemSelectionCard", "Slider value changed to $newVal for ${foodItem.foodFacts.name}")
-                            onAmountChange(newVal) // This will now trigger state updates.
+                            Log.d(
+                                "FoodItemSelectionCard",
+                                "Slider value changed to $newVal for ${foodItem.foodFacts.name}"
+                            )
+                            onAmountChange(newVal) // Trigger state updates
                         },
                         valueRange = 0f..maxAmount,
                         steps = 0

@@ -3,6 +3,7 @@ package com.android.shelfLife.viewmodel.recipes
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.newRecipe.RecipeRepository
@@ -13,6 +14,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,8 +24,6 @@ class ExecuteRecipeViewModel @Inject constructor(
     private val houseHoldRepository: HouseHoldRepository,
     private val listFoodItemsRepository: FoodItemRepository,
     private val recipeRepositoryFirestore: RecipeRepository,
-    private val userRepository: UserRepository,
-    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     companion object {
@@ -41,10 +43,24 @@ class ExecuteRecipeViewModel @Inject constructor(
     val executingRecipe = _executingRecipe.asStateFlow()
 
     private val _currentIngredientIndex = MutableStateFlow(0)
-    val currentIngredientIndex = _currentIngredientIndex.asStateFlow()
 
     private val _selectedFoodItemsForIngredients = MutableStateFlow<Map<String, List<FoodItem>>>(emptyMap())
     val selectedFoodItemsForIngredients = _selectedFoodItemsForIngredients.asStateFlow()
+
+    private val _currentIngredientName = MutableStateFlow<String?>(null)
+    val currentIngredientName = _currentIngredientName.asStateFlow()
+
+    init {
+        // Update currentIngredientName whenever _currentIngredientIndex or executingRecipe changes
+        combine(_currentIngredientIndex, executingRecipe) { index, recipe ->
+            if (index in recipe.ingredients.indices) {
+                recipe.ingredients[index].name
+            } else null
+        }.onEach { ingredientName ->
+            Log.d(TAG, "Current ingredient name updated to: $ingredientName")
+            _currentIngredientName.value = ingredientName
+        }.launchIn(viewModelScope)
+    }
 
     fun updateServings(newServings: Float) {
         Log.d(TAG, "Updating servings to $newServings")
@@ -54,6 +70,50 @@ class ExecuteRecipeViewModel @Inject constructor(
         if (updatedRecipe != null) {
             _executingRecipe.value = updatedRecipe
         }
+    }
+
+    fun selectFoodItemForIngredient(ingredientName: String, foodItem: FoodItem, newAmount: Float) {
+        Log.d(TAG, "Selecting food item: ${foodItem.foodFacts.name} with amount: $newAmount for ingredient: $ingredientName")
+
+        // Create a mutable copy of the current selections
+        val currentSelections = _selectedFoodItemsForIngredients.value.toMutableMap()
+
+        // Get or initialize the list of selected items for this ingredient
+        val selectedItemsForIngredient = currentSelections[ingredientName]?.toMutableList() ?: mutableListOf()
+
+        // Check if the food item already exists in the list
+        val existingItemIndex = selectedItemsForIngredient.indexOfFirst { it.uid == foodItem.uid }
+
+        if (existingItemIndex != -1) {
+            // If the item exists, update its quantity
+            val existingItem = selectedItemsForIngredient[existingItemIndex]
+            val updatedItem = existingItem.copy(
+                foodFacts = existingItem.foodFacts.copy(
+                    quantity = existingItem.foodFacts.quantity.copy(
+                        amount = newAmount.toDouble() // Update the amount
+                    )
+                )
+            )
+            selectedItemsForIngredient[existingItemIndex] = updatedItem
+            Log.d(TAG, "Updated item: ${updatedItem.foodFacts.name} with new amount: $newAmount")
+        } else {
+            // If the item does not exist, add it to the list with the specified amount
+            val newItem = foodItem.copy(
+                foodFacts = foodItem.foodFacts.copy(
+                    quantity = foodItem.foodFacts.quantity.copy(
+                        amount = newAmount.toDouble() // Set the initial amount
+                    )
+                )
+            )
+            selectedItemsForIngredient.add(newItem)
+            Log.d(TAG, "Added new item: ${newItem.foodFacts.name} with amount: $newAmount")
+        }
+
+        // Update the selections map with the modified list
+        currentSelections[ingredientName] = selectedItemsForIngredient
+        _selectedFoodItemsForIngredients.value = currentSelections
+
+        Log.d(TAG, "Updated selections for $ingredientName: ${currentSelections[ingredientName]}")
     }
 
     fun selectFoodItemsForIngredient(ingredientName: String, selectedItems: List<FoodItem>) {
@@ -73,7 +133,7 @@ class ExecuteRecipeViewModel @Inject constructor(
 
     private suspend fun consumeFoodItems(foodItems: List<FoodItem>) {
         Log.d(TAG, "Consuming food items: $foodItems")
-        // Implementation needed
+        TODO()
     }
 
     fun nextIngredient() {
@@ -95,13 +155,6 @@ class ExecuteRecipeViewModel @Inject constructor(
         return hasMore
     }
 
-    fun currentIngredientName(): String? {
-        val index = _currentIngredientIndex.value
-        val ingredients = executingRecipe.value.ingredients
-        val ingredientName = if (index in ingredients.indices) {
-            ingredients[index].name
-        } else null
-        Log.d(TAG, "Current ingredient name at index $index: $ingredientName")
-        return ingredientName
-    }
+
+
 }

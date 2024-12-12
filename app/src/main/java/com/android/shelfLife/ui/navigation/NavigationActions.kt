@@ -36,6 +36,7 @@ object Screen {
   const val FIRST_TIME_USER = "First Time User Screen"
   const val SERVINGS_SCREEN = "Servings Screen"
   const val FOOD_ITEM_SELECTION = "Food Item Selection Screen"
+  const val INSTRUCTION_SCREEN = "Instruction Screen"
   // Add other screens as needed
 }
 
