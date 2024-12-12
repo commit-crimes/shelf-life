@@ -5,7 +5,6 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import com.android.shelfLife.viewmodel.leaderboard.LeaderboardMode
 
@@ -164,14 +163,13 @@ object ThemeManager {
         surfaceContainerHighest = Color(0xFF5EA57A),
     )
 
-
-
-
+    var activeMode: LeaderboardMode? = null
 
     // When no special mode is active, this is null
     var currentColorScheme: MutableState<ColorScheme?> = mutableStateOf(null)
 
     fun updateScheme(mode: LeaderboardMode, isDark: Boolean) {
+        activeMode = mode
         currentColorScheme.value = when (mode) {
             LeaderboardMode.RAT -> if (isDark) RatDarkColorScheme else RatLightColorScheme
             LeaderboardMode.STINKY -> if (isDark) StinkyDarkColorScheme else StinkyLightColorScheme
@@ -179,7 +177,7 @@ object ThemeManager {
     }
 
     fun resetMode() {
-        // Revert to null means use the app's original color scheme
+        activeMode = null
         currentColorScheme.value = null
     }
 }

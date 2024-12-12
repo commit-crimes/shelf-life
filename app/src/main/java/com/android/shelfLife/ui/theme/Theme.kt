@@ -313,13 +313,21 @@ fun ShelfLifeTheme(dynamicColor: Boolean = false, content: @Composable () -> Uni
         ThemeMode.DARK -> true
     }
 
-    val colorScheme =
-        if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        } else if (isDarkTheme) darkScheme else lightScheme
+    // If we have an active RAT/STINKY mode, reapply its color scheme according to current isDarkTheme.
+    // This ensures the RAT/STINKY theme follows system dark mode changes.
+    ThemeManager.activeMode?.let { mode ->
+        ThemeManager.updateScheme(mode, isDarkTheme)
+    }
 
-    // If ThemeManager is overriding the scheme (RAT or STINKY), use that instead
-    val finalColorScheme = ThemeManager.currentColorScheme.value ?: colorScheme
+    val defaultColorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            if (isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        isDarkTheme -> darkScheme
+        else -> lightScheme
+    }
+
+    val finalColorScheme = ThemeManager.currentColorScheme.value ?: defaultColorScheme
 
     val view = LocalView.current
     if (!view.isInEditMode) {
@@ -336,8 +344,14 @@ fun ShelfLifeTheme(dynamicColor: Boolean = false, content: @Composable () -> Uni
     }
 
     CompositionLocalProvider(
-        LocalThemeTogglerProvider provides LocalThemeToggler, LocalThemeMode provides themeMode
+        LocalThemeTogglerProvider provides LocalThemeToggler,
+        LocalThemeMode provides themeMode
     ) {
-        MaterialTheme(colorScheme = finalColorScheme, typography = AppTypography, content = content)
+        MaterialTheme(
+            colorScheme = finalColorScheme,
+            typography = AppTypography,
+            content = content
+        )
     }
 }
+
