@@ -21,29 +21,56 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
-import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.navigation.TopLevelDestinations
 import com.android.shelfLife.viewmodel.authentication.SignInState
 import com.android.shelfLife.viewmodel.authentication.SignInViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 @Composable
-fun SignInScreen(navigationActions: NavigationActions, userRepository: UserRepository) {
-  val signInViewModel = viewModel { SignInViewModel(userRepository = userRepository) }
+fun SignInScreen(navigationActions: NavigationActions) {
   val context = LocalContext.current
+  val signInViewModel = hiltViewModel<SignInViewModel>()
+  val isUserLoggedIn by signInViewModel.isUserLoggedIn.collectAsState()
   val signInState by signInViewModel.signInState.collectAsState()
+  LaunchedEffect(isUserLoggedIn) {
+    if (isUserLoggedIn) {
+      navigationActions.navigateTo(Route.OVERVIEW)
+    }
+  }
+
+  // Handle sign-in states
+  LaunchedEffect(signInState) {
+    when (signInState) {
+      is SignInState.Success -> {
+        Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
+        Log.d("SignInScreen", "Login successful!, navigating to overview")
+        navigationActions.navigateTo(TopLevelDestinations.OVERVIEW)
+      }
+      is SignInState.Error -> {
+        val message = (signInState as SignInState.Error).message
+        Toast.makeText(context, "Login failed: $message", Toast.LENGTH_LONG).show()
+      }
+      is SignInState.Loading -> {
+        // Do nothing
+      }
+      else -> {
+        Log.e("SignInScreen", "Unexpected sign-in state: $signInState")
+      }
+    }
+  }
 
   val launcher =
       rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result
         ->
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
-          val account = task.getResult(Exception::class.java)
-          account?.idToken?.let { idToken -> signInViewModel.signInWithGoogle(idToken, context) }
+          val account = task.getResult(Exception::class.java)!!
+          account.idToken?.let { idToken -> signInViewModel.signInWithGoogle(idToken, context) }
               ?: run {
                 Toast.makeText(context, "Failed to get ID Token!", Toast.LENGTH_LONG).show()
               }
@@ -54,23 +81,6 @@ fun SignInScreen(navigationActions: NavigationActions, userRepository: UserRepos
       }
 
   val token = stringResource(R.string.default_web_client_id)
-
-  // Handle sign-in states
-  LaunchedEffect(signInState) {
-    when (signInState) {
-      is SignInState.Success -> {
-        Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
-        // Navigation is handled in ShelfLifeApp based on isUserLoggedIn
-      }
-      is SignInState.Error -> {
-        val message = (signInState as SignInState.Error).message
-        Toast.makeText(context, "Login failed: $message", Toast.LENGTH_LONG).show()
-      }
-      else -> {
-        Log.e("SignInScreen", "Unexpected sign-in state: $signInState")
-      }
-    }
-  }
 
   Scaffold(modifier = Modifier.fillMaxSize().testTag("signInScreen")) { padding ->
     Column(
@@ -103,7 +113,6 @@ fun SignInScreen(navigationActions: NavigationActions, userRepository: UserRepos
                         .build()
                 val googleSignInClient = GoogleSignIn.getClient(context, gso)
                 launcher.launch(googleSignInClient.signInIntent)
-                navigationActions.navigateTo(Route.OVERVIEW)
               },
               modifier = Modifier.testTag("loginButton"))
 

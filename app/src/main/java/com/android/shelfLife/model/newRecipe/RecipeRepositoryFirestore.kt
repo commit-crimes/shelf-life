@@ -6,9 +6,10 @@ import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.model.recipe.RecipeRepository
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,9 +17,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class RecipeRepositoryFirestore(
-    private val db: FirebaseFirestore,
-) : com.android.shelfLife.model.newRecipe.RecipeRepository {
+@Singleton
+class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFirestore) :
+    RecipeRepository {
 
   companion object {
     private const val COLLECTION_PATH = "recipes"

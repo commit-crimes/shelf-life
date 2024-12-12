@@ -9,9 +9,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.shelfLife.model.newhousehold.HouseHoldRepository
-import com.android.shelfLife.model.user.UserRepository
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.viewmodel.utils.DeletionConfirmationViewModel
 
 @Composable
@@ -19,13 +17,9 @@ fun DeletionConfirmationPopUp(
     showDeleteDialog: Boolean,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    houseHoldRepository: HouseHoldRepository,
-    userRepository: UserRepository
+    deletionConfirmationViewModel: DeletionConfirmationViewModel = hiltViewModel()
 ) {
-  val deletionConfirmationViewModel: DeletionConfirmationViewModel = viewModel {
-    DeletionConfirmationViewModel(
-        houseHoldRepository = houseHoldRepository, userRepository = userRepository)
-  }
+
   val householdToDelete by deletionConfirmationViewModel.householdToEdit.collectAsState()
 
   if (showDeleteDialog) {

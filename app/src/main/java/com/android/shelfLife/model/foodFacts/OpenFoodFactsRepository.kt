@@ -2,18 +2,68 @@ package com.android.shelfLife.model.foodFacts
 
 import android.util.Log
 import java.io.IOException
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
 
+sealed class SearchStatus {
+  data object Idle : SearchStatus()
+
+  data object Loading : SearchStatus()
+
+  data object Success : SearchStatus()
+
+  data object Failure : SearchStatus()
+}
+
 class OpenFoodFactsRepository(
     private val client: OkHttpClient,
     private val baseUrl: String = "https://world.openfoodfacts.net"
 ) : FoodFactsRepository {
 
-  private val MAX_RESULTS = 7 // Adjust the number of results as needed
+  companion object {
+    private val MAX_RESULTS = 7 // Adjust the number of results as needed
+  }
+
+  private val _searchStatus = MutableStateFlow<SearchStatus>(SearchStatus.Idle)
+  override val searchStatus: StateFlow<SearchStatus> = _searchStatus
+
+  private val _foodFactsSuggestions = MutableStateFlow<List<FoodFacts>>(emptyList())
+  override val foodFactsSuggestions: StateFlow<List<FoodFacts>> = _foodFactsSuggestions
+
+  override fun resetSearchStatus() {
+    _searchStatus.value = SearchStatus.Idle
+  }
+
+  // Modified search function
+  override fun searchByBarcode(barcode: Long) {
+    searchFoodFacts(
+        searchInput = FoodSearchInput.Barcode(barcode),
+        onSuccess = { foodFactsList -> _foodFactsSuggestions.value = foodFactsList },
+        onFailure = {
+          _searchStatus.value = SearchStatus.Failure
+          _foodFactsSuggestions.value = emptyList()
+        })
+  }
+
+  // Function to set a new query and trigger a search using a query string
+  override fun searchByQuery(newQuery: String) {
+    searchFoodFacts(
+        FoodSearchInput.Query(newQuery),
+        onSuccess = { foodFactsList ->
+          // Filter out items without images
+          val filteredList = foodFactsList.filter { it.imageUrl.isNotEmpty() }
+          _foodFactsSuggestions.value = filteredList
+        },
+        onFailure = {
+          _searchStatus.value = SearchStatus.Failure
+          _foodFactsSuggestions.value = emptyList()
+        })
+  }
 
   private fun buildUrl(vararg paths: String): String {
     return paths.joinToString("/") { it.trim('/') }
@@ -24,6 +74,7 @@ class OpenFoodFactsRepository(
       onSuccess: (List<FoodFacts>) -> Unit,
       onFailure: (Exception) -> Unit
   ) {
+    _searchStatus.value = SearchStatus.Loading
     val url =
         when (searchInput) {
           is FoodSearchInput.Barcode ->
@@ -41,11 +92,13 @@ class OpenFoodFactsRepository(
         .enqueue(
             object : okhttp3.Callback {
               override fun onFailure(call: okhttp3.Call, e: IOException) {
+                _searchStatus.value = SearchStatus.Failure
                 onFailure(e)
               }
 
               override fun onResponse(call: okhttp3.Call, response: Response) {
                 if (!response.isSuccessful) {
+                  _searchStatus.value = SearchStatus.Failure
                   onFailure(
                       IOException("Server error: HTTP ${response.code} - ${response.message}"))
                   return
@@ -53,8 +106,9 @@ class OpenFoodFactsRepository(
 
                 val body = response.body?.string() ?: ""
                 val foodFactsList = parseFoodFactsResponse(body, searchInput)
-                println("Response: $body") // Logging the response
+
                 Log.d("OpenFoodFactsRepository", "Food Facts: $foodFactsList")
+                _searchStatus.value = SearchStatus.Success
                 onSuccess(foodFactsList)
               }
             })

@@ -2,47 +2,28 @@ package com.android.shelfLife.ui.recipes
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -51,156 +32,151 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.android.shelfLife.R
-import com.android.shelfLife.model.household.HouseholdViewModel
 import com.android.shelfLife.model.recipe.ListRecipesViewModel
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipeType
-import com.android.shelfLife.ui.navigation.BottomNavigationMenu
-import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
-import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.navigation.TopNavigationBar
-import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
-import com.android.shelfLife.ui.utils.CustomSearchBar
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipesScreen(
     navigationActions: NavigationActions,
-    listRecipesViewModel: ListRecipesViewModel,
-    householdViewModel: HouseholdViewModel,
+    //    listRecipesViewModel: ListRecipesViewModel,
+    //    householdViewModel: HouseholdViewModel,
 ) {
-  // Collect the recipes StateFlow as a composable state
-  val recipeList by listRecipesViewModel.recipes.collectAsState()
-
-  // State for the search query
-  var query by remember { mutableStateOf("") }
-  var selectedFilters = remember { mutableStateListOf<String>() }
-
-  val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
-  val userHouseholds = householdViewModel.households.collectAsState().value
-
-  val drawerState = rememberDrawerState(DrawerValue.Closed)
-  val scope = rememberCoroutineScope()
-
-  val filters =
-      listOf("Soon to expire", "Only household items", "High protein", "Low calories", "Personal")
-
-  var fabExpanded = remember { mutableStateOf(false) }
-
-  HouseHoldSelectionDrawer(
-      scope = scope,
-      drawerState = drawerState,
-      householdViewModel = householdViewModel,
-      navigationActions = navigationActions) {
-
-        // filtering recipeList using the filter and the query from the searchBar
-        val filteredRecipes = filterRecipes(recipeList, selectedFilters, query)
-
-        if (selectedHousehold == null) {
-          FirstTimeWelcomeScreen(navigationActions, householdViewModel)
-        } else {
-          Scaffold(
-              modifier = Modifier.testTag("recipesScreen"),
-              topBar = {
-                selectedHousehold?.let {
-                  TopNavigationBar(
-                      houseHold = it,
-                      onHamburgerClick = { scope.launch { drawerState.open() } },
-                      filters = filters,
-                      selectedFilters = selectedFilters,
-                      onFilterChange = { filter, isSelected ->
-                        if (isSelected) {
-                          selectedFilters.add(filter)
-                        } else {
-                          selectedFilters.remove(filter)
-                        }
-                      })
-                }
-              },
-              bottomBar = {
-                BottomNavigationMenu(
-                    onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                    tabList = LIST_TOP_LEVEL_DESTINATION,
-                    selectedItem = Route.RECIPES)
-              },
-              // Floating Action Button to add a new food item
-              floatingActionButton = {
-                Column(
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)) {
-                      // Secondary FAB for "Manual" option
-                      if (fabExpanded.value) {
-                        ExtendedFloatingActionButton(
-                            text = { Text("Generate") },
-                            icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "Add") },
-                            onClick = {
-                              // Navigate to Manual Recipe screen
-                              navigationActions.navigateTo(Screen.GENERATE_RECIPE)
-                            },
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            modifier = Modifier.testTag("generateRecipeFab").width(150.dp))
-                      }
-
-                      // Primary FAB
-                      ExtendedFloatingActionButton(
-                          text = { Text(if (fabExpanded.value) "Manual" else "") },
-                          icon = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                          onClick = {
-                            if (fabExpanded.value) {
-                              // Navigate to Generate Recipe screen
-                              navigationActions.navigateTo(Screen.ADD_RECIPE)
-                            } else {
-                              // Expand the FABs
-                              fabExpanded.value = true
-                            }
-                          },
-                          expanded = fabExpanded.value, // Bind to the state
-                          containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                          modifier =
-                              Modifier.testTag("addRecipeFab")
-                                  .width(if (fabExpanded.value) 150.dp else 56.dp))
-                    }
-              },
-              content = { paddingValues ->
-                Column(
-                    modifier =
-                        Modifier.padding(paddingValues).fillMaxSize().pointerInput(Unit) {
-                          detectTapGestures(
-                              onTap = { if (fabExpanded.value) fabExpanded.value = false })
-                        }) {
-                      CustomSearchBar(
-                          query = query,
-                          onQueryChange = { query = it },
-                          placeholder = "Search recipe",
-                          searchBarTestTag = "searchBar",
-                          onDeleteTextClicked = { query = "" })
-
-                      if (filteredRecipes.isEmpty()) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            content = {
-                              Text(
-                                  text = "No recipes available",
-                                  modifier = Modifier.testTag("noRecipesAvailableText"))
-                            },
-                            contentAlignment = Alignment.Center)
-                      } else {
-                        // LazyColumn for displaying the list of filtered recipes
-                        LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
-                          items(filteredRecipes) { recipe ->
-                            RecipeItem(recipe, navigationActions, listRecipesViewModel)
-                          }
-                        }
-                      }
-                    }
-              })
-        }
-      }
+  Text("recipe screen")
+  //
+  //  // Collect the recipes StateFlow as a composable state
+  //  val recipeList by listRecipesViewModel.recipes.collectAsState()
+  //
+  //  // State for the search query
+  //  var query by remember { mutableStateOf("") }
+  //  var selectedFilters = remember { mutableStateListOf<String>() }
+  //
+  //  val selectedHousehold by householdViewModel.selectedHousehold.collectAsState()
+  //  val userHouseholds = householdViewModel.households.collectAsState().value
+  //
+  //  val drawerState = rememberDrawerState(DrawerValue.Closed)
+  //  val scope = rememberCoroutineScope()
+  //
+  //  val filters =
+  //      listOf("Soon to expire", "Only household items", "High protein", "Low calories",
+  // "Personal")
+  //
+  //  var fabExpanded = remember { mutableStateOf(false) }
+  //
+  //  HouseHoldSelectionDrawer(
+  //      scope = scope,
+  //      drawerState = drawerState,
+  //      householdViewModel = householdViewModel,
+  //      navigationActions = navigationActions) {
+  //
+  //        // filtering recipeList using the filter and the query from the searchBar
+  //        val filteredRecipes = filterRecipes(recipeList, selectedFilters, query)
+  //
+  //        if (selectedHousehold == null) {
+  //          FirstTimeWelcomeScreen(navigationActions, householdViewModel)
+  //        } else {
+  //          Scaffold(
+  //              modifier = Modifier.testTag("recipesScreen"),
+  //              topBar = {
+  //                selectedHousehold?.let {
+  //                  TopNavigationBar(
+  //                      houseHold = it,
+  //                      onHamburgerClick = { scope.launch { drawerState.open() } },
+  //                      filters = filters,
+  //                      selectedFilters = selectedFilters,
+  //                      onFilterChange = { filter, isSelected ->
+  //                        if (isSelected) {
+  //                          selectedFilters.add(filter)
+  //                        } else {
+  //                          selectedFilters.remove(filter)
+  //                        }
+  //                      })
+  //                }
+  //              },
+  //              bottomBar = {
+  //                BottomNavigationMenu(
+  //                    onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+  //                    tabList = LIST_TOP_LEVEL_DESTINATION,
+  //                    selectedItem = Route.RECIPES)
+  //              },
+  //              // Floating Action Button to add a new food item
+  //              floatingActionButton = {
+  //                Column(
+  //                    horizontalAlignment = Alignment.End,
+  //                    verticalArrangement = Arrangement.spacedBy(16.dp),
+  //                    modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)) {
+  //                      // Secondary FAB for "Manual" option
+  //                      if (fabExpanded.value) {
+  //                        ExtendedFloatingActionButton(
+  //                            text = { Text("Generate") },
+  //                            icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "Add")
+  // },
+  //                            onClick = {
+  //                              // Navigate to Manual Recipe screen
+  //                              navigationActions.navigateTo(Screen.GENERATE_RECIPE)
+  //                            },
+  //                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+  //                            modifier = Modifier.testTag("generateRecipeFab").width(150.dp))
+  //                      }
+  //
+  //                      // Primary FAB
+  //                      ExtendedFloatingActionButton(
+  //                          text = { Text(if (fabExpanded.value) "Manual" else "") },
+  //                          icon = { Icon(Icons.Default.Add, contentDescription = "Add") },
+  //                          onClick = {
+  //                            if (fabExpanded.value) {
+  //                              // Navigate to Generate Recipe screen
+  //                              navigationActions.navigateTo(Screen.ADD_RECIPE)
+  //                            } else {
+  //                              // Expand the FABs
+  //                              fabExpanded.value = true
+  //                            }
+  //                          },
+  //                          expanded = fabExpanded.value, // Bind to the state
+  //                          containerColor = MaterialTheme.colorScheme.secondaryContainer,
+  //                          modifier =
+  //                              Modifier.testTag("addRecipeFab")
+  //                                  .width(if (fabExpanded.value) 150.dp else 56.dp))
+  //                    }
+  //              },
+  //              content = { paddingValues ->
+  //                Column(
+  //                    modifier =
+  //                        Modifier.padding(paddingValues).fillMaxSize().pointerInput(Unit) {
+  //                          detectTapGestures(
+  //                              onTap = { if (fabExpanded.value) fabExpanded.value = false })
+  //                        }) {
+  //                      CustomSearchBar(
+  //                          query = query,
+  //                          onQueryChange = { query = it },
+  //                          placeholder = "Search recipe",
+  //                          searchBarTestTag = "searchBar",
+  //                          onDeleteTextClicked = { query = "" })
+  //
+  //                      if (filteredRecipes.isEmpty()) {
+  //                        Box(
+  //                            modifier = Modifier.fillMaxSize(),
+  //                            content = {
+  //                              Text(
+  //                                  text = "No recipes available",
+  //                                  modifier = Modifier.testTag("noRecipesAvailableText"))
+  //                            },
+  //                            contentAlignment = Alignment.Center)
+  //                      } else {
+  //                        // LazyColumn for displaying the list of filtered recipes
+  //                        LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
+  //                          items(filteredRecipes) { recipe ->
+  //                            RecipeItem(recipe, navigationActions, listRecipesViewModel)
+  //                          }
+  //                        }
+  //                      }
+  //                    }
+  //              })
+  //        }
+  //      }
 }
 /**
  * Converts a string representation of a recipe type into a corresponding

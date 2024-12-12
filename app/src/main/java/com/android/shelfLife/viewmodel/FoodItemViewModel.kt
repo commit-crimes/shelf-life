@@ -16,14 +16,19 @@ import com.android.shelfLife.model.newFoodItem.FoodStorageLocation
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.utils.formatDateToTimestamp
 import com.android.shelfLife.ui.utils.formatTimestampToDate
-import com.android.shelfLife.ui.utils.validateAmount
 import com.android.shelfLife.ui.utils.validateBuyDate
 import com.android.shelfLife.ui.utils.validateExpireDate
-import com.android.shelfLife.ui.utils.validateFoodName
+import com.android.shelfLife.ui.utils.validateNumber
 import com.android.shelfLife.ui.utils.validateOpenDate
+import com.android.shelfLife.ui.utils.validateString
 import com.google.firebase.Timestamp
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class FoodItemViewModel(
+@HiltViewModel
+class FoodItemViewModel
+@Inject
+constructor(
     private val foodItemRepository: FoodItemRepository,
     private val userRepository: UserRepository
 ) : ViewModel() {
@@ -31,6 +36,8 @@ class FoodItemViewModel(
   var selectedFood by mutableStateOf<FoodItem?>(null)
 
   var isSelected by mutableStateOf(false)
+
+  var isScanned by mutableStateOf(false)
 
   var foodName by mutableStateOf("")
   var amount by mutableStateOf("")
@@ -69,12 +76,18 @@ class FoodItemViewModel(
     }
   }
 
+  fun isScanned() {
+    isScanned = true
+  }
+
   /** Validates all fields when the submit button is clicked. */
   fun validateAllFieldsWhenSubmitButton() {
-    if (!isSelected) {
-      foodNameErrorResId = validateFoodName(foodName)
+    if (!isSelected && !isScanned) {
+      foodNameErrorResId = validateString(foodName)
     }
-    amountErrorResId = validateAmount(amount)
+    if (!isScanned) {
+      amountErrorResId = validateNumber(amount)
+    }
     buyDateErrorResId = validateBuyDate(buyDate)
     expireDateErrorResId = validateExpireDate(expireDate, buyDate, buyDateErrorResId)
     openDateErrorResId =
@@ -105,12 +118,12 @@ class FoodItemViewModel(
 
   fun changeFoodName(newFoodName: String) {
     foodName = newFoodName
-    foodNameErrorResId = validateFoodName(foodName)
+    foodNameErrorResId = validateString(foodName)
   }
 
   fun changeAmount(newAmount: String) {
     amount = newAmount
-    amountErrorResId = validateAmount(amount)
+    amountErrorResId = validateNumber(amount)
   }
 
   fun changeExpiryDate(newDate: String) {
@@ -136,7 +149,7 @@ class FoodItemViewModel(
         validateOpenDate(openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
   }
 
-  suspend fun submitFoodItem(): Boolean {
+  suspend fun submitFoodItem(scannedFoodFacts: FoodFacts? = null): Boolean {
     validateAllFieldsWhenSubmitButton()
     val isExpireDateValid = expireDateErrorResId == null && expireDate.isNotEmpty()
     val isOpenDateValid = openDateErrorResId == null
@@ -156,19 +169,21 @@ class FoodItemViewModel(
         expiryTimestamp != null &&
         buyTimestamp != null) {
       val foodFacts =
-          FoodFacts(
-              name = foodName,
-              barcode =
-                  if (isSelected) selectedFood!!.foodFacts.barcode
-                  else selectedImage?.barcode ?: "",
-              quantity = Quantity(amount.toDouble(), unit),
-              category = category,
-              nutritionFacts =
-                  if (isSelected) selectedFood!!.foodFacts.nutritionFacts
-                  else selectedImage?.nutritionFacts ?: NutritionFacts(),
-              imageUrl =
-                  if (isSelected) selectedFood!!.foodFacts.imageUrl
-                  else selectedImage?.imageUrl ?: FoodFacts.DEFAULT_IMAGE_URL)
+          if (isScanned) scannedFoodFacts!!
+          else
+              FoodFacts(
+                  name = foodName,
+                  barcode =
+                      if (isSelected) selectedFood!!.foodFacts.barcode
+                      else selectedImage?.barcode ?: "",
+                  quantity = Quantity(amount.toDouble(), unit),
+                  category = category,
+                  nutritionFacts =
+                      if (isSelected) selectedFood!!.foodFacts.nutritionFacts
+                      else selectedImage?.nutritionFacts ?: NutritionFacts(),
+                  imageUrl =
+                      if (isSelected) selectedFood!!.foodFacts.imageUrl
+                      else selectedImage?.imageUrl ?: FoodFacts.DEFAULT_IMAGE_URL)
       val newFoodItem =
           FoodItem(
               uid = if (isSelected) selectedFood!!.uid else foodItemRepository.getNewUid(),
@@ -189,5 +204,16 @@ class FoodItemViewModel(
     } else {
       return false
     }
+  }
+
+  fun resetForScanner() {
+    location = FoodStorageLocation.PANTRY
+    expireDate = ""
+    openDate = ""
+    buyDate = formatTimestampToDate(Timestamp.now())
+    expireDateErrorResId = null
+    openDateErrorResId = null
+    buyDateErrorResId = null
+    locationExpanded = false
   }
 }

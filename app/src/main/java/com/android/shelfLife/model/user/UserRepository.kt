@@ -1,19 +1,15 @@
 package com.android.shelfLife.model.user
 
 import android.content.Context
-import com.android.shelfLife.model.newhousehold.HouseHold
 import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {
-  val isUserLoggedIn: StateFlow<Boolean>
 
   /** Exposes the user data as a StateFlow. */
   val user: StateFlow<User?>
 
   /** Exposes the invitations list as a StateFlow. */
   val invitations: StateFlow<List<String>>
-
-  val selectedHousehold: StateFlow<HouseHold?>
 
   /** Generates a new unique ID for a user. */
   fun getNewUid(): String
@@ -32,13 +28,6 @@ interface UserRepository {
    * needed to avoid memory leaks.
    */
   fun stopListeningForInvitations()
-
-  /**
-   * Sets the user's logged-in status. This is used to determine whether to show the sign-in screen
-   *
-   * @param isLoggedIn - The new logged-in status.
-   */
-  fun setUserLoggedInStatus(isLoggedIn: Boolean)
 
   // Other suspend functions for updating user data
   suspend fun addHouseholdUID(householdUID: String)
@@ -62,10 +51,10 @@ interface UserRepository {
   suspend fun updateSelectedHousehold(selectedHouseholdUID: String)
 
   /** @param userEmails - The set of user emails to get the user IDs for. */
-  fun getUserIds(userEmails: Set<String?>, callback: (Map<String, String>) -> Unit)
+  suspend fun getUserIds(userEmails: Set<String?>): Map<String, String>
 
   /** @param userIds - The list of user IDs to get the emails for. */
-  fun getUserEmails(userIds: List<String>, callback: (Map<String, String>) -> Unit)
+  suspend fun getUserEmails(userIds: List<String>): Map<String, String>
 
   /**
    * Selects a household and saves it to the user's data. VIEW MODELS NEED TO MANUALLY SELECT THE
@@ -73,5 +62,5 @@ interface UserRepository {
    *
    * @param household - The household to select.
    */
-  suspend fun selectHousehold(household: HouseHold?)
+  suspend fun selectHousehold(householdUid: String?)
 }

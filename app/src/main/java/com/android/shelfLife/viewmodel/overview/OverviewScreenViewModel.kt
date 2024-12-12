@@ -1,5 +1,6 @@
 package com.android.shelfLife.viewmodel.overview
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
@@ -10,17 +11,23 @@ import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.newhousehold.HouseHold
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
-import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class OverviewScreenViewModel(
+@HiltViewModel
+class OverviewScreenViewModel
+@Inject
+constructor(
     private val houseHoldRepository: HouseHoldRepository,
     private val listFoodItemsRepository: FoodItemRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
   private val _selectedFilters = MutableStateFlow<List<String>>(emptyList())
   val selectedFilters = _selectedFilters.asStateFlow()
@@ -34,36 +41,14 @@ class OverviewScreenViewModel(
 
   val finishedLoading = MutableStateFlow(false)
 
-  val selectedHousehold = userRepository.selectedHousehold
   val households = houseHoldRepository.households
+  val selectedHousehold = houseHoldRepository.selectedHousehold
   val foodItems = listFoodItemsRepository.foodItems
 
   val filters = listOf("Dairy", "Meat", "Fish", "Fruit", "Vegetables", "Bread", "Canned")
 
-  /**
-   * Initializes the OverviewScreenViewModel by loading the list of households from the repository.
-   */
   init {
-    Log.d("OverviewScreenViewModel", "Initialized")
-    FirebaseAuth.getInstance().addAuthStateListener { firebaseAuth ->
-      if (firebaseAuth.currentUser != null) {
-        Log.d("OverviewScreenViewModel", "User logged in, loading....")
-      }
-    }
-  }
-
-  /** Loads the list of households from the repository and updates the [_households] flow. */
-  private fun loadHouseholds() {
-    viewModelScope.launch {
-      userRepository.user.value?.let { user ->
-        houseHoldRepository.initializeHouseholds(user.householdUIDs, user.selectedHouseholdUID!!)
-        userRepository.selectHousehold(
-            households.value.find { it.uid == user.selectedHouseholdUID }
-                ?: households.value.firstOrNull())
-      }
-      Log.d("OverviewScreenViewModel", "Households loaded")
-      finishedLoading.value = true
-    }
+    Log.d("OverviewScreenViewModel", "Init")
   }
 
   /**
