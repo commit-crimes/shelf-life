@@ -31,6 +31,7 @@ import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.recipes.execution.ServingsScreen
 import com.android.shelfLife.ui.recipes.addRecipe.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.execution.InstructionScreen
+import com.android.shelfLife.ui.recipes.execution.RecipeExecutionScreen
 import com.android.shelfLife.ui.recipes.execution.SelectFoodItemsForIngredientScreen
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
 import com.example.compose.ShelfLifeTheme
@@ -84,14 +85,14 @@ fun ShelfLifeApp() {
       composable(Screen.GENERATE_RECIPE) { GenerateRecipeScreen(navigationActions) }
     }
 
-    navigation(startDestination = Screen.SERVINGS_SCREEN, route = Route.RECIPE_EXECUTION){
-      composable(Screen.SERVINGS_SCREEN){
-        ServingsScreen(navigationActions)
+    navigation(startDestination = Screen.RECIPE_EXECUTION, route = Route.RECIPE_EXECUTION){
+      composable(Screen.RECIPE_EXECUTION){
+        RecipeExecutionScreen(navigationActions)
       }
-      composable(Screen.FOOD_ITEM_SELECTION){
-        SelectFoodItemsForIngredientScreen(navigationActions)
-      }
-      composable(Screen.INSTRUCTION_SCREEN){ InstructionScreen(navigationActions) }
+//      composable(Screen.FOOD_ITEM_SELECTION){
+//        SelectFoodItemsForIngredientScreen(navigationActions)
+//      }
+//      composable(Screen.INSTRUCTION_SCREEN){ InstructionScreen(navigationActions) }
     }
 
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {

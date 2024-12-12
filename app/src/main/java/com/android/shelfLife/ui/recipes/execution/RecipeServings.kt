@@ -36,12 +36,14 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
+import com.android.shelfLife.viewmodel.recipes.newExecuteRecipeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ServingsScreen(
     navigationActions: NavigationActions,
-    executeRecipeViewModel: ExecuteRecipeViewModel = hiltViewModel()
+    executeRecipeViewModel: newExecuteRecipeViewModel = hiltViewModel(),
+    onNext: () -> Unit
 ) {
     val servings by executeRecipeViewModel.servings.collectAsState()
 
@@ -95,9 +97,8 @@ fun ServingsScreen(
         floatingActionButton = {
             androidx.compose.material3.FloatingActionButton(
                 onClick = {
-                    Log.d("ServingsScreen", "FloatingActionButton clicked: navigating to FOOD_ITEM_SELECTION")
-                    navigationActions.navigateTo(Screen.FOOD_ITEM_SELECTION)
-                },
+                    Log.d("ServingsScreen", "FloatingActionButton clicked: next state")
+                    onNext() },
                 modifier = Modifier
                     .testTag("nextFab")
                     .padding(horizontal = 16.dp)

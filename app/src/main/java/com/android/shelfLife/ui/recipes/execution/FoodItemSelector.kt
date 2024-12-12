@@ -33,12 +33,15 @@ import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
+import com.android.shelfLife.viewmodel.recipes.newExecuteRecipeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectFoodItemsForIngredientScreen(
     navigationActions: NavigationActions,
-    viewModel: ExecuteRecipeViewModel = hiltViewModel()
+    viewModel: newExecuteRecipeViewModel = hiltViewModel(),
+    onNext: () -> Unit,
+    onPrevious: () -> Unit
 ) {
     val ingredientName by viewModel.currentIngredientName.collectAsState()
     val availableFoodItems by viewModel.foodItems.collectAsState()
@@ -67,8 +70,8 @@ fun SelectFoodItemsForIngredientScreen(
                 title = { Text("Select Items for $ingredientName") },
                 navigationIcon = {
                     IconButton(onClick = {
-                        Log.d("SelectFoodItemsScreen", "Back button clicked.")
-                        navigationActions.goBack()
+                        Log.d("SelectFoodItemsScreen", "Back button clicked. calling onPrevious")
+                        onPrevious()
                     }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
@@ -82,13 +85,21 @@ fun SelectFoodItemsForIngredientScreen(
             FloatingActionButton(
                 onClick = {
                     Log.d("SelectFoodItemsScreen", "Floating action button clicked.")
+
+                    // Retrieve the currently selected items for the ingredient
+                    val selectedItems = currentlySelectedItems
+                    val selectedAmounts = selectedItems.map { it.foodFacts.quantity.amount.toFloat() }
+
+                    // Temporarily consume the selected items
+                    viewModel.temporarilyConsumeItems(selectedItems, selectedAmounts)
+
                     if (viewModel.hasMoreIngredients()) {
                         Log.d("SelectFoodItemsScreen", "Navigating to the next ingredient.")
                         viewModel.nextIngredient()
                     } else {
                         Log.d("SelectFoodItemsScreen", "No more ingredients. Navigating to instructions.")
-                        //TODO(viewModel.consumeSelectedItems())
-                        navigationActions.navigateTo(Screen.INSTRUCTION_SCREEN)
+                        viewModel.consumeSelectedItems()
+                        onNext()
                     }
                 },
                 containerColor = MaterialTheme.colorScheme.primary,

@@ -95,7 +95,7 @@ fun IndividualRecipeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navigationActions.navigateTo(Screen.SERVINGS_SCREEN)
+                    navigationActions.navigateTo(Route.RECIPE_EXECUTION)
                 },
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 modifier = Modifier.testTag("startButton")
