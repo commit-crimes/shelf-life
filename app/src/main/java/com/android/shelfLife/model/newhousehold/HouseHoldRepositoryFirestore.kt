@@ -88,7 +88,6 @@ class HouseholdRepositoryFirestore(
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error initializing households", e)
     }
-
   }
 
   /**
@@ -114,7 +113,6 @@ class HouseholdRepositoryFirestore(
       db.collection(collectionPath)
           .document(household.uid) // Use the household UID as the document ID
           .set(householdData)
-
     } catch (e: Exception) {
       val updatedHouseHolds = _households.value.filterNot { it.uid == household.uid }
       _households.value = updatedHouseHolds
@@ -263,12 +261,12 @@ class HouseholdRepositoryFirestore(
       val stinkyPoints = doc.get("stinkyPoints") as? Map<String, Long> ?: emptyMap()
 
       HouseHold(
-        uid = uid,
-        name = name,
-        members = members,
-        sharedRecipes = sharedRecipes,
-        ratPoints = ratPoints,
-        stinkyPoints = stinkyPoints)
+          uid = uid,
+          name = name,
+          members = members,
+          sharedRecipes = sharedRecipes,
+          ratPoints = ratPoints,
+          stinkyPoints = stinkyPoints)
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error converting document to HouseHold", e)
       null

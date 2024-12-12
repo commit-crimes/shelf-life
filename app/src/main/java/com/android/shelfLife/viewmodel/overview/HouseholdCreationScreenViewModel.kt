@@ -135,7 +135,9 @@ constructor(
               }
 
       val householdUid = houseHoldRepository.getNewUid()
-      val household = HouseHold(householdUid, householdName, listOf(user.uid), emptyList(), emptyMap(), emptyMap())
+      val household =
+          HouseHold(
+              householdUid, householdName, listOf(user.uid), emptyList(), emptyMap(), emptyMap())
 
       houseHoldRepository.addHousehold(household)
       userRepository.addHouseholdUID(household.uid)
@@ -143,7 +145,6 @@ constructor(
       houseHoldRepository.selectHousehold(household)
       userRepository.selectHousehold(household.uid)
       Log.d("HouseholdViewModel", "Selected new household: ${household.name}")
-
 
       if (friendEmails.isNotEmpty()) {
         val emailToUid = userRepository.getUserIds(friendEmails)

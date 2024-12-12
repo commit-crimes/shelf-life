@@ -18,9 +18,7 @@ interface HouseHoldRepository {
    */
   fun selectHouseholdToEdit(household: HouseHold?)
 
-
   fun selectHousehold(household: HouseHold?)
-
 
   /**
    * Fetches households by their UIDs.
@@ -62,12 +60,12 @@ interface HouseHoldRepository {
    */
   fun checkIfHouseholdNameExists(houseHoldName: String): Boolean
 
-    /**
-     * Updates the stinky points for a household.
-     *
-     * @param householdId The ID of the household.
-     * @param stinkyPoints The updated stinky points.
-     */
+  /**
+   * Updates the stinky points for a household.
+   *
+   * @param householdId The ID of the household.
+   * @param stinkyPoints The updated stinky points.
+   */
   suspend fun updateStinkyPoints(householdId: String, stinkyPoints: Map<String, Long>)
 
   /**

@@ -2,7 +2,6 @@ package com.android.shelfLife.model.user
 
 import android.content.Context
 import android.util.Log
-import com.android.shelfLife.model.newhousehold.HouseHold
 import com.android.shelfLife.viewmodel.leaderboard.LeaderboardMode
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.auth.FirebaseAuth
@@ -40,9 +39,8 @@ constructor(
   // Listener for invitations
   private var invitationsListenerRegistration: ListenerRegistration? = null
 
-
   private val _isAudioPlaying = MutableStateFlow<Boolean>(true)
-  override var isAudioPlaying : StateFlow<Boolean> = _isAudioPlaying.asStateFlow()
+  override var isAudioPlaying: StateFlow<Boolean> = _isAudioPlaying.asStateFlow()
 
   private val _currentAudioMode = MutableStateFlow<LeaderboardMode?>(null)
   override var currentAudioMode: StateFlow<LeaderboardMode?> = _currentAudioMode.asStateFlow()
@@ -127,22 +125,22 @@ constructor(
     return uidToEmail
   }
 
-    override suspend fun getUserNames(userIds: List<String>): Map<String, String> {
-        if (userIds.isEmpty()) return emptyMap()
+  override suspend fun getUserNames(userIds: List<String>): Map<String, String> {
+    if (userIds.isEmpty()) return emptyMap()
 
-        val uidToName = mutableMapOf<String, String>()
-        val chunks = userIds.chunked(10)
+    val uidToName = mutableMapOf<String, String>()
+    val chunks = userIds.chunked(10)
 
-        for (chunk in chunks) {
-            val query = db.collection("users").whereIn(FieldPath.documentId(), chunk).get().await()
-            for (doc in query.documents) {
-                val username = doc.getString("username")
-                val userId = doc.id
-                if (username != null) uidToName[userId] = username
-            }
-        }
-        return uidToName
+    for (chunk in chunks) {
+      val query = db.collection("users").whereIn(FieldPath.documentId(), chunk).get().await()
+      for (doc in query.documents) {
+        val username = doc.getString("username")
+        val userId = doc.id
+        if (username != null) uidToName[userId] = username
+      }
     }
+    return uidToName
+  }
 
   override fun startListeningForInvitations() {
     val currentUser = firebaseAuth.currentUser
@@ -181,15 +179,15 @@ constructor(
     invitationsListenerRegistration = null
   }
 
-    override fun setAudioPlaying(isPlaying: Boolean) {
-        _isAudioPlaying.value = isPlaying
-    }
+  override fun setAudioPlaying(isPlaying: Boolean) {
+    _isAudioPlaying.value = isPlaying
+  }
 
-    override fun setCurrentAudioMode(mode: LeaderboardMode?) {
-        _currentAudioMode.value = mode
-    }
+  override fun setCurrentAudioMode(mode: LeaderboardMode?) {
+    _currentAudioMode.value = mode
+  }
 
-    private suspend fun updateUserField(fieldName: String, value: Any) {
+  private suspend fun updateUserField(fieldName: String, value: Any) {
     val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
     userCollection.document(currentUser.uid).update(fieldName, value)
 
@@ -244,7 +242,6 @@ constructor(
     _user.value = updatedUserData
     userCollection.document(currentUser.uid).update(fieldName, updateValue)
   }
-
 
   private enum class ArrayOperation {
     ADD,

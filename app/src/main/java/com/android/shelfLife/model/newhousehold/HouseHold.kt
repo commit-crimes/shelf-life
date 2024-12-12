@@ -14,5 +14,5 @@ data class HouseHold(
     val members: List<String>, // List of member IDs in the household
     val sharedRecipes: List<String>, // List of shared recipe IDs
     val ratPoints: Map<String, Long>, // Map of member IDs to their respective rat points
-    val stinkyPoints : Map<String, Long> // Map of member IDs to their respective stinky points
+    val stinkyPoints: Map<String, Long> // Map of member IDs to their respective stinky points
 )

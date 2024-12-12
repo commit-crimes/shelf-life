@@ -9,11 +9,10 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class Dummy {
-    @get:Rule
-    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+  @get:Rule val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    @Test
-    fun dummyTest() {
-        // Dummy test to make the test suite run
-    }
+  @Test
+  fun dummyTest() {
+    // Dummy test to make the test suite run
+  }
 }

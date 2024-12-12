@@ -3,12 +3,10 @@ package com.android.shelfLife.ui.newoverview
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Leaderboard
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -97,32 +95,30 @@ fun OverviewScreen(navigationActions: NavigationActions) {
               },
               // Floating Action Button to add a new food item
               floatingActionButton = {
-                  Column(
-                      horizontalAlignment = Alignment.End,
-                      verticalArrangement = Arrangement.spacedBy(16.dp) // space between FABs
-                  ) {
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(16.dp) // space between FABs
+                    ) {
                       // Leaderboard
                       FloatingActionButton(
                           onClick = { navigationActions.navigateTo(Screen.LEADERBOARD) },
                           containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                          modifier = Modifier.testTag("leaderboardFab")
-                      ) {
-                          Icon(
-                              imageVector = Icons.Default.Leaderboard, // Make sure you have an icon for leaderboard
-                              contentDescription = "Leaderboard"
-                          )
-                      }
+                          modifier = Modifier.testTag("leaderboardFab")) {
+                            Icon(
+                                imageVector =
+                                    Icons.Default
+                                        .Leaderboard, // Make sure you have an icon for leaderboard
+                                contentDescription = "Leaderboard")
+                          }
 
                       // Add
                       FloatingActionButton(
                           onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
                           containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                          modifier = Modifier.testTag("addFoodFab")
-                      ) {
-                          Icon(Icons.Default.Add, contentDescription = "Add")
-                      }
-
-                  }
+                          modifier = Modifier.testTag("addFoodFab")) {
+                            Icon(Icons.Default.Add, contentDescription = "Add")
+                          }
+                    }
               },
           ) { paddingValues ->
             Column(
