@@ -75,4 +75,10 @@ constructor(
   fun getRecipeInstruction(): List<String> {
     return selectedRecipe!!.instructions
   }
+
+  suspend fun deleteSelectedRecipe(){
+    if (selectedRecipe != null){
+      recipeRepository.deleteRecipe(selectedRecipe!!.uid)
+    }
+  }
 }

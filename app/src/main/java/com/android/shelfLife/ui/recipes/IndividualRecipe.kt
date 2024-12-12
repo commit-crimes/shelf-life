@@ -13,9 +13,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,6 +43,7 @@ import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
 import kotlin.math.floor
 
 @Composable
@@ -65,6 +71,8 @@ fun IndividualRecipeScreen(
     individualRecipeViewModel: IndividualRecipeViewModel = hiltViewModel()
 ) {
 
+    val coroutineScope = rememberCoroutineScope()
+
   if (individualRecipeViewModel.selectedRecipeIsNonEmpty) {
     // Scaffold that provides the structure for the screen, including top and bottom bars.
     Scaffold(
@@ -73,7 +81,19 @@ fun IndividualRecipeScreen(
           CustomTopAppBar(
               onClick = { navigationActions.goBack() },
               title = individualRecipeViewModel.getRecipeName(),
-              titleTestTag = "individualRecipeTitle")
+              titleTestTag = "individualRecipeTitle",
+              actions = {
+                  IconButton(
+                      onClick = {
+                          coroutineScope.launch {
+                              individualRecipeViewModel.deleteSelectedRecipe()
+                              navigationActions.goBack()
+                          }
+                      },
+                      modifier = Modifier.testTag("deleteFoodItem")) {
+                      Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
+                  }
+              })
         },
         bottomBar = {
           // Bottom navigation bar for switching between main app destinations.
