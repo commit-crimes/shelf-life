@@ -1,4 +1,4 @@
-package com.android.shelflife.utils
+package com.android.shelfLife.utils
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Box
@@ -17,9 +17,10 @@ import org.junit.Test
 @HiltAndroidTest
 class DummyTestClass {
 
-    @get:Rule
+    @get:Rule(order = 0)
+    val hiltRule = HiltAndroidRule(this)
+    @get:Rule(order = 1)
     val composeTestRule = createComposeRule()
-    @get:Rule val hiltRule = HiltAndroidRule(this)
 
     @Before
     fun setUp() {

@@ -10,7 +10,6 @@ plugins {
     alias(libs.plugins.sonar)
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
-    kotlin("kapt")
 }
 
 android {
@@ -95,7 +94,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.7"
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
 
     packaging {
@@ -246,6 +245,7 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.hilt.android.testing)
+    implementation(libs.core)
 
     // Global test implementation
     androidTestImplementation(libs.compose.test.junit)
@@ -260,8 +260,6 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.camera.core)
-    implementation(libs.androidx.datastore.core.android)
-    implementation(libs.androidx.datastore.preferences)
     implementation(libs.material)
     implementation(libs.androidx.material.icons.extended)
 
@@ -306,10 +304,12 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
-    kapt(libs.hilt.android.compiler)
+
 
     // Hilt Testing
-    kaptAndroidTest(libs.hilt.android.compiler)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.hilt.android.testing)
+
     testImplementation(libs.hilt.android.testing)
     kaptTest(libs.hilt.android.compiler)
 
@@ -326,11 +326,11 @@ dependencies {
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.mockk)
+    androidTestImplementation(libs.androidx.runner)
 
     // AndroidJUnitRunner and JUnit Rules
-    androidTestImplementation(libs.androidx.runner.v120)
-    testImplementation(libs.androidx.runner.v120)
-    implementation(libs.androidx.runner.v120)
+    testImplementation(libs.androidx.runner)
+    implementation(libs.androidx.runner)
     androidTestImplementation(libs.androidx.rules)
     testImplementation(libs.androidx.rules)
     implementation(libs.androidx.rules)
