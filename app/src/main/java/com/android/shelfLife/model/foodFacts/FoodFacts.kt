@@ -59,6 +59,7 @@ enum class FoodCategory {
   GRAIN, // Grain category
   BEVERAGE, // Beverage category
   SNACK, // Snack category
+  FISH, // Fish category
   OTHER // Other category
 }
 

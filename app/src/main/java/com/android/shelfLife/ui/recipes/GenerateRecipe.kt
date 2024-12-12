@@ -29,6 +29,7 @@ import com.android.shelfLife.model.recipe.RecipePrompt
 import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.viewmodel.recipe.RecipeGenerationViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun GenerateRecipeScreen(
@@ -36,6 +37,8 @@ fun GenerateRecipeScreen(
     generationViewModel: RecipeGenerationViewModel = hiltViewModel()
 ) {
   val context = LocalContext.current
+
+  val coroutineScope = rememberCoroutineScope()
 
   // States for recipe name and food items
   var recipeName by rememberSaveable { mutableStateOf("") }
@@ -136,11 +139,15 @@ fun GenerateRecipeScreen(
                     recipeType = RecipeType.HIGH_PROTEIN))
             generationViewModel.generateRecipe(
                 onSuccess = { recipe ->
-                  generationViewModel.acceptGeneratedRecipe {
-                    Handler(Looper.getMainLooper()).post {
-                      Toast.makeText(context, "Recipe generated successfully.", Toast.LENGTH_SHORT)
-                          .show()
+                  coroutineScope.launch {
+                    generationViewModel.acceptGeneratedRecipe {
+                      Handler(Looper.getMainLooper()).post {
+                        Toast.makeText(
+                                context, "Recipe generated successfully.", Toast.LENGTH_SHORT)
+                            .show()
+                      }
                     }
+
                     navigationActions.goBack()
                   }
                 },
