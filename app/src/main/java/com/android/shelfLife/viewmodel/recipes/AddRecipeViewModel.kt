@@ -10,6 +10,7 @@ import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.newRecipe.RecipeRepository
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.Recipe
+import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.utils.validateNumber
 import com.android.shelfLife.ui.utils.validateString
@@ -282,7 +283,8 @@ constructor(
             instructions = instructions.value,
             servings = servings.value.toFloat(),
             time = time.value.toDouble().minutes,
-            ingredients = ingredients.value)
+            ingredients = ingredients.value,
+            recipeType = RecipeType.PERSONAL)
     recipeRepository.addRecipe(recipe = newRecipe.copy(uid = newRecipeUid))
     userRepository.addRecipeUID(newRecipeUid)
   }
