@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.android.shelfLife.model.newRecipe.RecipeRepository
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.Recipe
+import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -15,6 +16,7 @@ class IndividualRecipeViewModel
 @Inject
 constructor(
     private val recipeRepository: RecipeRepository,
+  private val userRepository: UserRepository
 ) : ViewModel() {
 
   var selectedRecipe by mutableStateOf<Recipe?>(null)
@@ -78,7 +80,10 @@ constructor(
 
   suspend fun deleteSelectedRecipe(){
     if (selectedRecipe != null){
-      recipeRepository.deleteRecipe(selectedRecipe!!.uid)
+      val isDeleted = recipeRepository.deleteRecipe(selectedRecipe!!.uid)
+      if (isDeleted){
+        userRepository.deleteRecipeUID(selectedRecipe!!.uid)
+      }
     }
   }
 }

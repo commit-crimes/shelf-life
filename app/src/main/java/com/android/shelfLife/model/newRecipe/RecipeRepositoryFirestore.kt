@@ -164,7 +164,7 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
    *
    * @param recipeId The unique ID of the recipe to delete.
    */
-  override suspend fun deleteRecipe(recipeId: String) {
+  override suspend fun deleteRecipe(recipeId: String): Boolean {
     var deletedRecipe: Recipe? = null
     try {
       // Update local cache
@@ -180,7 +180,9 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
         current.add(it)
         _recipes.value = current
       }
+      return false
     }
+    return true
   }
 
   /**

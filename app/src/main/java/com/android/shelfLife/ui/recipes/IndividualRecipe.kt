@@ -204,18 +204,18 @@ fun DisplayInstructionNew(instruction: String) {
 }
 
 // this preview function allows us to see the easter egg screen
-@Preview()
-@Composable
-private fun IndividualRecipeScreenPreviewEasterEgg() {
-  val navController = rememberNavController()
-  val navigationActions = NavigationActions(navController)
-  val firebaseFirestore = FirebaseFirestore.getInstance()
-  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
-  val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
-
-  // Render the IndividualRecipeScreen with a null selectedRecipe
-  IndividualRecipeScreen(navigationActions = navigationActions)
-}
+//@Preview()
+//@Composable
+//private fun IndividualRecipeScreenPreviewEasterEgg() {
+//  val navController = rememberNavController()
+//  val navigationActions = NavigationActions(navController)
+//  val firebaseFirestore = FirebaseFirestore.getInstance()
+//  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
+//  val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
+//
+//  // Render the IndividualRecipeScreen with a null selectedRecipe
+//  IndividualRecipeScreen(navigationActions = navigationActions)
+//}
 // this preview shows the example where we do have a selected recipe
 // @Preview()
 // @Composable
