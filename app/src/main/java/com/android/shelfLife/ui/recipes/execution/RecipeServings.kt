@@ -33,16 +33,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
-import com.android.shelfLife.viewmodel.recipes.newExecuteRecipeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ServingsScreen(
     navigationActions: NavigationActions,
-    executeRecipeViewModel: newExecuteRecipeViewModel = hiltViewModel(),
+    executeRecipeViewModel: ExecuteRecipeViewModel = hiltViewModel(),
     onNext: () -> Unit
 ) {
     val servings by executeRecipeViewModel.servings.collectAsState()

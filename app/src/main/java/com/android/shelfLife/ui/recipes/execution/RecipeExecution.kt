@@ -9,10 +9,10 @@ import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.viewmodel.recipes.RecipeExecutionState
-import com.android.shelfLife.viewmodel.recipes.newExecuteRecipeViewModel
+import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
 
 @Composable
-fun RecipeExecutionScreen(navigationActions: NavigationActions, viewModel: newExecuteRecipeViewModel = hiltViewModel()) {
+fun RecipeExecutionScreen(navigationActions: NavigationActions, viewModel: ExecuteRecipeViewModel = hiltViewModel()) {
     val currentState by viewModel.state.collectAsState()
 
     when (currentState) {

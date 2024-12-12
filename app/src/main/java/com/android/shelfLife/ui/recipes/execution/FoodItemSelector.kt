@@ -31,15 +31,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
-import com.android.shelfLife.viewmodel.recipes.newExecuteRecipeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectFoodItemsForIngredientScreen(
     navigationActions: NavigationActions,
-    viewModel: newExecuteRecipeViewModel = hiltViewModel(),
+    viewModel: ExecuteRecipeViewModel = hiltViewModel(),
     onNext: () -> Unit,
     onPrevious: () -> Unit
 ) {
