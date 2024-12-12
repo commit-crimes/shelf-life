@@ -24,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,6 +55,8 @@ fun AddRecipeScreen(
 ) {
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
+
+  val instructions by addRecipeViewModel.instructions.collectAsState()
 
   Scaffold(
       modifier = Modifier.testTag("addRecipeScreen"),
@@ -160,7 +163,7 @@ fun AddRecipeScreen(
                 }
               }
 
-              itemsIndexed(addRecipeViewModel.instructions.value) { index, instruction ->
+              itemsIndexed(instructions) { index, instruction ->
                 InstructionItem(index = index, addRecipeViewModel = addRecipeViewModel)
               }
 
