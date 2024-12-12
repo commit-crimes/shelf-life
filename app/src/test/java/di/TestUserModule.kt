@@ -1,4 +1,4 @@
-package com.android.shelfLife.di
+package di
 
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.model.user.UserRepositoryFirestore
