@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.recipes
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -62,7 +61,6 @@ import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import com.android.shelfLife.viewmodel.recipes.RecipesViewModel
 import kotlinx.coroutines.launch
 
-@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun RecipesScreen(navigationActions: NavigationActions) {
   val recipesViewModel = hiltViewModel<RecipesViewModel>()
@@ -71,7 +69,6 @@ fun RecipesScreen(navigationActions: NavigationActions) {
   val user = recipesViewModel.user.collectAsState()
   val selectedHousehold = recipesViewModel.household.collectAsState()
 
-  val isFabExpanded by recipesViewModel.fabExpanded.collectAsState()
   val query by recipesViewModel.query.collectAsState()
   val filteredRecipeList by recipesViewModel.filteredRecipes.collectAsState()
   val selectedFilters by recipesViewModel.selectedFilters.collectAsState()
@@ -109,7 +106,7 @@ fun RecipesScreen(navigationActions: NavigationActions) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)) {
                   // Secondary FAB for "Manual" option
-                  if (isFabExpanded) {
+                  if (recipesViewModel.fabExpanded.value) {
                     ExtendedFloatingActionButton(
                         text = { Text("Generate") },
                         icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "Add") },
@@ -124,10 +121,10 @@ fun RecipesScreen(navigationActions: NavigationActions) {
 
                   // Primary FAB
                   ExtendedFloatingActionButton(
-                      text = { Text(if (isFabExpanded) "Manual" else "") },
+                      text = { Text(if (recipesViewModel.fabExpanded.value) "Manual" else "") },
                       icon = { Icon(Icons.Default.Add, contentDescription = "Add") },
                       onClick = {
-                        if (isFabExpanded) {
+                        if (recipesViewModel.fabExpanded.value) {
                           // Navigate to Generate Recipe screen
                           navigationActions.navigateTo(Screen.ADD_RECIPE)
                           recipesViewModel.shrinkFab()
@@ -136,7 +133,7 @@ fun RecipesScreen(navigationActions: NavigationActions) {
                           recipesViewModel.expandFab()
                         }
                       },
-                      expanded = isFabExpanded, // Bind to the state
+                      expanded = recipesViewModel.fabExpanded.value, // Bind to the state
                       containerColor = MaterialTheme.colorScheme.secondaryContainer,
                       modifier =
                           Modifier.testTag("addRecipeFab")

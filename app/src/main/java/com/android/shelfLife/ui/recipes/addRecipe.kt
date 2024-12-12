@@ -312,11 +312,12 @@ fun IngredientItemNEW(index: Int, ingredient: Ingredient, onRemoveClick: () -> U
  * @param onAddIngredient A callback function that is called when a new ingredient is successfully
  *   added.
  */
-@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
+
+    val ingredientUnit = addRecipeViewModel.ingredientQuantityUnit.collectAsState()
 
   androidx.compose.material3.AlertDialog(
       onDismissRequest = { addRecipeViewModel.createNewIngredient() },
@@ -354,7 +355,7 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
           // Quantity Unit Dropdown
           Row {
             UnitDropdownField(
-                unit = addRecipeViewModel.ingredientQuantityUnit.value,
+                unit = ingredientUnit.value,
                 onUnitChange = {newUnit -> addRecipeViewModel.changeIngredientQuantityUnit(newUnit)},
                 unitExpanded = addRecipeViewModel.unitExpanded,
                 onUnitExpandedChange = { addRecipeViewModel.changeUnitExpanded() },
