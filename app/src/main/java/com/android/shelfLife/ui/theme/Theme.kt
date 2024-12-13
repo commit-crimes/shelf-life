@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.android.shelfLife.ui.leaderboard.ThemeManager
 import com.android.shelfLife.ui.theme.*
 import com.example.ui.theme.AppTypography
 
@@ -289,51 +290,67 @@ val LocalThemeMode = compositionLocalOf { ThemeMode.SYSTEM_DEFAULT }
 
 @Composable
 fun ShelfLifeTheme(dynamicColor: Boolean = false, content: @Composable () -> Unit) {
-  val context = LocalContext.current
-  val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
-  // Initialize themeMode from shared preferences
-  var themeMode by rememberSaveable {
-    mutableStateOf(
-        ThemeMode.valueOf(
-            sharedPreferences.getString("theme_mode", ThemeMode.SYSTEM_DEFAULT.name)
-                ?: ThemeMode.SYSTEM_DEFAULT.name))
-  }
+    var themeMode by rememberSaveable {
+        mutableStateOf(
+            ThemeMode.valueOf(
+                sharedPreferences.getString("theme_mode", ThemeMode.SYSTEM_DEFAULT.name)
+                    ?: ThemeMode.SYSTEM_DEFAULT.name
+            )
+        )
+    }
 
-  // Function to toggle the theme and save to shared preferences
-  fun toggleTheme(newThemeMode: ThemeMode) {
-    themeMode = newThemeMode
-    sharedPreferences.edit().putString("theme_mode", newThemeMode.name).apply()
-  }
+    fun toggleTheme(newThemeMode: ThemeMode) {
+        themeMode = newThemeMode
+        sharedPreferences.edit().putString("theme_mode", newThemeMode.name).apply()
+    }
 
-  val darkTheme =
-      when (themeMode) {
+    val isDarkTheme = when (themeMode) {
         ThemeMode.SYSTEM_DEFAULT -> isSystemInDarkTheme()
         ThemeMode.LIGHT -> false
         ThemeMode.DARK -> true
-      }
-  val colorScheme =
-      if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-      } else if (darkTheme) darkScheme else lightScheme
-
-  val view = LocalView.current
-  if (!view.isInEditMode) {
-    SideEffect {
-      val window = (view.context as Activity).window
-      window.statusBarColor = Color.Transparent.toArgb()
-      WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
     }
-  }
-  // Update the LocalThemeToggler's toggleTheme function
-  DisposableEffect(Unit) {
-    LocalThemeToggler.toggleTheme = ::toggleTheme
-    onDispose { LocalThemeToggler.toggleTheme = {} }
-  }
 
-  // Provide LocalThemeToggler in CompositionLocalProvider
-  CompositionLocalProvider(
-      LocalThemeTogglerProvider provides LocalThemeToggler, LocalThemeMode provides themeMode) {
-        MaterialTheme(colorScheme = colorScheme, typography = AppTypography, content = content)
-      }
+    // If we have an active RAT/STINKY mode, reapply its color scheme according to current isDarkTheme.
+    // This ensures the RAT/STINKY theme follows system dark mode changes.
+    ThemeManager.activeMode?.let { mode ->
+        ThemeManager.updateScheme(mode, isDarkTheme)
+    }
+
+    val defaultColorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            if (isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        isDarkTheme -> darkScheme
+        else -> lightScheme
+    }
+
+    val finalColorScheme = ThemeManager.currentColorScheme.value ?: defaultColorScheme
+
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = Color.Transparent.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !isDarkTheme
+        }
+    }
+
+    DisposableEffect(Unit) {
+        LocalThemeToggler.toggleTheme = ::toggleTheme
+        onDispose { LocalThemeToggler.toggleTheme = {} }
+    }
+
+    CompositionLocalProvider(
+        LocalThemeTogglerProvider provides LocalThemeToggler,
+        LocalThemeMode provides themeMode
+    ) {
+        MaterialTheme(
+            colorScheme = finalColorScheme,
+            typography = AppTypography,
+            content = content
+        )
+    }
 }

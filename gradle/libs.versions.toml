@@ -1,7 +1,9 @@
 [versions]
 # Plugins
 agp = "8.4.2"
+androidxFragmentKtx = "1.8.5"
 coilCompose = "3.0.0-rc01"
+coilGif = "<latest-version>"
 coilNetworkOkhttp = "3.0.0-rc01"
 datastorePreferences = "1.1.1"
 hiltAndroid = "2.51.1"
@@ -115,6 +117,7 @@ androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", v
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "ui" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
+coil-gif = { module = "io.coil-kt:coil-gif", version.ref = "coilGif" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 firebase-auth = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuth" }
 firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.ref = "firebaseAuthKtx" }

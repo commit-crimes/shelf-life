@@ -42,7 +42,6 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
           .collection("items")
           .document(foodItem.uid)
           .set(foodItem.toMap())
-          .await()
     } catch (e: Exception) {
       Log.e("FoodItemRepository", "Error adding food item", e)
       val updatedFoodItems = _foodItems.value.filterNot { it.uid == foodItem.uid }
@@ -130,7 +129,6 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
           .collection("items")
           .document(foodItem.uid)
           .set(foodItem)
-          .await()
     } catch (e: Exception) {
       Log.e("FoodItemRepository", "Error updating food item", e)
       // Rollback: Restore the original item in the local cache
@@ -166,7 +164,6 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
           .collection("items")
           .document(foodItemId)
           .delete()
-          .await()
     } catch (e: Exception) {
       Log.e("FoodItemRepository", "Error deleting food item", e)
       // Rollback: Restore the deleted item in the local cache

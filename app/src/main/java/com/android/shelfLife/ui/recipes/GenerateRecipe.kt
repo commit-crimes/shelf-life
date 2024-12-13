@@ -28,7 +28,7 @@ import com.android.shelfLife.model.newFoodItem.FoodStorageLocation
 import com.android.shelfLife.model.recipe.RecipePrompt
 import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.viewmodel.recipe.RecipeGenerationViewModel
+import com.android.shelfLife.viewmodel.recipes.RecipeGenerationViewModel
 import kotlinx.coroutines.launch
 
 @Composable

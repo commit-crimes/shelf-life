@@ -1,5 +1,8 @@
 package com.android.shelfLife.viewmodel.recipes
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
@@ -7,6 +10,7 @@ import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.newRecipe.RecipeRepository
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.Recipe
+import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.utils.validateNumber
 import com.android.shelfLife.ui.utils.validateString
@@ -29,7 +33,7 @@ constructor(
   val title: StateFlow<String> = _title.asStateFlow()
 
   private val _servings = MutableStateFlow("")
-  val servings: StateFlow<String> = _servings.asStateFlow()
+  var servings: StateFlow<String> = _servings.asStateFlow()
 
   private val _time = MutableStateFlow("")
   val time: StateFlow<String> = _time.asStateFlow()
@@ -55,6 +59,8 @@ constructor(
   private val _showIngredientDialog = MutableStateFlow(false)
   val showIngredientDialog: StateFlow<Boolean> = _showIngredientDialog.asStateFlow()
 
+  var unitExpanded by mutableStateOf(false)
+
   // Error Properties
   private val _error = MutableStateFlow(false)
   val error: StateFlow<Boolean> = _error.asStateFlow()
@@ -75,6 +81,7 @@ constructor(
   val instructionError: StateFlow<List<Int?>> = _instructionError.asStateFlow()
 
   private val _instructionsError = MutableStateFlow(false)
+
   private val _ingredientsError = MutableStateFlow(false)
 
   private val _ingredientNameError = MutableStateFlow<Int?>(null)
@@ -270,15 +277,23 @@ constructor(
       return showToast(0)
     }
     val newRecipeUid = recipeRepository.getUid()
+    ingredients.value.forEach { ingredient ->
+      ingredient.quantity.amount = ingredient.quantity.amount / servings.value.toFloat()
+    }
     val newRecipe =
         Recipe(
             uid = newRecipeUid,
             name = title.value,
             instructions = instructions.value,
-            servings = servings.value.toFloat(),
+            servings = 1F,
             time = time.value.toDouble().minutes,
-            ingredients = ingredients.value)
+            ingredients = ingredients.value,
+            recipeType = RecipeType.PERSONAL)
     recipeRepository.addRecipe(recipe = newRecipe.copy(uid = newRecipeUid))
     userRepository.addRecipeUID(newRecipeUid)
+  }
+
+  fun changeUnitExpanded() {
+    unitExpanded = if (unitExpanded) false else true
   }
 }
