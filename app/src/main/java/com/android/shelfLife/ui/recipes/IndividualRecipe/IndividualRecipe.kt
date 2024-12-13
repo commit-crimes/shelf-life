@@ -34,6 +34,7 @@ import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
@@ -127,35 +128,8 @@ fun IndividualRecipeScreen(
           }
         })
   } else {
-    // If no recipe is selected, display an error message.
-    Scaffold(
-        modifier = Modifier.fillMaxSize(), // Ensure Scaffold takes up the full size
-        content = { paddingValues ->
-          // Column for the content inside the Scaffold
-          Column(
-              modifier =
-                  Modifier.fillMaxSize()
-                      .padding(paddingValues), // Apply padding values from Scaffold
-              horizontalAlignment = Alignment.CenterHorizontally,
-              verticalArrangement = Arrangement.Center // Center content vertically
-              ) {
-                // Easter egg image
-                Image(
-                    painter = painterResource(id = R.drawable.how_did_we_get_here),
-                    contentDescription = "How did we get here?",
-                    modifier = Modifier.fillMaxWidth(),
-                    contentScale = ContentScale.Fit)
-
-                // Spacer for some space between the image and the text
-                Spacer(modifier = Modifier.size(16.dp))
-
-                // Error message text
-                Text(
-                    text = "No recipe selected. Should not happen",
-                    modifier = Modifier.testTag("noRecipeSelectedMessage"),
-                    color = Color.Red)
-              }
-        })
+    // If no recipe is selected, go to the easteregg screen
+    navigationActions.navigateTo(Screen.EASTER_EGG)
   }
 }
 
