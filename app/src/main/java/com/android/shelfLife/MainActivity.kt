@@ -63,7 +63,6 @@ fun ShelfLifeApp() {
       composable(Screen.EDIT_FOOD) { EditFoodItemScreen(navigationActions) }
       composable(Screen.HOUSEHOLD_CREATION) { HouseHoldCreationScreen(navigationActions) }
       composable(Screen.INDIVIDUAL_FOOD_ITEM) { IndividualFoodItemScreen(navigationActions) }
-      composable(Screen.FIRST_TIME_USER) { FirstTimeWelcomeScreen(navigationActions) }
     }
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
       composable(Screen.PERMISSION_HANDLER) { CameraPermissionHandler(navigationActions) }
@@ -81,6 +80,9 @@ fun ShelfLifeApp() {
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
       composable(Screen.PROFILE) { ProfileScreen(navigationActions, context) }
       composable(Route.INVITATIONS) { InvitationScreen(navigationActions) }
+    }
+    navigation(startDestination = Screen.FIRST_TIME_USER, route = Route.FIRST_TIME_USER) {
+      composable(Screen.FIRST_TIME_USER) { FirstTimeWelcomeScreen(navigationActions) }
     }
   }
 }
