@@ -63,26 +63,23 @@ constructor(private val openai: OpenAI) :
     // Helper to filter and sort food items
     val foodItems = recipePrompt.ingredients
       .let { ingredients ->
-        when (recipePrompt.recipeType) {
-          RecipeType.USE_SOON_TO_EXPIRE -> ingredients.sortedBy { it.expiryDate }
-          else -> ingredients
-        }
+        if (recipePrompt.prioritiseSoonToExpire) ingredients.sortedBy { it.expiryDate }
+          else ingredients
       }
 
     val foodItemNames = foodItems.joinToString(", ") { it.foodFacts.name }
 
     val recipeTypeDescription = when (recipePrompt.recipeType) {
-      RecipeType.USE_SOON_TO_EXPIRE -> ""
-      RecipeType.USE_ONLY_HOUSEHOLD_ITEMS -> ""
-      RecipeType.HIGH_PROTEIN -> "high protein"
-      RecipeType.LOW_CALORIE -> "low calorie"
+      RecipeType.BASIC -> ""
+      RecipeType.HIGH_PROTEIN -> "high protein,"
+      RecipeType.LOW_CALORIE -> "low calorie,"
       RecipeType.PERSONAL -> throw IllegalArgumentException(
         "RecipeType.PERSONAL is not supported for recipe generation as it is reserved for user-created recipes."
       )
     }
-    val recipeDescriptionFinal = "$recipeTypeDescription, ${if (recipePrompt.shortDuration) QUICK_RECIPE_DEF else LONG_RECIPE_DEF}"
+    val recipeDescriptionFinal = "$recipeTypeDescription ${if (recipePrompt.shortDuration) QUICK_RECIPE_DEF else LONG_RECIPE_DEF}"
 
-    val finalUserPrompt = BASE_USER_PROMPT(servings, recipeDescriptionFinal, foodItemNames, recipePrompt.recipeType == RecipeType.USE_ONLY_HOUSEHOLD_ITEMS, recipePrompt.name, recipePrompt.specialInstruction)
+    val finalUserPrompt = BASE_USER_PROMPT(servings, recipeDescriptionFinal, foodItemNames, recipePrompt.onlyHouseHoldItems, recipePrompt.name, recipePrompt.specialInstruction)
 
     return BASE_SYSTEM_PROMPT(recipeDescriptionFinal) to finalUserPrompt
   }

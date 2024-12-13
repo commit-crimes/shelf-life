@@ -50,6 +50,9 @@ constructor(
   private val _selectedFoodItems = MutableStateFlow<List<FoodItem>>(emptyList()) //food items that have been selected
   open val selectedFoodItems: StateFlow<List<FoodItem>> = _selectedFoodItems.asStateFlow()
 
+  val _isGeneratingRecipe = MutableStateFlow(false)
+  open val isGeneratingRecipe: StateFlow<Boolean> = _isGeneratingRecipe.asStateFlow()
+
   fun selectFoodItem(foodItem: FoodItem) {
     _selectedFoodItemsUids.value += listOf(foodItem.uid)
     _updateFoodItemSelection()
@@ -88,17 +91,20 @@ constructor(
 
   /** Generates a recipe based on the current prompt. */
   fun generateRecipe(onSuccess: (Recipe) -> Unit, onFailure: (String) -> Unit) {
+    _isGeneratingRecipe.value = true
     val prompt = _recipePrompt.value
     viewModelScope.launch {
       val recipe = recipeGeneratorRepository.generateRecipe(prompt)
       if (recipe == null) {
           onFailure("Failed to generate recipe")
+          _isGeneratingRecipe.value = false
           return@launch
       }
       // Update the state with the generated recipe
       recipeRepository.selectRecipe(recipe) //select the recipe so individual recipe view can show it
       viewModelScope.launch { _currentGeneratedRecipe.emit(recipe) }
       onSuccess(recipe)
+      _isGeneratingRecipe.value = false
     }
   }
 
