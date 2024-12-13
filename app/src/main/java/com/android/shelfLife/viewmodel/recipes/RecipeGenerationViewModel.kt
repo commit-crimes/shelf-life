@@ -39,9 +39,6 @@ constructor(
   private val _currentGeneratedRecipe = MutableStateFlow<Recipe?>(null)
   open val currentGeneratedRecipe: StateFlow<Recipe?> = _currentGeneratedRecipe.asStateFlow()
 
-  private val _currentStep = MutableStateFlow(0)
-  open val currentStep: StateFlow<Int> = _currentStep.asStateFlow()
-
   private val _selectedFoodItemsUids = MutableStateFlow<List<String>>(emptyList())
 
   private val _availableFoodItems = MutableStateFlow<List<FoodItem>>(foodItemRepository.foodItems.value) //food items that are still available to be selected
@@ -73,21 +70,6 @@ constructor(
     _recipePrompt.value = prompt
   }
 
-  fun nextStep() {
-    _currentStep.value += 1
-  }
-
-  fun previousStep() {
-    _currentStep.value -= 1
-  }
-
-  fun resetSteps() {
-    _currentStep.value = 0
-  }
-
-  fun isLastStep(): Boolean {
-    return _currentStep.value == (CREATION_STEP_COUNT-1)
-  }
 
   /** Generates a recipe based on the current prompt. */
   fun generateRecipe(onSuccess: (Recipe) -> Unit, onFailure: (String) -> Unit) {
@@ -113,7 +95,8 @@ constructor(
     val recipe = _currentGeneratedRecipe.value
     if (recipe != null) {
       viewModelScope.launch {
-        recipeRepository.addRecipe(recipe.copy(uid = recipeRepository.getUid(), workInProgress = false))
+        val newRecipe = recipe.copy(uid = recipeRepository.getUid(), workInProgress = false)
+        recipeRepository.addRecipe(newRecipe)
         onSuccess()
       }
     } else {

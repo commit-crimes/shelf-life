@@ -25,6 +25,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
 import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.model.recipe.Recipe.Companion.MAX_SERVINGS
@@ -51,44 +55,70 @@ fun GenerateRecipeScreen(
   navigationActions: NavigationActions,
   viewModel: RecipeGenerationViewModel = hiltViewModel(),
 ) {
-  val currentStep by viewModel.currentStep.collectAsState()
-  val title = when (currentStep) {
-    0 -> "Generate your AI recipe"
-    1 -> "Select your ingredients"
-    2 -> "Review your recipe"
-    else -> "Generated recipe"
-  }
+  val navController = rememberNavController()
 
   Scaffold(
     topBar = {
+      val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
+      val title = when (currentDestination) {
+        "input" -> "Generate your AI recipe"
+        "selection" -> "Select your ingredients"
+        "review" -> "Review your recipe"
+        else -> "Generated recipe"
+      }
       CustomTopAppBar(
-        onClick = { if (currentStep == 0 || viewModel.isLastStep() ) navigationActions.goBack() else viewModel.previousStep() },
+        onClick = {
+          if (currentDestination == "input") navigationActions.goBack()
+          else navController.popBackStack()
+        },
         title = title,
-        titleTestTag = "addRecipeTitle")
+        titleTestTag = "addRecipeTitle"
+      )
     }
   ) { paddingValues ->
-    Column(
+    NavHost(
+      navController = navController,
+      startDestination = "input",
       modifier = Modifier
-        .fillMaxSize()
         .padding(paddingValues)
         .padding(16.dp),
-      horizontalAlignment = Alignment.CenterHorizontally
     ) {
-      // Step Content
-      when (currentStep) {
-        0 -> RecipeInputStep(viewModel = viewModel, navigationActions = navigationActions)
-        1 -> FoodSelectionStep(viewModel = viewModel, navigationActions)
-        2 -> ReviewStep(viewModel = viewModel)
-        else -> CompletionStep(viewModel, navigationActions = navigationActions)
+      composable("input") {
+        RecipeInputStep(
+          viewModel = viewModel,
+          onNext = { navController.navigate("selection") }
+        )
       }
-
+      composable("selection") {
+        FoodSelectionStep(
+          viewModel = viewModel,
+          onNext = { navController.navigate("review") },
+          onBack = { navController.popBackStack() }
+        )
+      }
+      composable("review") {
+        ReviewStep(
+          viewModel = viewModel,
+          onNext = { navController.navigate("completion") },
+          onBack = { navController.popBackStack() }
+        )
+      }
+      composable("completion") {
+        CompletionStep(
+          viewModel = viewModel,
+          onBack = { navController.popBackStack() },
+          navigationActions = navigationActions
+        )
+      }
     }
   }
 }
+
+
 @Composable
 fun RecipeInputStep(
   viewModel: RecipeGenerationViewModel,
-  navigationActions: NavigationActions
+  onNext: () -> Unit
 ) {
   val recipePrompt by viewModel.recipePrompt.collectAsState()
   val context = LocalContext.current
@@ -109,7 +139,7 @@ fun RecipeInputStep(
     bottomBar = {
       Row(verticalAlignment = Alignment.Bottom) {
         CustomButtons(
-          button1OnClick = { viewModel.previousStep() },
+          button1OnClick = {},
           button1TestTag = "cancelButton",
           button1Text = stringResource(id = R.string.cancel_button),
 
@@ -136,7 +166,7 @@ fun RecipeInputStep(
                 prioritiseSoonToExpire = localPrioritiseSoonToExpire
               )
             )
-            viewModel.nextStep()
+            onNext()
 
           },
           button2TestTag = "recipeSubmitButton",
@@ -243,7 +273,9 @@ fun RecipeInputStep(
 }
 
 @Composable
-fun FoodSelectionStep(viewModel: RecipeGenerationViewModel, navigationActions: NavigationActions, overviewViewModel: OverviewScreenViewModel = hiltViewModel()) {
+fun FoodSelectionStep(viewModel: RecipeGenerationViewModel,
+                      onNext: () -> Unit,
+                      onBack: () -> Unit, overviewViewModel: OverviewScreenViewModel = hiltViewModel()) {
   var newFoodItem by rememberSaveable { mutableStateOf("") }
   val recipePrompt by viewModel.recipePrompt.collectAsState()
   val context = LocalContext.current
@@ -264,14 +296,14 @@ fun FoodSelectionStep(viewModel: RecipeGenerationViewModel, navigationActions: N
       Row(verticalAlignment = Alignment.Bottom) {
         // Buttons Section
         CustomButtons(
-          button1OnClick = { viewModel.previousStep() },// Cancel button
+          button1OnClick = { onBack() },// Cancel button
           button1TestTag = "cancelButton",
           button1Text = stringResource(id = R.string.back_button),
 
           button2OnClick = {
             // Validate the recipe name
             if (recipePrompt.name.isNotBlank()) {
-              viewModel.nextStep() // Proceed to the next step
+              onNext()// Proceed to the next step
             } else {
               Toast.makeText(context, R.string.recipe_title_empty_error, Toast.LENGTH_SHORT).show()
             }
@@ -333,7 +365,9 @@ fun FoodSelectionStep(viewModel: RecipeGenerationViewModel, navigationActions: N
 }
 
 @Composable
-fun ReviewStep(viewModel: RecipeGenerationViewModel) {
+fun ReviewStep(viewModel: RecipeGenerationViewModel,
+               onNext: () -> Unit,
+               onBack: () -> Unit) {
   val recipePrompt by viewModel.recipePrompt.collectAsState()
   var customInstructions by remember { mutableStateOf(recipePrompt.specialInstruction) }
   val context = LocalContext.current
@@ -344,7 +378,7 @@ fun ReviewStep(viewModel: RecipeGenerationViewModel) {
       Row(verticalAlignment = Alignment.Bottom) {
         // Buttons Section
         CustomButtons(
-          button1OnClick = { viewModel.previousStep() },// Cancel button
+          button1OnClick = { onBack() },// Cancel button
           button1TestTag = "cancelButton2",
           button1Text = stringResource(id = R.string.back_button),
 
@@ -355,7 +389,7 @@ fun ReviewStep(viewModel: RecipeGenerationViewModel) {
             }, onFailure = {
               Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
             })
-            viewModel.nextStep() // Proceed to the next step
+            onNext() // Proceed to the next step
 
           },
           button2TestTag = "generateButton",
@@ -460,28 +494,32 @@ fun ReviewStep(viewModel: RecipeGenerationViewModel) {
 }
 
 @Composable
-fun CompletionStep(viewModel: RecipeGenerationViewModel, navigationActions: NavigationActions) {
-  val context = LocalContext.current
+fun CompletionStep(viewModel: RecipeGenerationViewModel,
+                   onBack: () -> Unit,
+                   navigationActions: NavigationActions) {
   val recipePrompt by viewModel.recipePrompt.collectAsState()
   val isGeneratingRecipe by viewModel.isGeneratingRecipe.collectAsState()
+  val currentGeneratedRecipe by viewModel.currentGeneratedRecipe.collectAsState()
   Scaffold(
     bottomBar = {
-      // Fixed buttons at the bottom
-      Row(verticalAlignment = Alignment.Bottom) {
-        // Buttons Section
-        CustomButtons(
-          button1OnClick = {
-            viewModel.previousStep()
-          },// Cancel button
-          button1TestTag = "regenerateButton",
-          button1Text = stringResource(id = R.string.regenerate_button),
+      if(!isGeneratingRecipe) {
+        // Fixed buttons at the bottom
+        Row(verticalAlignment = Alignment.Bottom) {
+          // Buttons Section
+          CustomButtons(
+            button1OnClick = {
+              onBack()
+            },// Cancel button
+            button1TestTag = "regenerateButton",
+            button1Text = stringResource(id = R.string.modify_button),
 
-          button2OnClick = {
-            viewModel.acceptGeneratedRecipe { navigationActions.navigateTo(screen = Screen.RECIPES) }
-          },
-          button2TestTag = "recipeSubmitButton",
-          button2Text = stringResource(id = R.string.save_button)
-        )
+            button2OnClick = {
+              viewModel.acceptGeneratedRecipe { navigationActions.navigateTo(screen = Screen.RECIPES) }
+            },
+            button2TestTag = "recipeSubmitButton",
+            button2Text = stringResource(id = R.string.save_button)
+          )
+        }
       }
     }
   ) { paddingValues ->
@@ -517,7 +555,7 @@ fun CompletionStep(viewModel: RecipeGenerationViewModel, navigationActions: Navi
             )
           }
         }
-      } else {
+      } else if(currentGeneratedRecipe != null) {
         Text(
           text = "Recipe: ${recipePrompt.name}",
           fontSize = 24.sp,
@@ -525,6 +563,8 @@ fun CompletionStep(viewModel: RecipeGenerationViewModel, navigationActions: Navi
           modifier = Modifier.padding(bottom = 16.dp)
         )
         RecipeContent(hiltViewModel())
+      }else{
+        onBack()
       }
     }
   }
