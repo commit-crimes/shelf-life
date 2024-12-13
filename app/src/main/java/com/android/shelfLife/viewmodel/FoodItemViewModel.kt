@@ -196,6 +196,7 @@ constructor(
               owner =
                   if (isSelected) selectedFood!!.owner else userRepository.user.value?.uid ?: "")
       if (isSelected) {
+        foodItemRepository.selectFoodItem(newFoodItem)
         editFoodItem(newFoodItem)
       } else {
         addFoodItem(newFoodItem)

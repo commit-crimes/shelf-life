@@ -1,4 +1,4 @@
-package com.android.shelfLife.ui.recipes.addRecipe
+package com.android.shelfLife.ui.recipes
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
@@ -24,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,11 +40,10 @@ import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.theme.onSecondaryDark
 import com.android.shelfLife.ui.theme.primaryContainerDark
-import com.android.shelfLife.ui.theme.primaryContainerLight
-import com.android.shelfLife.ui.theme.secondaryContainerDark
 import com.android.shelfLife.ui.theme.secondaryContainerLight
 import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
+import com.android.shelfLife.ui.utils.UnitDropdownField
 import com.android.shelfLife.viewmodel.recipes.AddRecipeViewModel
 import kotlinx.coroutines.launch
 
@@ -54,6 +54,9 @@ fun AddRecipeScreen(
 ) {
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
+
+  val ingredients by addRecipeViewModel.ingredients.collectAsState()
+  val instructions by addRecipeViewModel.instructions.collectAsState()
 
   Scaffold(
       modifier = Modifier.testTag("addRecipeScreen"),
@@ -133,7 +136,7 @@ fun AddRecipeScreen(
                 }
               }
 
-              itemsIndexed(addRecipeViewModel.ingredients.value) { index, ingredient ->
+              itemsIndexed(ingredients) { index, ingredient ->
                 IngredientItemNEW(
                     index = index,
                     ingredient = ingredient,
@@ -160,7 +163,7 @@ fun AddRecipeScreen(
                 }
               }
 
-              itemsIndexed(addRecipeViewModel.instructions.value) { index, instruction ->
+              itemsIndexed(instructions) { index, instruction ->
                 InstructionItem(index = index, addRecipeViewModel = addRecipeViewModel)
               }
 
@@ -184,7 +187,6 @@ fun AddRecipeScreen(
                     button2OnClick = {
                       coroutineScope.launch {
                         addRecipeViewModel.addNewRecipe(
-                            onSuccess = { navigationActions.goBack() },
                             showToast = { messageId ->
                               val message =
                                   if (messageId == 0) {
@@ -198,6 +200,7 @@ fun AddRecipeScreen(
                                   .show()
                             })
                       }
+                      navigationActions.goBack()
                     },
                     button2TestTag = "addButton",
                     button2Text = stringResource(R.string.add_button))
@@ -255,6 +258,8 @@ fun InstructionItem(
       addRecipeViewModel.instructionError.collectAsState().value[index], "instructionErrorMessage")
 }
 
+val UNITS = mapOf(FoodUnit.GRAM to "gram", FoodUnit.ML to "mL", FoodUnit.COUNT to "")
+
 /**
  * A composable function that displays a single ingredient in a recipe.
  *
@@ -279,7 +284,13 @@ fun IngredientItemNEW(index: Int, ingredient: Ingredient, onRemoveClick: () -> U
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
     // title of ingredient
     Text(
-        text = stringResource(R.string.ingredient_item, index + 1, ingredient.name),
+        text =
+            stringResource(
+                R.string.ingredient_item,
+                index + 1,
+                ingredient.quantity.amount,
+                UNITS.get(ingredient.quantity.unit)!!,
+                ingredient.name),
         modifier = Modifier.testTag("ingredientItem"))
     // delete button
     IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteIngredientButton")) {
@@ -301,6 +312,8 @@ fun IngredientItemNEW(index: Int, ingredient: Ingredient, onRemoveClick: () -> U
 fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
+
+  val ingredientUnit = addRecipeViewModel.ingredientQuantityUnit.collectAsState()
 
   androidx.compose.material3.AlertDialog(
       onDismissRequest = { addRecipeViewModel.createNewIngredient() },
@@ -333,28 +346,19 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
               addRecipeViewModel.ingredientQuantityAmountError.collectAsState().value,
               "ingredientQuantityErrorMessage")
 
+          Spacer(Modifier.padding(8.dp))
+
           // Quantity Unit Dropdown
           Row {
-            FoodUnit.values().forEach { unit ->
-              Button(
-                  onClick = { addRecipeViewModel.changeIngredientQuantityUnit(unit) },
-                  modifier = Modifier.testTag("ingredientUnitButton"),
-                  // colour of button changes if selected
-                  colors =
-                      ButtonDefaults.buttonColors(
-                          containerColor =
-                              if (addRecipeViewModel.ingredientQuantityUnit.value == unit)
-                                  primaryContainerDark
-                              else primaryContainerLight,
-                          contentColor =
-                              if (addRecipeViewModel.ingredientQuantityUnit.value == unit)
-                                  secondaryContainerLight
-                              else secondaryContainerDark),
-              ) {
-                Text(text = unit.name)
-              }
-              Spacer(Modifier.padding(2.dp))
-            }
+            UnitDropdownField(
+                unit = ingredientUnit.value,
+                onUnitChange = { newUnit ->
+                  addRecipeViewModel.changeIngredientQuantityUnit(newUnit)
+                },
+                unitExpanded = addRecipeViewModel.unitExpanded,
+                onUnitExpandedChange = { addRecipeViewModel.changeUnitExpanded() },
+                modifier = Modifier.weight(1f),
+                testTag = "inputIngredientUnit")
           }
         }
       },
