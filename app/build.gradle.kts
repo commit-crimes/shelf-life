@@ -235,8 +235,13 @@ tasks.register<Copy>("copyApks") {
 
 // Dependencies
 dependencies {
+    configurations.all {
+        resolutionStrategy {
+            force("androidx.test:core:1.6.1") // Ensure compatibility
+        }
+    }
+
     // Core dependencies
-    //implementation(libs.core.ktx)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -244,10 +249,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.kotlinx.serialization.json)
-    implementation(libs.hilt.android.testing){
-        exclude(group = "androidx.test", module = "core")
-    }
-    implementation(libs.core)
+    implementation(libs.hilt.android.testing)
 
     // Global test implementation
     androidTestImplementation(libs.compose.test.junit)
@@ -307,21 +309,17 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
 
-
     // Hilt Testing
     kapt(libs.hilt.android.compiler)
 
-    testImplementation(libs.hilt.android.testing){
-        exclude(group = "androidx.test", module = "core")
-    }
+    testImplementation(libs.hilt.android.testing)
     kaptTest(libs.hilt.android.compiler)
 
-    androidTestImplementation(libs.hilt.android.testing){
-        exclude(group = "androidx.test", module = "core")
-    }
+    androidTestImplementation(libs.hilt.android.testing)
     kaptAndroidTest(libs.hilt.android.compiler)
 
     // Unit Testing
+    testImplementation(libs.androidx.espresso.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
@@ -345,9 +343,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.espresso.intents)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4){
-        exclude(group = "androidx.test", module = "core")
-    }
+    androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.androidx.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
@@ -359,21 +355,19 @@ dependencies {
     androidTestImplementation(libs.kaspresso.allure.support)
     androidTestImplementation(libs.kaspresso.compose.support)
 
+    debugImplementation(libs.androidx.fragment.testing.manifest)
+    androidTestImplementation(libs.androidx.fragment.testing)
+
     testImplementation(libs.hamcrest.hamcrest)
     androidTestImplementation(libs.hamcrest.hamcrest)
-    androidTestImplementation(libs.androidx.core){
-        version {
-            strictly("1.6.1")
-        }
-    }
-    testImplementation(libs.androidx.core){
-        version {
-            strictly("1.6.1")
-        }
-    }
+
+    androidTestImplementation(libs.test.core.ktx)
+    testImplementation(libs.test.core.ktx)
 
     // Coroutine Testing
     testImplementation(libs.kotlinx.coroutines.test)
+
+    debugImplementation(libs.androidx.monitor)
 }
 
 kapt {
