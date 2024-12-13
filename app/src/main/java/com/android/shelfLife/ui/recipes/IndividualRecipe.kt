@@ -1,6 +1,8 @@
 package com.android.shelfLife.ui.recipes.IndividualRecipe
 
+import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,12 +10,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
@@ -25,8 +38,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.newRecipe.RecipeRepositoryFirestore
 import com.android.shelfLife.model.recipe.Ingredient
+import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
@@ -36,6 +51,8 @@ import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.math.floor
+import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.minutes
 
 @Composable
 /**
@@ -61,6 +78,9 @@ fun IndividualRecipeScreen(
     navigationActions: NavigationActions,
     individualRecipeViewModel: IndividualRecipeViewModel = hiltViewModel()
 ) {
+
+  val coroutineScope = rememberCoroutineScope()
+
   if (individualRecipeViewModel.selectedRecipeIsNonEmpty) {
     // Scaffold that provides the structure for the screen, including top and bottom bars.
     Scaffold(
@@ -69,13 +89,39 @@ fun IndividualRecipeScreen(
           CustomTopAppBar(
               onClick = { navigationActions.goBack() },
               title = individualRecipeViewModel.getRecipeName(),
-              titleTestTag = "individualRecipeTitle")
+              titleTestTag = "individualRecipeTitle",
+              actions = {
+                IconButton(
+                    onClick = {
+                      coroutineScope.launch {
+                        individualRecipeViewModel.deleteSelectedRecipe()
+                        navigationActions.goBack()
+                      }
+                    },
+                    modifier = Modifier.testTag("deleteFoodItem")) {
+                      Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
+                    }
+              })
         },
         bottomBar = {
           BottomNavigationMenu(
               onTabSelect = { destination -> navigationActions.navigateTo(destination) },
               tabList = LIST_TOP_LEVEL_DESTINATION,
               selectedItem = Route.RECIPES)
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    navigationActions.navigateTo(Route.RECIPE_EXECUTION)
+                },
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                modifier = Modifier.testTag("startButton")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow, // Replace with a suitable icon
+                    contentDescription = "Start Recipe"
+                )
+            }
         },
         content = { paddingValues ->
           Column(modifier = Modifier.padding(paddingValues).fillMaxSize().testTag("recipe")) {
@@ -158,18 +204,18 @@ fun DisplayInstructionNew(instruction: String) {
 }
 
 // this preview function allows us to see the easter egg screen
-@Preview()
-@Composable
-private fun IndividualRecipeScreenPreviewEasterEgg() {
-  val navController = rememberNavController()
-  val navigationActions = NavigationActions(navController)
-  val firebaseFirestore = FirebaseFirestore.getInstance()
-  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
-  val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
-
-  // Render the IndividualRecipeScreen with a null selectedRecipe
-  IndividualRecipeScreen(navigationActions = navigationActions)
-}
+// @Preview()
+// @Composable
+// private fun IndividualRecipeScreenPreviewEasterEgg() {
+//  val navController = rememberNavController()
+//  val navigationActions = NavigationActions(navController)
+//  val firebaseFirestore = FirebaseFirestore.getInstance()
+//  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
+//  val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
+//
+//  // Render the IndividualRecipeScreen with a null selectedRecipe
+//  IndividualRecipeScreen(navigationActions = navigationActions)
+// }
 // this preview shows the example where we do have a selected recipe
 // @Preview()
 // @Composable

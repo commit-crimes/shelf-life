@@ -135,7 +135,7 @@ constructor(
               }
 
       val householdUid = houseHoldRepository.getNewUid()
-      val household = HouseHold(householdUid, householdName, listOf(user.uid), emptyList())
+      val household = HouseHold(householdUid, householdName, listOf(user.uid), emptyList(), emptyMap(), emptyMap())
 
       houseHoldRepository.addHousehold(household)
       userRepository.addHouseholdUID(household.uid)

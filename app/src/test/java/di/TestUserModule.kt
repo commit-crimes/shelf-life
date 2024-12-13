@@ -1,4 +1,4 @@
-package com.android.shelfLife.di
+package di
 
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.model.user.UserRepositoryFirestore
@@ -25,11 +25,5 @@ object TestUserModule {
   @Singleton
   fun provideMockFirebaseAuth(): FirebaseAuth {
     return mock(FirebaseAuth::class.java)
-  }
-
-  @Provides
-  @Singleton
-  fun provideUserRepository(firestore: FirebaseFirestore, auth: FirebaseAuth): UserRepository {
-    return UserRepositoryFirestore(firestore, auth)
   }
 }

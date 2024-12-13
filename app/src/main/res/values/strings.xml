@@ -99,7 +99,7 @@
     <string name="instruction_empty_error">Instruction cannot be empty</string>
     <string name="instructions_invalid_error">Instruction contains invalid characters</string>
     <string name="instruction_step">Step %1$s</string>
-    <string name="ingredient_item">Ingredient%1$s : %2$s</string>
+    <string name="ingredient_item">%1$s.  %2$s %3$s %4$s</string>
     <string name="ingredient_name">Ingredient Name</string>
     <string name="ingredient_name_empty_error">Name cannot be empty</string>
     <string name= "ingredient_name_invalid_error">Name contains invalid characters</string>

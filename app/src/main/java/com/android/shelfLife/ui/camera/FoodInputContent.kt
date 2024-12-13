@@ -114,7 +114,9 @@ fun FoodInputContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         CustomButtons(
-            button1OnClick = { onCancel() },
+            button1OnClick = {
+                onCancel()
+                             },
             button1TestTag = "cancelButton",
             button1Text = stringResource(R.string.cancel_button),
             button2OnClick = {

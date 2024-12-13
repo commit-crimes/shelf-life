@@ -17,9 +17,12 @@ object Route {
   const val INVITATIONS = "Invitations"
   const val FIRST_TIME_USER = "First Time User"
   const val EASTEREGG = "Easteregg"
+  const val RECIPE_EXECUTION = "Recipe Execution"
+
 }
 
 object Screen {
+  const val LEADERBOARD = "Leaderboard Screen"
   const val OVERVIEW = "Overview Screen"
   const val AUTH = "Auth Screen"
   const val BARCODE_SCANNER = "Barcode Scanner Screen"
@@ -34,7 +37,11 @@ object Screen {
   const val PROFILE = "Profile Screen"
   const val HOUSEHOLD_CREATION = "Household Creation Screen"
   const val FIRST_TIME_USER = "First Time User Screen"
-  const val EASTER_EGG = "Easteregg Screen"
+  const val SERVINGS_SCREEN = "Servings Screen"
+  const val FOOD_ITEM_SELECTION = "Food Item Selection Screen"
+  const val INSTRUCTION_SCREEN = "Instruction Screen"
+    const val RECIPE_EXECUTION = "Recipe Execution Screen"
+    const val EASTER_EGG = "Easteregg Screen"
   // Add other screens as needed
 }
 
