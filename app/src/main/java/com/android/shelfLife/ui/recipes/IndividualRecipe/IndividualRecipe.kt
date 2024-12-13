@@ -94,9 +94,9 @@ fun IndividualRecipeScreen(
                 ) {
                   // Display the recipe image (placeholder for now)
                   Image(
-                      painter = painterResource(R.drawable.google_logo),
+                      painter = painterResource(R.drawable.individual_recipe_pot),
                       contentDescription = "Recipe Image",
-                      modifier = Modifier.width(537.dp).height(159.dp).testTag("recipeImage"),
+                      modifier = Modifier.width(537.dp).height(164.dp).testTag("recipeImage"),
                       contentScale = ContentScale.FillWidth)
 
                   // Row displaying servings and time information
