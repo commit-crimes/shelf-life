@@ -125,7 +125,7 @@ fun FoodItemCard(
             buyDate = foodItem.buyDate,
             status = FoodStatus.EXPIRED,
             owner = foodItem.owner)
-    overviewScreenViewModel.editFoodItem(newFoodItem, foodItem)
+    overviewScreenViewModel.editFoodItem(newFoodItem)
     overviewScreenViewModel.selectFoodItem(newFoodItem)
   }
 

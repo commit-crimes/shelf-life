@@ -2,6 +2,7 @@ package com.android.shelfLife.viewmodel.recipes
 
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.newRecipe.RecipeRepository
@@ -28,7 +29,7 @@ constructor(
 
   val userRecipes = recipeRepository.recipes
 
-  val fabExpanded = MutableStateFlow(false)
+  val fabExpanded = mutableStateOf(false)
 
   private val _drawerState = MutableStateFlow(DrawerState(DrawerValue.Closed))
   val drawerState = _drawerState.asStateFlow()
