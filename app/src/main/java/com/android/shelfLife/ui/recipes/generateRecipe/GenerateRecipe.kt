@@ -10,6 +10,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
+import androidx.compose.material3.TextFieldDefaults.Container
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -33,6 +34,7 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.newoverview.ListFoodItems
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
+import com.android.shelfLife.ui.recipes.IndividualRecipe.RecipeContent
 import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.ui.utils.DropdownFields
@@ -79,6 +81,7 @@ fun GenerateRecipeScreen(
         2 -> ReviewStep(viewModel = viewModel)
         else -> CompletionStep(viewModel, navigationActions = navigationActions)
       }
+
     }
   }
 }
@@ -253,7 +256,7 @@ fun FoodSelectionStep(viewModel: RecipeGenerationViewModel, navigationActions: N
 // Animate the height using a spring animation
   val animatedWeight by animateFloatAsState(
     targetValue = if (selectedFoodItems.isEmpty()) 0.1f else 0.55f,
-    animationSpec = tween(durationMillis = 1500, easing = LinearOutSlowInEasing)) // Adjust the duration for smoothness
+    animationSpec = spring(Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow)) // Adjust the duration for smoothness
 
   Scaffold(
     bottomBar = {
@@ -468,17 +471,13 @@ fun CompletionStep(viewModel: RecipeGenerationViewModel, navigationActions: Navi
         // Buttons Section
         CustomButtons(
           button1OnClick = {
-            viewModel.generateRecipe(onSuccess = {
-              Toast.makeText(context, "Recipe Generated!", Toast.LENGTH_SHORT).show()
-            }, onFailure = {
-              Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
-            })
+            viewModel.previousStep()
           },// Cancel button
           button1TestTag = "regenerateButton",
           button1Text = stringResource(id = R.string.regenerate_button),
 
           button2OnClick = {
-
+            viewModel.acceptGeneratedRecipe { navigationActions.navigateTo(screen = Screen.RECIPES) }
           },
           button2TestTag = "recipeSubmitButton",
           button2Text = stringResource(id = R.string.save_button)
@@ -492,16 +491,40 @@ fun CompletionStep(viewModel: RecipeGenerationViewModel, navigationActions: Navi
         .padding(paddingValues)
         .padding(16.dp)
     ) {
-      Text(
-        text = "Recipe Generation Complete!",
-        fontSize = 24.sp,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(bottom = 16.dp)
-      )
-      if (!isGeneratingRecipe) {
-        IndividualRecipeScreen(
-          navigationActions = navigationActions
+      if (isGeneratingRecipe) {
+        Box( // Box for centering the content
+          modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues),
+          contentAlignment = Alignment.TopCenter // Align everything to the center
+        ) {
+          Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+          ) {
+            // Nicely styled text
+            Text(
+              text = "Generating...",
+              fontSize = 20.sp,
+              fontWeight = FontWeight.Bold,
+              color = MaterialTheme.colorScheme.primary,
+              modifier = Modifier.padding(bottom = 16.dp) // Space between text and spinner
+            )
+            // Loading Spinner
+            CircularProgressIndicator(
+              modifier = Modifier.size(64.dp), // Visible size
+              strokeWidth = 6.dp // Thicker for better visibility
+            )
+          }
+        }
+      } else {
+        Text(
+          text = "Recipe: ${recipePrompt.name}",
+          fontSize = 24.sp,
+          fontWeight = FontWeight.Bold,
+          modifier = Modifier.padding(bottom = 16.dp)
         )
+        RecipeContent(hiltViewModel())
       }
     }
   }

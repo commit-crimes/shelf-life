@@ -46,7 +46,7 @@ constructor(
    * @return The servings amount of the recipe as a Float.
    */
   fun getRecipeServing(): Float {
-    return selectedRecipe!!.servings
+    return selectedRecipe?.servings ?: 1.0f
   }
 
   /**

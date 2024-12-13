@@ -102,9 +102,9 @@ constructor(
       }
       // Update the state with the generated recipe
       recipeRepository.selectRecipe(recipe) //select the recipe so individual recipe view can show it
-      viewModelScope.launch { _currentGeneratedRecipe.emit(recipe) }
-      onSuccess(recipe)
+      _currentGeneratedRecipe.value = recipe
       _isGeneratingRecipe.value = false
+      onSuccess(recipe)
     }
   }
 
@@ -112,7 +112,10 @@ constructor(
   fun acceptGeneratedRecipe(onSuccess: () -> Unit) {
     val recipe = _currentGeneratedRecipe.value
     if (recipe != null) {
-      viewModelScope.launch { recipeRepository.addRecipe(recipe.copy(uid = recipeRepository.getUid(), workInProgress = false))}
+      viewModelScope.launch {
+        recipeRepository.addRecipe(recipe.copy(uid = recipeRepository.getUid(), workInProgress = false))
+        onSuccess()
+      }
     } else {
       Log.e("RecipeGenerationViewModel", "No generated recipe to accept")
     }
