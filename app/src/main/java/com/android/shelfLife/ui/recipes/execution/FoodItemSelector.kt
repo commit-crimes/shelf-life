@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,6 +37,8 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.text.input.KeyboardType
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 
 
@@ -51,6 +54,8 @@ fun SelectFoodItemsForIngredientScreen(
     val availableFoodItems by viewModel.foodItems.collectAsState()
     val selectedMap by viewModel.selectedFoodItemsForIngredients.collectAsState()
     val currentlySelectedItems = selectedMap[ingredientName] ?: emptyList()
+    val totalSelectedAmount = currentlySelectedItems.sumOf { it.foodFacts.quantity.amount }.toFloat()
+    val necessaryAmount = ingredientName?.let { viewModel.necessaryAmountForIngredient(it) }
 
     Log.d("SelectFoodItemsScreen", "Current ingredient: $ingredientName")
     Log.d(
@@ -71,7 +76,7 @@ fun SelectFoodItemsForIngredientScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Select Items for $ingredientName") },
+                title = { Text("Select ingredient: $totalSelectedAmount/$necessaryAmount of $ingredientName") },
                 navigationIcon = {
                     IconButton(onClick = {
                         Log.d("SelectFoodItemsScreen", "Back button clicked. calling onPrevious")
@@ -167,7 +172,6 @@ fun SelectFoodItemsForIngredientScreen(
 }
 
 
-
 @Composable
 fun FoodItemSelectionCard(
     foodItem: FoodItem,
@@ -192,26 +196,38 @@ fun FoodItemSelectionCard(
 
             // Display the amount selected and the total available quantity
             Text(
-                text = "Selected: ${amount} ${foodItem.foodFacts.quantity.unit.name.lowercase()} of ${foodItem.foodFacts.quantity}",
+                text = "Selected: ${amount.toInt()} ${foodItem.foodFacts.quantity.unit.name.lowercase()} of ${maxAmount.toInt()}",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 8.dp)
             )
 
-            // If the card is expanded, show the slider for adjusting the amount
+            // If the card is expanded, show the slider and input for adjusting the amount
             if (expanded) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.padding(top = 16.dp)
                 ) {
-                    Text(text = "Adjust amount:")
+                    // Input field for manual amount entry
+                    OutlinedTextField(
+                        value = amount.toInt().toString(),
+                        onValueChange = { input ->
+                            val newValue = input.toFloatOrNull()
+                            if (newValue != null && newValue in 0f..maxAmount) {
+                                onAmountChange(newValue)
+                            }
+                        },
+                        label = { Text("Enter amount") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // Slider for adjusting the amount
                     androidx.compose.material3.Slider(
                         value = amount,
                         onValueChange = { newVal ->
-                            Log.d(
-                                "FoodItemSelectionCard",
-                                "Slider value changed to $newVal for ${foodItem.foodFacts.name}"
-                            )
-                            onAmountChange(newVal) // Trigger state updates
+                            if (newVal in 0f..maxAmount) {
+                                onAmountChange(newVal)
+                            }
                         },
                         valueRange = 0f..maxAmount,
                         steps = 0

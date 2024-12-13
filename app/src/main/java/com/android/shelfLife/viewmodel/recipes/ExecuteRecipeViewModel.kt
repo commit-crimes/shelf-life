@@ -95,6 +95,12 @@ class ExecuteRecipeViewModel @Inject constructor(
         Log.d(TAG, "Updated servings to: $servings")
     }
 
+    fun necessaryAmountForIngredient(ingredientName: String): Float {
+        val recipe = _executingRecipe.value
+        val ingredient = recipe.ingredients.find { it.name == ingredientName }
+        return (ingredient?.quantity?.amount?.toFloat()?.times(_servings.value)) ?: 0f
+    }
+
     fun temporarilyConsumeItems(listOfFoodItems: List<FoodItem>, listOfAmounts: List<Float>) {
         for (i in listOfFoodItems.indices) {
             temporarilyConsumeItem(listOfFoodItems[i], listOfAmounts[i])
