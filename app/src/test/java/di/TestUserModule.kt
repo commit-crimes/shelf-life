@@ -27,9 +27,12 @@ object TestUserModule {
     return mock(FirebaseAuth::class.java)
   }
 
+  /*
   @Provides
   @Singleton
   fun provideUserRepository(firestore: FirebaseFirestore, auth: FirebaseAuth): UserRepository {
     return UserRepositoryFirestore(firestore, auth)
   }
+
+   */
 }
