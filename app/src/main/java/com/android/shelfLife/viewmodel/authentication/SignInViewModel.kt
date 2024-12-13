@@ -62,7 +62,7 @@ constructor(
         userRepository.user.value?.householdUIDs ?: emptyList(),
         userRepository.user.value?.selectedHouseholdUID)
     userRepository.user.value?.selectedHouseholdUID?.let { foodItemRepository.getFoodItems(it) }
-      userRepository.user.value?.let { recipeRepository.initializeRecipes(it.recipeUIDs, null)}
+    userRepository.user.value?.let { recipeRepository.initializeRecipes(it.recipeUIDs, null) }
   }
 
   override fun onCleared() {
