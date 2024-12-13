@@ -57,7 +57,7 @@ fun OverviewScreen(navigationActions: NavigationActions) {
       scope = scope, drawerState = drawerState, navigationActions = navigationActions) {
         if (selectedHousehold == null && households.isEmpty()) {
           Log.d("OverviewScreen", households.toString())
-          FirstTimeWelcomeScreen(navigationActions, overviewScreenViewModel)
+          navigationActions.navigateTo(Screen.FIRST_TIME_USER)
         } else {
           Scaffold(
               modifier = Modifier.testTag("overviewScreen"),
