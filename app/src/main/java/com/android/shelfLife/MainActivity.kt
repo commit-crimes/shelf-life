@@ -30,10 +30,9 @@ import com.android.shelfLife.ui.newoverview.IndividualFoodItemScreen
 import com.android.shelfLife.ui.newoverview.OverviewScreen
 import com.android.shelfLife.ui.recipes.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.GenerateRecipeScreen
-import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
+import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.recipes.execution.ServingsScreen
-import com.android.shelfLife.ui.recipes.addRecipe.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.execution.RecipeExecutionScreen
 import com.android.shelfLife.ui.recipes.execution.SelectFoodItemsForIngredientScreen
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
