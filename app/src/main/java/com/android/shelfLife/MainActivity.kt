@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -29,8 +30,12 @@ import com.android.shelfLife.ui.newoverview.IndividualFoodItemScreen
 import com.android.shelfLife.ui.newoverview.OverviewScreen
 import com.android.shelfLife.ui.recipes.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.GenerateRecipeScreen
-import com.android.shelfLife.ui.recipes.IndividualRecipeScreen
+import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
+import com.android.shelfLife.ui.recipes.execution.ServingsScreen
+import com.android.shelfLife.ui.recipes.execution.RecipeExecutionScreen
+import com.android.shelfLife.ui.recipes.execution.SelectFoodItemsForIngredientScreen
+import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
 import com.example.compose.ShelfLifeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -80,6 +85,14 @@ fun ShelfLifeApp() {
       composable(Screen.ADD_RECIPE) { AddRecipeScreen(navigationActions) }
       composable(Screen.GENERATE_RECIPE) { GenerateRecipeScreen(navigationActions) }
     }
+
+    navigation(startDestination = Screen.RECIPE_EXECUTION, route = Route.RECIPE_EXECUTION){
+      composable(Screen.RECIPE_EXECUTION){
+        RecipeExecutionScreen(navigationActions)
+      }
+
+    }
+
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
       composable(Screen.PROFILE) { ProfileScreen(navigationActions, context) }
       composable(Route.INVITATIONS) { InvitationScreen(navigationActions) }
