@@ -30,8 +30,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.model.newFoodItem.FoodItem
+import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
+import androidx.compose.material.icons.filled.Close
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,12 +76,22 @@ fun SelectFoodItemsForIngredientScreen(
                         Log.d("SelectFoodItemsScreen", "Back button clicked. calling onPrevious")
                         onPrevious()
                     }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.Close, contentDescription = "Close")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.secondaryContainer
                 )
+            )
+        },
+        bottomBar = {
+            BottomNavigationMenu(
+                onTabSelect = { destination ->
+                    navigationActions.navigateTo(destination)
+                    Log.d("InstructionScreen", "BottomNavigationMenu: Navigated to $destination")
+                },
+                tabList = LIST_TOP_LEVEL_DESTINATION,
+                selectedItem = Route.RECIPES
             )
         },
         floatingActionButton = {
