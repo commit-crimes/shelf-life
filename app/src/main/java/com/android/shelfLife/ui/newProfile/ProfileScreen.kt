@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -16,6 +17,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,6 +64,12 @@ fun ProfileScreen(
 
   val color = MaterialTheme.colorScheme
 
+    // Variables to track clicks and reset the counter after a time interval
+    var clickCount by remember { mutableStateOf(0) }
+    var lastClickTime by remember { mutableStateOf(0L) }
+
+    val thresholdTime = 500 // Time in milliseconds between successive clicks
+
   Scaffold(
       modifier = Modifier.testTag("profileScaffold"),
       bottomBar = {
@@ -80,13 +90,47 @@ fun ProfileScreen(
                 Image(
                     imageVector = Icons.Outlined.AccountCircle,
                     contentDescription = "Profile Picture",
-                    modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"),
+                    modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture")
+                        .clickable {
+                            val currentTime = System.currentTimeMillis()
+                            if (currentTime - lastClickTime <= thresholdTime) {
+                                // Increment the click count for quick successive clicks
+                                clickCount++
+                            } else {
+                                // Reset the count if time exceeded threshold
+                                clickCount = 1
+                            }
+                            lastClickTime = currentTime
+
+                            // Check if the count has reached 5
+                            if (clickCount == 5) {
+                                navigationActions.navigateTo(Screen.EASTER_EGG)
+                                clickCount = 0 // Reset the counter after navigating
+                            }
+                        },
                     contentScale = ContentScale.Crop)
               } else {
                 AsyncImage(
                     model = currentUser.value?.photoUrl,
                     contentDescription = "Profile Picture",
-                    modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture"),
+                    modifier = Modifier.size(100.dp).clip(CircleShape).testTag("profilePicture")
+                        .clickable {
+                            val currentTime = System.currentTimeMillis()
+                            if (currentTime - lastClickTime <= thresholdTime) {
+                                // Increment the click count for quick successive clicks
+                                clickCount++
+                            } else {
+                                // Reset the count if time exceeded threshold
+                                clickCount = 1
+                            }
+                            lastClickTime = currentTime
+
+                            // Check if the count has reached 5
+                            if (clickCount == 5) {
+                                navigationActions.navigateTo(Screen.EASTER_EGG)
+                                clickCount = 0 // Reset the counter after navigating
+                            }
+                        },
                     contentScale = ContentScale.Crop)
               }
               Spacer(modifier = Modifier.height(32.dp))
