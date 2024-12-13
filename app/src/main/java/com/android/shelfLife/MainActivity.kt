@@ -15,6 +15,7 @@ import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
 import com.android.shelfLife.ui.easteregg.EasterEggScreen
+import com.android.shelfLife.ui.leaderboard.LeaderboardScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
@@ -63,6 +64,7 @@ fun ShelfLifeApp() {
       composable(Screen.EDIT_FOOD) { EditFoodItemScreen(navigationActions) }
       composable(Screen.HOUSEHOLD_CREATION) { HouseHoldCreationScreen(navigationActions) }
       composable(Screen.INDIVIDUAL_FOOD_ITEM) { IndividualFoodItemScreen(navigationActions) }
+      composable(Screen.LEADERBOARD) { LeaderboardScreen(navigationActions) }
     }
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
       composable(Screen.PERMISSION_HANDLER) { CameraPermissionHandler(navigationActions) }

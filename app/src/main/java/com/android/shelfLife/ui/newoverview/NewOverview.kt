@@ -1,10 +1,12 @@
 package com.android.shelfLife.ui.newoverview
 
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Leaderboard
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -13,8 +15,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -81,11 +86,30 @@ fun OverviewScreen(navigationActions: NavigationActions) {
               },
               // Floating Action Button to add a new food item
               floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
-                    content = { Icon(Icons.Default.Add, contentDescription = "Add") },
-                    modifier = Modifier.testTag("addFoodFab"),
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(16.dp) // space between FABs
+                    ) {
+                      // Leaderboard
+                      FloatingActionButton(
+                          onClick = { navigationActions.navigateTo(Screen.LEADERBOARD) },
+                          containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                          modifier = Modifier.testTag("leaderboardFab")) {
+                            Icon(
+                                imageVector =
+                                    Icons.Default
+                                        .Leaderboard, // Make sure you have an icon for leaderboard
+                                contentDescription = "Leaderboard")
+                          }
+
+                      // Add
+                      FloatingActionButton(
+                          onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
+                          containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                          modifier = Modifier.testTag("addFoodFab")) {
+                            Icon(Icons.Default.Add, contentDescription = "Add")
+                          }
+                    }
               },
           ) { paddingValues ->
             Column(

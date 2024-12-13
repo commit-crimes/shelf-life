@@ -75,6 +75,7 @@ constructor(
   val instructionError: StateFlow<List<Int?>> = _instructionError.asStateFlow()
 
   private val _instructionsError = MutableStateFlow(false)
+
   private val _ingredientsError = MutableStateFlow(false)
 
   private val _ingredientNameError = MutableStateFlow<Int?>(null)

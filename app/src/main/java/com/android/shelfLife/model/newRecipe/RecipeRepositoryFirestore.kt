@@ -110,7 +110,7 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
       _recipes.value = currentRecipes
       addedLocally = true
 
-      db.collection(COLLECTION_PATH).document(recipe.uid).set(recipe).await()
+      db.collection(COLLECTION_PATH).document(recipe.uid).set(recipe)
     } catch (e: Exception) {
       Log.e("RecipeRepository", "Error adding recipe", e)
       // Rollback
@@ -141,7 +141,7 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
       }
       _recipes.value = currentRecipes
 
-      db.collection(COLLECTION_PATH).document(recipe.uid).set(recipe).await()
+      db.collection(COLLECTION_PATH).document(recipe.uid).set(recipe)
     } catch (e: Exception) {
       Log.e("RecipeRepository", "Error updating recipe", e)
       // Rollback changes
@@ -171,7 +171,7 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
       deletedRecipe = _recipes.value.find { it.uid == recipeId }
       _recipes.value = _recipes.value.filterNot { it.uid == recipeId }
 
-      db.collection(COLLECTION_PATH).document(recipeId).delete().await()
+      db.collection(COLLECTION_PATH).document(recipeId).delete()
     } catch (e: Exception) {
       Log.e("RecipeRepository", "Error deleting recipe", e)
       // Rollback

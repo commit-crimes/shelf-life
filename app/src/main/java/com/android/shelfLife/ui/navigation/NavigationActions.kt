@@ -20,6 +20,7 @@ object Route {
 }
 
 object Screen {
+  const val LEADERBOARD = "Leaderboard Screen"
   const val OVERVIEW = "Overview Screen"
   const val AUTH = "Auth Screen"
   const val BARCODE_SCANNER = "Barcode Scanner Screen"

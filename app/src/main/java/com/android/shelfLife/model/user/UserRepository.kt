@@ -1,6 +1,7 @@
 package com.android.shelfLife.model.user
 
 import android.content.Context
+import com.android.shelfLife.viewmodel.leaderboard.LeaderboardMode
 import kotlinx.coroutines.flow.StateFlow
 
 interface UserRepository {
@@ -11,6 +12,10 @@ interface UserRepository {
   /** Exposes the invitations list as a StateFlow. */
   val invitations: StateFlow<List<String>>
 
+  var isAudioPlaying: StateFlow<Boolean>
+
+  var currentAudioMode: StateFlow<LeaderboardMode?>
+
   /** Generates a new unique ID for a user. */
   fun getNewUid(): String
 
@@ -19,6 +24,10 @@ interface UserRepository {
    * at startup to load initial data.
    */
   suspend fun initializeUserData(context: Context)
+
+  fun setAudioPlaying(isPlaying: Boolean)
+
+  fun setCurrentAudioMode(mode: LeaderboardMode?)
 
   // Other suspend functions for updating user data
   suspend fun addHouseholdUID(householdUID: String)
@@ -55,4 +64,6 @@ interface UserRepository {
    * @param householdUid - The household to select.
    */
   suspend fun selectHousehold(householdUid: String?)
+
+  suspend fun getUserNames(userIds: List<String>): Map<String, String>
 }

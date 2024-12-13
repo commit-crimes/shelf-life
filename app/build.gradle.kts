@@ -281,7 +281,6 @@ dependencies {
 
     // Google Service
     implementation(libs.play.services.auth)
-
     // Firebase
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.firestore)
