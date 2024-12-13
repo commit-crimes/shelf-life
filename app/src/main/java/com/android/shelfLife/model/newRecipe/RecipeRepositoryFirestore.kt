@@ -263,12 +263,10 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
 
   private fun convertToSearchType(recipeType: String): RecipeType {
     return when (recipeType) {
-      "USE_SOON_TO_EXPIRE" -> RecipeType.USE_SOON_TO_EXPIRE
-      "USE_ONLY_HOUSHOLD_ITEMS" -> RecipeType.USE_ONLY_HOUSEHOLD_ITEMS
       "HIGH_PROTEIN" -> RecipeType.HIGH_PROTEIN
       "LOW_CALORIE" -> RecipeType.LOW_CALORIE
       "PERSONAL" -> RecipeType.PERSONAL
-      else -> RecipeType.USE_SOON_TO_EXPIRE // its the default value
+      else -> RecipeType.BASIC // its the default value
     }
   }
 
