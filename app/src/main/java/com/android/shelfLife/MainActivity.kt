@@ -14,6 +14,7 @@ import androidx.navigation.navigation
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
+import com.android.shelfLife.ui.easteregg.EasterEggScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
@@ -83,6 +84,9 @@ fun ShelfLifeApp() {
     }
     navigation(startDestination = Screen.FIRST_TIME_USER, route = Route.FIRST_TIME_USER) {
       composable(Screen.FIRST_TIME_USER) { FirstTimeWelcomeScreen(navigationActions) }
+    }
+    navigation(startDestination = Screen.EASTER_EGG, route = Route.EASTEREGG) {
+      composable(Screen.EASTER_EGG) { EasterEggScreen(navigationActions) }
     }
   }
 }
