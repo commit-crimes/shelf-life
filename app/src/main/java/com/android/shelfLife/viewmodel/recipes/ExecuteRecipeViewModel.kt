@@ -1,14 +1,19 @@
 package com.android.shelfLife.viewmodel.recipes
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.newRecipe.RecipeRepository
 import com.android.shelfLife.model.newhousehold.HouseHoldRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
@@ -45,6 +50,22 @@ class ExecuteRecipeViewModel @Inject constructor(
     private val _currentIngredientName = MutableStateFlow<String?>(null)
     val currentIngredientName: StateFlow<String?> = _currentIngredientName.asStateFlow()
 
+    private val _currentInstructionIndex = MutableStateFlow(0)
+    val currentInstructionIndex: StateFlow<Int> = _currentInstructionIndex.asStateFlow()
+
+    val currentInstruction: StateFlow<String?> = combine(
+        _currentInstructionIndex,
+        executingRecipe
+    ) { index, recipe ->
+        if (index in recipe.instructions.indices) {
+            Log.d(TAG, "Current instruction updated: ${recipe.instructions[index]}")
+            recipe.instructions[index]
+        } else {
+            Log.e(TAG, "Instruction index $index is out of bounds.")
+            null
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
     init {
         updateCurrentIngredientName()
     }
@@ -56,6 +77,7 @@ class ExecuteRecipeViewModel @Inject constructor(
             is RecipeExecutionState.SelectFood -> RecipeExecutionState.Instructions
             else -> _state.value // Stay in the same state
         }
+        Log.d(TAG, "Transitioned to state: ${_state.value}")
     }
 
     // Function to go back to the previous state
@@ -65,19 +87,19 @@ class ExecuteRecipeViewModel @Inject constructor(
             is RecipeExecutionState.Instructions -> RecipeExecutionState.SelectFood
             else -> _state.value // Stay in the same state
         }
+        Log.d(TAG, "Transitioned to state: ${_state.value}")
     }
 
     fun updateServings(servings: Float) {
         _servings.value = servings
+        Log.d(TAG, "Updated servings to: $servings")
     }
 
-    fun temporarilyConsumeItems(listOfFoodItems: List<FoodItem>, listOfAmounts: List<Float>){
-        for (i in listOfFoodItems.indices){
+    fun temporarilyConsumeItems(listOfFoodItems: List<FoodItem>, listOfAmounts: List<Float>) {
+        for (i in listOfFoodItems.indices) {
             temporarilyConsumeItem(listOfFoodItems[i], listOfAmounts[i])
         }
     }
-
-
 
     private fun temporarilyConsumeItem(foodItem: FoodItem, amount: Float) {
         _availableFoodItems.value = _availableFoodItems.value.mapNotNull { currentItem ->
@@ -85,27 +107,28 @@ class ExecuteRecipeViewModel @Inject constructor(
                 val remainingAmount = currentItem.foodFacts.quantity.amount - amount
 
                 if (remainingAmount > 0) {
-                    // Update the item's quantity with the remaining amount
+                    Log.d(TAG, "Temporarily consumed $amount of ${currentItem.foodFacts.name}. Remaining: $remainingAmount")
                     currentItem.copy(
                         foodFacts = currentItem.foodFacts.copy(
                             quantity = currentItem.foodFacts.quantity.copy(amount = remainingAmount)
                         )
                     )
                 } else {
-                    // Remove the item if the remaining amount is 0 or less
+                    Log.d(TAG, "Completely consumed ${currentItem.foodFacts.name}.")
                     null
                 }
             } else {
-                // Keep items that do not match the food item being consumed
                 currentItem
             }
         }
     }
 
-
     fun consumeSelectedItems() {
         if (householdUid != null) {
-            foodItemsRepository.setFoodItems(householdId = householdUid,_availableFoodItems.value)
+            foodItemsRepository.setFoodItems(householdId = householdUid, _availableFoodItems.value)
+            Log.d(TAG, "Consumed selected items and updated Firestore for household: $householdUid")
+        } else {
+            Log.e(TAG, "Household ID is null. Cannot consume selected items.")
         }
     }
 
@@ -116,6 +139,7 @@ class ExecuteRecipeViewModel @Inject constructor(
         } else {
             null
         }
+        Log.d(TAG, "Current ingredient name updated: ${_currentIngredientName.value}")
     }
 
     fun nextIngredient() {
@@ -124,6 +148,7 @@ class ExecuteRecipeViewModel @Inject constructor(
             _currentIngredientIndex.value += 1
             updateCurrentIngredientName()
         }
+        Log.d(TAG, "Moved to next ingredient. Current index: ${_currentIngredientIndex.value}")
     }
 
     fun hasMoreIngredients(): Boolean {
@@ -153,9 +178,37 @@ class ExecuteRecipeViewModel @Inject constructor(
 
         currentSelections[ingredientName] = selectedItemsForIngredient
         _selectedFoodItemsForIngredients.value = currentSelections
+        Log.d(TAG, "Selected food items updated for ingredient: $ingredientName")
     }
 
+    fun nextInstruction() {
+        val instructions = _executingRecipe.value.instructions
+        if (_currentInstructionIndex.value < instructions.size - 1) {
+            _currentInstructionIndex.value += 1
+            Log.d(TAG, "Moved to next instruction. Current index: ${_currentInstructionIndex.value}")
+        } else {
+            Log.d(TAG, "No more instructions to display.")
+        }
+    }
+
+    fun previousInstruction() {
+        if (_currentInstructionIndex.value > 0) {
+            _currentInstructionIndex.value -= 1
+            Log.d(TAG, "Moved to previous instruction. Current index: ${_currentInstructionIndex.value}")
+        } else {
+            Log.d(TAG, "No previous instructions to display.")
+        }
+    }
+
+    fun hasMoreInstructions(): Boolean {
+        return _currentInstructionIndex.value < _executingRecipe.value.instructions.size - 1
+    }
+
+    fun hasPreviousInstructions(): Boolean {
+        return _currentInstructionIndex.value > 0
+    }
 }
+
 sealed class RecipeExecutionState {
     object SelectServings : RecipeExecutionState()
     object SelectFood : RecipeExecutionState()
