@@ -272,13 +272,13 @@ fun RecipeItem(
 
               // Display an image for the recipe (using a placeholder image)
               Image(
-                  painter = painterResource(R.drawable.google_logo), // Placeholder image resource
+                  painter = painterResource(R.drawable.recipe_placeholder_small), // Placeholder image resource
                   contentDescription = "Recipe Image", // Content description for accessibility
                   modifier =
                       Modifier.size(80.dp) // Set the size for the image
                           .clip(
                               RoundedCornerShape(
-                                  4.dp)), // Optionally clip the image with rounded corners
+                                  8.dp)), // Optionally clip the image with rounded corners
                   contentScale = ContentScale.Fit // Fit the image to the available space
                   )
             }
