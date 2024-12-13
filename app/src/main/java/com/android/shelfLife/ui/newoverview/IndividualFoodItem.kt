@@ -34,7 +34,6 @@ import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.overview.IndividualFoodItemViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IndividualFoodItemScreen(
     navigationActions: NavigationActions,
@@ -42,64 +41,68 @@ fun IndividualFoodItemScreen(
 ) {
   val coroutineScope = rememberCoroutineScope()
 
-  Scaffold(
-      modifier = Modifier.testTag("IndividualFoodItemScreen"),
-      topBar = {
-        CustomTopAppBar(
-            onClick = { navigationActions.goBack() },
-            title =
-                if (individualFoodItemViewModel.selectedFood != null)
-                    individualFoodItemViewModel.selectedFood!!.foodFacts.name
-                else "",
-            titleTestTag = "IndividualFoodItemName",
-            actions = {
-              IconButton(
-                  onClick = {
-                    individualFoodItemViewModel.selectedFood?.let {
-                      coroutineScope.launch {
-                        individualFoodItemViewModel.deleteFoodItem()
-                        navigationActions.goBack()
-                      }
-                    }
-                  },
-                  modifier = Modifier.testTag("deleteFoodItem")) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
-                  }
-            })
-      },
-      // Floating Action Button to edit the food item
-      floatingActionButton = {
-        FloatingActionButton(
-            onClick = { navigationActions.navigateTo(Screen.EDIT_FOOD) },
-            content = { Icon(Icons.Default.Edit, contentDescription = "Edit") },
-            modifier = Modifier.testTag("editFoodFab"),
-            containerColor = MaterialTheme.colorScheme.secondaryContainer)
-      },
-      bottomBar = {
-        BottomNavigationMenu(
-            onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-            tabList = LIST_TOP_LEVEL_DESTINATION,
-            selectedItem = Route.OVERVIEW)
-      }) { paddingValues ->
-        LazyColumn(modifier = Modifier.padding(paddingValues)) {
-          item {
-            if (individualFoodItemViewModel.selectedFood != null) {
-              AsyncImage(
-                  model = individualFoodItemViewModel.selectedFood!!.foodFacts.imageUrl,
-                  contentDescription = "Food Image",
-                  modifier =
-                      Modifier.fillMaxWidth()
-                          .padding(horizontal = 16.dp, vertical = 8.dp)
-                          .aspectRatio(1f)
-                          .clip(RoundedCornerShape(8.dp))
-                          .testTag("IndividualFoodItemImage"),
-                  contentScale = ContentScale.Crop)
+    if (individualFoodItemViewModel.selectedFood != null){
+        Scaffold(
+            modifier = Modifier.testTag("IndividualFoodItemScreen"),
+            topBar = {
+                CustomTopAppBar(
+                    onClick = { navigationActions.goBack() },
+                    title =
+                    if (individualFoodItemViewModel.selectedFood != null)
+                        individualFoodItemViewModel.selectedFood!!.foodFacts.name
+                    else "",
+                    titleTestTag = "IndividualFoodItemName",
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                individualFoodItemViewModel.selectedFood?.let {
+                                    coroutineScope.launch {
+                                        individualFoodItemViewModel.deleteFoodItem()
+                                        navigationActions.goBack()
+                                    }
+                                }
+                            },
+                            modifier = Modifier.testTag("deleteFoodItem")) {
+                            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
+                        }
+                    })
+            },
+            // Floating Action Button to edit the food item
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { navigationActions.navigateTo(Screen.EDIT_FOOD) },
+                    content = { Icon(Icons.Default.Edit, contentDescription = "Edit") },
+                    modifier = Modifier.testTag("editFoodFab"),
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer)
+            },
+            bottomBar = {
+                BottomNavigationMenu(
+                    onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                    tabList = LIST_TOP_LEVEL_DESTINATION,
+                    selectedItem = Route.OVERVIEW)
+            }) { paddingValues ->
+            LazyColumn(modifier = Modifier.padding(paddingValues)) {
+                item {
+                    if (individualFoodItemViewModel.selectedFood != null) {
+                        AsyncImage(
+                            model = individualFoodItemViewModel.selectedFood!!.foodFacts.imageUrl,
+                            contentDescription = "Food Image",
+                            modifier =
+                            Modifier.fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(8.dp))
+                                .testTag("IndividualFoodItemImage"),
+                            contentScale = ContentScale.Crop)
 
-              FoodItemDetails(foodItem = individualFoodItemViewModel.selectedFood!!)
-            } else {
-              CircularProgressIndicator(modifier = Modifier.testTag("CircularProgressIndicator"))
+                        FoodItemDetails(foodItem = individualFoodItemViewModel.selectedFood!!)
+                    } else {
+                        CircularProgressIndicator(modifier = Modifier.testTag("CircularProgressIndicator"))
+                    }
+                }
             }
-          }
         }
-      }
+    }else{
+        navigationActions.navigateTo(Screen.EASTER_EGG)
+    }
 }
