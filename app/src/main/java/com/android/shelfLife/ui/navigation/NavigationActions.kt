@@ -16,6 +16,7 @@ object Route {
   const val AUTH = "Auth"
   const val INVITATIONS = "Invitations"
   const val FIRST_TIME_USER = "First Time User"
+  const val EASTEREGG = "Easteregg"
 }
 
 object Screen {
@@ -34,6 +35,7 @@ object Screen {
   const val PROFILE = "Profile Screen"
   const val HOUSEHOLD_CREATION = "Household Creation Screen"
   const val FIRST_TIME_USER = "First Time User Screen"
+  const val EASTER_EGG = "Easteregg Screen"
   // Add other screens as needed
 }
 
