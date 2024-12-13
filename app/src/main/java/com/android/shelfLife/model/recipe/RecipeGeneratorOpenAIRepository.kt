@@ -31,8 +31,8 @@ class RecipeGeneratorOpenAIRepository @Inject constructor(private val openai: Op
     RecipeGeneratorRepository {
 
   companion object {
-    val QUICK_RECIPE_DEF = "quick, 15minutes"
-    val LONG_RECIPE_DEF = "long, over 30minutes"
+    val QUICK_RECIPE_DEF = "quick, under 15 minutes"
+    val LONG_RECIPE_DEF = "long, over 30 minutes"
 
     // Base prompts
     val BASE_SYSTEM_PROMPT = { recipeDescription: String ->
@@ -87,11 +87,10 @@ class RecipeGeneratorOpenAIRepository @Inject constructor(private val openai: Op
   }
 
   override suspend fun generateRecipe(recipePrompt: RecipePrompt): Recipe? {
-
-    // Get the custom system and user prompts based on the mode
-    val (systemPrompt, userPrompt) = getPromptsForMode(recipePrompt)
-
     try {
+      // Get the custom system and user prompts based on the mode
+      val (systemPrompt, userPrompt) = getPromptsForMode(recipePrompt)
+
       // Define the parameters for the recipe generation tool
       val params =
           Parameters.buildJsonObject {
@@ -180,7 +179,7 @@ class RecipeGeneratorOpenAIRepository @Inject constructor(private val openai: Op
         // Construct the final Recipe object from the tool response
         val generatedRecipe =
             Recipe(
-                uid = "0", // Placeholder UID
+                uid = "placeholder", // Placeholder UID
                 name = recipePrompt.name,
                 instructions = toolResponse["instructions"] as List<String>,
                 servings = (toolResponse["servings"] as Int).toFloat(),
