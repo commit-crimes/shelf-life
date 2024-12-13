@@ -286,11 +286,15 @@ constructor(
   }
 
     override suspend fun addCurrentUserToHouseHold(householdUID: String, userUID: String) {
-        db.collection("users")
-            .document(userUID)
-            .update("householdUIDs", FieldValue.arrayUnion(householdUID))
-            .await()
-        _user.value?.householdUIDs?.plus(householdUID)
+        try {
+            _user.value?.householdUIDs?.plus(householdUID)
+            db.collection("users")
+                .document(userUID)
+                .update("householdUIDs", FieldValue.arrayUnion(householdUID))
+        } catch (e: Exception) {
+            Log.e("UserRepositoryFirestore", "Error adding user to household", e)
+            _user.value?.householdUIDs?.minus(householdUID)
+        }
     }
 
   private fun convertToUser(doc: DocumentSnapshot): User? {
