@@ -41,7 +41,7 @@ constructor(
   override val invitations: StateFlow<List<String>> =
       invitationListener().stateIn(externalScope, SharingStarted.Eagerly, emptyList())
 
-  private val _isAudioPlaying = MutableStateFlow<Boolean>(true)
+  private val _isAudioPlaying = MutableStateFlow<Boolean>(false)
   override var isAudioPlaying: StateFlow<Boolean> = _isAudioPlaying.asStateFlow()
 
   private val _currentAudioMode = MutableStateFlow<LeaderboardMode?>(null)
