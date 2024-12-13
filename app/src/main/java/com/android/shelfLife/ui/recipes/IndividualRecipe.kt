@@ -1,6 +1,8 @@
 package com.android.shelfLife.ui.recipes.IndividualRecipe
 
+import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,25 +10,35 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.newRecipe.RecipeRepositoryFirestore
 import com.android.shelfLife.model.recipe.Ingredient
+import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
@@ -34,8 +46,9 @@ import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.math.floor
+import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.minutes
 
 @Composable
 /**
@@ -62,6 +75,8 @@ fun IndividualRecipeScreen(
     individualRecipeViewModel: IndividualRecipeViewModel = hiltViewModel()
 ) {
 
+  val coroutineScope = rememberCoroutineScope()
+
   if (individualRecipeViewModel.selectedRecipeIsNonEmpty) {
     // Scaffold that provides the structure for the screen, including top and bottom bars.
     Scaffold(
@@ -70,7 +85,19 @@ fun IndividualRecipeScreen(
           CustomTopAppBar(
               onClick = { navigationActions.goBack() },
               title = individualRecipeViewModel.getRecipeName(),
-              titleTestTag = "individualRecipeTitle")
+              titleTestTag = "individualRecipeTitle",
+              actions = {
+                IconButton(
+                    onClick = {
+                      coroutineScope.launch {
+                        individualRecipeViewModel.deleteSelectedRecipe()
+                        navigationActions.goBack()
+                      }
+                    },
+                    modifier = Modifier.testTag("deleteFoodItem")) {
+                      Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
+                    }
+              })
         },
         bottomBar = {
           // Bottom navigation bar for switching between main app destinations.
@@ -78,6 +105,20 @@ fun IndividualRecipeScreen(
               onTabSelect = { destination -> navigationActions.navigateTo(destination) },
               tabList = LIST_TOP_LEVEL_DESTINATION,
               selectedItem = Route.RECIPES)
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    navigationActions.navigateTo(Route.RECIPE_EXECUTION)
+                },
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                modifier = Modifier.testTag("startButton")
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow, // Replace with a suitable icon
+                    contentDescription = "Start Recipe"
+                )
+            }
         },
         content = { paddingValues ->
           Column(modifier = Modifier.padding(paddingValues).fillMaxSize().testTag("recipe")) {
@@ -154,22 +195,22 @@ fun DisplayInstructionNew(instruction: String) {
 }
 
 // this preview function allows us to see the easter egg screen
-@Preview()
-@Composable
-private fun IndividualRecipeScreenPreviewEasterEgg() {
-  val navController = rememberNavController()
-  val navigationActions = NavigationActions(navController)
-  val firebaseFirestore = FirebaseFirestore.getInstance()
-  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
-  val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
-
-  // Render the IndividualRecipeScreen with a null selectedRecipe
-  IndividualRecipeScreen(navigationActions = navigationActions)
-}
-// this preview shows the example where we do have a selected recipe
 // @Preview()
 // @Composable
-// private fun IndividualRecipeScreenPreview() {
+// private fun IndividualRecipeScreenPreviewEasterEgg() {
+//  val navController = rememberNavController()
+//  val navigationActions = NavigationActions(navController)
+//  val firebaseFirestore = FirebaseFirestore.getInstance()
+//  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
+//  val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
+//
+//  // Render the IndividualRecipeScreen with a null selectedRecipe
+//  IndividualRecipeScreen(navigationActions = navigationActions)
+// }
+// this preview shows the example where we do have a selected recipe
+//@Preview()
+//@Composable
+//private fun IndividualRecipeScreenPreview() {
 //  val navController = rememberNavController()
 //  val navigationActions = NavigationActions(navController)
 //  val firebaseFirestore = FirebaseFirestore.getInstance()
@@ -182,26 +223,17 @@ private fun IndividualRecipeScreenPreviewEasterEgg() {
 //          instructions =
 //              listOf(
 //                  "Preheat your oven to 425°F (220°C). Position a rack in the center.",
-//                  "Remove the chicken giblets (if present) and pat the chicken dry with paper
-// towels. Dry skin crisps better during roasting.",
-//                  "In a small bowl, mix the salt, pepper, garlic powder, onion powder, paprika,
-// and dried thyme.",
-//                  "Rub the olive oil or melted butter all over the chicken, including under the
-// skin if possible.",
-//                  "Generously sprinkle the seasoning mixture over the chicken, rubbing it into the
-// skin and inside the cavity.",
-//                  "Stuff the cavity with the lemon halves, smashed garlic cloves, and optional
-// fresh herb sprigs.",
+//                  "Remove the chicken giblets (if present) and pat the chicken dry with paper towels. Dry skin crisps better during roasting.",
+//                  "In a small bowl, mix the salt, pepper, garlic powder, onion powder, paprika, and dried thyme.",
+//                  "Rub the olive oil or melted butter all over the chicken, including under the skin if possible.",
+//                  "Generously sprinkle the seasoning mixture over the chicken, rubbing it into the skin and inside the cavity.",
+//                  "Stuff the cavity with the lemon halves, smashed garlic cloves, and optional fresh herb sprigs.",
 //                  "Tie the chicken legs together with kitchen twine to ensure even cooking.",
 //                  "Place the chicken breast-side up in a roasting pan or oven-safe skillet.",
-//                  "Roast for 75–90 minutes (approximately 40 minutes per kg), or until a meat
-// thermometer inserted into the thickest part of the thigh (without touching the bone) reads
-// 75°C.",
+//                  "Roast for 75–90 minutes (approximately 40 minutes per kg), or until a meat thermometer inserted into the thickest part of the thigh (without touching the bone) reads 75°C.",
 //                  "For extra crispy skin, baste the chicken with pan drippings every 30 minutes.",
-//                  "Remove the chicken from the oven and let it rest for 10–15 minutes to allow the
-// juices to redistribute.",
-//                  "Carve the chicken and serve with your favorite sides, such as roasted
-// vegetables, mashed potatoes, or a fresh salad."),
+//                  "Remove the chicken from the oven and let it rest for 10–15 minutes to allow the juices to redistribute.",
+//                  "Carve the chicken and serve with your favorite sides, such as roasted vegetables, mashed potatoes, or a fresh salad."),
 //          servings = 5.0F,
 //          time = 120.minutes,
 //          ingredients =
@@ -228,4 +260,4 @@ private fun IndividualRecipeScreenPreviewEasterEgg() {
 //
 //  // Render the IndividualRecipeScreen with a null selectedRecipe
 //  IndividualRecipeScreen(navigationActions = navigationActions)
-// }
+//}

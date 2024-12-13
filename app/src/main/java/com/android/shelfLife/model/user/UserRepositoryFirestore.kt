@@ -2,6 +2,7 @@ package com.android.shelfLife.model.user
 
 import android.content.Context
 import android.util.Log
+import com.android.shelfLife.viewmodel.leaderboard.LeaderboardMode
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
@@ -39,6 +40,12 @@ constructor(
 
   override val invitations: StateFlow<List<String>> =
       invitationListener().stateIn(externalScope, SharingStarted.Eagerly, emptyList())
+
+  private val _isAudioPlaying = MutableStateFlow<Boolean>(false)
+  override var isAudioPlaying: StateFlow<Boolean> = _isAudioPlaying.asStateFlow()
+
+  private val _currentAudioMode = MutableStateFlow<LeaderboardMode?>(null)
+  override var currentAudioMode: StateFlow<LeaderboardMode?> = _currentAudioMode.asStateFlow()
 
   override fun getNewUid(): String {
     return userCollection.document().id
@@ -145,9 +152,35 @@ constructor(
     return uidToEmail
   }
 
+  override suspend fun getUserNames(userIds: List<String>): Map<String, String> {
+    if (userIds.isEmpty()) return emptyMap()
+
+    val uidToName = mutableMapOf<String, String>()
+    val chunks = userIds.chunked(10)
+
+    for (chunk in chunks) {
+      val query = db.collection("users").whereIn(FieldPath.documentId(), chunk).get().await()
+      for (doc in query.documents) {
+        val username = doc.getString("username")
+        val userId = doc.id
+        if (username != null) uidToName[userId] = username
+      }
+    }
+    return uidToName
+  }
+
+
+  override fun setAudioPlaying(isPlaying: Boolean) {
+    _isAudioPlaying.value = isPlaying
+  }
+
+  override fun setCurrentAudioMode(mode: LeaderboardMode?) {
+    _currentAudioMode.value = mode
+  }
+
   private suspend fun updateUserField(fieldName: String, value: Any) {
     val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
-    userCollection.document(currentUser.uid).update(fieldName, value).await()
+    userCollection.document(currentUser.uid).update(fieldName, value)
 
     val currentUserData =
         _user.value
@@ -190,6 +223,7 @@ constructor(
           }
           else -> emptyList()
         }
+
     val updatedUserData =
         when (fieldName) {
           "householdUIDs" -> currentUserData.copy(householdUIDs = updatedArray)
@@ -197,7 +231,7 @@ constructor(
           else -> currentUserData
         }
     _user.value = updatedUserData
-    userCollection.document(currentUser.uid).update(fieldName, updateValue).await()
+    userCollection.document(currentUser.uid).update(fieldName, updateValue)
   }
 
   private enum class ArrayOperation {
@@ -239,7 +273,7 @@ constructor(
 
   override suspend fun updateEmail(email: String) {
     val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
-    currentUser.updateEmail(email).await()
+    currentUser.updateEmail(email)
     updateUserField("email", email)
   }
 
@@ -251,13 +285,17 @@ constructor(
     householdUid?.let { updateSelectedHousehold(it) }
   }
 
-  override suspend fun addCurrentUserToHouseHold(householdUID: String, userUID: String) {
-    db.collection("users")
-        .document(userUID)
-        .update("householdUIDs", FieldValue.arrayUnion(householdUID))
-        .await()
-    _user.value?.householdUIDs?.plus(householdUID)
-  }
+    override suspend fun addCurrentUserToHouseHold(householdUID: String, userUID: String) {
+        try {
+            _user.value?.householdUIDs?.plus(householdUID)
+            db.collection("users")
+                .document(userUID)
+                .update("householdUIDs", FieldValue.arrayUnion(householdUID))
+        } catch (e: Exception) {
+            Log.e("UserRepositoryFirestore", "Error adding user to household", e)
+            _user.value?.householdUIDs?.minus(householdUID)
+        }
+    }
 
   private fun convertToUser(doc: DocumentSnapshot): User? {
     return try {

@@ -53,7 +53,7 @@ interface RecipeRepository {
    *
    * @param recipeId The unique ID of the recipe to delete.
    */
-  suspend fun deleteRecipe(recipeId: String)
+  suspend fun deleteRecipe(recipeId: String): Boolean
 
   /**
    * Selects a recipe in the local state. This does not affect Firestore.

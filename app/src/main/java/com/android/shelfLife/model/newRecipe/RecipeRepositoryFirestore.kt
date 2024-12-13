@@ -6,6 +6,7 @@ import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.Recipe
+import com.android.shelfLife.model.recipe.RecipeType
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FirebaseFirestore
@@ -70,6 +71,7 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
       _recipes.value = emptyList()
       _selectedRecipe.value = null
     }
+    Log.i("RecipeRepository", "_recipes : ${_recipes.value}")
   }
 
   /**
@@ -102,6 +104,7 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
    * @param recipe The recipe to add.
    */
   override suspend fun addRecipe(recipe: Recipe) {
+    Log.i("RecipeRepository", "recipe  ${recipe}")
     var addedLocally = false
     try {
       // Update local cache first
@@ -110,7 +113,7 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
       _recipes.value = currentRecipes
       addedLocally = true
 
-      db.collection(COLLECTION_PATH).document(recipe.uid).set(recipe).await()
+      db.collection(COLLECTION_PATH).document(recipe.uid).set(recipe)
     } catch (e: Exception) {
       Log.e("RecipeRepository", "Error adding recipe", e)
       // Rollback
@@ -141,7 +144,7 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
       }
       _recipes.value = currentRecipes
 
-      db.collection(COLLECTION_PATH).document(recipe.uid).set(recipe).await()
+      db.collection(COLLECTION_PATH).document(recipe.uid).set(recipe)
     } catch (e: Exception) {
       Log.e("RecipeRepository", "Error updating recipe", e)
       // Rollback changes
@@ -164,14 +167,14 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
    *
    * @param recipeId The unique ID of the recipe to delete.
    */
-  override suspend fun deleteRecipe(recipeId: String) {
+  override suspend fun deleteRecipe(recipeId: String): Boolean {
     var deletedRecipe: Recipe? = null
     try {
       // Update local cache
       deletedRecipe = _recipes.value.find { it.uid == recipeId }
       _recipes.value = _recipes.value.filterNot { it.uid == recipeId }
 
-      db.collection(COLLECTION_PATH).document(recipeId).delete().await()
+      db.collection(COLLECTION_PATH).document(recipeId).delete()
     } catch (e: Exception) {
       Log.e("RecipeRepository", "Error deleting recipe", e)
       // Rollback
@@ -180,7 +183,9 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
         current.add(it)
         _recipes.value = current
       }
+      return false
     }
+    return true
   }
 
   /**
@@ -239,6 +244,7 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
       val timeMillis = doc.getLong("time") ?: 0L
       val time = timeMillis.toDuration(DurationUnit.SECONDS)
       val ingredients = doc["ingredients"] as? List<Map<String, Any>> ?: return null
+      val recipeType = doc.getString("recipeType") ?: return null
 
       Log.d("RecipeRepository", "Name of recipe: $name")
       Recipe(
@@ -247,10 +253,22 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
           instructions = instructions,
           servings = servings,
           time = time,
-          ingredients = ingredients.map { convertToIngredient(it) })
+          ingredients = ingredients.map { convertToIngredient(it) },
+          recipeType = convertToSearchType(recipeType))
     } catch (e: Exception) {
       Log.e("RecipeRepository", "Error converting document to Recipe", e)
       null
+    }
+  }
+
+  private fun convertToSearchType(recipeType: String): RecipeType {
+    return when (recipeType) {
+      "USE_SOON_TO_EXPIRE" -> RecipeType.USE_SOON_TO_EXPIRE
+      "USE_ONLY_HOUSHOLD_ITEMS" -> RecipeType.USE_ONLY_HOUSEHOLD_ITEMS
+      "HIGH_PROTEIN" -> RecipeType.HIGH_PROTEIN
+      "LOW_CALORIE" -> RecipeType.LOW_CALORIE
+      "PERSONAL" -> RecipeType.PERSONAL
+      else -> RecipeType.USE_SOON_TO_EXPIRE // its the default value
     }
   }
 
