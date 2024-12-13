@@ -271,7 +271,9 @@ fun RecipeItem(
 
               // Display an image for the recipe (using a placeholder image)
               Image(
-                  painter = painterResource(R.drawable.recipe_placeholder_small), // Placeholder image resource
+                  painter =
+                      painterResource(
+                          R.drawable.recipe_placeholder_small), // Placeholder image resource
                   contentDescription = "Recipe Image", // Content description for accessibility
                   modifier =
                       Modifier.size(80.dp) // Set the size for the image

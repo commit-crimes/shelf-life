@@ -130,11 +130,12 @@ fun FoodItemCard(
   }
 
   val cardHeight = if (isSelectedItemsList) 3.dp else 8.dp
-  val unit = when (foodItem.foodFacts.quantity.unit) {
-    FoodUnit.GRAM -> "g"
-    FoodUnit.ML -> "ml"
-    FoodUnit.COUNT -> "in stock"
-  }
+  val unit =
+      when (foodItem.foodFacts.quantity.unit) {
+        FoodUnit.GRAM -> "g"
+        FoodUnit.ML -> "ml"
+        FoodUnit.COUNT -> "in stock"
+      }
   // Composable UI
   ElevatedCard(
       colors = CardDefaults.elevatedCardColors(containerColor = cardColor),
@@ -150,18 +151,18 @@ fun FoodItemCard(
           Row {
             Column(modifier = Modifier.weight(1f)) {
               Text(text = foodItem.foodFacts.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-              if(!isSelectedItemsList) {
-                  Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}$unit", fontSize = 12.sp)
+              if (!isSelectedItemsList) {
+                Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}$unit", fontSize = 12.sp)
               }
               Text(text = expiryDateMessage, fontSize = 12.sp)
             }
-            if(isSelectedItemsList) {
+            if (isSelectedItemsList) {
               Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}$unit", fontSize = 12.sp)
             }
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            if(!isSelectedItemsList) {
+            if (!isSelectedItemsList) {
               AsyncImage(
                   model = foodItem.foodFacts.imageUrl,
                   contentDescription = "Food Image",
@@ -170,7 +171,7 @@ fun FoodItemCard(
                           .clip(RoundedCornerShape(8.dp))
                           .align(Alignment.CenterVertically),
                   contentScale = ContentScale.Crop)
-              }
+            }
           }
 
           // Progress bar

@@ -8,22 +8,14 @@ import com.aallam.openai.api.chat.chatCompletionRequest
 import com.aallam.openai.api.core.Parameters
 import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.client.OpenAI
-import com.android.shelfLife.di.IoDispatcher
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.newFoodItem.FoodItem
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.int
@@ -35,9 +27,7 @@ import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 
 @Singleton
-class RecipeGeneratorOpenAIRepository
-@Inject
-constructor(private val openai: OpenAI) :
+class RecipeGeneratorOpenAIRepository @Inject constructor(private val openai: OpenAI) :
     RecipeGeneratorRepository {
 
   companion object {
@@ -45,53 +35,61 @@ constructor(private val openai: OpenAI) :
     val LONG_RECIPE_DEF = "long, over 30minutes"
 
     // Base prompts
-    val BASE_SYSTEM_PROMPT =
-      { recipeDescription: String -> "You are an assistant who generates  $recipeDescription recipes according to user's needs." }
+    val BASE_SYSTEM_PROMPT = { recipeDescription: String ->
+      "You are an assistant who generates  $recipeDescription recipes according to user's needs."
+    }
 
     val BASE_USER_PROMPT: (Float, String, String, Boolean, String, String) -> String =
-      { servings, recipeDescription, ingredients, onlyHousehold, recipeName, specialInstructions -> "Create a $recipeDescription recipe with exactly $servings servings. " +
-        "The user named the recipe \"$recipeName\" and specified the following special instructions: \"$specialInstructions\". Use the following ingredients: (${ingredients}) ${
+        { servings, recipeDescription, ingredients, onlyHousehold, recipeName, specialInstructions
+          ->
+          "Create a $recipeDescription recipe with exactly $servings servings. " +
+              "The user named the recipe \"$recipeName\" and specified the following special instructions: \"$specialInstructions\". Use the following ingredients: (${ingredients}) ${
         if (onlyHousehold) "To ensure a valid recipe, stick strictly to the provided ingredients. Do not add any other ingredients."
         else "To ensure a great tasting recipe, you can add other ingredients you deem relevant and necessary."
-      } Call _createRecipeFunction with a list of ingredients (name + quantity), step-by-step instructions, servings, and cooking time in seconds." }
-
+      } Call _createRecipeFunction with a list of ingredients (name + quantity), step-by-step instructions, servings, and cooking time in seconds."
+        }
   }
 
   private fun getPromptsForMode(recipePrompt: RecipePrompt): Pair<String, String> {
     val servings = recipePrompt.servings
 
     // Helper to filter and sort food items
-    val foodItems = recipePrompt.ingredients
-      .let { ingredients ->
-        if (recipePrompt.prioritiseSoonToExpire) ingredients.sortedBy { it.expiryDate }
+    val foodItems =
+        recipePrompt.ingredients.let { ingredients ->
+          if (recipePrompt.prioritiseSoonToExpire) ingredients.sortedBy { it.expiryDate }
           else ingredients
-      }
+        }
 
     val foodItemNames = foodItems.joinToString(", ") { it.foodFacts.name }
 
-    val recipeTypeDescription = when (recipePrompt.recipeType) {
-      RecipeType.BASIC -> ""
-      RecipeType.HIGH_PROTEIN -> "high protein,"
-      RecipeType.LOW_CALORIE -> "low calorie,"
-      RecipeType.PERSONAL -> throw IllegalArgumentException(
-        "RecipeType.PERSONAL is not supported for recipe generation as it is reserved for user-created recipes."
-      )
-    }
-    val recipeDescriptionFinal = "$recipeTypeDescription ${if (recipePrompt.shortDuration) QUICK_RECIPE_DEF else LONG_RECIPE_DEF}"
+    val recipeTypeDescription =
+        when (recipePrompt.recipeType) {
+          RecipeType.BASIC -> ""
+          RecipeType.HIGH_PROTEIN -> "high protein,"
+          RecipeType.LOW_CALORIE -> "low calorie,"
+          RecipeType.PERSONAL ->
+              throw IllegalArgumentException(
+                  "RecipeType.PERSONAL is not supported for recipe generation as it is reserved for user-created recipes.")
+        }
+    val recipeDescriptionFinal =
+        "$recipeTypeDescription ${if (recipePrompt.shortDuration) QUICK_RECIPE_DEF else LONG_RECIPE_DEF}"
 
-    val finalUserPrompt = BASE_USER_PROMPT(servings, recipeDescriptionFinal, foodItemNames, recipePrompt.onlyHouseHoldItems, recipePrompt.name, recipePrompt.specialInstruction)
+    val finalUserPrompt =
+        BASE_USER_PROMPT(
+            servings,
+            recipeDescriptionFinal,
+            foodItemNames,
+            recipePrompt.onlyHouseHoldItems,
+            recipePrompt.name,
+            recipePrompt.specialInstruction)
 
     return BASE_SYSTEM_PROMPT(recipeDescriptionFinal) to finalUserPrompt
   }
 
-
-  override suspend fun generateRecipe(
-      recipePrompt: RecipePrompt
-  ): Recipe? {
+  override suspend fun generateRecipe(recipePrompt: RecipePrompt): Recipe? {
 
     // Get the custom system and user prompts based on the mode
-    val (systemPrompt, userPrompt) =
-        getPromptsForMode(recipePrompt)
+    val (systemPrompt, userPrompt) = getPromptsForMode(recipePrompt)
 
     try {
       // Define the parameters for the recipe generation tool
@@ -161,9 +159,7 @@ constructor(private val openai: OpenAI) :
                     role = ChatRole.System, content = systemPrompt // System prompt
                     ),
                 ChatMessage(
-                    role = ChatRole.User,
-                    content =
-                        userPrompt // User prompt with food items
+                    role = ChatRole.User, content = userPrompt // User prompt with food items
                     ))
         tools {
           function(
@@ -182,7 +178,8 @@ constructor(private val openai: OpenAI) :
         require(toolCall is ToolCall.Function) { "Tool call is not a function" }
         val toolResponse = toolCall.execute() as Map<String, Any>
         // Construct the final Recipe object from the tool response
-        val generatedRecipe = Recipe(
+        val generatedRecipe =
+            Recipe(
                 uid = "0", // Placeholder UID
                 name = recipePrompt.name,
                 instructions = toolResponse["instructions"] as List<String>,

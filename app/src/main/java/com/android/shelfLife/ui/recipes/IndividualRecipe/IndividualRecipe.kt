@@ -27,7 +27,6 @@ import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.newRecipe.RecipeRepositoryFirestore
 import com.android.shelfLife.model.recipe.Ingredient
-import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
@@ -59,39 +58,31 @@ import kotlin.math.floor
  *     - Shows an error message and an easter egg image.
  */
 fun IndividualRecipeScreen(
-  navigationActions: NavigationActions,
-  individualRecipeViewModel: IndividualRecipeViewModel = hiltViewModel()
+    navigationActions: NavigationActions,
+    individualRecipeViewModel: IndividualRecipeViewModel = hiltViewModel()
 ) {
   if (individualRecipeViewModel.selectedRecipeIsNonEmpty) {
     // Scaffold that provides the structure for the screen, including top and bottom bars.
     Scaffold(
-      modifier = Modifier.testTag("individualRecipesScreen"),
-      topBar = {
-        CustomTopAppBar(
-          onClick = { navigationActions.goBack() },
-          title = individualRecipeViewModel.getRecipeName(),
-          titleTestTag = "individualRecipeTitle"
-        )
-      },
-      bottomBar = {
-        BottomNavigationMenu(
-          onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-          tabList = LIST_TOP_LEVEL_DESTINATION,
-          selectedItem = Route.RECIPES
-        )
-      },
-      content = { paddingValues ->
-        Column(
-          modifier = Modifier
-            .padding(paddingValues)
-            .fillMaxSize()
-            .testTag("recipe")
-        ) {
-          // Use the extracted RecipeContent composable
-          RecipeContent(individualRecipeViewModel)
-        }
-      }
-    )
+        modifier = Modifier.testTag("individualRecipesScreen"),
+        topBar = {
+          CustomTopAppBar(
+              onClick = { navigationActions.goBack() },
+              title = individualRecipeViewModel.getRecipeName(),
+              titleTestTag = "individualRecipeTitle")
+        },
+        bottomBar = {
+          BottomNavigationMenu(
+              onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+              tabList = LIST_TOP_LEVEL_DESTINATION,
+              selectedItem = Route.RECIPES)
+        },
+        content = { paddingValues ->
+          Column(modifier = Modifier.padding(paddingValues).fillMaxSize().testTag("recipe")) {
+            // Use the extracted RecipeContent composable
+            RecipeContent(individualRecipeViewModel)
+          }
+        })
   } else {
     // If no recipe is selected, navigate to the easter egg screen
     navigationActions.navigateTo(Screen.EASTER_EGG)
@@ -101,54 +92,46 @@ fun IndividualRecipeScreen(
 @Composable
 fun RecipeContent(viewModel: IndividualRecipeViewModel) {
   Column(
-    modifier = Modifier
-      .padding(8.dp)
-      .fillMaxSize()
-      .verticalScroll(rememberScrollState()) // Enable vertical scrolling
-      .testTag("recipeContent")
-  ) {
-    // Display the recipe image
-    Image(
-      painter = painterResource(R.drawable.individual_recipe_pot),
-      contentDescription = "Recipe Image",
-      modifier = Modifier
-        .width(537.dp)
-        .height(164.dp)
-        .testTag("recipeImage"),
-      contentScale = ContentScale.FillWidth
-    )
+      modifier =
+          Modifier.padding(8.dp)
+              .fillMaxSize()
+              .verticalScroll(rememberScrollState()) // Enable vertical scrolling
+              .testTag("recipeContent")) {
+        // Display the recipe image
+        Image(
+            painter = painterResource(R.drawable.individual_recipe_pot),
+            contentDescription = "Recipe Image",
+            modifier = Modifier.width(537.dp).height(164.dp).testTag("recipeImage"),
+            contentScale = ContentScale.FillWidth)
 
-    // Row displaying servings and time information
-    Row(modifier = Modifier.fillMaxWidth()) {
-      Text(
-        text = "Servings: ${viewModel.getRecipeServing()}",
-        modifier = Modifier.testTag("recipeServings")
-      )
-      Spacer(modifier = Modifier.width(16.dp))
-      Text(
-        text = "Time: ${viewModel.getRecipeTime()} min",
-        modifier = Modifier.testTag("recipeTime")
-      )
-    }
+        // Row displaying servings and time information
+        Row(modifier = Modifier.fillMaxWidth()) {
+          Text(
+              text = "Servings: ${viewModel.getRecipeServing()}",
+              modifier = Modifier.testTag("recipeServings"))
+          Spacer(modifier = Modifier.width(16.dp))
+          Text(
+              text = "Time: ${viewModel.getRecipeTime()} min",
+              modifier = Modifier.testTag("recipeTime"))
+        }
 
-    Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-    // Ingredients section
-    Column(modifier = Modifier.testTag("recipeIngredients")) {
-      viewModel.getRecipeIngredients().forEach { ingredient ->
-        DisplayIngredientNew(ingredient)
+        // Ingredients section
+        Column(modifier = Modifier.testTag("recipeIngredients")) {
+          viewModel.getRecipeIngredients().forEach { ingredient ->
+            DisplayIngredientNew(ingredient)
+          }
+        }
+
+        // Instructions section
+        Column(modifier = Modifier.testTag("recipeInstructions")) {
+          viewModel.getRecipeInstruction().forEach { instruction ->
+            DisplayInstructionNew(instruction)
+          }
+        }
       }
-    }
-
-    // Instructions section
-    Column(modifier = Modifier.testTag("recipeInstructions")) {
-      viewModel.getRecipeInstruction().forEach { instruction ->
-        DisplayInstructionNew(instruction)
-      }
-    }
-  }
 }
-
 
 @Composable
 fun DisplayIngredientNew(ingredient: Ingredient) {
@@ -171,9 +154,7 @@ fun DisplayIngredientNew(ingredient: Ingredient) {
 fun DisplayInstructionNew(instruction: String) {
   // Display recipe instructions, scrollable if long
   Text(
-      text = instruction, modifier = Modifier
-      .padding(vertical = 8.dp)
-      .testTag("recipeInstruction"))
+      text = instruction, modifier = Modifier.padding(vertical = 8.dp).testTag("recipeInstruction"))
 }
 
 // this preview function allows us to see the easter egg screen

@@ -5,7 +5,6 @@ import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.newFoodItem.FoodItem
 import kotlin.time.Duration
 
-
 /** Data class representing a recipe object */
 data class Recipe(
     val uid: String, // unique identifier for the recipe
@@ -16,10 +15,10 @@ data class Recipe(
     val ingredients: List<Ingredient> = listOf(), // ingredients in recipe
     val recipeType: RecipeType = RecipeType.PERSONAL,
     val workInProgress: Boolean = false, // if the recipe is currently being worked on
-){
-    companion object {
-        const val MAX_SERVINGS: Float = 20.0f
-    }
+) {
+  companion object {
+    const val MAX_SERVINGS: Float = 20.0f
+  }
 }
 
 /** Data class representing a recipe prompt, that we use to query the Recipe generation model */
@@ -32,7 +31,7 @@ data class RecipePrompt(
     val servings: Float = 1.0f,
     val shortDuration: Boolean = false,
     val onlyHouseHoldItems: Boolean = false,
-    val prioritiseSoonToExpire:Boolean = true,
+    val prioritiseSoonToExpire: Boolean = true,
     val macros: NutritionFacts = NutritionFacts()
 )
 
@@ -45,14 +44,12 @@ data class Ingredient(
 )
 
 enum class RecipeType {
-    BASIC,
-    HIGH_PROTEIN,
-    LOW_CALORIE,
-    PERSONAL;
+  BASIC,
+  HIGH_PROTEIN,
+  LOW_CALORIE,
+  PERSONAL;
 
-    override fun toString(): String {
-        return name.replace("_", " ")
-            .lowercase()
-            .replaceFirstChar { it.uppercase() }
-    }
+  override fun toString(): String {
+    return name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
+  }
 }
