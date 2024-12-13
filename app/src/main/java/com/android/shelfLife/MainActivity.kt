@@ -81,8 +81,8 @@ fun ShelfLifeApp() {
       composable(Screen.PROFILE) { ProfileScreen(navigationActions, context) }
       composable(Route.INVITATIONS) { InvitationScreen(navigationActions) }
     }
-    navigation(startDestination = Screen.EASTER_EGG, route = Route.EASTEREGG){
-      composable(Screen.EASTER_EGG){ EasterEggScreen(navigationActions) }
+    navigation(startDestination = Screen.EASTER_EGG, route = Route.EASTEREGG) {
+      composable(Screen.EASTER_EGG) { EasterEggScreen(navigationActions) }
     }
   }
 }

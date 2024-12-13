@@ -24,39 +24,40 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 
 @Composable
-fun EasterEggScreen(navigationActions: NavigationActions){
+fun EasterEggScreen(navigationActions: NavigationActions) {
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(), // Ensure Scaffold takes up the full size
-        topBar = {CustomTopAppBar(
-            onClick = {navigationActions.goBack()},
-            title = stringResource(id =R.string.easteregg_title),
+  Scaffold(
+      modifier = Modifier.fillMaxSize(), // Ensure Scaffold takes up the full size
+      topBar = {
+        CustomTopAppBar(
+            onClick = { navigationActions.goBack() },
+            title = stringResource(id = R.string.easteregg_title),
             titleTestTag = "eastereggTitle",
-        )},
-        content = { paddingValues ->
-            // Column for the content inside the Scaffold
-            Column(
-                modifier =
-                Modifier.fillMaxSize()
-                    .padding(paddingValues), // Apply padding values from Scaffold
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center // Center content vertically
+        )
+      },
+      content = { paddingValues ->
+        // Column for the content inside the Scaffold
+        Column(
+            modifier =
+                Modifier.fillMaxSize().padding(paddingValues), // Apply padding values from Scaffold
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center // Center content vertically
             ) {
-                // Easter egg image
-                Image(
-                    painter = painterResource(id = R.drawable.how_did_we_get_here),
-                    contentDescription = "How did we get here?",
-                    modifier = Modifier.fillMaxWidth(),
-                    contentScale = ContentScale.Fit)
+              // Easter egg image
+              Image(
+                  painter = painterResource(id = R.drawable.how_did_we_get_here),
+                  contentDescription = "How did we get here?",
+                  modifier = Modifier.fillMaxWidth(),
+                  contentScale = ContentScale.Fit)
 
-                // Spacer for some space between the image and the text
-                Spacer(modifier = Modifier.size(16.dp))
+              // Spacer for some space between the image and the text
+              Spacer(modifier = Modifier.size(16.dp))
 
-                // Error message text
-                Text(
-                    text = "No recipe selected. Should not happen",
-                    modifier = Modifier.testTag("noRecipeSelectedMessage"),
-                    color = Color.Red)
+              // Error message text
+              Text(
+                  text = "No recipe selected. Should not happen",
+                  modifier = Modifier.testTag("noRecipeSelectedMessage"),
+                  color = Color.Red)
             }
-        })
+      })
 }
