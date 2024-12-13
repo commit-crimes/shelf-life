@@ -1,14 +1,9 @@
 package com.android.shelfLife.model.newInvitations
 
 import com.android.shelfLife.model.newhousehold.HouseHold
-import kotlinx.coroutines.flow.StateFlow
+import com.google.firebase.firestore.DocumentSnapshot
 
 interface InvitationRepository {
-
-  val invitations: StateFlow<List<Invitation>>
-
-  /** Removes the real-time listener for invitations. */
-  fun removeInvitationListener()
 
   /**
    * Declines an invitation.
@@ -25,18 +20,21 @@ interface InvitationRepository {
   suspend fun acceptInvitation(invitation: Invitation)
 
   /**
-   * Fetches all invitations for the current user.
-   *
-   * @param listOfInvitationUids The list of invitation UIDs to fetch.
-   * @return The list of invitations.
-   */
-  suspend fun getInvitations(listOfInvitationUids: List<String>): List<Invitation>
-
-  /**
    * Sends an invitation to a user to join a household.
    *
    * @param household The household to invite the user to.
    * @param user The user to invite.
    */
   fun sendInvitation(household: HouseHold, invitedUserID: String)
+
+  /**
+   * Gets a specific invitation.
+   *
+   * @param uid The uid of the invitation to get.
+   */
+  suspend fun getInvitationsBatch(invitationUIDs: List<String>): List<Invitation>
+
+  suspend fun getInvitation(uid: String): Invitation?
+
+  fun convertToInvitation(doc: DocumentSnapshot): Invitation?
 }

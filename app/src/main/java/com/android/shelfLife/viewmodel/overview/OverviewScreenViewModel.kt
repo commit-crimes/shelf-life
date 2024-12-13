@@ -137,7 +137,7 @@ constructor(
     _multipleSelectedFoodItems.value = emptyList()
   }
 
-  fun editFoodItem(newFoodItem: FoodItem, oldFoodItem: FoodItem) {
+  fun editFoodItem(newFoodItem: FoodItem) {
     val selectedHousehold = selectedHousehold.value
     if (selectedHousehold != null) {
       viewModelScope.launch {
