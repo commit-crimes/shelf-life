@@ -25,15 +25,6 @@ interface UserRepository {
    */
   suspend fun initializeUserData(context: Context)
 
-  /** Starts listening for changes to the invitations field. */
-  fun startListeningForInvitations()
-
-  /**
-   * Stops listening for changes to the invitations field. Call this when the listener is no longer
-   * needed to avoid memory leaks.
-   */
-  fun stopListeningForInvitations()
-
   fun setAudioPlaying(isPlaying: Boolean)
 
   fun setCurrentAudioMode(mode: LeaderboardMode?)
