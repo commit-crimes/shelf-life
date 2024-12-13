@@ -1,11 +1,15 @@
 import android.util.Log
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.with
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -32,7 +36,7 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun InstructionScreen(
     navigationActions: NavigationActions,
@@ -94,14 +98,21 @@ fun InstructionScreen(
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Display the current instruction
-            Text(
-                text = currentInstruction ?: "No instructions available",
+            // Display the current instruction with animation
+            AnimatedContent(
+                targetState = currentInstruction,
+                transitionSpec = {
+                    fadeIn() with fadeOut() // Define fade animations
+                },
                 modifier = Modifier
                     .weight(1f)
-                    .padding(16.dp),
-                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp)
-            )
+                    .padding(16.dp)
+            ) { instruction ->
+                Text(
+                    text = instruction ?: "No instructions available",
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp)
+                )
+            }
 
             // Navigation Buttons
             Row(
@@ -136,6 +147,7 @@ fun InstructionScreen(
                 } else {
                     Button(
                         onClick = {
+
                             onFinish()
                             Log.d("InstructionScreen", "Finish button clicked.")
                         },
