@@ -13,18 +13,25 @@ data class Recipe(
     val servings: Float, // total number of servings
     val time: Duration, // time it takes to cook
     val ingredients: List<Ingredient> = listOf(), // ingredients in recipe
-    val recipeType: RecipeType = RecipeType.USE_SOON_TO_EXPIRE
-)
+    val recipeType: RecipeType = RecipeType.PERSONAL,
+    val workInProgress: Boolean = false, // if the recipe is currently being worked on
+) {
+  companion object {
+    const val MAX_SERVINGS: Float = 20.0f
+  }
+}
 
 /** Data class representing a recipe prompt, that we use to query the Recipe generation model */
 data class RecipePrompt(
     val name: String,
-    val recipeType: RecipeType = RecipeType.USE_SOON_TO_EXPIRE,
+    val recipeType: RecipeType = RecipeType.BASIC,
     val specialInstruction: String = "",
     val ingredients: List<FoodItem> = listOf(),
     val missingIngredients: List<String> = listOf(),
     val servings: Float = 1.0f,
     val shortDuration: Boolean = false,
+    val onlyHouseHoldItems: Boolean = false,
+    val prioritiseSoonToExpire: Boolean = true,
     val macros: NutritionFacts = NutritionFacts()
 )
 
@@ -37,9 +44,12 @@ data class Ingredient(
 )
 
 enum class RecipeType {
-  USE_SOON_TO_EXPIRE,
-  USE_ONLY_HOUSEHOLD_ITEMS,
+  BASIC,
   HIGH_PROTEIN,
   LOW_CALORIE,
-  PERSONAL
+  PERSONAL;
+
+  override fun toString(): String {
+    return name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
+  }
 }

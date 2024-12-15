@@ -1,6 +1,8 @@
 package com.android.shelfLife.model.newhousehold
 
+import AudioPlayer
 import android.util.Log
+import com.android.shelfLife.ui.leaderboard.ThemeManager
 import com.google.firebase.firestore.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,6 +36,8 @@ constructor(
   }
 
   override fun selectHousehold(household: HouseHold?) {
+    AudioPlayer.stopAudio()
+    ThemeManager.resetMode()
     _selectedHousehold.value = household
   }
 
@@ -87,6 +91,7 @@ constructor(
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error initializing households", e)
     }
+
   }
 
   /**
@@ -99,7 +104,9 @@ constructor(
         mapOf(
             "name" to household.name,
             "members" to household.members,
-            "sharedRecipes" to household.sharedRecipes)
+            "sharedRecipes" to household.sharedRecipes,
+            "ratPoints" to household.ratPoints,
+            "stinkyPoints" to household.stinkyPoints)
     try {
       // Update local cache
       Log.d("HouseholdRepository", "Added household: $household")
@@ -110,7 +117,6 @@ constructor(
       db.collection(collectionPath)
           .document(household.uid) // Use the household UID as the document ID
           .set(householdData)
-          .await()
     } catch (e: Exception) {
       val updatedHouseHolds = _households.value.filterNot { it.uid == household.uid }
       _households.value = updatedHouseHolds
@@ -129,7 +135,9 @@ constructor(
         mapOf(
             "name" to household.name,
             "members" to household.members,
-            "sharedRecipes" to household.sharedRecipes)
+            "sharedRecipes" to household.sharedRecipes,
+            "ratPoints" to household.ratPoints,
+            "stinkyPoints" to household.stinkyPoints)
     try {
       // Update local cache
       val currentHouseholds = _households.value.toMutableList()
@@ -143,7 +151,7 @@ constructor(
       Log.d("HouseholdRepository", "Updated household: $household")
       _households.value = currentHouseholds
 
-      db.collection(collectionPath).document(household.uid).set(householdData).await()
+      db.collection(collectionPath).document(household.uid).set(householdData)
     } catch (e: Exception) {
       // Rollback: Restore the original item in the local cache
       originalItem?.let {
@@ -170,7 +178,7 @@ constructor(
       val currentHouseholds = _households.value.filterNot { it.uid == id }
       _households.value = currentHouseholds
 
-      db.collection(collectionPath).document(id).delete().await()
+      db.collection(collectionPath).document(id).delete()
     } catch (e: Exception) {
       // Rollback: Restore the deleted household in the local cache
       deletedHouseHold?.let {
@@ -217,6 +225,24 @@ constructor(
             }
   }
 
+  override suspend fun updateStinkyPoints(householdId: String, stinkyPoints: Map<String, Long>) {
+    try {
+      _selectedHousehold.value = _selectedHousehold.value?.copy(stinkyPoints = stinkyPoints)
+      db.collection(collectionPath).document(householdId).update("stinkyPoints", stinkyPoints)
+    } catch (e: Exception) {
+      Log.e("HouseholdRepository", "Error updating stinky points", e)
+    }
+  }
+
+  override suspend fun updateRatPoints(householdId: String, ratPoints: Map<String, Long>) {
+    try {
+      _selectedHousehold.value = _selectedHousehold.value?.copy(ratPoints = ratPoints)
+      db.collection(collectionPath).document(householdId).update("ratPoints", ratPoints)
+    } catch (e: Exception) {
+      Log.e("HouseholdRepository", "Error updating rat points", e)
+    }
+  }
+
   /** Stops listening for real-time updates. */
   fun stopListeningForHouseholds() {
     householdsListenerRegistration?.remove()
@@ -235,8 +261,16 @@ constructor(
       val name = doc.getString("name") ?: return null
       val members = doc.get("members") as? List<String> ?: emptyList()
       val sharedRecipes = doc.get("sharedRecipes") as? List<String> ?: emptyList()
+      val ratPoints = doc.get("ratPoints") as? Map<String, Long> ?: emptyMap()
+      val stinkyPoints = doc.get("stinkyPoints") as? Map<String, Long> ?: emptyMap()
 
-      HouseHold(uid = uid, name = name, members = members, sharedRecipes = sharedRecipes)
+      HouseHold(
+          uid = uid,
+          name = name,
+          members = members,
+          sharedRecipes = sharedRecipes,
+          ratPoints = ratPoints,
+          stinkyPoints = stinkyPoints)
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error converting document to HouseHold", e)
       null

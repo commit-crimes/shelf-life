@@ -8,10 +8,6 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,16 +20,7 @@ constructor(
     private val auth: FirebaseAuth
 ) : InvitationRepository {
 
-  internal var listenerRegistration: ListenerRegistration? = null
-  private val _invitations: MutableStateFlow<List<Invitation>> = MutableStateFlow(emptyList())
-  override val invitations: StateFlow<List<Invitation>> = _invitations.asStateFlow()
   private val invitationPath = "invitations"
-
-  /** Removes the real-time listener for invitations. */
-  override fun removeInvitationListener() {
-    listenerRegistration?.remove()
-    listenerRegistration = null
-  }
 
   /**
    * Sends an invitation to a user to join a household.
@@ -60,31 +47,6 @@ constructor(
   }
 
   /**
-   * Fetches all invitations for the current user.
-   *
-   * @param listOfInvitationUids The list of invitation UIDs to fetch.
-   * @return The list of invitations.
-   */
-  override suspend fun getInvitations(listOfInvitationUids: List<String>): List<Invitation> {
-    if (listOfInvitationUids.isEmpty()) {
-      return emptyList()
-    }
-    return try {
-      _invitations.value =
-          db.collection(invitationPath)
-              .whereIn(FieldPath.documentId(), listOfInvitationUids)
-              .get()
-              .await()
-              .documents
-              .mapNotNull { convertToInvitation(it) }
-      invitations.value
-    } catch (e: Exception) {
-      Log.e("HouseholdRepository", "Error fetching households", e)
-      emptyList()
-    }
-  }
-
-  /**
    * Accepts an invitation.
    *
    * @param invitation The invitation to accept.
@@ -104,6 +66,16 @@ constructor(
    */
   override suspend fun declineInvitation(invitation: Invitation) {
     db.collection(invitationPath).document(invitation.invitationId).delete()
+  }
+
+  override suspend fun getInvitationsBatch(invitationUIDs: List<String>): List<Invitation> {
+    val querySnapshot =
+        db.collection("invitations").whereIn(FieldPath.documentId(), invitationUIDs).get().await()
+    return querySnapshot.documents.mapNotNull { doc -> convertToInvitation(doc) }
+  }
+
+  override suspend fun getInvitation(uid: String): Invitation? {
+    return convertToInvitation(db.collection("invitations").document(uid).get().await())
   }
 
   /**

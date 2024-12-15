@@ -46,7 +46,6 @@ constructor
           .collection("items")
           .document(foodItem.uid)
           .set(foodItem.toMap())
-          .await()
     } catch (e: Exception) {
       Log.e("FoodItemRepository", "Error adding food item", e)
       val updatedFoodItems = _foodItems.value.filterNot { it.uid == foodItem.uid }
@@ -74,6 +73,42 @@ constructor
     _selectedFoodItem.value = foodItem
   }
 
+  override fun setFoodItems(householdId: String, value: List<FoodItem>) {
+    try {
+      // Update the local cache
+      _foodItems.value = value
+
+      // Clear the existing items in Firestore for the household
+      val batch = db.batch()
+      val householdCollection = db.collection(collectionPath).document(householdId).collection("items")
+
+      // Retrieve all existing documents in the household's collection
+      householdCollection.get().addOnSuccessListener { snapshot ->
+        snapshot.documents.forEach { document ->
+          batch.delete(document.reference)
+        }
+
+        // Add the new items to Firestore
+        value.forEach { foodItem ->
+          val itemRef = householdCollection.document(foodItem.uid)
+          batch.set(itemRef, foodItem.toMap()) // Assuming FoodItem has a toMap() method
+        }
+
+        // Commit the batch
+        batch.commit().addOnSuccessListener {
+          Log.d("FoodItemRepository", "Successfully set food items for household: $householdId")
+        }.addOnFailureListener { e ->
+          Log.e("FoodItemRepository", "Failed to commit batch for household: $householdId", e)
+        }
+      }.addOnFailureListener { e ->
+        Log.e("FoodItemRepository", "Failed to fetch existing items for household: $householdId", e)
+      }
+    } catch (e: Exception) {
+      Log.e("FoodItemRepository", "Error setting food items for household: $householdId", e)
+      _errorMessage.value = "Failed to set food items. Please try again."
+    }
+  }
+
   override suspend fun updateFoodItem(householdId: String, foodItem: FoodItem) {
     var originalItem: FoodItem? = null
     try {
@@ -98,7 +133,6 @@ constructor
           .collection("items")
           .document(foodItem.uid)
           .set(foodItem)
-          .await()
     } catch (e: Exception) {
       Log.e("FoodItemRepository", "Error updating food item", e)
       // Rollback: Restore the original item in the local cache
@@ -134,7 +168,6 @@ constructor
           .collection("items")
           .document(foodItemId)
           .delete()
-          .await()
     } catch (e: Exception) {
       Log.e("FoodItemRepository", "Error deleting food item", e)
       // Rollback: Restore the deleted item in the local cache

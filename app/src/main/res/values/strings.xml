@@ -8,6 +8,7 @@
     <!-- Screen Titles -->
     <string name="add_food_item_title">Add Food Item</string>
     <string name="edit_food_item_title">Edit Food Item</string>
+    <string name="easteregg_title">How did you get here ?</string>
 
     <!-- Input Field Hints -->
     <string name="food_name_hint">Enter food name</string>
@@ -24,9 +25,15 @@
 
     <!-- Buttons -->
     <string name="submit_button_text">Submit</string>
+    <string name="next_button_text">Next</string>
     <string name="cancel_button">Cancel</string>
+    <string name="back_button">Back</string>
     <string name="add_button">Add</string>
     <string name="save_button">Save</string>
+    <string name="regenerate_button">Regenerate</string>
+    <string name="modify_button">Modify</string>
+    <string name="generate_button">Generate</string>
+
 
     <!-- Error Messages -->
     <string name="submission_error_message">Please correct the errors before submitting</string>
@@ -59,6 +66,9 @@
     <string name="search_recipes_placeholder">Search recipes</string>
     <string name="icon_for_recipes_search_bar">Icon for recipes search bar</string>
 
+    <!-- Recipe generation -->
+
+
     <!-- Food Item Details -->
     <string name="food_item_no_expiry_date">No Expiry Date</string>
     <string name="food_item_not_opened">Not Opened</string>
@@ -89,7 +99,7 @@
     <string name="instruction_empty_error">Instruction cannot be empty</string>
     <string name="instructions_invalid_error">Instruction contains invalid characters</string>
     <string name="instruction_step">Step %1$s</string>
-    <string name="ingredient_item">Ingredient%1$s : %2$s</string>
+    <string name="ingredient_item">%1$s.  %2$s %3$s %4$s</string>
     <string name="ingredient_name">Ingredient Name</string>
     <string name="ingredient_name_empty_error">Name cannot be empty</string>
     <string name= "ingredient_name_invalid_error">Name contains invalid characters</string>

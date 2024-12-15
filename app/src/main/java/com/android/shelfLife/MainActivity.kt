@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -14,6 +15,8 @@ import androidx.navigation.navigation
 import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
+import com.android.shelfLife.ui.easteregg.EasterEggScreen
+import com.android.shelfLife.ui.leaderboard.LeaderboardScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
@@ -21,12 +24,18 @@ import com.android.shelfLife.ui.newInvitations.InvitationScreen
 import com.android.shelfLife.ui.newProfile.ProfileScreen
 import com.android.shelfLife.ui.newoverview.AddFoodItemScreen
 import com.android.shelfLife.ui.newoverview.EditFoodItemScreen
+import com.android.shelfLife.ui.newoverview.FirstTimeWelcomeScreen
 import com.android.shelfLife.ui.newoverview.HouseHoldCreationScreen
 import com.android.shelfLife.ui.newoverview.IndividualFoodItemScreen
 import com.android.shelfLife.ui.newoverview.OverviewScreen
-import com.android.shelfLife.ui.recipes.GenerateRecipeScreen
+import com.android.shelfLife.ui.recipes.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
-import com.android.shelfLife.ui.recipes.addRecipe.AddRecipeScreen
+import com.android.shelfLife.ui.recipes.RecipesScreen
+import com.android.shelfLife.ui.recipes.execution.ServingsScreen
+import com.android.shelfLife.ui.recipes.execution.RecipeExecutionScreen
+import com.android.shelfLife.ui.recipes.execution.SelectFoodItemsForIngredientScreen
+import com.android.shelfLife.ui.recipes.generateRecipe.GenerateRecipeScreen
+import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
 import com.example.compose.ShelfLifeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -61,6 +70,7 @@ fun ShelfLifeApp() {
       composable(Screen.EDIT_FOOD) { EditFoodItemScreen(navigationActions) }
       composable(Screen.HOUSEHOLD_CREATION) { HouseHoldCreationScreen(navigationActions) }
       composable(Screen.INDIVIDUAL_FOOD_ITEM) { IndividualFoodItemScreen(navigationActions) }
+      composable(Screen.LEADERBOARD) { LeaderboardScreen(navigationActions) }
     }
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
       composable(Screen.PERMISSION_HANDLER) { CameraPermissionHandler(navigationActions) }
@@ -70,16 +80,28 @@ fun ShelfLifeApp() {
         startDestination = Screen.RECIPES,
         route = Route.RECIPES,
     ) {
-      composable(Screen.RECIPES) {
-        // RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
-      }
+      composable(Screen.RECIPES) { RecipesScreen(navigationActions) }
       composable(Screen.INDIVIDUAL_RECIPE) { IndividualRecipeScreen(navigationActions) }
       composable(Screen.ADD_RECIPE) { AddRecipeScreen(navigationActions) }
       composable(Screen.GENERATE_RECIPE) { GenerateRecipeScreen(navigationActions) }
     }
+
+    navigation(startDestination = Screen.RECIPE_EXECUTION, route = Route.RECIPE_EXECUTION){
+      composable(Screen.RECIPE_EXECUTION){
+        RecipeExecutionScreen(navigationActions)
+      }
+
+    }
+
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
       composable(Screen.PROFILE) { ProfileScreen(navigationActions, context) }
       composable(Route.INVITATIONS) { InvitationScreen(navigationActions) }
+    }
+    navigation(startDestination = Screen.FIRST_TIME_USER, route = Route.FIRST_TIME_USER) {
+      composable(Screen.FIRST_TIME_USER) { FirstTimeWelcomeScreen(navigationActions) }
+    }
+    navigation(startDestination = Screen.EASTER_EGG, route = Route.EASTEREGG) {
+      composable(Screen.EASTER_EGG) { EasterEggScreen(navigationActions) }
     }
   }
 }
