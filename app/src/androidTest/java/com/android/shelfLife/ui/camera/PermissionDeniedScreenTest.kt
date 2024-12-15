@@ -6,17 +6,26 @@ import androidx.navigation.NavHostController
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
+@HiltAndroidTest
 class PermissionDeniedScreenTest {
 
+  @get:Rule val hiltAndroidTestRule = HiltAndroidRule(this)
   @get:Rule val composeTestRule = createComposeRule()
+
+  @Before
+    fun setUp() {
+        hiltAndroidTestRule.inject()
+    }
 
   @Test
   fun testPermissionDeniedMessageIsDisplayed() {

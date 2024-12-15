@@ -36,8 +36,7 @@ constructor(
 
   private val FILTERS =
       mapOf(
-          "Soon to expire" to RecipeType.USE_SOON_TO_EXPIRE,
-          "Only household items" to RecipeType.USE_ONLY_HOUSEHOLD_ITEMS,
+          "Basic" to RecipeType.BASIC,
           "High protein" to RecipeType.HIGH_PROTEIN,
           "Low calories" to RecipeType.LOW_CALORIE,
           "Personal" to RecipeType.PERSONAL)
