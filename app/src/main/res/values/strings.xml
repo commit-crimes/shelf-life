@@ -8,6 +8,7 @@
     <!-- Screen Titles -->
     <string name="add_food_item_title">Add Food Item</string>
     <string name="edit_food_item_title">Edit Food Item</string>
+    <string name="edit_recipe_title">Edit your recipe</string>
     <string name="easteregg_title">How did you get here ?</string>
 
     <!-- Input Field Hints -->
