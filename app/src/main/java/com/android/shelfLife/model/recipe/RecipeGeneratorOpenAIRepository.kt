@@ -175,7 +175,7 @@ class RecipeGeneratorOpenAIRepository @Inject constructor(private val openai: Op
       val message = response.choices.firstOrNull()?.message
       message?.toolCalls?.firstOrNull()?.let { toolCall ->
         require(toolCall is ToolCall.Function) { "Tool call is not a function" }
-        val toolResponse = toolCall.execute() as Map<String, Any>
+        val toolResponse = toolCall.execute()
         // Construct the final Recipe object from the tool response
         val generatedRecipe =
             Recipe(
