@@ -3,10 +3,10 @@ package com.android.shelfLife.viewmodel.recipes
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.shelfLife.model.newFoodItem.FoodItem
-import com.android.shelfLife.model.newFoodItem.FoodItemRepository
-import com.android.shelfLife.model.newRecipe.RecipeRepository
-import com.android.shelfLife.model.newhousehold.HouseHoldRepository
+import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.foodItem.FoodItemRepository
+import com.android.shelfLife.model.recipe.RecipeRepository
+import com.android.shelfLife.model.household.HouseHoldRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

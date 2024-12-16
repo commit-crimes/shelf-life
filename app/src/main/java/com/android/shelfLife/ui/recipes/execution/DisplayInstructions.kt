@@ -33,7 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
+import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)

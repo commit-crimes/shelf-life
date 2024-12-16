@@ -28,7 +28,7 @@ import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
+import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.utils.OnLifecycleEvent
 import com.android.shelfLife.viewmodel.FoodItemViewModel
 import kotlinx.coroutines.launch

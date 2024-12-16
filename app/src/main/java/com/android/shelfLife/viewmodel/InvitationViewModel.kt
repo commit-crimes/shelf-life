@@ -3,8 +3,8 @@ package com.android.shelfLife.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.shelfLife.model.newInvitations.Invitation
-import com.android.shelfLife.model.newInvitations.InvitationRepository
+import com.android.shelfLife.model.invitations.Invitation
+import com.android.shelfLife.model.invitations.InvitationRepository
 import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject

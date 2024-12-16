@@ -53,9 +53,9 @@ import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
-import com.android.shelfLife.ui.newnavigation.HouseHoldSelectionDrawer
-import com.android.shelfLife.ui.newnavigation.TopNavigationBar
+import com.android.shelfLife.ui.navigation.BottomNavigationMenu
+import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
+import com.android.shelfLife.ui.navigation.TopNavigationBar
 import com.android.shelfLife.ui.utils.CustomSearchBar
 import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import com.android.shelfLife.viewmodel.recipes.RecipesViewModel

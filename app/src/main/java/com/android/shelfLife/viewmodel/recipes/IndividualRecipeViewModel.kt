@@ -4,7 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.android.shelfLife.model.newRecipe.RecipeRepository
+import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.user.UserRepository

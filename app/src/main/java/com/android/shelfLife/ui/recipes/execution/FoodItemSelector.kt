@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -29,14 +28,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.android.shelfLife.model.newFoodItem.FoodItem
+import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
+import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
 import androidx.compose.material.icons.filled.Close
-import com.android.shelfLife.ui.utils.CustomTopAppBar
 
 
 @OptIn(ExperimentalMaterial3Api::class)
