@@ -35,7 +35,6 @@ import com.android.shelfLife.ui.utils.DropdownFields
 import com.android.shelfLife.ui.utils.validateString
 import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import com.android.shelfLife.viewmodel.recipes.RecipeGenerationViewModel
-
 import kotlin.math.floor
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -122,10 +121,13 @@ fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit) {
               button1TestTag = "cancelButton",
               button1Text = stringResource(id = R.string.cancel_button),
               button2OnClick = {
-                val error = validateString(localName, R.string.recipe_title_empty_error, R.string.recipe_title_invalid_error)
-                if (error!= null) {
-                  Toast.makeText(context, error, Toast.LENGTH_SHORT)
-                      .show()
+                val error =
+                    validateString(
+                        localName,
+                        R.string.recipe_title_empty_error,
+                        R.string.recipe_title_invalid_error)
+                if (error != null) {
+                  Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
                   return@CustomButtons
                 }
 

@@ -1,8 +1,8 @@
 package com.android.shelflife.di
 
 import com.android.shelfLife.di.HouseholdRepositoryModule
-import com.android.shelfLife.model.newhousehold.HouseHoldRepository
-import com.android.shelfLife.model.newhousehold.HouseholdRepositoryFirestore
+import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
@@ -12,9 +12,7 @@ import javax.inject.Singleton
 
 @Module
 @TestInstallIn(
-  components = [SingletonComponent::class],
-  replaces = [HouseholdRepositoryModule::class]
-)
+    components = [SingletonComponent::class], replaces = [HouseholdRepositoryModule::class])
 object TestHouseHoldModule {
 
   @Provides

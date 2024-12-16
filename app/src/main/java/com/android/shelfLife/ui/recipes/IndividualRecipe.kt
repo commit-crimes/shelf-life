@@ -12,12 +12,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,11 +31,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.recipe.Ingredient
+import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
 import kotlin.math.floor
@@ -97,18 +97,14 @@ fun IndividualRecipeScreen(
               selectedItem = Route.RECIPES)
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navigationActions.navigateTo(Route.RECIPE_EXECUTION)
-                },
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                modifier = Modifier.testTag("startButton")
-            ) {
+          FloatingActionButton(
+              onClick = { navigationActions.navigateTo(Route.RECIPE_EXECUTION) },
+              containerColor = MaterialTheme.colorScheme.secondaryContainer,
+              modifier = Modifier.testTag("startButton")) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow, // Replace with a suitable icon
-                    contentDescription = "Start Recipe"
-                )
-            }
+                    contentDescription = "Start Recipe")
+              }
         },
         content = { paddingValues ->
           Column(modifier = Modifier.padding(paddingValues).fillMaxSize().testTag("recipe")) {

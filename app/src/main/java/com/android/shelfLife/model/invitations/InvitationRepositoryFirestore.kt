@@ -8,17 +8,15 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.tasks.await
 
 @Singleton
 open class InvitationRepositoryFirestore
 @Inject
-constructor(
-    private val db: FirebaseFirestore,
-    private val auth: FirebaseAuth
-) : InvitationRepository {
+constructor(private val db: FirebaseFirestore, private val auth: FirebaseAuth) :
+    InvitationRepository {
 
   private val invitationPath = "invitations"
 
@@ -84,7 +82,7 @@ constructor(
    * @param doc The Firestore document to convert.
    * @return The corresponding Invitation object, or null if the document is invalid.
    */
-  internal fun convertToInvitation(doc: DocumentSnapshot): Invitation? {
+  override fun convertToInvitation(doc: DocumentSnapshot): Invitation? {
     return try {
       Invitation(
           invitationId = doc.getString("invitationId") ?: return null,
