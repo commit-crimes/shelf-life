@@ -90,6 +90,27 @@ constructor(
   private val _ingredientQuantityAmountError = MutableStateFlow<Int?>(null)
   val ingredientQuantityAmountError: StateFlow<Int?> = _ingredientQuantityAmountError.asStateFlow()
 
+    var selectedRecipe by mutableStateOf<Recipe?>(null)
+
+    var isSelected by mutableStateOf(false)
+
+
+    init{
+        selectedRecipe = recipeRepository.selectedRecipe.value
+        if (selectedRecipe != null){
+            isSelected = true
+            _title.value = selectedRecipe!!.name
+            _time.value = selectedRecipe!!.time.toString()
+            _servings.value = selectedRecipe!!.servings.toString()
+            _ingredients.value = selectedRecipe!!.ingredients
+            _instructions.value = selectedRecipe!!.instructions
+        }
+        else{
+            isSelected = false
+        }
+    }
+
+
   // Helper function to validate if any instruction is empty
   fun validateInstructions() {
     _instructionsError.value =
@@ -282,15 +303,19 @@ constructor(
     }
     val newRecipe =
         Recipe(
-            uid = newRecipeUid,
+            uid = if (isSelected) selectedRecipe!!.uid else newRecipeUid,
             name = title.value,
             instructions = instructions.value,
             servings = 1F,
             time = time.value.toDouble().minutes,
             ingredients = ingredients.value,
             recipeType = RecipeType.PERSONAL)
-    recipeRepository.addRecipe(recipe = newRecipe.copy(uid = newRecipeUid))
-    userRepository.addRecipeUID(newRecipeUid)
+    if (isSelected){
+        recipeRepository.updateRecipe(newRecipe)
+    }else{
+        recipeRepository.addRecipe(recipe = newRecipe.copy(uid = newRecipeUid))
+        userRepository.addRecipeUID(newRecipeUid)
+    }
   }
 
   fun changeUnitExpanded() {
