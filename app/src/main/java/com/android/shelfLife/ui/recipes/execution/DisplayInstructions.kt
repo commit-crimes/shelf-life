@@ -3,7 +3,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.with
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -102,7 +102,7 @@ fun InstructionScreen(
             AnimatedContent(
                 targetState = currentInstruction,
                 transitionSpec = {
-                    fadeIn() with fadeOut() // Define fade animations
+                    fadeIn() togetherWith fadeOut() // Define fade animations
                 },
                 modifier = Modifier
                     .weight(1f)

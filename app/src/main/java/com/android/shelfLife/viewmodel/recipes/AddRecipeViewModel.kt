@@ -294,6 +294,6 @@ constructor(
   }
 
   fun changeUnitExpanded() {
-    unitExpanded = if (unitExpanded) false else true
+    unitExpanded = !unitExpanded
   }
 }

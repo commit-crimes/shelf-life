@@ -172,8 +172,8 @@ fun LocationDropdownField(
 // TODO Delete this after everything is compatible
 @Composable
 fun NewLocationDropdownField(
-    location: com.android.shelfLife.model.foodItem.FoodStorageLocation,
-    onLocationChange: (com.android.shelfLife.model.foodItem.FoodStorageLocation) -> Unit,
+    location: FoodStorageLocation,
+    onLocationChange: (FoodStorageLocation) -> Unit,
     locationExpanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
