@@ -35,9 +35,19 @@ import com.android.shelfLife.ui.recipes.generateRecipe.GenerateRecipeScreen
 import com.example.compose.ShelfLifeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+/**
+ * The main entry point for the Shelf Life app.
+ * Handles edge-to-edge UI settings and sets up the navigation graph.
+ */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+  /**
+   * Called when the activity is starting. Sets up the content and enables edge-to-edge layout.
+   *
+   * @param savedInstanceState If the activity is being re-initialized after previously being shut down,
+   * this contains the most recently saved data.
+   */
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
@@ -45,6 +55,10 @@ class MainActivity : ComponentActivity() {
   }
 }
 
+/**
+ * The main composable function for the Shelf Life app.
+ * Sets up the navigation graph with various routes and screens.
+ */
 @Composable
 fun ShelfLifeApp() {
   val navController = rememberNavController()
@@ -55,11 +69,13 @@ fun ShelfLifeApp() {
   NavHost(navController = navController, startDestination = Route.AUTH) {
     // Authentication route
     navigation(
-        startDestination = Screen.AUTH,
-        route = Route.AUTH,
+      startDestination = Screen.AUTH,
+      route = Route.AUTH,
     ) {
       composable(Screen.AUTH) { SignInScreen(navigationActions) }
     }
+
+    // Overview route
     navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
       composable(Screen.OVERVIEW) { OverviewScreen(navigationActions) }
       composable(Screen.ADD_FOOD) { AddFoodItemScreen(navigationActions) }
@@ -68,13 +84,17 @@ fun ShelfLifeApp() {
       composable(Screen.INDIVIDUAL_FOOD_ITEM) { IndividualFoodItemScreen(navigationActions) }
       composable(Screen.LEADERBOARD) { LeaderboardScreen(navigationActions) }
     }
+
+    // Scanner route
     navigation(startDestination = Screen.PERMISSION_HANDLER, route = Route.SCANNER) {
       composable(Screen.PERMISSION_HANDLER) { CameraPermissionHandler(navigationActions) }
       composable(Screen.BARCODE_SCANNER) { BarcodeScannerScreen(navigationActions) }
     }
+
+    // Recipes route
     navigation(
-        startDestination = Screen.RECIPES,
-        route = Route.RECIPES,
+      startDestination = Screen.RECIPES,
+      route = Route.RECIPES,
     ) {
       composable(Screen.RECIPES) { RecipesScreen(navigationActions) }
       composable(Screen.INDIVIDUAL_RECIPE) { IndividualRecipeScreen(navigationActions) }
@@ -82,20 +102,23 @@ fun ShelfLifeApp() {
       composable(Screen.GENERATE_RECIPE) { GenerateRecipeScreen(navigationActions) }
     }
 
-    navigation(startDestination = Screen.RECIPE_EXECUTION, route = Route.RECIPE_EXECUTION){
-      composable(Screen.RECIPE_EXECUTION){
-        RecipeExecutionScreen(navigationActions)
-      }
-
+    // Recipe Execution route
+    navigation(startDestination = Screen.RECIPE_EXECUTION, route = Route.RECIPE_EXECUTION) {
+      composable(Screen.RECIPE_EXECUTION) { RecipeExecutionScreen(navigationActions) }
     }
 
+    // Profile route
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
       composable(Screen.PROFILE) { ProfileScreen(navigationActions, context) }
       composable(Route.INVITATIONS) { InvitationScreen(navigationActions) }
     }
+
+    // First Time User route
     navigation(startDestination = Screen.FIRST_TIME_USER, route = Route.FIRST_TIME_USER) {
       composable(Screen.FIRST_TIME_USER) { FirstTimeWelcomeScreen(navigationActions) }
     }
+
+    // Easter Egg route
     navigation(startDestination = Screen.EASTER_EGG, route = Route.EASTEREGG) {
       composable(Screen.EASTER_EGG) { EasterEggScreen(navigationActions) }
     }

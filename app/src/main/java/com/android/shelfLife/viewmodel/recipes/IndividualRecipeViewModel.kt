@@ -11,6 +11,13 @@ import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
+
+/**
+ * ViewModel for managing individual recipes, including operations like deletion.
+ *
+ * @property recipeRepository Repository for managing recipe data.
+ * @property userRepository Repository for managing user-specific data, including recipe IDs.
+ */
 @HiltViewModel
 class IndividualRecipeViewModel
 @Inject
