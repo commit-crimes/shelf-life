@@ -3,6 +3,7 @@ package com.android.shelfLife.ui.recipes.IndividualRecipe
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +21,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ModeEdit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -91,16 +93,29 @@ fun IndividualRecipeScreen(
               title = individualRecipeViewModel.getRecipeName(),
               titleTestTag = "individualRecipeTitle",
               actions = {
-                IconButton(
-                    onClick = {
-                      coroutineScope.launch {
-                        individualRecipeViewModel.deleteSelectedRecipe()
-                        navigationActions.goBack()
+                  Row{
+                      IconButton(
+                          onClick = {
+                              coroutineScope.launch {
+                                  navigationActions.navigateTo(Screen.EDIT_RECIPE)
+                              }
+                          },
+                          modifier = Modifier.testTag("editRecipe")) {
+                          Icon(imageVector = Icons.Default.ModeEdit, contentDescription = "Delete Icon")
                       }
-                    },
-                    modifier = Modifier.testTag("deleteFoodItem")) {
-                      Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
-                    }
+
+                      IconButton(
+                          onClick = {
+                              coroutineScope.launch {
+                                  individualRecipeViewModel.deleteSelectedRecipe()
+                                  individualRecipeViewModel.selectRecipe(null)
+                                  navigationActions.goBack()
+                              }
+                          },
+                          modifier = Modifier.testTag("deleteRecipe")) {
+                          Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
+                      }
+                  }
               })
         },
         bottomBar = {

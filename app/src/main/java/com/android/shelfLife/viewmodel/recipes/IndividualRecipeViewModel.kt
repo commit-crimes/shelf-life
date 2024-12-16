@@ -60,6 +60,10 @@ constructor(
     return selectedRecipe!!.time.inWholeMinutes
   }
 
+  fun selectRecipe(recipe: Recipe?){
+    recipeRepository.selectRecipe(recipe)
+  }
+
   /**
    * Returns a list of ingredients required for the selected recipe.
    *
