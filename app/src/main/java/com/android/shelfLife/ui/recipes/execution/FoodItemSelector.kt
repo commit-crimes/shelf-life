@@ -2,29 +2,14 @@ package com.android.shelfLife.ui.recipes.execution
 
 import android.util.Log
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -34,38 +19,45 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
-import androidx.compose.material.icons.filled.Close
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+        /**
+         * Composable function to display the screen where users can select food items for a specific ingredient.
+         *
+         * This screen displays a list of available food items for a selected ingredient, allowing users to
+         * select the amount of each item they want to use. Users can navigate through the list of ingredients
+         * and select appropriate food items. The screen also provides a "Done" button to finalize the selections
+         * and move on to the next step.
+         *
+         * @param navigationActions The actions to be used for navigating between screens.
+         * @param viewModel The [ExecuteRecipeViewModel] responsible for managing the data and actions related to recipe execution.
+         * @param onNext Lambda function to call when the user finishes selecting food items and is ready to move to the next step.
+         * @param onPrevious Lambda function to call when the user goes back to the previous step.
+         */
 fun SelectFoodItemsForIngredientScreen(
     navigationActions: NavigationActions,
     viewModel: ExecuteRecipeViewModel = hiltViewModel(),
     onNext: () -> Unit,
     onPrevious: () -> Unit
 ) {
-    val ingredientName by viewModel.currentIngredientName.collectAsState()
-    val availableFoodItems by viewModel.foodItems.collectAsState()
-    val selectedMap by viewModel.selectedFoodItemsForIngredients.collectAsState()
-    val currentlySelectedItems = selectedMap[ingredientName] ?: emptyList()
+    val ingredientName by viewModel.currentIngredientName.collectAsState() // Current ingredient name
+    val availableFoodItems by viewModel.foodItems.collectAsState() // List of available food items
+    val selectedMap by viewModel.selectedFoodItemsForIngredients.collectAsState() // Map of selected food items for each ingredient
+    val currentlySelectedItems = selectedMap[ingredientName] ?: emptyList() // Items currently selected for this ingredient
 
     Log.d("SelectFoodItemsScreen", "Current ingredient: $ingredientName")
-    Log.d(
-        "SelectFoodItemsScreen",
-        "Available food items: ${availableFoodItems.joinToString { it.foodFacts.name }}"
-    )
-    Log.d(
-        "SelectFoodItemsScreen",
-        "Currently selected items: $currentlySelectedItems"
-    )
+    Log.d("SelectFoodItemsScreen", "Available food items: ${availableFoodItems.joinToString { it.foodFacts.name }}")
+    Log.d("SelectFoodItemsScreen", "Currently selected items: $currentlySelectedItems")
 
+    // If ingredient name is null, navigate back
     if (ingredientName == null) {
         Log.e("SelectFoodItemsScreen", "Ingredient name is null. Navigating back.")
         navigationActions.goBack()
         return
     }
 
+    // Scaffold to display the screen content with top app bar, bottom bar, and floating action button
     Scaffold(
         topBar = {
             TopAppBar(
@@ -73,9 +65,9 @@ fun SelectFoodItemsForIngredientScreen(
                 navigationIcon = {
                     IconButton(onClick = {
                         Log.d("SelectFoodItemsScreen", "Back button clicked. calling onPrevious")
-                        onPrevious()
+                        onPrevious() // Handle the back action
                     }) {
-                        Icon(Icons.Default.Close, contentDescription = "Close")
+                        Icon(Icons.Default.Close, contentDescription = "Close") // Close icon for navigation
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -84,6 +76,7 @@ fun SelectFoodItemsForIngredientScreen(
             )
         },
         bottomBar = {
+            // Bottom navigation menu
             BottomNavigationMenu(
                 onTabSelect = { destination ->
                     navigationActions.navigateTo(destination)
@@ -105,19 +98,21 @@ fun SelectFoodItemsForIngredientScreen(
                     // Temporarily consume the selected items
                     viewModel.temporarilyConsumeItems(selectedItems, selectedAmounts)
 
+                    // If there are more ingredients, navigate to the next ingredient
                     if (viewModel.hasMoreIngredients()) {
                         Log.d("SelectFoodItemsScreen", "Navigating to the next ingredient.")
                         viewModel.nextIngredient()
                     } else {
+                        // If no more ingredients, finalize the selection and proceed to instructions
                         Log.d("SelectFoodItemsScreen", "No more ingredients. Navigating to instructions.")
                         viewModel.consumeSelectedItems()
-                        onNext()
+                        onNext() // Call onNext when finished selecting ingredients
                     }
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
-                Text("Done")
+                Text("Done") // Button label
             }
         }
     ) { paddingValues ->
@@ -126,6 +121,7 @@ fun SelectFoodItemsForIngredientScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
+            // LazyColumn to display the list of available food items
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.padding(16.dp)
@@ -138,6 +134,7 @@ fun SelectFoodItemsForIngredientScreen(
 
                     val maxAmount = foodItem.foodFacts.quantity.amount.toFloat()
 
+                    // Food item selection card
                     FoodItemSelectionCard(
                         foodItem = foodItem,
                         amount = currentAmount.toFloat(),
@@ -145,16 +142,10 @@ fun SelectFoodItemsForIngredientScreen(
                         expanded = expanded,
                         onCardClick = {
                             expanded = !expanded
-                            Log.d(
-                                "FoodItemSelectionCard",
-                                "Card clicked for food item: ${foodItem.foodFacts.name}. Expanded: $expanded"
-                            )
+                            Log.d("FoodItemSelectionCard", "Card clicked for food item: ${foodItem.foodFacts.name}. Expanded: $expanded")
                         },
                         onAmountChange = { newAmount ->
-                            Log.d(
-                                "FoodItemSelectionCard",
-                                "Amount changed for ${foodItem.foodFacts.name} to $newAmount"
-                            )
+                            Log.d("FoodItemSelectionCard", "Amount changed for ${foodItem.foodFacts.name} to $newAmount")
                             viewModel.selectFoodItemForIngredient(ingredientName!!, foodItem, newAmount)
                         }
                     )
@@ -164,8 +155,19 @@ fun SelectFoodItemsForIngredientScreen(
     }
 }
 
-
-
+/**
+ * Composable function to display a selection card for each food item.
+ *
+ * This card displays the name of the food item, the selected amount, and a slider to adjust the amount.
+ * The slider allows the user to select the amount of the food item to use for the ingredient.
+ *
+ * @param foodItem The food item to display.
+ * @param amount The currently selected amount for this food item.
+ * @param maxAmount The maximum available amount of this food item.
+ * @param expanded Boolean to control if the slider should be displayed.
+ * @param onCardClick Lambda function to toggle the expanded state of the card.
+ * @param onAmountChange Lambda function to handle changes in the selected amount.
+ */
 @Composable
 fun FoodItemSelectionCard(
     foodItem: FoodItem,
@@ -179,7 +181,7 @@ fun FoodItemSelectionCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
-            .clickable { onCardClick() }
+            .clickable { onCardClick() } // Toggle expanded state when the card is clicked
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // Display the name of the food item
@@ -212,7 +214,7 @@ fun FoodItemSelectionCard(
                             onAmountChange(newVal) // Trigger state updates
                         },
                         valueRange = 0f..maxAmount,
-                        steps = 0
+                        steps = 0 // No intermediate steps for the slider
                     )
                 }
             }

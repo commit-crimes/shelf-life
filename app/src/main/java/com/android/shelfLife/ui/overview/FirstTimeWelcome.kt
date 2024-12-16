@@ -31,7 +31,6 @@ import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 @Composable
 fun FirstTimeWelcomeScreen(navigationActions: NavigationActions) {
   val overviewScreenViewModel = hiltViewModel<OverviewScreenViewModel>()
-  val currentContext = LocalContext.current
   Column(
       modifier = Modifier.fillMaxSize().padding(16.dp).testTag("firstTimeWelcomeScreen"),
       verticalArrangement = Arrangement.Center,

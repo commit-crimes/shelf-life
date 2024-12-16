@@ -5,45 +5,6 @@ import com.android.shelfLife.ui.theme.expired
 import com.android.shelfLife.ui.theme.expiresInALongTime
 import com.android.shelfLife.ui.theme.expiresLater
 import com.android.shelfLife.ui.theme.expiresSoon
-import java.text.SimpleDateFormat
-import java.util.*
-
-/**
- * Gets the expiry information including the user-friendly expiry message and progress bar state.
- *
- * @param expiryDateString The expiry date as a string in the `dd/MM/yyyy` format. Can be null or
- *   blank.
- * @param currentDate The current date for calculation. Defaults to today's date if not provided.
- * @return A pair containing the expiry message and a pair of the progress bar fill level and color.
- */
-fun getExpiryInfo(
-    expiryDateString: String?,
-    currentDate: Date = Date()
-): Pair<String, Pair<Float, Color>> {
-  if (expiryDateString.isNullOrBlank()) {
-    return Pair("No Expiry Date", Pair(0f, expired))
-  }
-
-  val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-  val expiryDate: Date =
-      try {
-        formatter.parse(expiryDateString)!!
-      } catch (e: Exception) {
-        return Pair("Invalid Date Format", Pair(0f, expired))
-      }
-
-  val todayCalendar = Calendar.getInstance().apply { time = currentDate }
-  val expiryCalendar = Calendar.getInstance().apply { time = expiryDate }
-
-  // Calculate the difference in days
-  val timeDifference = expiryCalendar.timeInMillis - todayCalendar.timeInMillis
-  val daysDifference = (timeDifference / (1000 * 60 * 60 * 24)).toInt()
-
-  val expiryMessage = getExpiryMessageBasedOnDays(daysDifference, expiryDateString)
-  val progressBarState = getProgressBarState(daysDifference)
-
-  return Pair(expiryMessage, progressBarState)
-}
 
 /**
  * Generates a user-friendly expiry message based on the number of days remaining.

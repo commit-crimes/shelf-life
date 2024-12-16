@@ -1,25 +1,15 @@
+package com.android.shelfLife.ui.recipes.execution
+
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,16 +28,30 @@ import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
+        /**
+         * Composable function to display the instruction screen of a recipe.
+         *
+         * This screen displays the step-by-step instructions for executing a recipe. The user can navigate
+         * through the instructions using "Back" and "Next" buttons. If there are no more instructions,
+         * the "Finish" button will appear, allowing the user to finish the recipe process. The screen includes
+         * a top app bar for navigation, a bottom navigation menu, and animated transitions for instructions.
+         *
+         * @param navigationActions The navigation actions to handle screen transitions.
+         * @param viewModel The [ExecuteRecipeViewModel] responsible for managing the recipe data and instruction flow.
+         * @param onFinish Lambda function to call when the user finishes the recipe.
+         */
 fun InstructionScreen(
     navigationActions: NavigationActions,
     viewModel: ExecuteRecipeViewModel = hiltViewModel(),
     onFinish: () -> Unit
 ) {
-    val currentInstruction by viewModel.currentInstruction.collectAsState()
+    val currentInstruction by viewModel.currentInstruction.collectAsState() // Current instruction to display
 
+    // Scaffold to provide the basic structure of the screen with top and bottom bars
     Scaffold(
         modifier = Modifier.testTag("instructionScreen"),
         topBar = {
+            // Top AppBar with a close button to navigate back
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
@@ -59,7 +63,7 @@ fun InstructionScreen(
                     IconButton(
                         onClick = {
                             Log.d("InstructionScreen", "TopAppBar Back button clicked")
-                            navigationActions.goBack()
+                            navigationActions.goBack() // Go back on close button click
                         },
                         modifier = Modifier.testTag("goBackArrow")
                     ) {
@@ -70,6 +74,7 @@ fun InstructionScreen(
                     }
                 },
                 title = {
+                    // Display the recipe name as the title
                     Text(
                         text = "Instructions",
                         style = MaterialTheme.typography.bodyLarge.copy(
@@ -81,6 +86,7 @@ fun InstructionScreen(
             )
         },
         bottomBar = {
+            // Bottom navigation menu
             BottomNavigationMenu(
                 onTabSelect = { destination ->
                     navigationActions.navigateTo(destination)
@@ -98,29 +104,29 @@ fun InstructionScreen(
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Display the current instruction with animation
+            // Display the current instruction with animated transition
             AnimatedContent(
                 targetState = currentInstruction,
                 transitionSpec = {
-                    fadeIn() togetherWith fadeOut() // Define fade animations
+                    fadeIn() togetherWith fadeOut() // Fade-in and fade-out transition for instructions
                 },
                 modifier = Modifier
                     .weight(1f)
                     .padding(16.dp)
             ) { instruction ->
                 Text(
-                    text = instruction ?: "No instructions available",
+                    text = instruction ?: "No instructions available", // Default text if no instruction is available
                     style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp)
                 )
             }
 
-            // Navigation Buttons
+            // Row for navigation buttons (Back, Next, Finish)
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(16.dp)
             ) {
-                // Back button
+                // Back button, only visible if there are previous instructions
                 if (viewModel.hasPreviousInstructions()) {
                     Button(
                         onClick = {
@@ -133,7 +139,7 @@ fun InstructionScreen(
                     }
                 }
 
-                // Next/Finish button
+                // Next button, visible if there are more instructions
                 if (viewModel.hasMoreInstructions()) {
                     Button(
                         onClick = {
@@ -145,10 +151,10 @@ fun InstructionScreen(
                         Text("Next")
                     }
                 } else {
+                    // Finish button, visible if there are no more instructions
                     Button(
                         onClick = {
-
-                            onFinish()
+                            onFinish() // Finish the recipe process
                             Log.d("InstructionScreen", "Finish button clicked.")
                         },
                         modifier = Modifier.testTag("finishButton")

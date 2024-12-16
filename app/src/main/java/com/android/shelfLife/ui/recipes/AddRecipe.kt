@@ -47,6 +47,17 @@ import com.android.shelfLife.ui.utils.UnitDropdownField
 import com.android.shelfLife.viewmodel.recipes.AddRecipeViewModel
 import kotlinx.coroutines.launch
 
+
+/**
+ * The main screen for adding a recipe in the Shelf Life application.
+ *
+ * This screen provides an interface to input the recipe title, servings, preparation time,
+ * ingredients, and instructions. It allows users to validate their input, manage errors, and
+ * interact with the app via buttons and dialog modals.
+ *
+ * @param navigationActions Actions for navigating within the application.
+ * @param addRecipeViewModel The ViewModel associated with the Add Recipe screen.
+ */
 @Composable
 fun AddRecipeScreen(
     navigationActions: NavigationActions,
@@ -420,25 +431,3 @@ fun ErrorTextBoxNEW(errorMessageId: Int?, testTag: String) {
     )
   }
 }
-
-// @Preview(showBackground = true)
-// @Composable
-// fun AddRecipeScreenPreview() {
-//    val navController = rememberNavController()
-//    val navigationActions = NavigationActions(navController)
-//
-//    // Create mock or fake repositories for testing
-//    val fakeRecipeRepository = FakeRecipeRepository() // Implement a simple fake
-//    val fakeUserRepository = FakeUserRepository()     // Implement a simple fake
-//
-//    // Manually instantiate your ViewModel with fakes
-//    val viewModel = AddRecipeViewModel(
-//        recipeRepository = fakeRecipeRepository,
-//        userRepository = fakeUserRepository
-//    )
-//
-//    AddRecipeScreen(
-//        navigationActions = navigationActions,
-//        addRecipeViewModel = viewModel
-//    )
-// }

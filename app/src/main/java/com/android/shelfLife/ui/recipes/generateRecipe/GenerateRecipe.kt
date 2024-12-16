@@ -38,197 +38,228 @@ import com.android.shelfLife.viewmodel.recipes.RecipeGenerationViewModel
 
 import kotlin.math.floor
 
+/**
+ * Composable function to manage the recipe generation process.
+ *
+ * This screen guides the user through generating a recipe, consisting of multiple steps:
+ * entering basic information about the recipe, selecting ingredients, reviewing the recipe,
+ * and completing the recipe generation process.
+ *
+ * @param navigationActions The actions for navigating between screens.
+ * @param viewModel The [RecipeGenerationViewModel] for managing recipe generation logic.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenerateRecipeScreen(
     navigationActions: NavigationActions,
     viewModel: RecipeGenerationViewModel = hiltViewModel(),
 ) {
-  val navController = rememberNavController()
+    val navController = rememberNavController()
 
-  Scaffold(
-      topBar = {
-        val currentDestination =
-            navController.currentBackStackEntryAsState().value?.destination?.route
-        val title =
-            when (currentDestination) {
-              "input" -> "Generate your AI recipe"
-              "selection" -> "Select your ingredients"
-              "review" -> "Review your recipe"
-              else -> "Generated recipe"
-            }
-        CustomTopAppBar(
-            onClick = {
-              if (currentDestination == "input") navigationActions.goBack()
-              else navController.popBackStack()
-            },
-            title = title,
-            titleTestTag = "addRecipeTitle")
-      }) { paddingValues ->
+    Scaffold(
+        topBar = {
+            val currentDestination =
+                navController.currentBackStackEntryAsState().value?.destination?.route
+            val title =
+                when (currentDestination) {
+                    "input" -> "Generate your AI recipe"
+                    "selection" -> "Select your ingredients"
+                    "review" -> "Review your recipe"
+                    else -> "Generated recipe"
+                }
+            CustomTopAppBar(
+                onClick = {
+                    if (currentDestination == "input") navigationActions.goBack()
+                    else navController.popBackStack()
+                },
+                title = title,
+                titleTestTag = "addRecipeTitle")
+        }) { paddingValues ->
         NavHost(
             navController = navController,
             startDestination = "input",
             modifier = Modifier.padding(paddingValues).padding(16.dp),
         ) {
-          composable("input") {
-            RecipeInputStep(viewModel = viewModel, onNext = { navController.navigate("selection") })
-          }
-          composable("selection") {
-            FoodSelectionStep(
-                viewModel = viewModel,
-                onNext = { navController.navigate("review") },
-                onBack = { navController.popBackStack() })
-          }
-          composable("review") {
-            ReviewStep(
-                viewModel = viewModel,
-                onNext = { navController.navigate("completion") },
-                onBack = { navController.popBackStack() })
-          }
-          composable("completion") {
-            CompletionStep(
-                viewModel = viewModel,
-                onBack = { navController.popBackStack() },
-                navigationActions = navigationActions)
-          }
+            composable("input") {
+                RecipeInputStep(viewModel = viewModel, onNext = { navController.navigate("selection") })
+            }
+            composable("selection") {
+                FoodSelectionStep(
+                    viewModel = viewModel,
+                    onNext = { navController.navigate("review") },
+                    onBack = { navController.popBackStack() })
+            }
+            composable("review") {
+                ReviewStep(
+                    viewModel = viewModel,
+                    onNext = { navController.navigate("completion") },
+                    onBack = { navController.popBackStack() })
+            }
+            composable("completion") {
+                CompletionStep(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    navigationActions = navigationActions)
+            }
         }
-      }
+    }
 }
 
+/**
+ * Composable function for the recipe input step in the recipe generation process.
+ *
+ * This step allows the user to input the recipe name, type, number of servings, and additional options
+ * like recipe duration, ingredients source, and prioritization of ingredients. It also validates the inputs
+ * before proceeding to the next step.
+ *
+ * @param viewModel The [RecipeGenerationViewModel] to manage the state and logic for recipe input.
+ * @param onNext Lambda function to navigate to the next step after valid inputs.
+ */
 @Composable
 fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit) {
-  val recipePrompt by viewModel.recipePrompt.collectAsState()
-  val context = LocalContext.current
-  val expanded = rememberSaveable { mutableStateOf(false) }
-  val options = RecipeType.values().filter { it != RecipeType.PERSONAL }.toList().toTypedArray()
+    val recipePrompt by viewModel.recipePrompt.collectAsState()
+    val context = LocalContext.current
+    val expanded = rememberSaveable { mutableStateOf(false) }
+    val options = RecipeType.values().filter { it != RecipeType.PERSONAL }.toList().toTypedArray()
 
-  // Local state for form inputs
-  var localName by rememberSaveable { mutableStateOf(recipePrompt.name) }
-  var localRecipeType by rememberSaveable { mutableStateOf(recipePrompt.recipeType) }
-  var localServings by rememberSaveable { mutableStateOf(floor(recipePrompt.servings).toInt()) }
-  var localShortDuration by rememberSaveable { mutableStateOf(recipePrompt.shortDuration) }
-  var localOnlyHouseHoldItems by rememberSaveable {
-    mutableStateOf(recipePrompt.onlyHouseHoldItems)
-  }
-  var localPrioritiseSoonToExpire by rememberSaveable {
-    mutableStateOf(recipePrompt.prioritiseSoonToExpire)
-  }
+    // Local state for form inputs
+    var localName by rememberSaveable { mutableStateOf(recipePrompt.name) }
+    var localRecipeType by rememberSaveable { mutableStateOf(recipePrompt.recipeType) }
+    var localServings by rememberSaveable { mutableStateOf(floor(recipePrompt.servings).toInt()) }
+    var localShortDuration by rememberSaveable { mutableStateOf(recipePrompt.shortDuration) }
+    var localOnlyHouseHoldItems by rememberSaveable {
+        mutableStateOf(recipePrompt.onlyHouseHoldItems)
+    }
+    var localPrioritiseSoonToExpire by rememberSaveable {
+        mutableStateOf(recipePrompt.prioritiseSoonToExpire)
+    }
 
-  Scaffold(
-      bottomBar = {
-        Row(verticalAlignment = Alignment.Bottom) {
-          CustomButtons(
-              button1OnClick = {},
-              button1TestTag = "cancelButton",
-              button1Text = stringResource(id = R.string.cancel_button),
-              button2OnClick = {
-                val error = validateString(localName, R.string.recipe_title_empty_error, R.string.recipe_title_invalid_error)
-                if (error!= null) {
-                  Toast.makeText(context, error, Toast.LENGTH_SHORT)
-                      .show()
-                  return@CustomButtons
-                }
+    Scaffold(
+        bottomBar = {
+            Row(verticalAlignment = Alignment.Bottom) {
+                CustomButtons(
+                    button1OnClick = {},
+                    button1TestTag = "cancelButton",
+                    button1Text = stringResource(id = R.string.cancel_button),
+                    button2OnClick = {
+                        val error = validateString(localName, R.string.recipe_title_empty_error, R.string.recipe_title_invalid_error)
+                        if (error!= null) {
+                            Toast.makeText(context, error, Toast.LENGTH_SHORT)
+                                .show()
+                            return@CustomButtons
+                        }
 
-                if (localServings > MAX_SERVINGS || localServings <= 0) {
-                  Toast.makeText(
-                          context,
-                          "Servings must be between 1 and $MAX_SERVINGS",
-                          Toast.LENGTH_SHORT)
-                      .show()
-                  return@CustomButtons
-                }
-                // Update the recipePrompt in the ViewModel with local values
-                viewModel.updateRecipePrompt(
-                    recipePrompt.copy(
-                        name = localName,
-                        recipeType = localRecipeType,
-                        servings = localServings.toFloat(),
-                        shortDuration = localShortDuration,
-                        onlyHouseHoldItems = localOnlyHouseHoldItems,
-                        prioritiseSoonToExpire = localPrioritiseSoonToExpire))
-                onNext()
-              },
-              button2TestTag = "recipeSubmitButton",
-              button2Text = stringResource(id = R.string.next_button_text))
-        }
-      }) { paddingValues ->
+                        if (localServings > MAX_SERVINGS || localServings <= 0) {
+                            Toast.makeText(
+                                context,
+                                "Servings must be between 1 and $MAX_SERVINGS",
+                                Toast.LENGTH_SHORT)
+                                .show()
+                            return@CustomButtons
+                        }
+                        // Update the recipePrompt in the ViewModel with local values
+                        viewModel.updateRecipePrompt(
+                            recipePrompt.copy(
+                                name = localName,
+                                recipeType = localRecipeType,
+                                servings = localServings.toFloat(),
+                                shortDuration = localShortDuration,
+                                onlyHouseHoldItems = localOnlyHouseHoldItems,
+                                prioritiseSoonToExpire = localPrioritiseSoonToExpire))
+                        onNext()
+                    },
+                    button2TestTag = "recipeSubmitButton",
+                    button2Text = stringResource(id = R.string.next_button_text))
+            }
+        }) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
-          // Recipe Name Input
-          OutlinedTextField(
-              value = localName,
-              onValueChange = { localName = it },
-              label = { Text("Recipe Name") },
-              modifier = Modifier.fillMaxWidth())
+            // Recipe Name Input
+            OutlinedTextField(
+                value = localName,
+                onValueChange = { localName = it },
+                label = { Text("Recipe Name") },
+                modifier = Modifier.fillMaxWidth())
 
-          Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-          Row(
-              modifier = Modifier.fillMaxWidth(),
-              horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 // Dropdown for Recipe Type
                 Box(modifier = Modifier.weight(1f).padding(top = 8.dp)) {
-                  DropdownFields(
-                      label = "Recipe Type",
-                      options = options,
-                      selectedOption = localRecipeType,
-                      onOptionSelected = { localRecipeType = it },
-                      expanded = expanded.value,
-                      onExpandedChange = { expanded.value = it },
-                      optionLabel = { it.toString() })
+                    DropdownFields(
+                        label = "Recipe Type",
+                        options = options,
+                        selectedOption = localRecipeType,
+                        onOptionSelected = { localRecipeType = it },
+                        expanded = expanded.value,
+                        onExpandedChange = { expanded.value = it },
+                        optionLabel = { it.toString() })
                 }
 
                 // Number of Servings Input
                 OutlinedTextField(
                     value = if (localServings == 0) "" else localServings.toString(),
                     onValueChange = { newValue ->
-                      if (newValue.all { it.isDigit() }) {
-                        val inValue = newValue.toIntOrNull() ?: 0
-                        localServings = inValue
-                      }
+                        if (newValue.all { it.isDigit() }) {
+                            val inValue = newValue.toIntOrNull() ?: 0
+                            localServings = inValue
+                        }
                     },
                     label = { Text("Servings") },
                     keyboardOptions =
-                        KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
                     modifier = Modifier.weight(1f))
-              }
+            }
 
-          Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-          // Toggle for Short/Long Recipe
-          Row(
-              verticalAlignment = Alignment.CenterVertically,
-              modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+            // Toggle for Short/Long Recipe
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                 Text("Recipe duration", modifier = Modifier.weight(1f))
                 Text(
                     if (localShortDuration) "Short" else "Long",
                     modifier = Modifier.padding(end = 8.dp))
                 Switch(
                     checked = !localShortDuration, onCheckedChange = { localShortDuration = !it })
-              }
+            }
 
-          // Toggle for only household items
-          Row(
-              verticalAlignment = Alignment.CenterVertically,
-              modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+            // Toggle for only household items
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                 Text("Only household ingredients", modifier = Modifier.weight(1f))
                 Switch(
                     checked = localOnlyHouseHoldItems,
                     onCheckedChange = { localOnlyHouseHoldItems = it })
-              }
+            }
 
-          // Toggle for prioritise soon to expire
-          Row(
-              verticalAlignment = Alignment.CenterVertically,
-              modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+            // Toggle for prioritise soon to expire
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
                 Text("Use expiring ingredients first", modifier = Modifier.weight(1f))
                 Switch(
                     checked = localPrioritiseSoonToExpire,
                     onCheckedChange = { localPrioritiseSoonToExpire = it })
-              }
+            }
         }
-      }
+    }
 }
 
+/**
+ * Composable function to handle the ingredient selection step in the recipe generation process.
+ *
+ * This step allows the user to select food items from the household inventory to include as ingredients
+ * in the recipe. Users can also review their selections in real time.
+ *
+ * @param viewModel The [RecipeGenerationViewModel] managing the recipe generation state.
+ * @param onNext Lambda function to proceed to the next step after ingredient selection.
+ * @param onBack Lambda function to navigate back to the previous step.
+ * @param overviewViewModel The [OverviewScreenViewModel] managing the household inventory state.
+ */
 @Composable
 fun FoodSelectionStep(
     viewModel: RecipeGenerationViewModel,
@@ -236,266 +267,278 @@ fun FoodSelectionStep(
     onBack: () -> Unit,
     overviewViewModel: OverviewScreenViewModel = hiltViewModel()
 ) {
-  var newFoodItem by rememberSaveable { mutableStateOf("") }
-  val recipePrompt by viewModel.recipePrompt.collectAsState()
-  val context = LocalContext.current
-  val availableFoodItems by viewModel.availableFoodItems.collectAsState()
-  val selectedFoodItems by viewModel.selectedFoodItems.collectAsState()
+    // State variables for food items and recipe prompt
+    var newFoodItem by rememberSaveable { mutableStateOf("") }
+    val recipePrompt by viewModel.recipePrompt.collectAsState()
+    val context = LocalContext.current
+    val availableFoodItems by viewModel.availableFoodItems.collectAsState()
+    val selectedFoodItems by viewModel.selectedFoodItems.collectAsState()
 
-  // Calculate the height dynamically based on whether the list is empty
-  val targetHeight = if (selectedFoodItems.isEmpty()) 0.dp else 200.dp // Adjust height as needed
+    // Calculate the height of the selected ingredients list dynamically
+    val targetHeight = if (selectedFoodItems.isEmpty()) 0.dp else 200.dp
 
-  // Animate the height using a spring animation
-  val animatedWeight by
-      animateFloatAsState(
-          targetValue = if (selectedFoodItems.isEmpty()) 0.1f else 0.55f,
-          animationSpec =
-              spring(
-                  Spring.DampingRatioMediumBouncy,
-                  stiffness = Spring.StiffnessLow)) // Adjust the duration for smoothness
+    // Use animation for smooth height changes
+    val animatedWeight by animateFloatAsState(
+        targetValue = if (selectedFoodItems.isEmpty()) 0.1f else 0.55f,
+        animationSpec = spring(Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow)
+    )
 
-  Scaffold(
-      bottomBar = {
-        // Fixed buttons at the bottom
-        Row(verticalAlignment = Alignment.Bottom) {
-          // Buttons Section
-          CustomButtons(
-              button1OnClick = { onBack() }, // Cancel button
-              button1TestTag = "cancelButton",
-              button1Text = stringResource(id = R.string.back_button),
-              button2OnClick = {
-                // Validate the recipe name
-                if (recipePrompt.name.isNotBlank()) {
-                  onNext() // Proceed to the next step
-                } else {
-                  Toast.makeText(context, R.string.recipe_title_empty_error, Toast.LENGTH_SHORT)
-                      .show()
-                }
-              },
-              button2TestTag = "recipeSubmitButton",
-              button2Text = stringResource(id = R.string.next_button_text))
+    Scaffold(
+        bottomBar = {
+            Row(verticalAlignment = Alignment.Bottom) {
+                CustomButtons(
+                    button1OnClick = { onBack() }, // Navigate back
+                    button1TestTag = "cancelButton",
+                    button1Text = stringResource(id = R.string.back_button),
+                    button2OnClick = {
+                        if (recipePrompt.name.isNotBlank()) {
+                            onNext() // Proceed to the next step
+                        } else {
+                            Toast.makeText(context, R.string.recipe_title_empty_error, Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    button2TestTag = "recipeSubmitButton",
+                    button2Text = stringResource(id = R.string.next_button_text)
+                )
+            }
         }
-      }) { paddingValues ->
+    ) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
-          // "Household" Section
-          Text(
-              text = "Household",
-              fontSize = 24.sp,
-              fontWeight = FontWeight.Bold,
-              modifier = Modifier.padding(bottom = 8.dp))
-          Box(modifier = Modifier.weight(1f)) {
-            ListFoodItems(
-                foodItems = availableFoodItems,
-                overviewScreenViewModel = overviewViewModel,
-                onFoodItemClick = { selectedFoodItem ->
-                  viewModel.selectFoodItem(selectedFoodItem)
-                },
-                onFoodItemLongHold = { selectedFoodItem ->
-                  viewModel.selectFoodItem(selectedFoodItem)
-                })
-          }
-          Spacer(modifier = Modifier.height(8.dp))
+            // Display the "Household" section
+            Text(
+                text = "Household",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Box(modifier = Modifier.weight(1f)) {
+                ListFoodItems(
+                    foodItems = availableFoodItems,
+                    overviewScreenViewModel = overviewViewModel,
+                    onFoodItemClick = { selectedFoodItem ->
+                        viewModel.selectFoodItem(selectedFoodItem)
+                    },
+                    onFoodItemLongHold = { selectedFoodItem ->
+                        viewModel.selectFoodItem(selectedFoodItem)
+                    }
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
 
-          // "Selected" Section
-          Text(
-              text = "Ingredients (${selectedFoodItems.size})",
-              fontSize = 20.sp,
-              fontWeight = FontWeight.Bold,
-              modifier = Modifier.padding(bottom = 8.dp, top = 4.dp))
-          Box(
-              modifier = Modifier.fillMaxWidth().weight(animatedWeight) // Smooth height animation
-              ) {
+            // Display the "Ingredients" section
+            Text(
+                text = "Ingredients (${selectedFoodItems.size})",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp, top = 4.dp)
+            )
+            Box(
+                modifier = Modifier.fillMaxWidth().weight(animatedWeight)
+            ) {
                 ListFoodItems(
                     foodItems = selectedFoodItems,
                     overviewScreenViewModel = overviewViewModel,
                     onFoodItemClick = { selectedFoodItem ->
-                      viewModel.deselectFoodItem(selectedFoodItem)
+                        viewModel.deselectFoodItem(selectedFoodItem)
                     },
                     onFoodItemLongHold = { selectedFoodItem ->
-                      viewModel.deselectFoodItem(selectedFoodItem)
+                        viewModel.deselectFoodItem(selectedFoodItem)
                     },
-                    isSelectedItemsList = true)
-              }
+                    isSelectedItemsList = true
+                )
+            }
         }
-      }
+    }
 }
 
+/**
+ * Composable function to handle the review step of the recipe generation process.
+ *
+ * This step allows the user to review the recipe's title, selected ingredients, and additional options.
+ * The user can also provide custom instructions or comments before generating the recipe.
+ *
+ * @param viewModel The [RecipeGenerationViewModel] managing the recipe generation state.
+ * @param onNext Lambda function to proceed to the next step.
+ * @param onBack Lambda function to navigate back to the previous step.
+ */
 @Composable
 fun ReviewStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit, onBack: () -> Unit) {
-  val recipePrompt by viewModel.recipePrompt.collectAsState()
-  var customInstructions by remember { mutableStateOf(recipePrompt.specialInstruction) }
-  val context = LocalContext.current
+    val recipePrompt by viewModel.recipePrompt.collectAsState()
+    var customInstructions by remember { mutableStateOf(recipePrompt.specialInstruction) }
+    val context = LocalContext.current
 
-  Scaffold(
-      bottomBar = {
-        // Fixed buttons at the bottom
-        Row(verticalAlignment = Alignment.Bottom) {
-          // Buttons Section
-          CustomButtons(
-              button1OnClick = { onBack() }, // Cancel button
-              button1TestTag = "cancelButton2",
-              button1Text = stringResource(id = R.string.back_button),
-              button2OnClick = {
-                // Validate the recipe name
-                viewModel.generateRecipe(
-                    onSuccess = {
-                      Toast.makeText(context, "Recipe Generated!", Toast.LENGTH_SHORT).show()
+    Scaffold(
+        bottomBar = {
+            Row(verticalAlignment = Alignment.Bottom) {
+                CustomButtons(
+                    button1OnClick = { onBack() },
+                    button1TestTag = "cancelButton2",
+                    button1Text = stringResource(id = R.string.back_button),
+                    button2OnClick = {
+                        viewModel.generateRecipe(
+                            onSuccess = {
+                                Toast.makeText(context, "Recipe Generated!", Toast.LENGTH_SHORT).show()
+                            },
+                            onFailure = { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
+                        )
+                        onNext()
                     },
-                    onFailure = { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() })
-                onNext() // Proceed to the next step
-              },
-              button2TestTag = "generateButton",
-              button2Text = stringResource(id = R.string.generate_button))
+                    button2TestTag = "generateButton",
+                    button2Text = stringResource(id = R.string.generate_button)
+                )
+            }
         }
-      }) { paddingValues ->
+    ) { paddingValues ->
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
-          // Recipe Title
-          Text(
-              text = recipePrompt.name,
-              fontSize = 24.sp,
-              fontWeight = FontWeight.Bold,
-              modifier = Modifier.padding(bottom = 16.dp))
-
-          // Subtitle for Ingredients
-          Text(
-              text =
-                  if (recipePrompt.ingredients.isNotEmpty()) "Specified ingredients:"
-                  else "No ingredients specified",
-              fontSize = 20.sp,
-              fontWeight = FontWeight.Medium,
-              modifier = Modifier.padding(bottom = 8.dp))
-
-          // List of Ingredients
-          Column {
-            recipePrompt.ingredients.forEach { ingredient ->
-              Text(
-                  text = "- ${ingredient.foodFacts.name}, ${ingredient.foodFacts.quantity}",
-                  fontSize = 16.sp,
-                  modifier = Modifier.padding(vertical = 4.dp))
-            }
-          }
-
-          Spacer(modifier = Modifier.height(16.dp))
-
-          Text(
-              text = "Options:",
-              fontSize = 20.sp,
-              fontWeight = FontWeight.Medium,
-              modifier = Modifier.padding(bottom = 8.dp))
-
-          Column {
             Text(
-                text =
-                    "- ${recipePrompt.servings.toInt()} ${if (recipePrompt.servings > 1) "servings" else "serving"}",
-                fontSize = 16.sp,
+                text = recipePrompt.name,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            Text(
+                text = if (recipePrompt.ingredients.isNotEmpty()) "Specified ingredients:" else "No ingredients specified",
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(bottom = 8.dp))
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Column {
+                recipePrompt.ingredients.forEach { ingredient ->
+                    Text(
+                        text = "- ${ingredient.foodFacts.name}, ${ingredient.foodFacts.quantity}",
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "- ${recipePrompt.recipeType} recipe",
-                fontSize = 16.sp,
-                modifier = Modifier.padding(bottom = 8.dp))
-
-            if (recipePrompt.onlyHouseHoldItems) {
-              Text(
-                  text = "- Only household ingredients",
-                  fontSize = 16.sp,
-                  modifier = Modifier.padding(bottom = 8.dp))
+                text = "Options:",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Column {
+                Text(
+                    text = "- ${recipePrompt.servings.toInt()} servings",
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = "- ${recipePrompt.recipeType} recipe",
+                    fontSize = 16.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                if (recipePrompt.onlyHouseHoldItems) {
+                    Text(text = "- Only household ingredients", fontSize = 16.sp)
+                }
+                if (recipePrompt.prioritiseSoonToExpire) {
+                    Text(text = "- Prioritise soon-to-expire ingredients", fontSize = 16.sp)
+                }
             }
-
-            if (recipePrompt.prioritiseSoonToExpire) {
-              Text(
-                  text = "- Prioritising soon to expire ingredients",
-                  fontSize = 16.sp,
-                  modifier = Modifier.padding(bottom = 8.dp))
-            }
-          }
-
-          // Spacer for separation
-          Spacer(modifier = Modifier.padding(24.dp))
-
-          // Custom Instructions or Comments Input Field
-          OutlinedTextField(
-              value = customInstructions,
-              onValueChange = {
-                customInstructions = it
-                viewModel.updateRecipePrompt(recipePrompt.copy(specialInstruction = it))
-              },
-              label = { Text("Custom instructions or comments") },
-              modifier =
-                  Modifier.fillMaxWidth()
-                      .height(150.dp) // Adjust the height to make it taller
-                      .padding(top = 8.dp),
-              singleLine = false,
-              maxLines = 6)
+            Spacer(modifier = Modifier.height(24.dp))
+            OutlinedTextField(
+                value = customInstructions,
+                onValueChange = {
+                    customInstructions = it
+                    viewModel.updateRecipePrompt(recipePrompt.copy(specialInstruction = it))
+                },
+                label = { Text("Custom instructions or comments") },
+                modifier = Modifier.fillMaxWidth().height(150.dp).padding(top = 8.dp),
+                singleLine = false,
+                maxLines = 6
+            )
         }
-      }
+    }
 }
 
+/**
+ * Composable function to handle the final step of the recipe generation process.
+ *
+ * This step shows the generated recipe to the user after processing, providing options to either
+ * regenerate the recipe or save it. If the recipe is still being generated, a loading spinner
+ * is displayed.
+ *
+ * @param viewModel The [RecipeGenerationViewModel] managing the recipe generation process.
+ * @param onBack Lambda function to navigate back to the previous screen.
+ * @param navigationActions The navigation actions used to navigate between screens.
+ */
 @Composable
 fun CompletionStep(
     viewModel: RecipeGenerationViewModel,
     onBack: () -> Unit,
     navigationActions: NavigationActions
 ) {
-  val recipePrompt by viewModel.recipePrompt.collectAsState()
-  val isGeneratingRecipe by viewModel.isGeneratingRecipe.collectAsState()
-  val currentGeneratedRecipe by viewModel.currentGeneratedRecipe.collectAsState()
-  Scaffold(
-      bottomBar = {
-        if (!isGeneratingRecipe) {
-          // Fixed buttons at the bottom
-          Row(verticalAlignment = Alignment.Bottom) {
-            // Buttons Section
-            CustomButtons(
-                button1OnClick = { onBack() }, // Cancel button
-                button1TestTag = "regenerateButton",
-                button1Text = stringResource(id = R.string.modify_button),
-                button2OnClick = {
-                  viewModel.acceptGeneratedRecipe {
-                    navigationActions.navigateTo(screen = Screen.RECIPES)
-                  }
-                },
-                button2TestTag = "recipeSubmitButton",
-                button2Text = stringResource(id = R.string.save_button))
-          }
-        }
-      }) { paddingValues ->
+    // State to track the recipe prompt, generation status, and the generated recipe
+    val recipePrompt by viewModel.recipePrompt.collectAsState()
+    val isGeneratingRecipe by viewModel.isGeneratingRecipe.collectAsState()
+    val currentGeneratedRecipe by viewModel.currentGeneratedRecipe.collectAsState()
+
+    // Scaffold to display the bottom bar and content of the screen
+    Scaffold(
+        bottomBar = {
+            // Show buttons only if the recipe is not being generated
+            if (!isGeneratingRecipe) {
+                Row(verticalAlignment = Alignment.Bottom) {
+                    // Cancel button and Save button
+                    CustomButtons(
+                        button1OnClick = { onBack() }, // Cancel button
+                        button1TestTag = "regenerateButton",
+                        button1Text = stringResource(id = R.string.modify_button),
+                        button2OnClick = {
+                            // Accept the generated recipe and navigate to the recipe screen
+                            viewModel.acceptGeneratedRecipe {
+                                navigationActions.navigateTo(screen = Screen.RECIPES)
+                            }
+                        },
+                        button2TestTag = "recipeSubmitButton",
+                        button2Text = stringResource(id = R.string.save_button)
+                    )
+                }
+            }
+        }) { paddingValues ->
+        // Content inside the Scaffold
         Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
-          if (isGeneratingRecipe) {
-            Box( // Box for centering the content
-                modifier = Modifier.fillMaxSize().padding(paddingValues),
-                contentAlignment = Alignment.TopCenter // Align everything to the center
+            // Show loading spinner when the recipe is still being generated
+            if (isGeneratingRecipe) {
+                Box(
+                    modifier = Modifier.fillMaxSize().padding(paddingValues),
+                    contentAlignment = Alignment.TopCenter // Align everything to the center
                 ) {
-                  Column(
-                      horizontalAlignment = Alignment.CenterHorizontally,
-                      verticalArrangement = Arrangement.Center) {
-                        // Nicely styled text
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        // Display text "Generating..." with some padding
                         Text(
                             text = "Generating...",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
-                            modifier =
-                                Modifier.padding(bottom = 16.dp) // Space between text and spinner
-                            )
-                        // Loading Spinner
+                            modifier = Modifier.padding(bottom = 16.dp) // Space between text and spinner
+                        )
+                        // Display a circular progress indicator (spinner)
                         CircularProgressIndicator(
                             modifier = Modifier.size(64.dp), // Visible size
                             strokeWidth = 6.dp // Thicker for better visibility
-                            )
-                      }
+                        )
+                    }
                 }
-          } else if (currentGeneratedRecipe != null) {
-            Text(
-                text = "Recipe: ${recipePrompt.name}",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp))
-            RecipeContent(hiltViewModel())
-          } else {
-            onBack()
-          }
+            } else if (currentGeneratedRecipe != null) {
+                // Show the generated recipe title and content once generation is complete
+                Text(
+                    text = "Recipe: ${recipePrompt.name}",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                // Display the recipe content
+                RecipeContent(hiltViewModel())
+            } else {
+                // Navigate back if the recipe is not available
+                onBack()
+            }
         }
-      }
+    }
 }

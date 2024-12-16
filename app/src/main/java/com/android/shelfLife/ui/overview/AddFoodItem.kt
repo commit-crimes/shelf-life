@@ -15,24 +15,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.utils.*
-import com.android.shelfLife.ui.utils.AmountField
-import com.android.shelfLife.ui.utils.CategoryDropdownField
-import com.android.shelfLife.ui.utils.CustomButtons
-import com.android.shelfLife.ui.utils.CustomTopAppBar
-import com.android.shelfLife.ui.utils.DateField
-import com.android.shelfLife.ui.utils.FoodNameField
-import com.android.shelfLife.ui.utils.NewLocationDropdownField
-import com.android.shelfLife.ui.utils.UnitDropdownField
 import com.android.shelfLife.viewmodel.overview.FoodItemViewModel
 import kotlinx.coroutines.launch
 
 /**
  * Composable function to display the Add Food Item screen.
  *
+ * This screen allows users to add a new food item to their inventory. It includes input fields for
+ * food name, amount, category, location, expiry date, and open date, along with buttons to cancel
+ * or submit the data. The UI is structured with a `LazyColumn` for a smooth scrolling experience.
+ *
  * @param navigationActions The navigation actions to be used in the screen.
- * @param foodItemRepository The food item model.
- * @param userRepository The user model.
  * @param paddingValues The padding values to be applied to the screen.
+ * @param foodItemViewModel The view model responsible for handling food item data.
  */
 @Composable
 fun AddFoodItemScreen(
@@ -40,215 +35,136 @@ fun AddFoodItemScreen(
     paddingValues: PaddingValues = PaddingValues(16.dp),
     foodItemViewModel: FoodItemViewModel = hiltViewModel()
 ) {
-  // val foodFacts by foodFactsViewModel.foodFactsSuggestions.collectAsState()
+    val coroutineScope = rememberCoroutineScope() // For launching coroutines
+    val context = LocalContext.current
 
-  val coroutineScope = rememberCoroutineScope()
-
-  val context = LocalContext.current
-
-  // DisposableEffect(Unit) { onDispose { foodFactsViewModel.clearFoodFactsSuggestions() } }
-
-  Scaffold(
-      modifier = Modifier.fillMaxSize(),
-      topBar = {
-        CustomTopAppBar(
-            onClick = { navigationActions.goBack() },
-            title = stringResource(id = R.string.add_food_item_title),
-            titleTestTag = "addFoodItemTitle")
-      }) { innerPadding ->
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            CustomTopAppBar(
+                onClick = { navigationActions.goBack() },
+                title = stringResource(id = R.string.add_food_item_title),
+                titleTestTag = "addFoodItemTitle"
+            )
+        }
+    ) { innerPadding ->
         LazyColumn(
             modifier =
-                Modifier.fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(innerPadding)
-                    .testTag("addFoodItemScreen"),
+            Modifier.fillMaxSize()
+                .padding(paddingValues)
+                .padding(innerPadding)
+                .testTag("addFoodItemScreen"),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top) {
-              item(key = "foodName") {
+            verticalArrangement = Arrangement.Top
+        ) {
+            item(key = "foodName") {
                 FoodNameField(
                     foodName = foodItemViewModel.foodName,
                     onFoodNameChange = { newValue ->
-                      foodItemViewModel.changeFoodName(newValue)
-                      // foodFactsViewModel.searchByQuery(foodName) // TODO ask kevin
+                        foodItemViewModel.changeFoodName(newValue)
                     },
-                    foodNameErrorResId = foodItemViewModel.foodNameErrorResId)
+                    foodNameErrorResId = foodItemViewModel.foodNameErrorResId
+                )
                 Spacer(modifier = Modifier.height(16.dp))
-              }
+            }
 
-              item(key = "amountAndUnit") {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically) {
-                      AmountField(
-                          amount = foodItemViewModel.amount,
-                          onAmountChange = { newValue -> foodItemViewModel.changeAmount(newValue) },
-                          amountErrorResId = foodItemViewModel.amountErrorResId,
-                          modifier = Modifier.weight(1f),
-                          testTag = "inputFoodAmount")
-                      Spacer(modifier = Modifier.width(8.dp))
-                      UnitDropdownField(
-                          unit = foodItemViewModel.unit,
-                          onUnitChange = { foodItemViewModel.unit = it },
-                          unitExpanded = foodItemViewModel.unitExpanded,
-                          onUnitExpandedChange = { foodItemViewModel.unitExpanded = it },
-                          modifier = Modifier.weight(1f),
-                          testTag = "inputFoodUnit")
-                    }
+            item(key = "amountAndUnit") {
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    AmountField(
+                        amount = foodItemViewModel.amount,
+                        onAmountChange = { newValue -> foodItemViewModel.changeAmount(newValue) },
+                        amountErrorResId = foodItemViewModel.amountErrorResId,
+                        modifier = Modifier.weight(1f),
+                        testTag = "inputFoodAmount"
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    UnitDropdownField(
+                        unit = foodItemViewModel.unit,
+                        onUnitChange = { foodItemViewModel.unit = it },
+                        unitExpanded = foodItemViewModel.unitExpanded,
+                        onUnitExpandedChange = { foodItemViewModel.unitExpanded = it },
+                        modifier = Modifier.weight(1f),
+                        testTag = "inputFoodUnit"
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
-              }
+            }
 
-              item(key = "category") {
+            item(key = "category") {
                 CategoryDropdownField(
                     category = foodItemViewModel.category,
                     onCategoryChange = { foodItemViewModel.category = it },
                     categoryExpanded = foodItemViewModel.categoryExpanded,
-                    onCategoryExpandedChange = { foodItemViewModel.categoryExpanded = it })
+                    onCategoryExpandedChange = { foodItemViewModel.categoryExpanded = it }
+                )
                 Spacer(modifier = Modifier.height(16.dp))
-              }
+            }
 
-              item(key = "location") {
+            item(key = "location") {
                 NewLocationDropdownField(
                     location = foodItemViewModel.location,
                     onLocationChange = { foodItemViewModel.location = it },
                     locationExpanded = foodItemViewModel.locationExpanded,
                     onExpandedChange = { foodItemViewModel.locationExpanded = it },
-                    testTag = "inputFoodLocation")
+                    testTag = "inputFoodLocation"
+                )
                 Spacer(modifier = Modifier.height(16.dp))
-              }
+            }
 
-              item(key = "expireDate") {
+            item(key = "expireDate") {
                 DateField(
                     date = foodItemViewModel.expireDate,
                     onDateChange = { newValue -> foodItemViewModel.changeExpiryDate(newValue) },
                     dateErrorResId = foodItemViewModel.expireDateErrorResId,
                     labelResId = R.string.expire_date_hint,
-                    testTag = "inputFoodExpireDate")
+                    testTag = "inputFoodExpireDate"
+                )
                 Spacer(modifier = Modifier.height(16.dp))
-              }
+            }
 
-              item(key = "openDate") {
+            item(key = "openDate") {
                 DateField(
                     date = foodItemViewModel.openDate,
                     onDateChange = { newValue -> foodItemViewModel.changeOpenDate(newValue) },
                     dateErrorResId = foodItemViewModel.openDateErrorResId,
                     labelResId = R.string.open_date_hint,
-                    testTag = "inputFoodOpenDate")
+                    testTag = "inputFoodOpenDate"
+                )
                 Spacer(modifier = Modifier.height(16.dp))
-              }
+            }
 
-              item(key = "buyDate") {
+            item(key = "buyDate") {
                 DateField(
                     date = foodItemViewModel.buyDate,
                     onDateChange = { newValue -> foodItemViewModel.changeBuyDate(newValue) },
                     dateErrorResId = foodItemViewModel.buyDateErrorResId,
                     labelResId = R.string.buy_date_hint,
-                    testTag = "inputFoodBuyDate")
+                    testTag = "inputFoodBuyDate"
+                )
                 Spacer(modifier = Modifier.height(32.dp))
-              }
+            }
 
-              //              if (foodFacts.isNotEmpty()) {
-              //                item(key = "selectImage") {
-              //                  Text(
-              //                      text = stringResource(id = R.string.select_image_label),
-              //                      modifier = Modifier.testTag("selectImage"))
-              //                  Spacer(modifier = Modifier.height(8.dp))
-              //
-              //                  LazyRow(
-              //                      modifier = Modifier.fillMaxWidth(),
-              //                      horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-              //                        items(foodFacts.take(10)) { foodFact ->
-              //                          Box(
-              //                              modifier =
-              //                                  Modifier.fillMaxWidth(0.3f)
-              //                                      .aspectRatio(1f)
-              //                                      .border(
-              //                                          width = if (selectedImage == foodFact)
-              // 2.dp else 1.dp,
-              //                                          color = MaterialTheme.colorScheme.primary,
-              //                                          shape = RoundedCornerShape(8.dp))
-              //                                      .clickable { selectedImage = foodFact }
-              //                                      .testTag("foodImage")) {
-              //                                Image(
-              //                                    painter =
-              // rememberAsyncImagePainter(foodFact.imageUrl),
-              //                                    contentDescription = foodFact.name,
-              //                                    modifier = Modifier.fillMaxSize())
-              //                              }
-              //                        }
-              //                      }
-              //                  Spacer(modifier = Modifier.height(16.dp))
-              //                }
-              //              }
-
-              // Add a "No Image" option
-              //              item("noImage") {
-              //                Box(
-              //                    modifier =
-              //                        Modifier.size(100.dp)
-              //                            .border(
-              //                                width = if (selectedImage == null) 4.dp else 1.dp,
-              //                                color = MaterialTheme.colorScheme.primary,
-              //                                shape = RoundedCornerShape(8.dp))
-              //                            .clickable {
-              //                              selectedImage = null // Indicate no image selected
-              //                            }
-              //                            .testTag("noImage"),
-              //                    contentAlignment = Alignment.Center) {
-              //                      Text(
-              //                          stringResource(id = R.string.no_image_option),
-              //                          modifier = Modifier.testTag("noImageText"))
-              //                    }
-              //                Spacer(modifier = Modifier.height(16.dp))
-              //              }
-
-              // Display Selected Image
-              //              selectedImage?.let {
-              //                item {
-              //                  Text(
-              //                      stringResource(id = R.string.selected_image_label),
-              //                      modifier = Modifier.testTag("selectedImageText"))
-              //                  Image(
-              //                      painter = rememberAsyncImagePainter(it.imageUrl),
-              //                      contentDescription = null,
-              //                      modifier =
-              // Modifier.size(150.dp).padding(8.dp).testTag("selectedImage"))
-              //                  Spacer(modifier = Modifier.height(16.dp))
-              //                }
-              //              }
-              //                  ?: item {
-              //                    Text(
-              //                        stringResource(id = R.string.default_image_label),
-              //                        modifier = Modifier.testTag("defaultImageText"))
-              //                    Image(
-              //                        painter =
-              // rememberAsyncImagePainter(FoodFacts.DEFAULT_IMAGE_URL),
-              //                        contentDescription = null,
-              //                        modifier =
-              // Modifier.size(150.dp).padding(8.dp).testTag("defaultImage"))
-              //                    Spacer(modifier = Modifier.height(16.dp))
-              //                  }
-
-              item(key = "buttons") {
+            item(key = "buttons") {
                 CustomButtons(
                     button1OnClick = { navigationActions.goBack() },
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(R.string.cancel_button),
                     button2OnClick = {
-                      coroutineScope.launch {
-                        val success = foodItemViewModel.submitFoodItem()
-                        if (success) {
-                          // foodFactsViewModel.clearFoodFactsSuggestions()
-                          navigationActions.goBack()
-                        } else {
-                          Toast.makeText(
-                                  context, R.string.submission_error_message, Toast.LENGTH_SHORT)
-                              .show()
+                        coroutineScope.launch {
+                            val success = foodItemViewModel.submitFoodItem()
+                            if (success) {
+                                navigationActions.goBack()
+                            } else {
+                                Toast.makeText(
+                                    context, R.string.submission_error_message, Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
-                      }
                     },
                     button2TestTag = "foodSave",
-                    button2Text = stringResource(R.string.submit_button_text))
-              }
+                    button2Text = stringResource(R.string.submit_button_text)
+                )
             }
-      }
+        }
+    }
 }

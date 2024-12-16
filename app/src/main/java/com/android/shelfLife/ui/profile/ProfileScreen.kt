@@ -43,6 +43,17 @@ import com.example.compose.LocalThemeMode
 import com.example.compose.LocalThemeTogglerProvider
 import com.example.compose.ThemeMode
 
+/**
+ * Composable function to display the Profile screen.
+ *
+ * This screen allows users to view their profile information, including their username, email, and
+ * profile picture. It also provides options to switch themes, view pending invitations, and log out.
+ * Users can trigger an Easter Egg by quickly clicking the profile picture multiple times.
+ *
+ * @param navigationActions Actions for navigating to other screens.
+ * @param context Application context, used for actions such as logging out.
+ * @param profileViewModel ViewModel for managing user profile-related data.
+ */
 @Composable
 fun ProfileScreen(
     navigationActions: NavigationActions,
@@ -157,7 +168,7 @@ fun ProfileScreen(
 
               Spacer(modifier = Modifier.weight(0.2f))
 
-              ////
+
               Row(
                   verticalAlignment = Alignment.CenterVertically,
                   modifier = Modifier.padding(16.dp)) {
