@@ -45,9 +45,7 @@ constructor(
   val multipleSelectedFoodItems: StateFlow<List<FoodItem>> =
       _multipleSelectedFoodItems.asStateFlow()
 
-  val finishedLoading = MutableStateFlow(false)
-
-  val households = houseHoldRepository.households
+    val households = houseHoldRepository.households
   val selectedHousehold = houseHoldRepository.selectedHousehold
   val foodItems = listFoodItemsRepository.foodItems
 
