@@ -1,13 +1,22 @@
 package com.android.shelfLife.model.recipe
 
-/** Interface describing a model for generating recipes */
+/**
+ * Interface representing a repository for generating recipes.
+ *
+ * This repository provides functionality to generate recipes dynamically
+ * based on the provided input, such as available food items or recipe preferences.
+ */
 interface RecipeGeneratorRepository {
+
   /**
-   * Generates a recipe based on the provided search input.
+   * Generates a recipe based on the provided recipe prompt.
    *
-   * @param listFoodItems The list of food items to use for generating recipes.
-   * @param searchRecipeType The type of recipe search to perform (default is USE_SOON_TO_EXPIRE).
-   * @return The generated recipe, or null if there is an error.
+   * The recipe prompt includes details such as desired ingredients, recipe type,
+   * servings, and special instructions. The repository uses this information to
+   * create a recipe tailored to the user's preferences or constraints.
+   *
+   * @param recipePrompt The [RecipePrompt] containing the criteria for recipe generation.
+   * @return The generated [Recipe], or `null` if recipe generation fails.
    */
   suspend fun generateRecipe(recipePrompt: RecipePrompt): Recipe?
 }
