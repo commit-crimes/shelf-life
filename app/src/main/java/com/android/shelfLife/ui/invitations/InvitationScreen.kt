@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.model.invitations.Invitation
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.viewmodel.InvitationViewModel
+import com.android.shelfLife.viewmodel.invitations.InvitationViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -38,7 +38,7 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.utils.DropdownFields
-import com.android.shelfLife.viewmodel.ProfileScreenViewModel
+import com.android.shelfLife.viewmodel.profile.ProfileScreenViewModel
 import com.example.compose.LocalThemeMode
 import com.example.compose.LocalThemeTogglerProvider
 import com.example.compose.ThemeMode

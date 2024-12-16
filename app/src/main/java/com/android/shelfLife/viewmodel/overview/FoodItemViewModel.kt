@@ -1,4 +1,4 @@
-package com.android.shelfLife.viewmodel
+package com.android.shelfLife.viewmodel.overview
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

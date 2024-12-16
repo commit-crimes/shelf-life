@@ -1,4 +1,4 @@
-package com.android.shelfLife.model.camera
+package com.android.shelfLife.viewmodel.camera
 
 import android.Manifest
 import android.app.Application

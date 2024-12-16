@@ -1,4 +1,4 @@
-package com.android.shelfLife.viewmodel
+package com.android.shelfLife.viewmodel.profile
 
 import android.content.Context
 import android.util.Log

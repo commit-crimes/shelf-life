@@ -23,7 +23,7 @@ import com.android.shelfLife.ui.utils.DateField
 import com.android.shelfLife.ui.utils.FoodNameField
 import com.android.shelfLife.ui.utils.NewLocationDropdownField
 import com.android.shelfLife.ui.utils.UnitDropdownField
-import com.android.shelfLife.viewmodel.FoodItemViewModel
+import com.android.shelfLife.viewmodel.overview.FoodItemViewModel
 import kotlinx.coroutines.launch
 
 /**

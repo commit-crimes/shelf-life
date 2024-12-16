@@ -1,4 +1,4 @@
-package com.android.shelfLife.viewmodel
+package com.android.shelfLife.viewmodel.invitations
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
