@@ -90,28 +90,6 @@ constructor(
     }
   }
 
-  fun signOutUser(context: Context, onSignOutComplete: () -> Unit) {
-    val googleSignInClient =
-        GoogleSignIn.getClient(
-            context,
-            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(context.getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build())
-
-    googleSignInClient.signOut().addOnCompleteListener { task ->
-      if (task.isSuccessful) {
-        firebaseAuth.signOut()
-        onSignOutComplete()
-      } else {
-        Toast.makeText(context, "Sign-out failed: ${task.exception}", Toast.LENGTH_SHORT).show()
-      }
-    }
-  }
-
-  fun setSignInStateForTesting(state: SignInState) {
-    _signInState.value = state
-  }
 }
 
 sealed class SignInState {
