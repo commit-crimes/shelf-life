@@ -1,7 +1,7 @@
 package com.android.shelfLife.di
 
-import com.android.shelfLife.model.newRecipe.RecipeRepository
-import com.android.shelfLife.model.newRecipe.RecipeRepositoryFirestore
+import com.android.shelfLife.model.recipe.RecipeRepository
+import com.android.shelfLife.model.recipe.RecipeRepositoryFirestore
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides

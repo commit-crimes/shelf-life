@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.shelfLife.model.newFoodItem.FoodItem
-import com.android.shelfLife.model.newFoodItem.FoodItemRepository
-import com.android.shelfLife.model.newRecipe.RecipeRepository
+import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.foodItem.FoodItemRepository
+import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.recipe.RecipePrompt
@@ -22,10 +22,10 @@ import kotlinx.coroutines.launch
 open class RecipeGenerationViewModel
 @Inject
 constructor(
-    private val recipeRepository: RecipeRepository,
-    private val recipeGeneratorRepository: RecipeGeneratorRepository,
-    private val foodItemRepository: FoodItemRepository,
-    private val userRepository: UserRepository
+  private val recipeRepository: RecipeRepository,
+  private val recipeGeneratorRepository: RecipeGeneratorRepository,
+  private val foodItemRepository: FoodItemRepository,
+  private val userRepository: UserRepository
 ) : ViewModel() {
 
   companion object {

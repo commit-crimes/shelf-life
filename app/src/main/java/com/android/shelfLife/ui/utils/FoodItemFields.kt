@@ -12,7 +12,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodUnit
-import com.android.shelfLife.model.newFoodItem.FoodStorageLocation
+import com.android.shelfLife.model.foodItem.FoodStorageLocation
 
 /**
  * Composable function to display a text field for entering the food name.
@@ -172,8 +172,8 @@ fun LocationDropdownField(
 // TODO Delete this after everything is compatible
 @Composable
 fun NewLocationDropdownField(
-    location: com.android.shelfLife.model.newFoodItem.FoodStorageLocation,
-    onLocationChange: (com.android.shelfLife.model.newFoodItem.FoodStorageLocation) -> Unit,
+    location: FoodStorageLocation,
+    onLocationChange: (FoodStorageLocation) -> Unit,
     locationExpanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
