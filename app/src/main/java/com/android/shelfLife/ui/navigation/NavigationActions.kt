@@ -33,6 +33,7 @@ object Screen {
   const val INDIVIDUAL_FOOD_ITEM = "Individual Food Item Screen"
   const val INDIVIDUAL_RECIPE = "Individual Recipe Screen"
   const val ADD_RECIPE = "Add recipe Screen"
+    const val EDIT_RECIPE = "Edit recipe Screen"
   const val GENERATE_RECIPE = "Generate recipe Screen"
   const val PROFILE = "Profile Screen"
   const val HOUSEHOLD_CREATION = "Household Creation Screen"

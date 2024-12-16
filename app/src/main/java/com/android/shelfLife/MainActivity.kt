@@ -29,6 +29,7 @@ import com.android.shelfLife.ui.newoverview.HouseHoldCreationScreen
 import com.android.shelfLife.ui.newoverview.IndividualFoodItemScreen
 import com.android.shelfLife.ui.newoverview.OverviewScreen
 import com.android.shelfLife.ui.recipes.AddRecipeScreen
+import com.android.shelfLife.ui.recipes.EditRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
 import com.android.shelfLife.ui.recipes.execution.ServingsScreen
@@ -84,6 +85,7 @@ fun ShelfLifeApp() {
       composable(Screen.INDIVIDUAL_RECIPE) { IndividualRecipeScreen(navigationActions) }
       composable(Screen.ADD_RECIPE) { AddRecipeScreen(navigationActions) }
       composable(Screen.GENERATE_RECIPE) { GenerateRecipeScreen(navigationActions) }
+      composable(Screen.EDIT_RECIPE) { EditRecipeScreen(navigationActions) }
     }
 
     navigation(startDestination = Screen.RECIPE_EXECUTION, route = Route.RECIPE_EXECUTION){
