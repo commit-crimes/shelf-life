@@ -97,8 +97,7 @@ fun IndividualRecipeScreen(
                       IconButton(
                           onClick = {
                               coroutineScope.launch {
-                                  navigationActions.navigateTo(Screen.EDIT_RECIPE)
-                              }
+                                  navigationActions.navigateTo(Screen.EDIT_RECIPE) }
                           },
                           modifier = Modifier.testTag("editRecipe")) {
                           Icon(imageVector = Icons.Default.ModeEdit, contentDescription = "Delete Icon")

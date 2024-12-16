@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.recipes
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -150,6 +151,9 @@ fun InstructionItem(
         androidx.compose.material3.OutlinedTextField(
             value = addRecipeViewModel.instructions.collectAsState().value[index],
             onValueChange = { newInstruction ->
+                Log.i("RecipeComponents", "Change in instruction")
+                Log.i("RecipeComponent", "instructions : ${addRecipeViewModel.instructions.value.toString()}")
+                Log.i("RecipeComponent", "instruction errors _ ${addRecipeViewModel.instructionError.value.toString()}")
                 addRecipeViewModel.changeInstruction(index, newInstruction)
             },
             label = { Text(stringResource(R.string.instruction_step, index + 1)) },
@@ -160,9 +164,14 @@ fun InstructionItem(
             Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Step")
         }
     }
-    // Display error message if needed
-    ErrorTextBoxNEW(
-        addRecipeViewModel.instructionError.collectAsState().value[index], "instructionErrorMessage")
+
+    if(addRecipeViewModel.instructionError.collectAsState().value.isNotEmpty() ){
+        if (addRecipeViewModel.instructionError.collectAsState().value[index] != -1){
+            // Display error message if needed
+            ErrorTextBoxNEW(
+                addRecipeViewModel.instructionError.collectAsState().value[index], "instructionErrorMessage")
+        }
+    }
 }
 
 val UNITS = mapOf(FoodUnit.GRAM to "gram", FoodUnit.ML to "mL", FoodUnit.COUNT to "")

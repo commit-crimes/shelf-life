@@ -77,8 +77,8 @@ constructor(
   private val _timeError = MutableStateFlow<Int?>(null)
   val timeError: StateFlow<Int?> = _timeError.asStateFlow()
 
-  private val _instructionError = MutableStateFlow<List<Int?>>(emptyList())
-  val instructionError: StateFlow<List<Int?>> = _instructionError.asStateFlow()
+  private val _instructionError = MutableStateFlow<List<Int>>(emptyList())
+  val instructionError: StateFlow<List<Int>> = _instructionError.asStateFlow()
 
   private val _instructionsError = MutableStateFlow(false)
 
@@ -264,7 +264,7 @@ constructor(
   // Function to create a new instruction
   fun createNewInstruction() {
     _instructions.value = instructions.value + ""
-    _instructionError.value = instructionError.value + null
+    _instructionError.value = instructionError.value + (-1)
   }
 
   // Function to modify an instruction
@@ -274,11 +274,11 @@ constructor(
     _instructions.value = updatedInstructions
     val updatedErrors =
         instructionError.value.toMutableList().apply {
-          this[index] =
-              validateString(
-                  newInstruction,
-                  R.string.instruction_empty_error,
-                  R.string.instructions_invalid_error)
+            val errorMessage = validateString(
+                newInstruction,
+                R.string.instruction_empty_error,
+                R.string.instructions_invalid_error)
+          this[index] = if (errorMessage != null) errorMessage else -1
         }
     _instructionError.value = updatedErrors
     validateInstructions()
