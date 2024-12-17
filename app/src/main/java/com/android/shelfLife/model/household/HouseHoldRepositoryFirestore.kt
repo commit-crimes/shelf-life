@@ -234,6 +234,12 @@ constructor(
             }
   }
 
+  /** Stops listening for real-time updates. */
+  fun stopListeningForHouseholds() {
+    householdsListenerRegistration?.remove()
+    householdsListenerRegistration = null
+  }
+
   override fun updateStinkyPoints(householdId: String, stinkyPoints: Map<String, Long>) {
     // Save the original points for rollback
     val originalStinkyPoints = _selectedHousehold.value?.stinkyPoints
