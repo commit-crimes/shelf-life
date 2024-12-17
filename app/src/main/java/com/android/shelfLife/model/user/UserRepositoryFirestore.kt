@@ -195,7 +195,7 @@ constructor(
     _user.value = updatedUserData
   }
 
-  private suspend fun updateArrayField(
+  private fun updateArrayField(
       fieldName: String,
       value: String,
       operation: ArrayOperation
@@ -258,7 +258,7 @@ constructor(
     updateArrayField("recipeUIDs", uid, ArrayOperation.REMOVE)
   }
 
-  override suspend fun deleteInvitationUID(uid: String) {
+  override fun deleteInvitationUID(uid: String) {
     updateArrayField("invitationUIDs", uid, ArrayOperation.REMOVE)
   }
 
