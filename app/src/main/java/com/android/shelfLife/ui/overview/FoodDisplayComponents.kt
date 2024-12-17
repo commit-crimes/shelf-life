@@ -134,7 +134,7 @@ fun FoodItemCard(
       when (foodItem.foodFacts.quantity.unit) {
         FoodUnit.GRAM -> "g"
         FoodUnit.ML -> "ml"
-        FoodUnit.COUNT -> "in stock"
+        FoodUnit.COUNT -> " in stock"
       }
   // Composable UI
   ElevatedCard(

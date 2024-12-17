@@ -45,8 +45,6 @@ constructor(
   val multipleSelectedFoodItems: StateFlow<List<FoodItem>> =
       _multipleSelectedFoodItems.asStateFlow()
 
-  val finishedLoading = MutableStateFlow(false)
-
   val households = houseHoldRepository.households
   val selectedHousehold = houseHoldRepository.selectedHousehold
   val foodItems = listFoodItemsRepository.foodItems
@@ -120,7 +118,9 @@ constructor(
       viewModelScope.launch {
         listFoodItemsRepository.foodItems.collect { foodItems ->
           foodItems.forEach { foodItem ->
-            if (foodItem.expiryDate!! < Timestamp.now() && foodItem.status != FoodStatus.EXPIRED) {
+            if (foodItem.expiryDate != null &&
+                foodItem.expiryDate < Timestamp.now() &&
+                foodItem.status != FoodStatus.EXPIRED) {
 
               listFoodItemsRepository.updateFoodItem(
                   selectedHousehold.uid, foodItem.copy(status = FoodStatus.EXPIRED))
