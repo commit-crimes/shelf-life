@@ -4,12 +4,14 @@ import android.util.Log
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 
-class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemRepository {
+class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFirestore) :
+    FoodItemRepository {
 
   private val collectionPath = "foodItems"
 
@@ -76,29 +78,40 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
 
       // Clear the existing items in Firestore for the household
       val batch = db.batch()
-      val householdCollection = db.collection(collectionPath).document(householdId).collection("items")
+      val householdCollection =
+          db.collection(collectionPath).document(householdId).collection("items")
 
       // Retrieve all existing documents in the household's collection
-      householdCollection.get().addOnSuccessListener { snapshot ->
-        snapshot.documents.forEach { document ->
-          batch.delete(document.reference)
-        }
+      householdCollection
+          .get()
+          .addOnSuccessListener { snapshot ->
+            snapshot.documents.forEach { document -> batch.delete(document.reference) }
 
-        // Add the new items to Firestore
-        value.forEach { foodItem ->
-          val itemRef = householdCollection.document(foodItem.uid)
-          batch.set(itemRef, foodItem.toMap()) // Assuming FoodItem has a toMap() method
-        }
+            // Add the new items to Firestore
+            value.forEach { foodItem ->
+              val itemRef = householdCollection.document(foodItem.uid)
+              batch.set(itemRef, foodItem.toMap()) // Assuming FoodItem has a toMap() method
+            }
 
-        // Commit the batch
-        batch.commit().addOnSuccessListener {
-          Log.d("FoodItemRepository", "Successfully set food items for household: $householdId")
-        }.addOnFailureListener { e ->
-          Log.e("FoodItemRepository", "Failed to commit batch for household: $householdId", e)
-        }
-      }.addOnFailureListener { e ->
-        Log.e("FoodItemRepository", "Failed to fetch existing items for household: $householdId", e)
-      }
+            // Commit the batch
+            batch
+                .commit()
+                .addOnSuccessListener {
+                  Log.d(
+                      "FoodItemRepository",
+                      "Successfully set food items for household: $householdId")
+                }
+                .addOnFailureListener { e ->
+                  Log.e(
+                      "FoodItemRepository", "Failed to commit batch for household: $householdId", e)
+                }
+          }
+          .addOnFailureListener { e ->
+            Log.e(
+                "FoodItemRepository",
+                "Failed to fetch existing items for household: $householdId",
+                e)
+          }
     } catch (e: Exception) {
       Log.e("FoodItemRepository", "Error setting food items for household: $householdId", e)
       _errorMessage.value = "Failed to set food items. Please try again."
@@ -216,7 +229,7 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
    * @param doc The Firestore document to convert.
    * @return A FoodItem object or null if conversion fails.
    */
-  private fun convertToFoodItem(doc: DocumentSnapshot): FoodItem? {
+  internal fun convertToFoodItem(doc: DocumentSnapshot): FoodItem? {
     return try {
       doc.toFoodItem()
     } catch (e: Exception) {
