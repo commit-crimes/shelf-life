@@ -19,9 +19,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 @HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
+@Config(application = dagger.hilt.android.testing.HiltTestApplication::class)
 class FoodItemTest {
 
     @get:Rule var hiltRule = HiltAndroidRule(this)

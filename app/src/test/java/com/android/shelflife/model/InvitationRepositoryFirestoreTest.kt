@@ -28,9 +28,11 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 @HiltAndroidTest
 @RunWith(RobolectricTestRunner::class)
+@Config(application = dagger.hilt.android.testing.HiltTestApplication::class)
 class InvitationRepositoryFirestoreTest {
 
   @get:Rule var hiltRule = HiltAndroidRule(this)
