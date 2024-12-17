@@ -62,14 +62,8 @@ class InvitationViewModelTest {
             Invitation("invitation1", "household1", "h1", "user1", "u1"),
             Invitation("invitation2", "household2", "h2", "user2", "u1")
         )
-
-        // Stub repository before changing flows
         `when`(invitationRepository.getInvitationsBatch(invitationUIDs)).thenReturn(invitations)
-
-        // Emit invitation UIDs
         userInvitations.value = invitationUIDs
-
-        // Let the ViewModel process the flows
         advanceUntilIdle()
 
         assertEquals(invitations, invitationViewModel.invitations.value)
@@ -82,11 +76,7 @@ class InvitationViewModelTest {
             Invitation("invitation2", "household2", "h2", "user2", "u1")
         )
 
-        // Initially, userInvitations must contain "invitation1"
         userInvitations.value = listOf("invitation1", "invitation2")
-
-        // After acceptInvitation and deleteInvitationUID, "invitation1" should be removed from userInvitations by doAnswer setup
-        // invitationRepository should return refreshedInvitations for the remaining UIDs
         `when`(invitationRepository.getInvitationsBatch(listOf("invitation2"))).thenReturn(refreshedInvitations)
 
         invitationViewModel.acceptInvitation(invitation)
@@ -95,9 +85,6 @@ class InvitationViewModelTest {
         verify(userRepository).deleteInvitationUID("invitation1")
         verify(invitationRepository).acceptInvitation(invitation)
         verify(userRepository).addCurrentUserToHouseHold("household1", "user1")
-
-        // Now that invitation1 is removed, refreshInvitations queries only "invitation2"
-        // getInvitationsBatch(listOf("invitation2")) returns refreshedInvitations
         assertEquals(refreshedInvitations, invitationViewModel.invitations.value)
     }
 
@@ -155,12 +142,7 @@ class InvitationViewModelTest {
         // Mock repository behavior
         userInvitations.value = invitationUIDs
         `when`(invitationRepository.getInvitationsBatch(invitationUIDs)).thenReturn(invitations)
-
-        // Act
         invitationViewModel.refreshInvitations()
-
-        // Assert
         assertEquals(invitations, invitationViewModel.invitations.value)
     }
-
 }
