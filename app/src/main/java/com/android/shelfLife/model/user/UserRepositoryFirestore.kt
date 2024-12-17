@@ -169,7 +169,6 @@ constructor(
     return uidToName
   }
 
-
   override fun setAudioPlaying(isPlaying: Boolean) {
     _isAudioPlaying.value = isPlaying
   }
@@ -285,17 +284,17 @@ constructor(
     householdUid?.let { updateSelectedHousehold(it) }
   }
 
-    override suspend fun addCurrentUserToHouseHold(householdUID: String, userUID: String) {
-        try {
-            _user.value?.householdUIDs?.plus(householdUID)
-            db.collection("users")
-                .document(userUID)
-                .update("householdUIDs", FieldValue.arrayUnion(householdUID))
-        } catch (e: Exception) {
-            Log.e("UserRepositoryFirestore", "Error adding user to household", e)
-            _user.value?.householdUIDs?.minus(householdUID)
-        }
+  override suspend fun addCurrentUserToHouseHold(householdUID: String, userUID: String) {
+    try {
+      _user.value?.householdUIDs?.plus(householdUID)
+      db.collection("users")
+          .document(userUID)
+          .update("householdUIDs", FieldValue.arrayUnion(householdUID))
+    } catch (e: Exception) {
+      Log.e("UserRepositoryFirestore", "Error adding user to household", e)
+      _user.value?.householdUIDs?.minus(householdUID)
     }
+  }
 
   private fun convertToUser(doc: DocumentSnapshot): User? {
     return try {

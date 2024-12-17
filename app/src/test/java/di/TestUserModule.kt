@@ -1,7 +1,5 @@
 package di
 
-import com.android.shelfLife.model.user.UserRepository
-import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
