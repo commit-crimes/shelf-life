@@ -10,12 +10,29 @@ import com.android.shelfLife.model.foodItem.toFoodItem
 import com.android.shelfLife.model.foodItem.toMap
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Assert.*
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mockito.*
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@HiltAndroidTest
+@RunWith(RobolectricTestRunner::class)
+@Config(application = dagger.hilt.android.testing.HiltTestApplication::class)
 class FoodItemTest {
 
+    @get:Rule var hiltRule = HiltAndroidRule(this)
+
+    @Before
+    fun setUp() {
+        hiltRule.inject()
+    }
+    
   private val mockFoodFacts =
       FoodFacts(
           name = "Sample Food",
