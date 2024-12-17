@@ -15,18 +15,18 @@ import com.android.shelfLife.ui.authentication.SignInScreen
 import com.android.shelfLife.ui.camera.BarcodeScannerScreen
 import com.android.shelfLife.ui.camera.CameraPermissionHandler
 import com.android.shelfLife.ui.easteregg.EasterEggScreen
+import com.android.shelfLife.ui.invitations.InvitationScreen
 import com.android.shelfLife.ui.leaderboard.LeaderboardScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.invitations.InvitationScreen
-import com.android.shelfLife.ui.profile.ProfileScreen
 import com.android.shelfLife.ui.overview.AddFoodItemScreen
 import com.android.shelfLife.ui.overview.EditFoodItemScreen
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
 import com.android.shelfLife.ui.overview.HouseHoldCreationScreen
 import com.android.shelfLife.ui.overview.IndividualFoodItemScreen
 import com.android.shelfLife.ui.overview.OverviewScreen
+import com.android.shelfLife.ui.profile.ProfileScreen
 import com.android.shelfLife.ui.recipes.AddRecipeScreen
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.ui.recipes.RecipesScreen
@@ -82,11 +82,8 @@ fun ShelfLifeApp() {
       composable(Screen.GENERATE_RECIPE) { GenerateRecipeScreen(navigationActions) }
     }
 
-    navigation(startDestination = Screen.RECIPE_EXECUTION, route = Route.RECIPE_EXECUTION){
-      composable(Screen.RECIPE_EXECUTION){
-        RecipeExecutionScreen(navigationActions)
-      }
-
+    navigation(startDestination = Screen.RECIPE_EXECUTION, route = Route.RECIPE_EXECUTION) {
+      composable(Screen.RECIPE_EXECUTION) { RecipeExecutionScreen(navigationActions) }
     }
 
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {

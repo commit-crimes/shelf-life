@@ -44,7 +44,10 @@ fun <T> DropdownFields(
             onValueChange = {},
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-            modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable).testTag("dropdownMenu_$label"))
+            modifier =
+                Modifier.fillMaxWidth()
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                    .testTag("dropdownMenu_$label"))
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { onExpandedChange(false) }) {
           options.forEach { selectionOption ->
             DropdownMenuItem(

@@ -30,8 +30,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.utils.DeletionConfirmationPopUp
 import com.android.shelfLife.ui.utils.CustomButtons
+import com.android.shelfLife.ui.utils.DeletionConfirmationPopUp
 import com.android.shelfLife.viewmodel.overview.HouseholdCreationScreenViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch

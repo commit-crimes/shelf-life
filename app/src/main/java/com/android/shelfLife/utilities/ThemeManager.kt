@@ -170,16 +170,17 @@ object ThemeManager {
   // When no special mode is active, this is null
   var currentColorScheme: MutableState<ColorScheme?> = mutableStateOf(null)
 
-    fun updateScheme(mode: LeaderboardMode, isDark: Boolean) {
-        activeMode = mode
-        currentColorScheme.value = when (mode) {
-            LeaderboardMode.RAT -> if (isDark) RatDarkColorScheme else RatLightColorScheme
-            LeaderboardMode.STINKY -> if (isDark) StinkyDarkColorScheme else StinkyLightColorScheme
+  fun updateScheme(mode: LeaderboardMode, isDark: Boolean) {
+    activeMode = mode
+    currentColorScheme.value =
+        when (mode) {
+          LeaderboardMode.RAT -> if (isDark) RatDarkColorScheme else RatLightColorScheme
+          LeaderboardMode.STINKY -> if (isDark) StinkyDarkColorScheme else StinkyLightColorScheme
         }
-    }
+  }
 
-    fun resetMode() {
-        activeMode = null
-        currentColorScheme.value = null
-    }
+  fun resetMode() {
+    activeMode = null
+    currentColorScheme.value = null
+  }
 }
