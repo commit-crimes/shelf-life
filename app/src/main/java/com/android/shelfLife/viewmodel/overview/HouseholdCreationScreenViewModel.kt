@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.foodItem.FoodItemRepository
-import com.android.shelfLife.model.invitations.InvitationRepository
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.invitations.InvitationRepository
 import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -135,7 +135,9 @@ constructor(
               }
 
       val householdUid = houseHoldRepository.getNewUid()
-      val household = HouseHold(householdUid, householdName, listOf(user.uid), emptyList(), emptyMap(), emptyMap())
+      val household =
+          HouseHold(
+              householdUid, householdName, listOf(user.uid), emptyList(), emptyMap(), emptyMap())
 
       houseHoldRepository.addHousehold(household)
       userRepository.addHouseholdUID(household.uid)

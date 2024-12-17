@@ -6,10 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepository
-import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.recipe.Recipe
 import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
 import com.android.shelfLife.model.recipe.RecipePrompt
+import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -22,10 +22,10 @@ import kotlinx.coroutines.launch
 open class RecipeGenerationViewModel
 @Inject
 constructor(
-  private val recipeRepository: RecipeRepository,
-  private val recipeGeneratorRepository: RecipeGeneratorRepository,
-  private val foodItemRepository: FoodItemRepository,
-  private val userRepository: UserRepository
+    private val recipeRepository: RecipeRepository,
+    private val recipeGeneratorRepository: RecipeGeneratorRepository,
+    private val foodItemRepository: FoodItemRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
   companion object {
@@ -63,7 +63,7 @@ constructor(
   }
 
   fun _updateFoodItemSelection() { // update our lists of selected and available food items, and
-                                   // update the recipe prompt aswell
+    // update the recipe prompt aswell
     _availableFoodItems.value =
         foodItemRepository.foodItems.value.filter { it.uid !in _selectedFoodItemsUids.value }
     _selectedFoodItems.value =

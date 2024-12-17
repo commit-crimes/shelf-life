@@ -3,7 +3,6 @@ package com.android.shelfLife.ui.camera
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.NavHostController
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -14,7 +13,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
 @HiltAndroidTest
 class PermissionDeniedScreenTest {
@@ -23,9 +21,9 @@ class PermissionDeniedScreenTest {
   @get:Rule val composeTestRule = createComposeRule()
 
   @Before
-    fun setUp() {
-        hiltAndroidTestRule.inject()
-    }
+  fun setUp() {
+    hiltAndroidTestRule.inject()
+  }
 
   @Test
   fun testPermissionDeniedMessageIsDisplayed() {
