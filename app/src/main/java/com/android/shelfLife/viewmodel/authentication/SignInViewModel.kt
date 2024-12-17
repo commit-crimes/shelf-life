@@ -6,9 +6,9 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.R
-import com.android.shelfLife.model.newFoodItem.FoodItemRepository
-import com.android.shelfLife.model.newRecipe.RecipeRepository
-import com.android.shelfLife.model.newhousehold.HouseHoldRepository
+import com.android.shelfLife.model.foodItem.FoodItemRepository
+import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions

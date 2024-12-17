@@ -49,13 +49,13 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
 import com.android.shelfLife.model.recipe.Recipe
+import com.android.shelfLife.ui.navigation.BottomNavigationMenu
+import com.android.shelfLife.ui.navigation.HouseHoldSelectionDrawer
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
-import com.android.shelfLife.ui.newnavigation.HouseHoldSelectionDrawer
-import com.android.shelfLife.ui.newnavigation.TopNavigationBar
+import com.android.shelfLife.ui.navigation.TopNavigationBar
 import com.android.shelfLife.ui.newutils.ExtendedActionButtons
 import com.android.shelfLife.ui.utils.CustomSearchBar
 import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel

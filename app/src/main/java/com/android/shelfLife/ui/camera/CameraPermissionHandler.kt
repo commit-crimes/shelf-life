@@ -16,10 +16,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.utils.OnLifecycleEvent
+import com.android.shelfLife.viewmodel.camera.BarcodeScannerViewModel
 
 /**
  * Composable function for handling camera permissions.

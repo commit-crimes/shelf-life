@@ -1,8 +1,6 @@
 package com.android.shelfLife.ui.recipes.IndividualRecipe
 
-import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,49 +8,38 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.rememberNavController
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodUnit
-import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.newRecipe.RecipeRepositoryFirestore
 import com.android.shelfLife.model.recipe.Ingredient
-import com.android.shelfLife.model.recipe.Recipe
+import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlin.math.floor
 import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.minutes
 
 @Composable
 /**
@@ -110,18 +97,14 @@ fun IndividualRecipeScreen(
               selectedItem = Route.RECIPES)
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navigationActions.navigateTo(Route.RECIPE_EXECUTION)
-                },
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                modifier = Modifier.testTag("startButton")
-            ) {
+          FloatingActionButton(
+              onClick = { navigationActions.navigateTo(Route.RECIPE_EXECUTION) },
+              containerColor = MaterialTheme.colorScheme.secondaryContainer,
+              modifier = Modifier.testTag("startButton")) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow, // Replace with a suitable icon
-                    contentDescription = "Start Recipe"
-                )
-            }
+                    contentDescription = "Start Recipe")
+              }
         },
         content = { paddingValues ->
           Column(modifier = Modifier.padding(paddingValues).fillMaxSize().testTag("recipe")) {

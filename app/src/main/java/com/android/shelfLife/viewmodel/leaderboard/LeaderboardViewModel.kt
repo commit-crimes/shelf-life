@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.shelfLife.model.newhousehold.HouseHold
-import com.android.shelfLife.model.newhousehold.HouseHoldRepository
+import com.android.shelfLife.model.household.HouseHold
+import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.leaderboard.ThemeManager
 import dagger.hilt.android.lifecycle.HiltViewModel

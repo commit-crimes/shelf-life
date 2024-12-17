@@ -24,7 +24,7 @@ import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.DateField
 import com.android.shelfLife.ui.utils.LocationDropdownField
-import com.android.shelfLife.viewmodel.FoodItemViewModel
+import com.android.shelfLife.viewmodel.overview.FoodItemViewModel
 import kotlinx.coroutines.launch
 
 /**
@@ -114,9 +114,7 @@ fun FoodInputContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         CustomButtons(
-            button1OnClick = {
-                onCancel()
-                             },
+            button1OnClick = { onCancel() },
             button1TestTag = "cancelButton",
             button1Text = stringResource(R.string.cancel_button),
             button2OnClick = {

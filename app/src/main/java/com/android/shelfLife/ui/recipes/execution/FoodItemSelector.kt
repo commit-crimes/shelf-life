@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -29,15 +29,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.android.shelfLife.model.newFoodItem.FoodItem
+import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
-import androidx.compose.material.icons.filled.Close
-import com.android.shelfLife.ui.utils.CustomTopAppBar
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,126 +44,110 @@ fun SelectFoodItemsForIngredientScreen(
     onNext: () -> Unit,
     onPrevious: () -> Unit
 ) {
-    val ingredientName by viewModel.currentIngredientName.collectAsState()
-    val availableFoodItems by viewModel.foodItems.collectAsState()
-    val selectedMap by viewModel.selectedFoodItemsForIngredients.collectAsState()
-    val currentlySelectedItems = selectedMap[ingredientName] ?: emptyList()
+  val ingredientName by viewModel.currentIngredientName.collectAsState()
+  val availableFoodItems by viewModel.foodItems.collectAsState()
+  val selectedMap by viewModel.selectedFoodItemsForIngredients.collectAsState()
+  val currentlySelectedItems = selectedMap[ingredientName] ?: emptyList()
 
-    Log.d("SelectFoodItemsScreen", "Current ingredient: $ingredientName")
-    Log.d(
-        "SelectFoodItemsScreen",
-        "Available food items: ${availableFoodItems.joinToString { it.foodFacts.name }}"
-    )
-    Log.d(
-        "SelectFoodItemsScreen",
-        "Currently selected items: $currentlySelectedItems"
-    )
+  Log.d("SelectFoodItemsScreen", "Current ingredient: $ingredientName")
+  Log.d(
+      "SelectFoodItemsScreen",
+      "Available food items: ${availableFoodItems.joinToString { it.foodFacts.name }}")
+  Log.d("SelectFoodItemsScreen", "Currently selected items: $currentlySelectedItems")
 
-    if (ingredientName == null) {
-        Log.e("SelectFoodItemsScreen", "Ingredient name is null. Navigating back.")
-        navigationActions.goBack()
-        return
-    }
+  if (ingredientName == null) {
+    Log.e("SelectFoodItemsScreen", "Ingredient name is null. Navigating back.")
+    navigationActions.goBack()
+    return
+  }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Select Items for $ingredientName") },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        Log.d("SelectFoodItemsScreen", "Back button clicked. calling onPrevious")
-                        onPrevious()
-                    }) {
-                        Icon(Icons.Default.Close, contentDescription = "Close")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer
-                )
-            )
-        },
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { destination ->
-                    navigationActions.navigateTo(destination)
-                    Log.d("InstructionScreen", "BottomNavigationMenu: Navigated to $destination")
-                },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.RECIPES
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    Log.d("SelectFoodItemsScreen", "Floating action button clicked.")
+  Scaffold(
+      topBar = {
+        TopAppBar(
+            title = { Text("Select Items for $ingredientName") },
+            navigationIcon = {
+              IconButton(
+                  onClick = {
+                    Log.d("SelectFoodItemsScreen", "Back button clicked. calling onPrevious")
+                    onPrevious()
+                  }) {
+                    Icon(Icons.Default.Close, contentDescription = "Close")
+                  }
+            },
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer))
+      },
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { destination ->
+              navigationActions.navigateTo(destination)
+              Log.d("InstructionScreen", "BottomNavigationMenu: Navigated to $destination")
+            },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = Route.RECIPES)
+      },
+      floatingActionButton = {
+        FloatingActionButton(
+            onClick = {
+              Log.d("SelectFoodItemsScreen", "Floating action button clicked.")
 
-                    // Retrieve the currently selected items for the ingredient
-                    val selectedItems = currentlySelectedItems
-                    val selectedAmounts = selectedItems.map { it.foodFacts.quantity.amount.toFloat() }
+              // Retrieve the currently selected items for the ingredient
+              val selectedItems = currentlySelectedItems
+              val selectedAmounts = selectedItems.map { it.foodFacts.quantity.amount.toFloat() }
 
-                    // Temporarily consume the selected items
-                    viewModel.temporarilyConsumeItems(selectedItems, selectedAmounts)
+              // Temporarily consume the selected items
+              viewModel.temporarilyConsumeItems(selectedItems, selectedAmounts)
 
-                    if (viewModel.hasMoreIngredients()) {
-                        Log.d("SelectFoodItemsScreen", "Navigating to the next ingredient.")
-                        viewModel.nextIngredient()
-                    } else {
-                        Log.d("SelectFoodItemsScreen", "No more ingredients. Navigating to instructions.")
-                        viewModel.consumeSelectedItems()
-                        onNext()
-                    }
-                },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ) {
-                Text("Done")
+              if (viewModel.hasMoreIngredients()) {
+                Log.d("SelectFoodItemsScreen", "Navigating to the next ingredient.")
+                viewModel.nextIngredient()
+              } else {
+                Log.d("SelectFoodItemsScreen", "No more ingredients. Navigating to instructions.")
+                viewModel.consumeSelectedItems()
+                onNext()
+              }
+            },
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary) {
+              Text("Done")
             }
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-        ) {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(16.dp)
-            ) {
+      }) { paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues).fillMaxSize()) {
+          LazyColumn(
+              verticalArrangement = Arrangement.spacedBy(8.dp),
+              modifier = Modifier.padding(16.dp)) {
                 items(availableFoodItems) { foodItem ->
-                    var expanded by rememberSaveable { mutableStateOf(false) }
-                    val currentAmount = currentlySelectedItems
-                        .filter { it.uid == foodItem.uid }
-                        .sumOf { it.foodFacts.quantity.amount }
+                  var expanded by rememberSaveable { mutableStateOf(false) }
+                  val currentAmount =
+                      currentlySelectedItems
+                          .filter { it.uid == foodItem.uid }
+                          .sumOf { it.foodFacts.quantity.amount }
 
-                    val maxAmount = foodItem.foodFacts.quantity.amount.toFloat()
+                  val maxAmount = foodItem.foodFacts.quantity.amount.toFloat()
 
-                    FoodItemSelectionCard(
-                        foodItem = foodItem,
-                        amount = currentAmount.toFloat(),
-                        maxAmount = maxAmount,
-                        expanded = expanded,
-                        onCardClick = {
-                            expanded = !expanded
-                            Log.d(
-                                "FoodItemSelectionCard",
-                                "Card clicked for food item: ${foodItem.foodFacts.name}. Expanded: $expanded"
-                            )
-                        },
-                        onAmountChange = { newAmount ->
-                            Log.d(
-                                "FoodItemSelectionCard",
-                                "Amount changed for ${foodItem.foodFacts.name} to $newAmount"
-                            )
-                            viewModel.selectFoodItemForIngredient(ingredientName!!, foodItem, newAmount)
-                        }
-                    )
+                  FoodItemSelectionCard(
+                      foodItem = foodItem,
+                      amount = currentAmount.toFloat(),
+                      maxAmount = maxAmount,
+                      expanded = expanded,
+                      onCardClick = {
+                        expanded = !expanded
+                        Log.d(
+                            "FoodItemSelectionCard",
+                            "Card clicked for food item: ${foodItem.foodFacts.name}. Expanded: $expanded")
+                      },
+                      onAmountChange = { newAmount ->
+                        Log.d(
+                            "FoodItemSelectionCard",
+                            "Amount changed for ${foodItem.foodFacts.name} to $newAmount")
+                        viewModel.selectFoodItemForIngredient(ingredientName!!, foodItem, newAmount)
+                      })
                 }
-            }
+              }
         }
-    }
+      }
 }
-
-
 
 @Composable
 fun FoodItemSelectionCard(
@@ -177,47 +158,37 @@ fun FoodItemSelectionCard(
     onCardClick: () -> Unit,
     onAmountChange: (Float) -> Unit
 ) {
-    androidx.compose.material3.Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)
-            .clickable { onCardClick() }
-    ) {
+  androidx.compose.material3.Card(
+      modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).clickable { onCardClick() }) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Display the name of the food item
-            Text(
-                text = foodItem.foodFacts.name,
-                style = MaterialTheme.typography.titleMedium
-            )
+          // Display the name of the food item
+          Text(text = foodItem.foodFacts.name, style = MaterialTheme.typography.titleMedium)
 
-            // Display the amount selected and the total available quantity
-            Text(
-                text = "Selected: ${amount} ${foodItem.foodFacts.quantity.unit.name.lowercase()} of ${foodItem.foodFacts.quantity}",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(top = 8.dp)
-            )
+          // Display the amount selected and the total available quantity
+          Text(
+              text =
+                  "Selected: ${amount} ${foodItem.foodFacts.quantity.unit.name.lowercase()} of ${foodItem.foodFacts.quantity}",
+              style = MaterialTheme.typography.bodyMedium,
+              modifier = Modifier.padding(top = 8.dp))
 
-            // If the card is expanded, show the slider for adjusting the amount
-            if (expanded) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(top = 16.dp)
-                ) {
-                    Text(text = "Adjust amount:")
-                    androidx.compose.material3.Slider(
-                        value = amount,
-                        onValueChange = { newVal ->
-                            Log.d(
-                                "FoodItemSelectionCard",
-                                "Slider value changed to $newVal for ${foodItem.foodFacts.name}"
-                            )
-                            onAmountChange(newVal) // Trigger state updates
-                        },
-                        valueRange = 0f..maxAmount,
-                        steps = 0
-                    )
+          // If the card is expanded, show the slider for adjusting the amount
+          if (expanded) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(top = 16.dp)) {
+                  Text(text = "Adjust amount:")
+                  androidx.compose.material3.Slider(
+                      value = amount,
+                      onValueChange = { newVal ->
+                        Log.d(
+                            "FoodItemSelectionCard",
+                            "Slider value changed to $newVal for ${foodItem.foodFacts.name}")
+                        onAmountChange(newVal) // Trigger state updates
+                      },
+                      valueRange = 0f..maxAmount,
+                      steps = 0)
                 }
-            }
+          }
         }
-    }
+      }
 }

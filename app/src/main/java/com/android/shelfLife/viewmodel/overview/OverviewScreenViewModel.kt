@@ -8,11 +8,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.foodFacts.FoodCategory
-import com.android.shelfLife.model.newFoodItem.FoodItem
-import com.android.shelfLife.model.newFoodItem.FoodItemRepository
-import com.android.shelfLife.model.newFoodItem.FoodStatus
-import com.android.shelfLife.model.newhousehold.HouseHold
-import com.android.shelfLife.model.newhousehold.HouseHoldRepository
+import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.foodItem.FoodItemRepository
+import com.android.shelfLife.model.foodItem.FoodStatus
+import com.android.shelfLife.model.household.HouseHold
+import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.google.firebase.Timestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -68,33 +68,33 @@ constructor(
 
   var filters = FILTERS.keys.toList()
 
-    private val _query = MutableStateFlow<String>("")
-    val query = _query.asStateFlow()
+  private val _query = MutableStateFlow<String>("")
+  val query = _query.asStateFlow()
 
-    // Automatically filtered list of food items based on selected filters and query
-    val filteredFoodItems =
-        combine(foodItems, selectedFilters, query) { foods, currentFilters, currentQuery ->
+  // Automatically filtered list of food items based on selected filters and query
+  val filteredFoodItems =
+      combine(foodItems, selectedFilters, query) { foods, currentFilters, currentQuery ->
             foods.filter { item ->
-                // Check filters:
-                // Matches if no filters are selected OR if the item's category is one of the selected
-                // filters
-                val matchesFilters =
-                    currentFilters.isEmpty() ||
-                            currentFilters.any { filter -> item.foodFacts.category == FILTERS[filter] }
+              // Check filters:
+              // Matches if no filters are selected OR if the item's category is one of the selected
+              // filters
+              val matchesFilters =
+                  currentFilters.isEmpty() ||
+                      currentFilters.any { filter -> item.foodFacts.category == FILTERS[filter] }
 
-                // Check query:
-                // Matches if the query is empty OR if the item's name contains the query
-                val matchesQuery =
-                    currentQuery.isEmpty() ||
-                            item.foodFacts.name.contains(currentQuery, ignoreCase = true)
+              // Check query:
+              // Matches if the query is empty OR if the item's name contains the query
+              val matchesQuery =
+                  currentQuery.isEmpty() ||
+                      item.foodFacts.name.contains(currentQuery, ignoreCase = true)
 
-                matchesFilters && matchesQuery
+              matchesFilters && matchesQuery
             }
-        }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = emptyList())
+          }
+          .stateIn(
+              scope = viewModelScope,
+              started = SharingStarted.WhileSubscribed(5000),
+              initialValue = emptyList())
 
   /**
    * Initializes the OverviewScreenViewModel by loading the list of households from the repository.
@@ -123,7 +123,9 @@ constructor(
       viewModelScope.launch {
         listFoodItemsRepository.foodItems.collect { foodItems ->
           foodItems.forEach { foodItem ->
-            if (foodItem.expiryDate!! < Timestamp.now() && foodItem.status != FoodStatus.EXPIRED) {
+            if (foodItem.expiryDate != null &&
+                foodItem.expiryDate < Timestamp.now() &&
+                foodItem.status != FoodStatus.EXPIRED) {
 
               listFoodItemsRepository.updateFoodItem(
                   selectedHousehold.uid, foodItem.copy(status = FoodStatus.EXPIRED))

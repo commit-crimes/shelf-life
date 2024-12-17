@@ -18,7 +18,6 @@ object Route {
   const val FIRST_TIME_USER = "First Time User"
   const val EASTEREGG = "Easteregg"
   const val RECIPE_EXECUTION = "Recipe Execution"
-
 }
 
 object Screen {
@@ -42,8 +41,8 @@ object Screen {
   const val SERVINGS_SCREEN = "Servings Screen"
   const val FOOD_ITEM_SELECTION = "Food Item Selection Screen"
   const val INSTRUCTION_SCREEN = "Instruction Screen"
-    const val RECIPE_EXECUTION = "Recipe Execution Screen"
-    const val EASTER_EGG = "Easteregg Screen"
+  const val RECIPE_EXECUTION = "Recipe Execution Screen"
+  const val EASTER_EGG = "Easteregg Screen"
   // Add other screens as needed
 }
 
