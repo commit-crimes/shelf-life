@@ -28,9 +28,11 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseUser
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
+import org.robolectric.annotation.Config
 
 @HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
+@Config(application = dagger.hilt.android.testing.HiltTestApplication::class)
 class SignInViewModelTest {
 
     @get:Rule(order = 0)

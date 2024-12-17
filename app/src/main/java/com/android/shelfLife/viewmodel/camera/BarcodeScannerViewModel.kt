@@ -27,17 +27,16 @@ import kotlinx.coroutines.flow.StateFlow
 class BarcodeScannerViewModel
 @Inject
 constructor(
-    @ApplicationContext private val context: Context,
+    private val application: Application,
     private val foodFactsRepository: FoodFactsRepository
-) : ViewModel() {
+) : ViewModel(), LifecycleObserver {
 
-  private val application = context as Application
   private val sharedPreferences =
       application.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
   var permissionGranted by
       mutableStateOf(
-          ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+          ContextCompat.checkSelfPermission(application, Manifest.permission.CAMERA) ==
               PackageManager.PERMISSION_GRANTED)
     private set
 
@@ -65,7 +64,7 @@ constructor(
   /** Checks if the camera permission is granted. */
   fun checkCameraPermission() {
     permissionGranted =
-        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+        ContextCompat.checkSelfPermission(application, Manifest.permission.CAMERA) ==
             PackageManager.PERMISSION_GRANTED
   }
 
