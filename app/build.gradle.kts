@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.ktfmt)
     alias(libs.plugins.gms)
     alias(libs.plugins.sonar)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -30,7 +32,9 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // Use HiltTestRunner for instrumentation tests
+        testInstrumentationRunner = "com.android.shelfLife.HiltTestRunner"
+
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -90,7 +94,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
 
     packaging {
@@ -231,6 +235,12 @@ tasks.register<Copy>("copyApks") {
 
 // Dependencies
 dependencies {
+    configurations.all {
+        resolutionStrategy {
+            force("androidx.test:core:1.6.1") // Ensure compatibility
+        }
+    }
+
     // Core dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -239,6 +249,11 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.hilt.android.testing)
+
+    // Global test implementation
+    androidTestImplementation(libs.compose.test.junit)
+    testImplementation(libs.compose.test.junit)
 
     // Jetpack Compose UI
     implementation(libs.androidx.ui)
@@ -249,14 +264,12 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.camera.core)
-    implementation(libs.androidx.navigation.testing)
-    implementation(libs.androidx.datastore.core.android)
-    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.material)
+    implementation(libs.androidx.material.icons.extended)
+
     testImplementation(libs.test.core.ktx)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation(libs.material)
-    implementation(libs.androidx.material.icons.extended)
 
     // OpenAI
     implementation(libs.aallam.openai.client)
@@ -276,7 +289,6 @@ dependencies {
 
     // Google Service
     implementation(libs.play.services.auth)
-
     // Firebase
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.firestore)
@@ -292,20 +304,46 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
-    // Testing Unit
+    // Hilt
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // Hilt Testing
+    kapt(libs.hilt.android.compiler)
+
+    testImplementation(libs.hilt.android.testing)
+    kaptTest(libs.hilt.android.compiler)
+
+    androidTestImplementation(libs.hilt.android.testing)
+    kaptAndroidTest(libs.hilt.android.compiler)
+
+    // Unit Testing
+    testImplementation(libs.androidx.espresso.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.mockk)
     androidTestImplementation(libs.mockk.android)
     androidTestImplementation(libs.mockk.agent)
     testImplementation(libs.json)
     testImplementation(libs.mockwebserver)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockk)
+    androidTestImplementation(libs.androidx.runner)
 
-    // Test UI
-    androidTestImplementation(libs.androidx.junit)
+    // AndroidJUnitRunner and JUnit Rules
+    testImplementation(libs.androidx.runner)
+    implementation(libs.androidx.runner)
+    androidTestImplementation(libs.androidx.rules)
+    testImplementation(libs.androidx.rules)
+    implementation(libs.androidx.rules)
+
+
+    // UI tests
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.espresso.intents)
-    androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.androidx.junit)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.inline)
     testImplementation(libs.mockito.kotlin)
@@ -316,6 +354,21 @@ dependencies {
     androidTestImplementation(libs.kaspresso.allure.support)
     androidTestImplementation(libs.kaspresso.compose.support)
 
+    debugImplementation(libs.androidx.fragment.testing.manifest)
+    androidTestImplementation(libs.androidx.fragment.testing)
+
+    testImplementation(libs.hamcrest.hamcrest)
+    androidTestImplementation(libs.hamcrest.hamcrest)
+
+    androidTestImplementation(libs.test.core.ktx)
+    testImplementation(libs.test.core.ktx)
+
     // Coroutine Testing
     testImplementation(libs.kotlinx.coroutines.test)
+
+    debugImplementation(libs.androidx.monitor)
+}
+
+kapt {
+    correctErrorTypes = true
 }

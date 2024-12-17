@@ -2,6 +2,7 @@ package com.android.shelfLife.ui.newoverview
 
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
@@ -30,6 +31,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import coil3.compose.rememberAsyncImagePainter
 import com.android.shelfLife.R
@@ -48,19 +50,11 @@ import com.android.shelfLife.viewmodel.FoodItemViewModel
 @Composable
 fun ChooseFoodItem(
     navigationActions: NavigationActions,
-    foodFactsViewModel: FoodFactsViewModel,
-    foodItemRepository: FoodItemRepository,
-    userRepository: UserRepository,
-    paddingValues: PaddingValues = PaddingValues(16.dp)
+    foodItemViewModel: FoodItemViewModel = hiltViewModel()
 ) {
   val coroutineScope = rememberCoroutineScope()
-  val foodItemViewModel = FoodItemViewModel(foodItemRepository, userRepository)
-
-
   val context = LocalContext.current
   // TODO These are temp while we work on the new FoodFactsModel
-  val foodFacts by foodFactsViewModel.foodFactsSuggestions.collectAsState()
-  val searchStatus by foodFactsViewModel.searchStatus.collectAsState()
 
     var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
     val captureImageLauncher = rememberLauncherForActivityResult(
@@ -93,6 +87,7 @@ fun ChooseFoodItem(
             titleTestTag = "chooseFoodItemTitle")
       },
       content = { paddingValues ->
+          Log.e("ChooseFoodItem", "foodName1: ${foodItemViewModel.foodName}")
         LazyColumn(
             modifier =
                 Modifier.fillMaxSize()
@@ -108,98 +103,102 @@ fun ChooseFoodItem(
                 Spacer(modifier = Modifier.height(16.dp))
               }
 
-              item {
+            item {
+                val searchStatus by foodItemViewModel.searchStatus.collectAsState()
                 when (searchStatus) {
-                  is SearchStatus.Loading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(48.dp).padding(16.dp).testTag("loadingIndicator"))
-                  }
-                  is SearchStatus.Success -> {
-                    Box(modifier = Modifier.height(350.dp)) {
-                      LazyVerticalGrid(
-                          columns = GridCells.Fixed(3),
-                          modifier = Modifier.fillMaxSize(),
-                          contentPadding = PaddingValues(4.dp)) {
-                            items(foodFacts.take(7) + listOf(null)) { foodFact ->
-                              val borderColor =
-                                  if (foodItemViewModel.selectedImage == foodFact) {
-                                    MaterialTheme.colorScheme.primary
-                                  } else {
-                                    Color.Gray
-                                  }
-
-                              val alpha =
-                                  if (foodItemViewModel.selectedImage == foodFact ||
-                                      foodItemViewModel.selectedImage == null)
-                                      1f
-                                  else 0.5f
-
-                              if (foodFact != null) {
-                                Box(
-                                    modifier =
-                                        Modifier.padding(4.dp)
-                                            .size(100.dp)
-                                            .border(
-                                                width =
-                                                    if (foodItemViewModel.selectedImage == foodFact)
-                                                        4.dp
-                                                    else 1.dp,
-                                                color = borderColor,
-                                                shape = RoundedCornerShape(8.dp))
-                                            .clickable {
-                                              foodItemViewModel.selectedImage = foodFact
-                                            }
-                                            .testTag("foodImage")) {
-                                      AsyncImage(
-                                          model = foodFact.imageUrl,
-                                          contentDescription = "Food Image",
-                                          modifier =
-                                              Modifier.fillMaxSize()
-                                                  .clip(RoundedCornerShape(8.dp))
-                                                  .graphicsLayer(alpha = alpha)
-                                                  .testTag("IndividualFoodItemImage"),
-                                          contentScale = ContentScale.Crop)
-                                    }
-                              } else {
-                                Box(
-                                    modifier =
-                                        Modifier.padding(4.dp)
-                                            .size(100.dp)
-                                            .border(
-                                                width =
-                                                    if (foodItemViewModel.selectedImage == null)
-                                                        4.dp
-                                                    else 1.dp,
-                                                color = borderColor,
-                                                shape = RoundedCornerShape(8.dp))
-                                            .clickable {
-                                              foodItemViewModel.selectedImage =
-                                                  null // Indicate no image selected
-                                            }
-                                            .testTag("noImage"),
-                                    contentAlignment = Alignment.Center) {
-                                      Text(
-                                          stringResource(id = R.string.no_image_option),
-                                          modifier = Modifier.testTag("noImageText"))
-                                    }
-                              }
-                            }
-                          }
+                    is SearchStatus.Loading -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .padding(16.dp)
+                                .testTag("loadingIndicator")
+                        )
                     }
-                  }
-                  is SearchStatus.Failure -> {
-                    Text(
-                        text = stringResource(id = R.string.image_not_loading_error),
-                        color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(16.dp))
-                  }
-                  else -> Unit
+                    is SearchStatus.Success -> {
+                        val foodFacts by foodItemViewModel.foodFactsSuggestions.collectAsState()
+                        Box(modifier = Modifier.height(350.dp)) {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(3),
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(4.dp)
+                            ) {
+                                items(foodFacts.take(7) + listOf(null)) { foodFact ->
+                                    val borderColor =
+                                        if (foodItemViewModel.selectedImage == foodFact) {
+                                            MaterialTheme.colorScheme.primary
+                                        } else {
+                                            Color.Gray
+                                        }
+
+                                    val alpha =
+                                        if (foodItemViewModel.selectedImage == foodFact ||
+                                            foodItemViewModel.selectedImage == null
+                                        ) 1f else 0.5f
+
+                                    if (foodFact != null) {
+                                        Box(
+                                            modifier = Modifier
+                                                .padding(4.dp)
+                                                .size(100.dp)
+                                                .border(
+                                                    width = if (foodItemViewModel.selectedImage == foodFact) 4.dp else 1.dp,
+                                                    color = borderColor,
+                                                    shape = RoundedCornerShape(8.dp)
+                                                )
+                                                .clickable {
+                                                    foodItemViewModel.selectedImage = foodFact
+                                                }
+                                                .testTag("foodImage")
+                                        ) {
+                                            AsyncImage(
+                                                model = foodFact.imageUrl,
+                                                contentDescription = "Food Image",
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .clip(RoundedCornerShape(8.dp))
+                                                    .graphicsLayer(alpha = alpha)
+                                                    .testTag("IndividualFoodItemImage"),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                        }
+                                    } else {
+                                        Box(
+                                            modifier = Modifier
+                                                .padding(4.dp)
+                                                .size(100.dp)
+                                                .border(
+                                                    width = if (foodItemViewModel.selectedImage == null) 4.dp else 1.dp,
+                                                    color = borderColor,
+                                                    shape = RoundedCornerShape(8.dp)
+                                                )
+                                                .clickable {
+                                                    foodItemViewModel.selectedImage = null
+                                                }
+                                                .testTag("noImage"),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                stringResource(id = R.string.no_image_option),
+                                                modifier = Modifier.testTag("noImageText")
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    is SearchStatus.Failure -> {
+                        Text(
+                            text = stringResource(id = R.string.image_not_loading_error),
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                    else -> Unit
                 }
-              }
+            }
 
               item { Spacer(modifier = Modifier.height(8.dp)) }
-
-
 
               item {
                 foodItemViewModel.selectedImage?.let {
@@ -260,32 +259,18 @@ fun ChooseFoodItem(
               item {
                 CustomButtons(
                     button1OnClick = {
-                      foodFactsViewModel.resetSearchStatus()
                       foodItemViewModel.selectedImage = null
                       navigationActions.navigateTo(Route.OVERVIEW)
                     },
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(id = R.string.cancel_button),
                     button2OnClick = {
-                      foodFactsViewModel.resetSearchStatus()
+                        Log.e("ChooseFoodItem", "foodName: ${foodItemViewModel.foodName}")
+
                       navigationActions.navigateTo(Screen.EDIT_FOOD)
                     },
                     button2TestTag = "foodSave",
                     button2Text = stringResource(id = R.string.submit_button_text))
-              }
-
-              item {
-                Text(
-                    text = "OR",
-                    modifier = Modifier.padding(bottom = 16.dp).testTag("foodItemDetailsTitle"))
-                Button(
-                    onClick = {
-                      foodFactsViewModel.resetSearchStatus()
-                      navigationActions.navigateTo(Screen.ADD_FOOD)
-                    },
-                    modifier = Modifier.testTag("manualEntryButton")) {
-                      Text(stringResource(id = R.string.food_item_manual_alternative))
-                    }
               }
             }
       })

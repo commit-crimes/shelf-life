@@ -45,4 +45,6 @@ interface FoodItemRepository {
 
   /** Selects a FoodItem document for individual view */
   fun selectFoodItem(foodItem: FoodItem?)
+
+  fun setFoodItems(householdId: String, value: List<FoodItem>)
 }

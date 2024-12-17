@@ -4,12 +4,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.android.shelfLife.model.newRecipe.RecipeRepository
 import com.android.shelfLife.model.recipe.Ingredient
 import com.android.shelfLife.model.recipe.Recipe
-import com.android.shelfLife.model.recipe.RecipeRepository
+import com.android.shelfLife.model.user.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class IndividualRecipeViewModel(
+@HiltViewModel
+class IndividualRecipeViewModel
+@Inject
+constructor(
     private val recipeRepository: RecipeRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
   var selectedRecipe by mutableStateOf<Recipe?>(null)
@@ -41,7 +48,7 @@ class IndividualRecipeViewModel(
    * @return The servings amount of the recipe as a Float.
    */
   fun getRecipeServing(): Float {
-    return selectedRecipe!!.servings
+    return selectedRecipe?.servings ?: 1.0f
   }
 
   /**
@@ -69,5 +76,14 @@ class IndividualRecipeViewModel(
    */
   fun getRecipeInstruction(): List<String> {
     return selectedRecipe!!.instructions
+  }
+
+  suspend fun deleteSelectedRecipe() {
+    if (selectedRecipe != null) {
+      val isDeleted = recipeRepository.deleteRecipe(selectedRecipe!!.uid)
+      if (isDeleted) {
+        userRepository.deleteRecipeUID(selectedRecipe!!.uid)
+      }
+    }
   }
 }

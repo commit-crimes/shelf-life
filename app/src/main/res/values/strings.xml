@@ -8,9 +8,10 @@
     <!-- Screen Titles -->
     <string name="add_food_item_title">Add Food Item</string>
     <string name="edit_food_item_title">Edit Food Item</string>
-    <string name="first_food_item_title">First Food Item</string>
-    <string name="choose_food_item_title">Choose Food Item</string>
-    <string name="finish_food_item_title">Finish Food Item</string>
+    <string name="first_food_item_title">Choose Food Item Name</string>
+    <string name="choose_food_item_title">Choose Food Item Image</string>
+    <string name="finalize_food_item_title">Finalize Food Item</string>
+    <string name="easteregg_title">How did you get here ?</string>
 
     <!-- Input Field Hints -->
     <string name="food_name_hint">Enter food name</string>
@@ -27,9 +28,15 @@
 
     <!-- Buttons -->
     <string name="submit_button_text">Submit</string>
+    <string name="next_button_text">Next</string>
     <string name="cancel_button">Cancel</string>
+    <string name="back_button">Back</string>
     <string name="add_button">Add</string>
     <string name="save_button">Save</string>
+    <string name="regenerate_button">Regenerate</string>
+    <string name="modify_button">Modify</string>
+    <string name="generate_button">Generate</string>
+
 
     <!-- Error Messages -->
     <string name="submission_error_message">Please correct the errors before submitting</string>
@@ -50,6 +57,7 @@
 
     <!-- Toast Messages -->
     <string name="food_added_message">Food item added.</string>
+    <string name="error_uploading_recipe_message">Error uploading recipe, please try again</string>
 
     <!-- Accessibility Descriptions -->
     <string name="go_back_button_description">Go Back</string>
@@ -61,6 +69,9 @@
     <string name="no_recipes_available">No recipes available</string>
     <string name="search_recipes_placeholder">Search recipes</string>
     <string name="icon_for_recipes_search_bar">Icon for recipes search bar</string>
+
+    <!-- Recipe generation -->
+
 
     <!-- Food Item Details -->
     <string name="food_item_details_title">What is the food item you want to add today?</string>
@@ -80,20 +91,29 @@
 
     <string name="title_of_AddRecipeScreen">Add your own recipe</string>
     <string name="title_of_recipe">Recipe title</string>
-    <string name="error_message_title_of_recipe">Incomplete title</string>
+    <string name="recipe_title_empty_error">Recipe title cannot be empty</string>
+    <string name="recipe_title_invalid_error">Recipe title contains invalid characters</string>
     <string name="servings">Servings</string>
-    <string name="error_message_servings">Incomplete serving number</string>
+    <string name="servings_empty_error">Servings cannot be empty</string>
+    <string name="servings_not_number_error">Servings must be a number</string>
+    <string name="servings_negative_error">Servings must be positive</string>
     <string name="time">Time in minutes</string>
-    <string name="error_message_time">Incomplete time</string>
+    <string name="time_empty_error">Time cannot be empty</string>
+    <string name="time_not_number_error">Time must be a number</string>
+    <string name="time_negative_error">Time must be positive</string>
     <string name="ingredients">Ingredients</string>
     <string name="instructions">Instructions</string>
-    <string name="error_message_instructions">Incomplete instruction</string>
+    <string name="instruction_empty_error">Instruction cannot be empty</string>
+    <string name="instructions_invalid_error">Instruction contains invalid characters</string>
     <string name="instruction_step">Step %1$s</string>
-    <string name="ingredient_item">Ingredient%1$s : %2$s</string>
+    <string name="ingredient_item">%1$s.  %2$s %3$s %4$s</string>
     <string name="ingredient_name">Ingredient Name</string>
-    <string name="error_message_ingredient_name">Incomplete name</string>
+    <string name="ingredient_name_empty_error">Name cannot be empty</string>
+    <string name= "ingredient_name_invalid_error">Name contains invalid characters</string>
     <string name="ingredient_quantity">Quantity</string>
-    <string name="error_message_ingredient_quantity">Incomplete quantity</string>
+    <string name="ingredient_quantity_empty_error">Quantity cannot be incomplete</string>
+    <string name="ingredient_quantity_not_number_error">Quantity must be a number</string>
+    <string name="ingredient_quantity_negative_error">Quantity must be positive</string>
     <string name="add_ingredient">Add Ingredient</string>
 
     <string name="select_image_label">Select an Image:</string>

@@ -2,58 +2,89 @@ package com.android.shelfLife.model.user
 
 import android.content.Context
 import android.util.Log
-import com.android.shelfLife.model.newhousehold.HouseHold
+import com.android.shelfLife.viewmodel.leaderboard.LeaderboardMode
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
+import javax.inject.Inject
+import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.tasks.await
 
-class UserRepositoryFirestore(
+@Singleton
+class UserRepositoryFirestore
+@Inject
+constructor(
     private val db: FirebaseFirestore,
-    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val firebaseAuth: FirebaseAuth,
+    private val externalScope: CoroutineScope
 ) : UserRepository {
 
-  private val auth = FirebaseAuth.getInstance()
   private val userCollection = db.collection("users")
 
   // Local variable to store user data
   private val _user = MutableStateFlow<User?>(null)
   override val user: StateFlow<User?> = _user.asStateFlow()
 
-  private val _isUserLoggedIn = MutableStateFlow(firebaseAuth.currentUser != null)
-  override val isUserLoggedIn: StateFlow<Boolean> = _isUserLoggedIn
+  override val invitations: StateFlow<List<String>> =
+      invitationListener().stateIn(externalScope, SharingStarted.Eagerly, emptyList())
 
-  // Invitations StateFlow
-  private val _invitations = MutableStateFlow<List<String>>(emptyList())
-  override val invitations: StateFlow<List<String>> = _invitations.asStateFlow()
+  private val _isAudioPlaying = MutableStateFlow<Boolean>(false)
+  override var isAudioPlaying: StateFlow<Boolean> = _isAudioPlaying.asStateFlow()
 
-  private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
-  override var selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
-
-  // Listener for invitations
-  private var invitationsListenerRegistration: ListenerRegistration? = null
+  private val _currentAudioMode = MutableStateFlow<LeaderboardMode?>(null)
+  override var currentAudioMode: StateFlow<LeaderboardMode?> = _currentAudioMode.asStateFlow()
 
   override fun getNewUid(): String {
     return userCollection.document().id
   }
 
+  private fun invitationListener() =
+      firebaseAuth.currentUser?.let { user ->
+        callbackFlow<List<String>> {
+          val listener =
+              userCollection.document(user.uid).addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                  Log.e("UserRepository", "Firestore listener error: ", error)
+                  trySend(emptyList())
+                  return@addSnapshotListener
+                }
+                if (snapshot != null && snapshot.exists()) {
+                  val updatedUser = convertToUser(snapshot)
+                  if (updatedUser != null) {
+                    Log.d("UserRepository", "Updated invitationUIDs: ${updatedUser.invitationUIDs}")
+                    _user.value = updatedUser
+                    trySend(updatedUser.invitationUIDs)
+                  } else {
+                    trySend(emptyList())
+                  }
+                } else {
+                  trySend(emptyList())
+                }
+              }
+          awaitClose(listener::remove)
+        }
+      } ?: flowOf(emptyList())
+
   override suspend fun initializeUserData(context: Context) {
-    val currentUser = auth.currentUser ?: throw Exception("User not logged in")
+    val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
     try {
-      // Fetch user data from Firestore
       val snapshot = userCollection.document(currentUser.uid).get().await()
       if (snapshot.exists()) {
         val userData = convertToUser(snapshot)
         _user.value = userData
-        _invitations.value = userData?.invitationUIDs ?: emptyList()
       } else {
         val currentAccount = GoogleSignIn.getLastSignedInAccount(context)
         val name = currentAccount?.displayName ?: "Guest"
@@ -66,7 +97,7 @@ class UserRepositoryFirestore(
                 email = email,
                 photoUrl = photoUrl,
                 selectedHouseholdUID = "")
-        val userDoc = db.collection("users").document(currentUser.uid)
+        val userDoc = userCollection.document(currentUser.uid)
         val userData =
             mapOf(
                 "username" to name,
@@ -81,56 +112,76 @@ class UserRepositoryFirestore(
     } catch (e: Exception) {
       Log.e("UserRepository", "Error initializing user data", e)
       _user.value = null
-      _invitations.value = emptyList()
       throw e
     }
+    Log.d("User Repo", "User data initialized, ${user.value}")
   }
 
-  override fun startListeningForInvitations() {
-    val currentUser = auth.currentUser
-    if (currentUser != null) {
-      // Remove any existing listener
-      invitationsListenerRegistration?.remove()
-      invitationsListenerRegistration =
-          userCollection.document(currentUser.uid).addSnapshotListener { snapshot, error ->
-            if (error != null) {
-              Log.e("UserRepository", "Error fetching invitations", error)
-              _invitations.value = emptyList()
-              return@addSnapshotListener
-            }
-            if (snapshot != null && snapshot.exists()) {
-              val invitationsList = snapshot.get("invitationUIDs") as? List<String> ?: emptyList()
-              _invitations.value = invitationsList
+  override suspend fun getUserIds(userEmails: Set<String?>): Map<String, String> {
+    if (userEmails.isEmpty()) return emptyMap()
 
-              // Optionally update the invitations in the local _user variable
-              val currentUserData =
-                  _user.value
-                      ?: User(
-                          uid = currentUser.uid,
-                          username = "",
-                          email = "",
-                          selectedHouseholdUID = "")
-              _user.value = currentUserData.copy(invitationUIDs = invitationsList)
-            } else {
-              _invitations.value = emptyList()
-            }
-          }
-    } else {
-      _invitations.value = emptyList()
+    val emailToUserId = mutableMapOf<String, String>()
+    val chunks = userEmails.filterNotNull().chunked(10)
+
+    for (chunk in chunks) {
+      val query = db.collection("users").whereIn("email", chunk).get().await()
+      for (doc in query.documents) {
+        val email = doc.getString("email")
+        val userId = doc.id
+        if (email != null) emailToUserId[email] = userId
+      }
     }
+
+    return emailToUserId
   }
 
-  override fun stopListeningForInvitations() {
-    invitationsListenerRegistration?.remove()
-    invitationsListenerRegistration = null
+  override suspend fun getUserEmails(userIds: List<String>): Map<String, String> {
+    if (userIds.isEmpty()) return emptyMap()
+
+    val uidToEmail = mutableMapOf<String, String>()
+    val chunks = userIds.chunked(10)
+
+    for (chunk in chunks) {
+      val query = db.collection("users").whereIn(FieldPath.documentId(), chunk).get().await()
+      for (doc in query.documents) {
+        val email = doc.getString("email")
+        val userId = doc.id
+        if (email != null) uidToEmail[userId] = email
+      }
+    }
+    return uidToEmail
   }
 
-  // Helper function to update local user data and Firestore
+  override suspend fun getUserNames(userIds: List<String>): Map<String, String> {
+    if (userIds.isEmpty()) return emptyMap()
+
+    val uidToName = mutableMapOf<String, String>()
+    val chunks = userIds.chunked(10)
+
+    for (chunk in chunks) {
+      val query = db.collection("users").whereIn(FieldPath.documentId(), chunk).get().await()
+      for (doc in query.documents) {
+        val username = doc.getString("username")
+        val userId = doc.id
+        if (username != null) uidToName[userId] = username
+      }
+    }
+    return uidToName
+  }
+
+
+  override fun setAudioPlaying(isPlaying: Boolean) {
+    _isAudioPlaying.value = isPlaying
+  }
+
+  override fun setCurrentAudioMode(mode: LeaderboardMode?) {
+    _currentAudioMode.value = mode
+  }
+
   private suspend fun updateUserField(fieldName: String, value: Any) {
-    val currentUser = auth.currentUser ?: throw Exception("User not logged in")
-    userCollection.document(currentUser.uid).update(fieldName, value).await()
+    val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
+    userCollection.document(currentUser.uid).update(fieldName, value)
 
-    // Update local _user variable
     val currentUserData =
         _user.value
             ?: User(uid = currentUser.uid, username = "", email = "", selectedHouseholdUID = "")
@@ -145,21 +196,18 @@ class UserRepositoryFirestore(
     _user.value = updatedUserData
   }
 
-  // Helper function to update array fields and local user data
   private suspend fun updateArrayField(
       fieldName: String,
       value: String,
       operation: ArrayOperation
   ) {
-    val currentUser = auth.currentUser ?: throw Exception("User not logged in")
+    val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
     val updateValue =
         when (operation) {
           ArrayOperation.ADD -> FieldValue.arrayUnion(value)
           ArrayOperation.REMOVE -> FieldValue.arrayRemove(value)
         }
-    userCollection.document(currentUser.uid).update(fieldName, updateValue).await()
 
-    // Update local _user variable
     val currentUserData =
         _user.value
             ?: User(uid = currentUser.uid, username = "", email = "", selectedHouseholdUID = "")
@@ -167,20 +215,15 @@ class UserRepositoryFirestore(
         when (fieldName) {
           "householdUIDs" -> {
             val currentList = currentUserData.householdUIDs
-            when (operation) {
-              ArrayOperation.ADD -> currentList + value
-              ArrayOperation.REMOVE -> currentList - value
-            }
+            if (operation == ArrayOperation.ADD) currentList + value else currentList - value
           }
           "recipeUIDs" -> {
             val currentList = currentUserData.recipeUIDs
-            when (operation) {
-              ArrayOperation.ADD -> currentList + value
-              ArrayOperation.REMOVE -> currentList - value
-            }
+            if (operation == ArrayOperation.ADD) currentList + value else currentList - value
           }
           else -> emptyList()
         }
+
     val updatedUserData =
         when (fieldName) {
           "householdUIDs" -> currentUserData.copy(householdUIDs = updatedArray)
@@ -188,10 +231,7 @@ class UserRepositoryFirestore(
           else -> currentUserData
         }
     _user.value = updatedUserData
-  }
-
-  override fun setUserLoggedInStatus(isLoggedIn: Boolean) {
-    _isUserLoggedIn.value = isLoggedIn
+    userCollection.document(currentUser.uid).update(fieldName, updateValue)
   }
 
   private enum class ArrayOperation {
@@ -220,9 +260,7 @@ class UserRepositoryFirestore(
   }
 
   override suspend fun deleteInvitationUID(uid: String) {
-    // Update Firestore
     updateArrayField("invitationUIDs", uid, ArrayOperation.REMOVE)
-    // No need to update local _user or _invitations, as listener will handle it
   }
 
   override suspend fun updateUsername(username: String) {
@@ -234,10 +272,8 @@ class UserRepositoryFirestore(
   }
 
   override suspend fun updateEmail(email: String) {
-    val currentUser = auth.currentUser ?: throw Exception("User not logged in")
-    // Update email in FirebaseAuth
-    currentUser.updateEmail(email).await()
-    // Update email in Firestore
+    val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
+    currentUser.updateEmail(email)
     updateUserField("email", email)
   }
 
@@ -245,83 +281,21 @@ class UserRepositoryFirestore(
     updateUserField("selectedHouseholdUID", selectedHouseholdUID)
   }
 
-  override fun getUserIds(userEmails: Set<String?>, callback: (Map<String, String>) -> Unit) {
-    if (userEmails.isEmpty()) {
-      callback(emptyMap())
-      return
-    }
-    val emailBatches = userEmails.chunked(10) // Firestore allows up to 10 values in 'whereIn'
-    val emailToUserId = mutableMapOf<String, String>()
-    var batchesProcessed = 0
-
-    for (emailBatch in emailBatches) {
-      db.collection("users")
-          .whereIn("email", emailBatch)
-          .get()
-          .addOnSuccessListener { querySnapshot ->
-            for (doc in querySnapshot.documents) {
-              val email = doc.getString("email")
-              val userId = doc.id
-              if (email != null) {
-                emailToUserId[email] = userId
-              }
-            }
-            batchesProcessed++
-            if (batchesProcessed == emailBatches.size) {
-              callback(emailToUserId)
-            }
-          }
-          .addOnFailureListener { exception ->
-            Log.e("HouseholdRepository", "Error fetching user IDs by emails", exception)
-            batchesProcessed++
-            if (batchesProcessed == emailBatches.size) {
-              callback(emailToUserId)
-            }
-          }
-    }
+  override suspend fun selectHousehold(householdUid: String?) {
+    householdUid?.let { updateSelectedHousehold(it) }
   }
 
-  override fun getUserEmails(userIds: List<String>, callback: (Map<String, String>) -> Unit) {
-    if (userIds.isEmpty()) {
-      callback(emptyMap())
-      return
+    override suspend fun addCurrentUserToHouseHold(householdUID: String, userUID: String) {
+        try {
+            _user.value?.householdUIDs?.plus(householdUID)
+            db.collection("users")
+                .document(userUID)
+                .update("householdUIDs", FieldValue.arrayUnion(householdUID))
+        } catch (e: Exception) {
+            Log.e("UserRepositoryFirestore", "Error adding user to household", e)
+            _user.value?.householdUIDs?.minus(householdUID)
+        }
     }
-
-    val uidBatches = userIds.chunked(10) // Firestore allows up to 10 values in 'whereIn'
-    val uidToEmail = mutableMapOf<String, String>()
-    var batchesProcessed = 0
-
-    for (uidBatch in uidBatches) {
-      db.collection("users")
-          .whereIn(FieldPath.documentId(), uidBatch)
-          .get()
-          .addOnSuccessListener { querySnapshot ->
-            for (doc in querySnapshot.documents) {
-              val email = doc.getString("email")
-              val userId = doc.id
-              if (email != null) {
-                uidToEmail[userId] = email
-              }
-            }
-            batchesProcessed++
-            if (batchesProcessed == uidBatches.size) {
-              callback(uidToEmail)
-            }
-          }
-          .addOnFailureListener { exception ->
-            Log.e("HouseholdRepository", "Error fetching emails by user IDs", exception)
-            batchesProcessed++
-            if (batchesProcessed == uidBatches.size) {
-              callback(uidToEmail)
-            }
-          }
-    }
-  }
-
-  override suspend fun selectHousehold(household: HouseHold?) {
-    _selectedHousehold.value = household
-    household?.let { updateSelectedHousehold(it.uid) }
-  }
 
   private fun convertToUser(doc: DocumentSnapshot): User? {
     return try {
@@ -335,16 +309,16 @@ class UserRepositoryFirestore(
       val invitationUIDs = doc.get("invitationUIDs") as? List<String> ?: emptyList()
 
       User(
-          uid,
-          username,
-          email,
-          photoURL,
-          selectedHouseholdUID,
-          householdUIDs,
-          recipeUIDs,
-          invitationUIDs)
+          uid = uid,
+          username = username,
+          email = email,
+          photoUrl = photoURL,
+          selectedHouseholdUID = selectedHouseholdUID,
+          householdUIDs = householdUIDs,
+          recipeUIDs = recipeUIDs,
+          invitationUIDs = invitationUIDs)
     } catch (e: Exception) {
-      Log.e("HouseholdRepository", "Error converting document to HouseHold", e)
+      Log.e("HouseholdRepository", "Error converting document to User", e)
       null
     }
   }

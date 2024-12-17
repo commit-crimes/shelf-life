@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.newoverview
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.user.UserRepository
@@ -29,13 +31,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun FirstFoodItem(
     navigationActions: NavigationActions,
-    foodItemRepository: FoodItemRepository,
-    userRepository: UserRepository,
-    paddingValues: PaddingValues = PaddingValues(16.dp)
+    foodItemViewModel: FoodItemViewModel = hiltViewModel(),
 ) {
 
   val coroutineScope = rememberCoroutineScope()
-  val foodItemViewModel = FoodItemViewModel(foodItemRepository, userRepository)
   val context = LocalContext.current
 
   Scaffold(
@@ -75,7 +74,8 @@ fun FirstFoodItem(
                       coroutineScope.launch {
                         val success = foodItemViewModel.submbitFoodName()
                         if (success) {
-                          // TODO search query using the new FoodFactsViewModel
+                            foodItemViewModel.searchByQuery(foodItemViewModel.foodName)
+                            Log.e("FirstFoodItem", "foodName: ${foodItemViewModel.foodName}")
                           navigationActions.navigateTo(Screen.CHOOSE_FOOD_ITEM)
                         } else {
                           Toast.makeText(

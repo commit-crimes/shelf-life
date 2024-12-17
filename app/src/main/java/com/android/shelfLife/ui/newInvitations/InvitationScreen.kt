@@ -30,18 +30,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.model.newInvitations.Invitation
-import com.android.shelfLife.model.newInvitations.InvitationRepository
-import com.android.shelfLife.model.user.UserRepository
+import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.viewmodel.InvitationViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InvitationScreen(invitationRepository: InvitationRepository, userRepository: UserRepository) {
-  val invitationViewModel = viewModel { InvitationViewModel(invitationRepository, userRepository) }
-  val invitations by invitationViewModel.invitations.collectAsState()
+fun InvitationScreen(
+    navigationActions: NavigationActions,
+    viewModel: InvitationViewModel = hiltViewModel()
+) {
+  val invitations by viewModel.invitations.collectAsState()
   Scaffold(topBar = { TopAppBar(title = { Text("Invitations") }) }) { paddingValues ->
     if (invitations.isEmpty()) {
       Box(
@@ -53,7 +54,7 @@ fun InvitationScreen(invitationRepository: InvitationRepository, userRepository:
       // Show list of invitations
       LazyColumn(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
         items(invitations) { invitation ->
-          InvitationCard(invitation, invitationViewModel)
+          InvitationCard(invitation, viewModel, navigationActions)
           Spacer(modifier = Modifier.height(8.dp))
         }
       }
@@ -65,6 +66,7 @@ fun InvitationScreen(invitationRepository: InvitationRepository, userRepository:
 fun InvitationCard(
     invitation: Invitation,
     invitationViewModel: InvitationViewModel,
+    navigationActions: NavigationActions
 ) {
   val context = LocalContext.current
   val coroutineScope = rememberCoroutineScope()
@@ -81,6 +83,7 @@ fun InvitationCard(
                 invitationViewModel.acceptInvitation(invitation)
                 Toast.makeText(context, "Invitation accepted", Toast.LENGTH_SHORT).show()
               }
+              navigationActions.goBack()
             },
             modifier = Modifier.weight(1f)) {
               Text("Accept")
@@ -91,6 +94,7 @@ fun InvitationCard(
               coroutineScope.launch {
                 invitationViewModel.declineInvitation(invitation)
                 Toast.makeText(context, "Invitation declined", Toast.LENGTH_SHORT).show()
+                navigationActions.goBack()
               }
             },
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),

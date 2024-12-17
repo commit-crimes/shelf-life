@@ -12,6 +12,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -19,19 +20,17 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.model.camera.BarcodeScannerViewModel
 import com.android.shelfLife.model.foodFacts.FoodFacts
-import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
 import com.android.shelfLife.model.foodFacts.SearchStatus
-import com.android.shelfLife.model.foodItem.ListFoodItemsViewModel
-import com.android.shelfLife.model.household.HouseholdViewModel
-import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.newnavigation.BottomNavigationMenu
 import com.android.shelfLife.ui.utils.OnLifecycleEvent
+import com.android.shelfLife.viewmodel.FoodItemViewModel
 import kotlinx.coroutines.launch
 
 /**
@@ -39,28 +38,24 @@ import kotlinx.coroutines.launch
  *
  * @param navigationActions Actions for navigation.
  * @param cameraViewModel ViewModel for the camera.
- * @param foodFactsViewModel ViewModel for food facts.
- * @param householdViewModel ViewModel for household.
- * @param foodItemViewModel ViewModel for food items.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BarcodeScannerScreen(
     navigationActions: NavigationActions,
-    cameraViewModel: BarcodeScannerViewModel = viewModel(),
-    foodFactsViewModel: FoodFactsViewModel,
-    householdViewModel: HouseholdViewModel,
-    foodItemViewModel: ListFoodItemsViewModel
+    cameraViewModel: BarcodeScannerViewModel = hiltViewModel()
 ) {
   val context = LocalContext.current
   val permissionGranted = cameraViewModel.permissionGranted
 
   // State variables
-  val isScanningState = remember { mutableStateOf(true) }
-  val foodScanned = remember { mutableStateOf(false) }
-  val barcodeScanned = remember { mutableStateOf<String?>(null) }
-  val foodFacts = remember { mutableStateOf<FoodFacts?>(null) }
-  val searchInProgress = remember { mutableStateOf(false) }
+  val isScanningState = rememberSaveable { mutableStateOf(true) }
+  val foodScanned = rememberSaveable { mutableStateOf(false) }
+  val barcodeScanned = rememberSaveable { mutableStateOf<String?>(null) }
+  val foodFacts = rememberSaveable { mutableStateOf<FoodFacts?>(null) }
+  val searchInProgress = rememberSaveable { mutableStateOf(false) }
+
+  val showFailureDialog = rememberSaveable { mutableStateOf(false) }
 
   val coroutineScope = rememberCoroutineScope()
 
@@ -91,7 +86,7 @@ fun BarcodeScannerScreen(
   LaunchedEffect(sheetScaffoldState.bottomSheetState) {
     snapshotFlow { sheetScaffoldState.bottomSheetState.currentValue }
         .collect { sheetState ->
-          if (sheetState == SheetValue.Hidden || sheetState == SheetValue.PartiallyExpanded) {
+          if (sheetState == SheetValue.Hidden) {
             // Resume scanning when the sheet is hidden
             isScanningState.value = true
             foodScanned.value = false
@@ -116,14 +111,16 @@ fun BarcodeScannerScreen(
             sheetContent = {
               val foodFactsValue = foodFacts.value
               if (foodScanned.value && foodFactsValue != null) {
+                val foodItemViewModel = hiltViewModel<FoodItemViewModel>()
+                foodItemViewModel.resetForScanner()
                 FoodInputContent(
+                    foodItemViewModel = foodItemViewModel,
                     foodFacts = foodFactsValue,
-                    onSubmit = { newFoodItem ->
+                    onSubmit = {
                       // Reset states
                       foodScanned.value = false
                       isScanningState.value = true
                       coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
-                      householdViewModel.addFoodItem(newFoodItem)
                       Log.d("BarcodeScanner", "Food item added")
                     },
                     onCancel = {
@@ -133,11 +130,14 @@ fun BarcodeScannerScreen(
                       coroutineScope.launch { sheetScaffoldState.bottomSheetState.hide() }
                       Log.d("BarcodeScanner", "Cancelled")
                     },
-                    foodItemViewModel = foodItemViewModel,
-                )
+                    onExpandRequested = {
+                      // When the partially expanded content is clicked, expand the sheet fully
+                      coroutineScope.launch { sheetScaffoldState.bottomSheetState.expand() }
+                    })
               }
               Spacer(modifier = Modifier.height(100.dp))
             },
+            sheetPeekHeight = 240.dp,
             modifier =
                 Modifier.padding(innerPadding) // Apply the inner padding from the parent Scaffold
             ) {
@@ -182,40 +182,67 @@ fun BarcodeScannerScreen(
 
   // Handle barcode scanning and search
   val currentBarcode = barcodeScanned.value
+  // TODO check if barcode can be converted to long before passing to searchByBarcode
   if (searchInProgress.value && currentBarcode != null) {
-    LaunchedEffect(currentBarcode) { foodFactsViewModel.searchByBarcode(currentBarcode.toLong()) }
+    LaunchedEffect(currentBarcode) { cameraViewModel.searchByBarcode(currentBarcode.toLong()) }
   }
 
   // Observe searchStatus and update foodScanned.value
-  val searchStatus by foodFactsViewModel.searchStatus.collectAsState()
+  val searchStatus by cameraViewModel.searchStatus.collectAsState()
   LaunchedEffect(searchStatus) {
     when (searchStatus) {
       is SearchStatus.Success -> {
-        val suggestions = foodFactsViewModel.foodFactsSuggestions.value
+        val suggestions = cameraViewModel.foodFactsSuggestions.value
         if (suggestions.isNotEmpty()) {
           foodFacts.value = suggestions[0]
           foodScanned.value = true
-          coroutineScope.launch { sheetScaffoldState.bottomSheetState.expand() }
+          coroutineScope.launch { sheetScaffoldState.bottomSheetState.partialExpand() }
         } else {
           Toast.makeText(context, "Food Not Found in Database", Toast.LENGTH_SHORT).show()
+
           navigationActions.navigateTo(Screen.ADD_FOOD)
         }
         // Reset states
         barcodeScanned.value = null
         searchInProgress.value = false
-        foodFactsViewModel.resetSearchStatus()
+        cameraViewModel.resetSearchStatus()
       }
       is SearchStatus.Failure -> {
         Toast.makeText(context, "Search failed, check internet connection", Toast.LENGTH_SHORT)
             .show()
+        showFailureDialog.value = true
         barcodeScanned.value = null
         searchInProgress.value = false
-        foodFactsViewModel.resetSearchStatus()
+        cameraViewModel.resetSearchStatus()
       }
       else -> {
         // Do nothing for Idle or Loading
       }
     }
+  }
+
+  if (showFailureDialog.value) {
+    AlertDialog(
+        onDismissRequest = {
+          // User tapped outside or back button
+          // Handle similarly to pressing OK or X: reset scanning
+          showFailureDialog.value = false
+          foodScanned.value = false
+          isScanningState.value = true
+        },
+        title = { Text(text = "Search Failed") },
+        text = { Text("Check your internet connection and try again later.") },
+        confirmButton = {
+          TextButton(
+              onClick = {
+                // OK button pressed: reset scanning and hide dialog
+                showFailureDialog.value = false
+                foodScanned.value = false
+                isScanningState.value = true
+              }) {
+                Text("OK")
+              }
+        })
   }
 }
 
