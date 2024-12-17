@@ -4,12 +4,15 @@ import AudioPlayer
 import android.util.Log
 import com.android.shelfLife.ui.leaderboard.ThemeManager
 import com.google.firebase.firestore.*
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 
-class HouseholdRepositoryFirestore(
+class HouseholdRepositoryFirestore
+@Inject
+constructor(
     private val db: FirebaseFirestore,
 ) : HouseHoldRepository {
 
@@ -88,7 +91,6 @@ class HouseholdRepositoryFirestore(
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error initializing households", e)
     }
-
   }
 
   /**

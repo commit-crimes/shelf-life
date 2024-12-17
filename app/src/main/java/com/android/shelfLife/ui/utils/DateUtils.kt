@@ -138,7 +138,7 @@ fun isValidDate(dateStr: String): Boolean {
         else -> 31
       }
 
-    return day in 1..daysInMonth
+  return day in 1..daysInMonth
 
   // Additional checks can be added (e.g., year range)
 }
