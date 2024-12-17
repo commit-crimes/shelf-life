@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.viewmodel.camera.BarcodeScannerViewModel
@@ -182,9 +183,15 @@ fun BarcodeScannerScreen(
 
   // Handle barcode scanning and search
   val currentBarcode = barcodeScanned.value
-  // TODO check if barcode can be converted to long before passing to searchByBarcode
   if (searchInProgress.value && currentBarcode != null) {
-    LaunchedEffect(currentBarcode) { cameraViewModel.searchByBarcode(currentBarcode.toLong()) }
+    val barcodeLong = currentBarcode.toLongOrNull()
+      LaunchedEffect(barcodeLong) {
+          if (barcodeLong == null){
+              cameraViewModel.setFailureStatus()
+          } else {
+            cameraViewModel.searchByBarcode(barcodeLong)
+          }
+      }
   }
 
   // Observe searchStatus and update foodScanned.value
@@ -207,7 +214,7 @@ fun BarcodeScannerScreen(
         cameraViewModel.resetSearchStatus()
       }
       is SearchStatus.Failure -> {
-        Toast.makeText(context, "Search failed, check internet connection", Toast.LENGTH_SHORT)
+        Toast.makeText(context, "Search failed, scan again or check your internet connection", Toast.LENGTH_SHORT)
             .show()
         showFailureDialog.value = true
         barcodeScanned.value = null
@@ -270,7 +277,8 @@ fun PermissionDeniedScreen(navigationActions: NavigationActions) {
             horizontalAlignment = Alignment.CenterHorizontally) {
               Text(
                   text = "Camera permission is required to scan barcodes.",
-                  modifier = Modifier.semantics { testTag = "permissionDeniedMessage" })
+                  modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp).semantics { testTag = "permissionDeniedMessage" },
+                  textAlign = TextAlign.Center)
               Spacer(modifier = Modifier.height(16.dp))
               Button(
                   onClick = {
