@@ -2,6 +2,7 @@ package com.android.shelfLife.ui.overview
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.test.platform.app.InstrumentationRegistry
 import com.android.shelfLife.HiltTestActivity
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
@@ -14,115 +15,120 @@ import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import com.google.firebase.Timestamp
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import java.util.*
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
-import javax.inject.Inject
 
 @HiltAndroidTest
 class OverviewTest {
 
-    @get:Rule(order = 0)
-    val hiltAndroidTestRule = HiltAndroidRule(this)
-    @get:Rule(order = 1)
-    val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
+  @get:Rule(order = 0) val hiltAndroidTestRule = HiltAndroidRule(this)
+  @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
 
-    private lateinit var navigationActions: NavigationActions
-    private lateinit var houseHold: HouseHold
+  private lateinit var navigationActions: NavigationActions
+  private lateinit var houseHold: HouseHold
 
-    @Inject lateinit var houseHoldRepository: HouseHoldRepository
-    @Inject lateinit var listFoodItemsRepository: FoodItemRepository
-    @Inject lateinit var userRepository: UserRepository
+  @Inject lateinit var houseHoldRepository: HouseHoldRepository
+  @Inject lateinit var listFoodItemsRepository: FoodItemRepository
+  @Inject lateinit var userRepository: UserRepository
 
-    private lateinit var overviewScreenViewModel: OverviewScreenViewModel
+  private lateinit var overviewScreenViewModel: OverviewScreenViewModel
 
-    // This section might need to be moved to it's own file
-    private val selectedHousehold = MutableStateFlow<HouseHold?>(null)
-    private val householdToEdit = MutableStateFlow<HouseHold?>(null)
-    private val households = MutableStateFlow<List<HouseHold>>(emptyList())
-    private val foodItems = MutableStateFlow<List<FoodItem>>(emptyList())
+  // This section might need to be moved to it's own file
+  private val selectedHousehold = MutableStateFlow<HouseHold?>(null)
+  private val householdToEdit = MutableStateFlow<HouseHold?>(null)
+  private val households = MutableStateFlow<List<HouseHold>>(emptyList())
+  private val foodItems = MutableStateFlow<List<FoodItem>>(emptyList())
 
-    @Before
-    fun setUp() {
-        hiltAndroidTestRule.inject()
-        navigationActions = mock()
+  private lateinit var instrumentationContext: android.content.Context
 
-        whenever(navigationActions.currentRoute()).thenReturn(Route.OVERVIEW)
-        whenever(houseHoldRepository.selectedHousehold).thenReturn(selectedHousehold.asStateFlow())
-        whenever(houseHoldRepository.households).thenReturn(households.asStateFlow())
-        whenever(houseHoldRepository.householdToEdit).thenReturn(householdToEdit.asStateFlow())
-        whenever(listFoodItemsRepository.foodItems).thenReturn(foodItems.asStateFlow())
+  private fun selectHousehold(houseHold: HouseHold) {
+    households.value = listOf(houseHold)
+    selectedHousehold.value = houseHold
+  }
 
-        // Create a FoodItem to be used in tests
-        val foodFacts =
-            FoodFacts(
-                name = "Apple",
-                barcode = "123456789",
-                quantity = Quantity(5.0, FoodUnit.COUNT),
-                category = FoodCategory.FRUIT
-            )
-        val foodItem =
-            FoodItem(
-                uid = "foodItem1",
-                foodFacts = foodFacts,
-                expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)), // Expires in 1 day,
-                owner = "testOwner"
-            )
+  @Before
+  fun setUp() {
+    hiltAndroidTestRule.inject()
+    navigationActions = mock()
 
-        // Initialize the household with the food item
-        houseHold =
-            HouseHold(
-                uid = "1",
-                name = "Test Household",
-                members = listOf("John", "Doe"),
-                sharedRecipes = emptyList(),
-                ratPoints = emptyMap(),
-                stinkyPoints = emptyMap()
-            )
-        households.value = listOf(houseHold)
-        selectedHousehold.value = houseHold
-        foodItems.value = listOf(foodItem)
+    instrumentationContext = InstrumentationRegistry.getInstrumentation().context
+    whenever(navigationActions.currentRoute()).thenReturn(Route.OVERVIEW)
+    whenever(houseHoldRepository.selectedHousehold).thenReturn(selectedHousehold.asStateFlow())
+    whenever(houseHoldRepository.households).thenReturn(households.asStateFlow())
+    whenever(houseHoldRepository.householdToEdit).thenReturn(householdToEdit.asStateFlow())
+    whenever(listFoodItemsRepository.foodItems).thenReturn(foodItems.asStateFlow())
+
+    // Create a FoodItem to be used in tests
+    val foodFacts =
+        FoodFacts(
+            name = "Apple",
+            barcode = "123456789",
+            quantity = Quantity(5.0, FoodUnit.COUNT),
+            category = FoodCategory.FRUIT)
+    val foodItem =
+        FoodItem(
+            uid = "foodItem1",
+            foodFacts = foodFacts,
+            expiryDate =
+                Timestamp(Date(System.currentTimeMillis() + 86400000)), // Expires in 1 day,
+            owner = "testOwner")
+
+    // Initialize the household with the food item
+    houseHold =
+        HouseHold(
+            uid = "1",
+            name = "Test Household",
+            members = listOf("John", "Doe"),
+            sharedRecipes = emptyList(),
+            ratPoints = emptyMap(),
+            stinkyPoints = emptyMap())
+    households.value = listOf(houseHold)
+    selectedHousehold.value = houseHold
+    foodItems.value = listOf(foodItem)
+    overviewScreenViewModel =
+        OverviewScreenViewModel(
+            houseHoldRepository, listFoodItemsRepository, userRepository, instrumentationContext)
+  }
+
+  @Test
+  fun foodItemWithGramsDisplaysCorrectQuantity() {
+    val gramsFoodFacts =
+        FoodFacts(
+            name = "Flour",
+            barcode = "111222333",
+            quantity = Quantity(500.0, FoodUnit.GRAM),
+            category = FoodCategory.GRAIN)
+    val gramsFoodItem =
+        FoodItem(
+            uid = "foodItemGram",
+            foodFacts = gramsFoodFacts,
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)),
+            owner = "testOwner")
+
+    foodItems.value = listOf(gramsFoodItem)
+
+    composeTestRule.setContent {
+      OverviewScreen(
+          navigationActions = navigationActions,
+      )
     }
 
-    @Test
-    fun foodItemWithGramsDisplaysCorrectQuantity() {
-        val gramsFoodFacts =
-            FoodFacts(
-                name = "Flour",
-                barcode = "111222333",
-                quantity = Quantity(500.0, FoodUnit.GRAM),
-                category = FoodCategory.GRAIN
-            )
-        val gramsFoodItem =
-            FoodItem(
-                uid = "foodItemGram",
-                foodFacts = gramsFoodFacts,
-                expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)),
-                owner = "testOwner"
-            )
+    // Check that the quantity text displays "500g"
+    composeTestRule.onNodeWithText("500g").assertIsDisplayed()
+  }
 
-        foodItems.value = listOf(gramsFoodItem)
-
-        composeTestRule.setContent {
-            OverviewScreen(
-                navigationActions = navigationActions,
-            )
-        }
-
-        // Check that the quantity text displays "500g"
-        composeTestRule.onNodeWithText("500g").assertIsDisplayed()
-    }
-}
-
-    /*
   // Test that the quantity in milliliters is displayed correctly
   @Test
   fun foodItemWithMillilitersDisplaysCorrectQuantity() {
@@ -136,17 +142,13 @@ class OverviewTest {
         FoodItem(
             uid = "foodItemMl",
             foodFacts = mlFoodFacts,
-            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)))
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)),
+            owner = "testOwner")
 
-    val householdWithMlItem = houseHold.copy(foodItems = listOf(mlFoodItem))
-    selectHousehold(householdWithMlItem)
+    foodItems.value = listOf(mlFoodItem)
+    selectedHousehold.value = houseHold
 
-    composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel)
-    }
+    composeTestRule.setContent { OverviewScreen(navigationActions = navigationActions) }
 
     // Check that the quantity text displays "1000ml"
     composeTestRule.onNodeWithText("1000ml").assertIsDisplayed()
@@ -165,18 +167,13 @@ class OverviewTest {
         FoodItem(
             uid = "foodItemNoExpiry",
             foodFacts = noExpiryFoodFacts,
-            expiryDate = null // No expiry date
-            )
+            expiryDate = null, // No expiry date,
+            owner = "testOwner")
 
-    val householdWithNoExpiryItem = houseHold.copy(foodItems = listOf(noExpiryFoodItem))
-    selectHousehold(householdWithNoExpiryItem)
+    foodItems.value = listOf(noExpiryFoodItem)
+    selectedHousehold.value = houseHold
 
-    composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel)
-    }
+    composeTestRule.setContent { OverviewScreen(navigationActions = navigationActions) }
 
     // Check that the text "No Expiry Date" is displayed
     composeTestRule.onNodeWithText("No Expiry Date").assertIsNotDisplayed()
@@ -195,17 +192,13 @@ class OverviewTest {
         FoodItem(
             uid = "foodItemCount",
             foodFacts = countFoodFacts,
-            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)))
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)),
+            owner = "testOwner")
 
-    val householdWithCountItem = houseHold.copy(foodItems = listOf(countFoodItem))
-    selectHousehold(householdWithCountItem)
+    foodItems.value = listOf(countFoodItem)
+    selectedHousehold.value = houseHold
 
-    composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel)
-    }
+    composeTestRule.setContent { OverviewScreen(navigationActions = navigationActions) }
 
     // Check that the quantity text displays "12 in stock"
     composeTestRule.onNodeWithText("12 in stock").assertIsDisplayed()
@@ -214,12 +207,7 @@ class OverviewTest {
   @Test
   fun clickingDeleteTextInSearchBarDeletesText() {
     selectHousehold(houseHold)
-    composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel)
-    }
+    composeTestRule.setContent { OverviewScreen(navigationActions = navigationActions) }
 
     // Click on the search bar
     composeTestRule.onNodeWithTag("foodSearchBar").performClick()
@@ -243,38 +231,14 @@ class OverviewTest {
 
   // Test that the quantity in grams is displayed correctly
   @Test
-  fun firstTimeWelcomeScreenDisplayedCorrectly() {
+  fun firstTimeWelcomeScreenNavigationTriggeredWhenHouseholdsAreEmpty() {
     // Mock empty households to trigger the first-time screen
-    mockHouseHoldRepositoryGetHouseholds(emptyList())
+    households.value = emptyList()
+    selectedHousehold.value = null
 
-    composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel)
-    }
-    composeTestRule.onNodeWithTag("firstTimeWelcomeScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("householdNameSaveButton").assertIsDisplayed()
-  }
+    composeTestRule.setContent { OverviewScreen(navigationActions = navigationActions) }
 
-  @Test
-  fun firstTimeWelcomeScreenClickingAddHouseholdNavigatesToHouseholdCreationScreen() {
-    // Mock empty households to trigger the first-time screen
-    mockHouseHoldRepositoryGetHouseholds(emptyList())
-
-    composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel)
-    }
-    composeTestRule.onNodeWithTag("householdNameSaveButton").performClick()
-    verify(navigationActions).navigateTo(Screen.HOUSEHOLD_CREATION)
-  }
-
-  private fun selectHousehold(houseHold: HouseHold) {
-    householdViewModel.setHouseholds(listOf(houseHold))
-    householdViewModel.selectHousehold(houseHold)
+    verify(navigationActions).navigateTo(Screen.FIRST_TIME_USER)
   }
 
   // Test if the OverviewScreen is displayed with all elements
@@ -282,12 +246,7 @@ class OverviewTest {
   @Test
   fun overviewScreenDisplayedCorrectly() {
     selectHousehold(houseHold)
-    composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel)
-    }
+    composeTestRule.setContent { OverviewScreen(navigationActions = navigationActions) }
 
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addFoodFab").assertIsDisplayed()
@@ -299,42 +258,17 @@ class OverviewTest {
   @Test
   fun clickHamburgerIconOpensHouseholdSelectionDrawer() {
     selectHousehold(houseHold)
-    composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel)
-    }
+    composeTestRule.setContent { OverviewScreen(navigationActions = navigationActions) }
 
     composeTestRule.onNodeWithTag("hamburgerIcon").performClick()
     composeTestRule.onNodeWithTag("householdSelectionDrawer").assertIsDisplayed()
   }
 
-  /*
-  @Test
-  fun clickEditInDrawerLaunchesEditSelection() {
-    householdViewModel.(houseHold)
-    composeTestRule.setContent {
-      OverviewScreen(navigationActions = navigationActions, householdViewModel = householdViewModel)
-    }
-
-    composeTestRule.onNodeWithTag("hamburgerIcon").performClick()
-    composeTestRule.onNodeWithTag("editHouseholdIcon").performClick()
-      composeTestRule.onNodeWithTag("editHouseholdIndicatorIcon").assertIsDisplayed()
-  }
-
-     */
-
   // Clicking on add icon in the drawer opens the add household popup
   @Test
   fun clickAddInDrawerOpensHouseholdCreationScreen() {
     selectHousehold(houseHold)
-    composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel)
-    }
+    composeTestRule.setContent { OverviewScreen(navigationActions = navigationActions) }
 
     composeTestRule.onNodeWithTag("hamburgerIcon").performClick()
     composeTestRule.onNodeWithTag("addHouseholdIcon").performClick()
@@ -345,12 +279,7 @@ class OverviewTest {
   @Test
   fun foodItemListIsDisplayedWhenFoodItemsExist() {
     selectHousehold(houseHold)
-    composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel)
-    }
+    composeTestRule.setContent { OverviewScreen(navigationActions = navigationActions) }
 
     // Check that the food item list is displayed
     composeTestRule.onNodeWithTag("foodItemList").assertIsDisplayed()
@@ -371,17 +300,12 @@ class OverviewTest {
                     barcode = "",
                     quantity = Quantity(0.0, FoodUnit.COUNT),
                     category = FoodCategory.OTHER),
-            expiryDate = null)
+            expiryDate = null,
+            owner = "testOwner")
 
-    val householdWithNullFactsItem = houseHold.copy(foodItems = listOf(nullFoodFactsItem))
-    householdViewModel.selectHousehold(householdWithNullFactsItem)
+    foodItems.value = listOf(nullFoodFactsItem)
 
-    composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel)
-    }
+    composeTestRule.setContent { OverviewScreen(navigationActions = navigationActions) }
 
     // Check that the placeholder text or image is displayed
     composeTestRule
@@ -393,18 +317,9 @@ class OverviewTest {
   // Test that "No food available" message is displayed when no food items exist
   @Test
   fun noFoodAvailableMessageIsDisplayedWhenNoFoodItems() {
-    val emptyHousehold = houseHold.copy(foodItems = emptyList())
+    foodItems.value = emptyList()
 
-    // Mock the repository to return the household with no food items
-    mockHouseHoldRepositoryGetHouseholds(listOf(emptyHousehold))
-
-    selectHousehold(emptyHousehold)
-    composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel)
-    }
+    composeTestRule.setContent { OverviewScreen(navigationActions = navigationActions) }
 
     // Check that the "No food available" message is displayed
     composeTestRule.onNodeWithTag("NoFoodItems").assertIsDisplayed()
@@ -425,24 +340,16 @@ class OverviewTest {
             uid = "foodItem2",
             foodFacts = bananaFoodFacts,
             expiryDate =
-                Timestamp(Date(System.currentTimeMillis() + 172800000)) // Expires in 2 days
-            )
+                Timestamp(Date(System.currentTimeMillis() + 172800000)), // Expires in 2 days
+            owner = "testOwner")
 
-    val householdWithMultipleItems =
-        houseHold.copy(
-            members = listOf("Jane", "Doe"),
-            foodItems = listOf(bananaFoodItem, houseHold.foodItems[0]))
+    val householdWithMultipleItems = houseHold.copy(members = listOf("Jane", "Doe"))
 
-    // Mock the repository to return the household with multiple food items
-    mockHouseHoldRepositoryGetHouseholds(listOf(householdWithMultipleItems))
+    // This seems sketchy
+    foodItems.value = listOf(bananaFoodItem, foodItems.value[0])
 
     selectHousehold(householdWithMultipleItems)
-    composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel)
-    }
+    composeTestRule.setContent { OverviewScreen(navigationActions = navigationActions) }
 
     // Initially, both items should be displayed
     composeTestRule.onAllNodesWithTag("foodItemCard").assertCountEquals(2)
@@ -466,18 +373,11 @@ class OverviewTest {
   // Test that the app handles an empty FoodItem list gracefully
   @Test
   fun emptyFoodItemListDisplaysNoFoodAvailable() {
-    val emptyHousehold = houseHold.copy(foodItems = emptyList())
+    foodItems.value = emptyList()
 
-    // Mock the repository to return the household with no food items
-    mockHouseHoldRepositoryGetHouseholds(listOf(emptyHousehold))
+    selectHousehold(houseHold)
 
-    selectHousehold(emptyHousehold)
-    composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel)
-    }
+    composeTestRule.setContent { OverviewScreen(navigationActions = navigationActions) }
 
     // Check that the "No food available" message is displayed
     composeTestRule.onNodeWithTag("NoFoodItems").assertIsDisplayed()
@@ -488,12 +388,7 @@ class OverviewTest {
   @Test
   fun clickAddFoodFabNavigatesToAddFoodScreen() {
     selectHousehold(houseHold)
-    composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel)
-    }
+    composeTestRule.setContent { OverviewScreen(navigationActions = navigationActions) }
 
     // Click on the add food FAB
     composeTestRule.onNodeWithTag("addFoodFab").performClick()
@@ -516,7 +411,8 @@ class OverviewTest {
         FoodItem(
             uid = "foodItem1",
             foodFacts = appleFoodFacts,
-            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)))
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)),
+            owner = "testOwner")
 
     val bananaFoodFacts =
         FoodFacts(
@@ -528,20 +424,14 @@ class OverviewTest {
         FoodItem(
             uid = "foodItem2",
             foodFacts = bananaFoodFacts,
-            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)))
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)),
+            owner = "testOwner")
 
-    val householdWithMultipleItems =
-        houseHold.copy(foodItems = listOf(appleFoodItem, bananaFoodItem))
+    foodItems.value = listOf(appleFoodItem, bananaFoodItem)
 
-    // Mock the repository to return the household with multiple food items
-    mockHouseHoldRepositoryGetHouseholds(listOf(householdWithMultipleItems))
-
-    selectHousehold(householdWithMultipleItems)
+    selectHousehold(houseHold)
     composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel = listFoodItemsViewModel)
+      OverviewScreen(navigationActions = navigationActions, overviewScreenViewModel)
     }
 
     // Initially, both items should be displayed
@@ -550,12 +440,12 @@ class OverviewTest {
     // Long press to select the first item
     composeTestRule.onAllNodesWithTag("foodItemCard")[0].performTouchInput { longClick() }
     composeTestRule.onNodeWithTag("deleteFoodItems").assertIsDisplayed()
-    assertEquals(1, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+    assertEquals(1, overviewScreenViewModel.multipleSelectedFoodItems.value.size)
     // Long press to select the second item
     composeTestRule.onAllNodesWithTag("foodItemCard")[1].performTouchInput { longClick() }
-    assertEquals(2, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+    assertEquals(2, overviewScreenViewModel.multipleSelectedFoodItems.value.size)
     composeTestRule.onNodeWithTag("deleteFoodItems").assertIsEnabled().performClick()
-    assertEquals(0, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+    assertEquals(0, overviewScreenViewModel.multipleSelectedFoodItems.value.size)
   }
 
   @Test
@@ -571,7 +461,8 @@ class OverviewTest {
         FoodItem(
             uid = "foodItem1",
             foodFacts = appleFoodFacts,
-            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)))
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)),
+            owner = "testOwner")
 
     val bananaFoodFacts =
         FoodFacts(
@@ -583,20 +474,14 @@ class OverviewTest {
         FoodItem(
             uid = "foodItem2",
             foodFacts = bananaFoodFacts,
-            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)))
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)),
+            owner = "testOwner")
 
-    val householdWithMultipleItems =
-        houseHold.copy(foodItems = listOf(appleFoodItem, bananaFoodItem))
+    foodItems.value = listOf(appleFoodItem, bananaFoodItem)
 
-    // Mock the repository to return the household with multiple food items
-    mockHouseHoldRepositoryGetHouseholds(listOf(householdWithMultipleItems))
-
-    selectHousehold(householdWithMultipleItems)
+    selectHousehold(houseHold)
     composeTestRule.setContent {
-      OverviewScreen(
-          navigationActions = navigationActions,
-          householdViewModel = householdViewModel,
-          listFoodItemsViewModel = listFoodItemsViewModel)
+      OverviewScreen(navigationActions = navigationActions, overviewScreenViewModel)
     }
 
     // Initially, both items should be displayed
@@ -604,20 +489,18 @@ class OverviewTest {
 
     // Long press to select the first item
     composeTestRule.onAllNodesWithTag("foodItemCard")[0].performTouchInput { longClick() }
-    assertEquals(1, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+    assertEquals(1, overviewScreenViewModel.multipleSelectedFoodItems.value.size)
 
     // Long press to select the second item
     composeTestRule.onAllNodesWithTag("foodItemCard")[1].performTouchInput { longClick() }
-    assertEquals(2, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+    assertEquals(2, overviewScreenViewModel.multipleSelectedFoodItems.value.size)
 
     // Long press again to deselect the first item
     composeTestRule.onAllNodesWithTag("foodItemCard")[0].performTouchInput { longClick() }
-    assertEquals(1, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+    assertEquals(1, overviewScreenViewModel.multipleSelectedFoodItems.value.size)
 
     // Long press again to deselect the second item
     composeTestRule.onAllNodesWithTag("foodItemCard")[1].performTouchInput { longClick() }
-    assertEquals(0, listFoodItemsViewModel.multipleSelectedFoodItems.value.size)
+    assertEquals(0, overviewScreenViewModel.multipleSelectedFoodItems.value.size)
   }
 }
-
-     */
