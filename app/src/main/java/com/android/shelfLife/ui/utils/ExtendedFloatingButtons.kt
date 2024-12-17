@@ -40,7 +40,6 @@ fun ExtendedActionButtons(
     Column(
         horizontalAlignment = Alignment.End,
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        //modifier = Modifier.padding(end = 16.dp, bottom = 16.dp),
 
     ) {
         // Secondary FAB for "Generate" option
