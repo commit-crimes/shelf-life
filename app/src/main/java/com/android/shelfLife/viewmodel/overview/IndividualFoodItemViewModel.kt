@@ -27,6 +27,10 @@ constructor(
     foodItemRepository.selectFoodItem(null)
   }
 
+  fun setIsGenerated(isGenerated: Boolean) {
+    foodItemRepository.setIsGenerated(isGenerated)
+  }
+
   suspend fun deleteFoodItem() {
     val householdId = userRepository.user.value?.selectedHouseholdUID
     if (householdId != null) {

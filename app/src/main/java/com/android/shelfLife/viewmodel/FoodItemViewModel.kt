@@ -27,6 +27,7 @@ import com.android.shelfLife.ui.utils.validateString
 import com.google.firebase.Timestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 @HiltViewModel
@@ -43,6 +44,7 @@ constructor(
   var isSelected by mutableStateOf(false)
 
   var isScanned by mutableStateOf(false)
+  var isQuickAdd by mutableStateOf(false)
     val searchStatus: StateFlow<SearchStatus> = foodFactsRepository.searchStatus
 
     val foodFactsSuggestions: StateFlow<List<FoodFacts>> = foodFactsRepository.foodFactsSuggestions
@@ -79,6 +81,7 @@ constructor(
       expireDate = selectedFood!!.expiryDate?.let { formatTimestampToDate(it) } ?: ""
       openDate = selectedFood!!.openDate?.let { formatTimestampToDate(it) } ?: ""
       buyDate = selectedFood!!.buyDate?.let { formatTimestampToDate(it) } ?: ""
+        selectedImage = selectedFood!!.foodFacts
     } else {
       isSelected = false
     }
@@ -174,23 +177,9 @@ constructor(
     val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
     val isFoodNameValid = foodNameErrorResId == null
     val isAmountValid = amountErrorResId == null
-
-      Log.d("FoodItemViewModel", "selectedFood: $foodName")
-      Log.d("FoodItemViewModel", "isExpireDateValid: $isExpireDateValid")
-      Log.d("FoodItemViewModel", "isOpenDateValid: $isOpenDateValid")
-      Log.d("FoodItemViewModel", "isBuyDateValid: $isBuyDateValid")
-      Log.d("FoodItemViewModel", "isFoodNameValid: $isFoodNameValid")
-      Log.d("FoodItemViewModel", "isAmountValid: $isAmountValid")
-
     val expiryTimestamp = formatDateToTimestamp(expireDate)
     val openTimestamp = if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
     val buyTimestamp = formatDateToTimestamp(buyDate)
-
-
-      Log.d("FoodItemViewModel", "expiryTimestamp: $expiryTimestamp")
-      Log.d("FoodItemViewModel", "openTimestamp: $openTimestamp")
-      Log.d("FoodItemViewModel", "buyTimestamp: $buyTimestamp")
-
     if (isExpireDateValid &&
         isOpenDateValid &&
         isBuyDateValid &&
@@ -199,9 +188,11 @@ constructor(
         expiryTimestamp != null &&
         buyTimestamp != null) {
       val foodFacts =
-          if (isScanned) scannedFoodFacts!!
+          if (isScanned) {
+              scannedFoodFacts!!
+          }
           else
-              if (selectedImage == null) {
+              if (!isQuickAdd) {
                   FoodFacts(
                       name = foodName,
                       barcode =
@@ -222,21 +213,27 @@ constructor(
               }
        val newFoodItem =
           FoodItem(
-              uid = if (isSelected) selectedFood!!.uid else foodItemRepository.getNewUid(),
+              uid = if (isSelected && !foodItemRepository.isGenerated.first()) selectedFood!!.uid else foodItemRepository.getNewUid(),
               foodFacts = foodFacts!!,
               location = location,
               expiryDate = expiryTimestamp,
               openDate = openTimestamp,
               buyDate = buyTimestamp,
-              status = if (isSelected) selectedFood!!.status else FoodStatus.UNOPENED,
+              status = if (isSelected && !foodItemRepository.isGenerated.first()) selectedFood!!.status else FoodStatus.UNOPENED,
               owner =
-                  if (isSelected) selectedFood!!.owner else userRepository.user.value?.uid ?: "")
+                  if (isSelected && !foodItemRepository.isGenerated.first()) selectedFood!!.owner else userRepository.user.value?.uid ?: "")
 
         resetSearchStatus()
         if (isSelected) {
-        foodItemRepository.selectFoodItem(newFoodItem)
-        editFoodItem(newFoodItem)
-      } else {
+            if (foodItemRepository.isGenerated.first()){
+                foodItemRepository.selectFoodItem(null)
+                addFoodItem(newFoodItem)
+            }else{
+                foodItemRepository.selectFoodItem(null)
+                foodItemRepository.setIsGenerated(false)
+                editFoodItem(newFoodItem)
+            }
+        } else {
         addFoodItem(newFoodItem)
       }
       return true
@@ -255,6 +252,18 @@ constructor(
 
     fun resetSelectFoodItem() {
         foodItemRepository.selectFoodItem(FoodItem(uid = "", foodFacts = FoodFacts(name = "", quantity = Quantity(0.0, FoodUnit.GRAM)), owner = ""))
+    }
+
+    fun setIsGenerated(isGenerated: Boolean) {
+        foodItemRepository.setIsGenerated(isGenerated)
+    }
+
+    fun setFoodItem(foodItem: FoodItem?){
+        foodItemRepository.selectFoodItem(foodItem)
+    }
+
+    fun getIsGenerated(): Boolean {
+        return foodItemRepository.isGenerated.value ?: false
     }
 
   fun resetForScanner() {

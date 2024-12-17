@@ -52,7 +52,7 @@ fun EditFoodItemScreen(
         topBar = {
           CustomTopAppBar(
               onClick = { navigationActions.goBack() },
-              title = stringResource(id = if (foodItemViewModel.isSelected) R.string.edit_food_item_title else R.string.finalize_food_item_title),
+              title = stringResource(id = if (!foodItemViewModel.getIsGenerated()) R.string.edit_food_item_title else R.string.finalize_food_item_title),
               titleTestTag = "editFoodItemTitle",
               actions = {
                 IconButton(
@@ -155,18 +155,15 @@ fun EditFoodItemScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                   }
                 }
-                item(key = "ChangePic") {
-                  Button(
-                      onClick = { navigationActions.navigateTo(Screen.CHOOSE_FOOD_ITEM) },
-                      modifier = Modifier.testTag("navigateToChooseFoodItemButton")) {
-                        Text("Go to Choose Food Item")
-                      }
-                }
               }
 
               item(key = "buttons") {
                 CustomButtons(
-                    button1OnClick = { navigationActions.navigateTo(Route.OVERVIEW) },
+                    button1OnClick = {
+                        foodItemViewModel.setFoodItem(null)
+                        foodItemViewModel.resetSearchStatus()
+                        navigationActions.navigateTo(Route.OVERVIEW)
+                                     },
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(R.string.cancel_button),
                     button2OnClick = {

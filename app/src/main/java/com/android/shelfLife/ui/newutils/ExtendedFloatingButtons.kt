@@ -22,8 +22,9 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.ui.navigation.Screen
-
+import com.android.shelfLife.viewmodel.FoodItemViewModel
 
 
 @Composable
@@ -33,7 +34,8 @@ fun ExtendedActionButtons(
     firstScreen: String = Screen.GENERATE_RECIPE,
     secondScreen: String = Screen.ADD_RECIPE,
     firstScreenTestTag: String = "generateRecipeFab",
-    secondScreenTestTag: String = "addRecipeFab"
+    secondScreenTestTag: String = "addRecipeFab",
+    foodItemViewModel: FoodItemViewModel = hiltViewModel()
 ) {
     Column(
         horizontalAlignment = Alignment.End,
@@ -48,6 +50,8 @@ fun ExtendedActionButtons(
                 icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "Generate") },
                 onClick = {
                     // Navigate to Generate Recipe screen
+                    foodItemViewModel.setIsGenerated(true)
+                    foodItemViewModel.resetSelectFoodItem()
                     navigationActions.navigateTo(firstScreen)
                     fabExpanded.value = false
                 },
@@ -63,6 +67,7 @@ fun ExtendedActionButtons(
             onClick = {
                 if (fabExpanded.value) {
                     // Navigate to Add Recipe screen
+                    foodItemViewModel.setIsGenerated(false)
                     navigationActions.navigateTo(secondScreen)
                     fabExpanded.value = false
                 } else {

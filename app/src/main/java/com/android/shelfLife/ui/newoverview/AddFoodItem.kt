@@ -40,16 +40,11 @@ fun AddFoodItemScreen(
     paddingValues: PaddingValues = PaddingValues(16.dp),
     foodItemViewModel: FoodItemViewModel = hiltViewModel()
 ) {
-  // val foodFacts by foodFactsViewModel.foodFactsSuggestions.collectAsState()
-
-    foodItemViewModel.resetSelectFoodItem()
-
 
   val coroutineScope = rememberCoroutineScope()
 
   val context = LocalContext.current
 
-  // DisposableEffect(Unit) { onDispose { foodFactsViewModel.clearFoodFactsSuggestions() } }
 
   Scaffold(
       modifier = Modifier.fillMaxSize(),

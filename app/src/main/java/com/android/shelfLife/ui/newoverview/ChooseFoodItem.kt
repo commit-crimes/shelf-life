@@ -37,7 +37,10 @@ import coil3.compose.rememberAsyncImagePainter
 import com.android.shelfLife.R
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
+import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodFacts.SearchStatus
+import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -54,7 +57,6 @@ fun ChooseFoodItem(
 ) {
   val coroutineScope = rememberCoroutineScope()
   val context = LocalContext.current
-  // TODO These are temp while we work on the new FoodFactsModel
 
     var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
     val captureImageLauncher = rememberLauncherForActivityResult(
@@ -260,13 +262,20 @@ fun ChooseFoodItem(
                 CustomButtons(
                     button1OnClick = {
                       foodItemViewModel.selectedImage = null
+                      foodItemViewModel.setFoodItem(null)
+                      foodItemViewModel.resetSearchStatus()
                       navigationActions.navigateTo(Route.OVERVIEW)
                     },
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(id = R.string.cancel_button),
                     button2OnClick = {
-                        Log.e("ChooseFoodItem", "foodName: ${foodItemViewModel.foodName}")
-
+                        foodItemViewModel.setFoodItem(
+                            FoodItem(
+                                foodFacts = foodItemViewModel.selectedImage!!,
+                                owner = "",
+                                uid = ""
+                            )
+                        )
                       navigationActions.navigateTo(Screen.EDIT_FOOD)
                     },
                     button2TestTag = "foodSave",

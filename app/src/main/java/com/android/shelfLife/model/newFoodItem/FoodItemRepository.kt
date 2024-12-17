@@ -7,6 +7,7 @@ interface FoodItemRepository {
   val foodItems: StateFlow<List<FoodItem>>
   val selectedFoodItem: StateFlow<FoodItem?>
   val errorMessage: StateFlow<String?>
+  val isGenerated: StateFlow<Boolean>
 
   /** Generates a new unique ID for a food item. */
   fun getNewUid(): String
@@ -47,4 +48,6 @@ interface FoodItemRepository {
   fun selectFoodItem(foodItem: FoodItem?)
 
   fun setFoodItems(householdId: String, value: List<FoodItem>)
+
+  fun setIsGenerated(value: Boolean)
 }

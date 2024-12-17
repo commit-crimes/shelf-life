@@ -23,6 +23,8 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
   private val _errorMessage = MutableStateFlow<String?>(null)
   override val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
+  private val _isGenerated = MutableStateFlow<Boolean>(false)
+  override val isGenerated: StateFlow<Boolean> = _isGenerated.asStateFlow()
   // Listener registration
   private var foodItemsListenerRegistration: ListenerRegistration? = null
 
@@ -69,6 +71,9 @@ class FoodItemRepositoryFirestore(private val db: FirebaseFirestore) : FoodItemR
     _selectedFoodItem.value = foodItem
   }
 
+  override fun setIsGenerated(value: Boolean) {
+    _isGenerated.value  =value
+  }
   override fun setFoodItems(householdId: String, value: List<FoodItem>) {
     try {
       // Update the local cache

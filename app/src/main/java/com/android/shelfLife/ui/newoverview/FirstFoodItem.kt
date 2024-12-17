@@ -17,6 +17,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.R
+import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodFacts.Quantity
+import com.android.shelfLife.model.newFoodItem.FoodItem
 import com.android.shelfLife.model.newFoodItem.FoodItemRepository
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
@@ -66,6 +70,7 @@ fun FirstFoodItem(
                 CustomButtons(
                     button1OnClick = {
                       foodItemViewModel.foodName = ""
+                        foodItemViewModel.resetSelectFoodItem()
                       navigationActions.navigateTo(Route.OVERVIEW)
                     },
                     button1TestTag = "cancelButton",
@@ -75,7 +80,13 @@ fun FirstFoodItem(
                         val success = foodItemViewModel.submbitFoodName()
                         if (success) {
                             foodItemViewModel.searchByQuery(foodItemViewModel.foodName)
-                            Log.e("FirstFoodItem", "foodName: ${foodItemViewModel.foodName}")
+                            foodItemViewModel.setFoodItem(
+                                FoodItem(
+                                    foodFacts = FoodFacts(name = foodItemViewModel.foodName, quantity = Quantity(0.0, FoodUnit.GRAM)),
+                                    owner = "",
+                                    uid = ""
+                                )
+                            )
                           navigationActions.navigateTo(Screen.CHOOSE_FOOD_ITEM)
                         } else {
                           Toast.makeText(

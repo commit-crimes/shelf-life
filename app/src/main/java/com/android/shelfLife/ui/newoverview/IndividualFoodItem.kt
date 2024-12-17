@@ -41,6 +41,7 @@ fun IndividualFoodItemScreen(
   val coroutineScope = rememberCoroutineScope()
 
   if (individualFoodItemViewModel.selectedFood != null) {
+      individualFoodItemViewModel.setIsGenerated(false)
     Scaffold(
         modifier = Modifier.testTag("IndividualFoodItemScreen"),
         topBar = {
