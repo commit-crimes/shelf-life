@@ -162,10 +162,6 @@ class ExecuteRecipeViewModelTest {
         viewModel.temporarilyConsumeItems(listOf(tomatoItem, cheeseItem), listOf(2f, 1f))
         advanceUntilIdle()
 
-        // The tomatoItem is owned by currentUserUID, consuming doesn't add rat points.
-        // The cheeseItem is owned by otherUserUID, consuming should update rat points.
-        verify(houseHoldRepository).updateRatPoints(eq("h1"), argThat { this["currentUserUID"] == 1L })
-
         val updatedItems = viewModel.foodItems.value
         val updatedTomato = updatedItems.find { it.foodFacts.name == "Tomato" }!!
         val updatedCheese = updatedItems.find { it.foodFacts.name == "Cheese" }!!
@@ -175,10 +171,20 @@ class ExecuteRecipeViewModelTest {
     }
 
     @Test
-    fun `consumeSelectedItems updates Firestore`() = runTest {
+    fun `consumeSelectedItems updates Firestore and rat points`() = runTest {
+        // Select some items not owned by current user to trigger rat points update
+        val cheeseItem = viewModel.foodItems.value.first { it.foodFacts.name == "Cheese" }
+        viewModel.selectFoodItemForIngredient("Cheese", cheeseItem, 1f)
+        advanceUntilIdle()
+
         viewModel.consumeSelectedItems()
         advanceUntilIdle()
+
+        // Now verify that rat points are updated here
         verify(foodItemRepository).setFoodItems(eq("h1"), eq(viewModel.foodItems.value))
+        verify(houseHoldRepository).updateRatPoints(eq("h1"), argThat {
+            this["currentUserUID"] == 1L
+        })
     }
 
     @Test
