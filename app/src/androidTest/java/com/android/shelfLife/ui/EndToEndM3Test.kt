@@ -78,7 +78,7 @@ class EndToEndM3Test {
         FoodItem(
             uid = "foodItem1",
             foodFacts = foodFacts,
-            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)), // Expires in 1 day
+            expiryDate = Timestamp(Date(2025 - 1900, 11, 29)), // Expires in 1 day
             owner = "John",
         )
 
@@ -117,8 +117,14 @@ class EndToEndM3Test {
     userRepositoryTestHelper.setUser(user)
   }
 
-  // In this test an user tries to manually add a food item to their household and later not
-  // satisfied with the manual approach tries rather to scan the item.
+  /**
+   * This test goes through the following flow:
+   * 1. User logs in
+   * 2. User scans a barcode
+   * 3. User inputs details for the food item
+   * 4. User checks the overview screen
+   * 5. User logs out
+   */
   @Test
   fun testEndToEnd_see_add_food_item() {
     // User starts at the login screen
@@ -157,8 +163,23 @@ class EndToEndM3Test {
         .assertTextContains("Pantry")
     composeTestRule
         .onNodeWithTag("expireDateTextField", useUnmergedTree = true)
-        .performTextInput("29122024")
+        .performTextInput("29122025")
     composeTestRule.onNodeWithTag("submitButton").performClick()
+    foodItemRepositoryTestHelper.setFoodItems(listOf(foodItem))
+    composeTestRule.waitForIdle()
+
+    // User navigates back to the overview screen
+    composeTestRule.onNodeWithTag("Overview").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+
+    // User navigates to the profile screen
+    composeTestRule.onNodeWithTag("Profile").assertIsDisplayed().performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("profileScaffold").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("logoutButton").assertIsDisplayed().performClick()
+
+    // User is now on the login screen
+    composeTestRule.onNodeWithTag("signInScreen").assertIsDisplayed()
   }
 
   // In this test the user searches for an food item, clicks on it to see all its fields and edits
