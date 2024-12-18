@@ -42,7 +42,7 @@ interface UserRepository {
 
   suspend fun deleteRecipeUID(uid: String)
 
-  suspend fun deleteInvitationUID(uid: String)
+  fun deleteInvitationUID(uid: String)
 
   suspend fun updateUsername(username: String)
 
