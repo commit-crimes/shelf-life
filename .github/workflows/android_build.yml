@@ -52,7 +52,7 @@ jobs:
       # Set environment variable OPENAI_KEY
       - name: Export OPENAI_KEY as an environment variable
         env:
-          OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           echo "OPENAI_KEY=$OPENAI_KEY" >> $GITHUB_ENV
           echo "Environment variable OPENAI_KEY set successfully."
