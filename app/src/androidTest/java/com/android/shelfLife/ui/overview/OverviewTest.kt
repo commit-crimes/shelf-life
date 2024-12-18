@@ -383,6 +383,7 @@ class OverviewTest {
 
     // Click on the add food FAB
     composeTestRule.onNodeWithTag("addFoodFab").performClick()
+      composeTestRule.onNodeWithTag("addFoodFab").performClick()
 
     // Verify that navigateTo(Screen.ADD_FOOD) was called
     verify(navigationActions).navigateTo(Screen.ADD_FOOD)
