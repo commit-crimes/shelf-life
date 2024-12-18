@@ -24,12 +24,12 @@ import kotlinx.coroutines.tasks.await
 class SignInViewModel
 @Inject
 constructor(
-  private val firebaseAuth: FirebaseAuth,
-  private val userRepository: UserRepository,
-  private val householdRepository: HouseHoldRepository,
-  private val recipeRepository: RecipeRepository,
-  private val foodItemRepository: FoodItemRepository,
-  @ApplicationContext private val appContext: Context
+    private val firebaseAuth: FirebaseAuth,
+    private val userRepository: UserRepository,
+    private val householdRepository: HouseHoldRepository,
+    private val recipeRepository: RecipeRepository,
+    private val foodItemRepository: FoodItemRepository,
+    @ApplicationContext private val appContext: Context
 ) : ViewModel() {
 
   private val _signInState = MutableStateFlow<SignInState>(SignInState.Idle)
@@ -41,12 +41,12 @@ constructor(
   val bypassLogin = userRepository.bypassLogin
 
   private val authStateListener =
-    FirebaseAuth.AuthStateListener { auth ->
-      Log.d("SignInViewModel", "AuthStateListener triggered, user: ${auth.currentUser}")
-      if (auth.currentUser == null) {
-        _isUserLoggedIn.value = false
+      FirebaseAuth.AuthStateListener { auth ->
+        Log.d("SignInViewModel", "AuthStateListener triggered, user: ${auth.currentUser}")
+        if (auth.currentUser == null) {
+          _isUserLoggedIn.value = false
+        }
       }
-    }
 
   init {
     firebaseAuth.addAuthStateListener(authStateListener)
@@ -61,8 +61,8 @@ constructor(
   private suspend fun populateModelData(context: Context) {
     userRepository.initializeUserData(context)
     householdRepository.initializeHouseholds(
-      userRepository.user.value?.householdUIDs ?: emptyList(),
-      userRepository.user.value?.selectedHouseholdUID)
+        userRepository.user.value?.householdUIDs ?: emptyList(),
+        userRepository.user.value?.selectedHouseholdUID)
     userRepository.user.value?.selectedHouseholdUID?.let { foodItemRepository.getFoodItems(it) }
     userRepository.user.value?.let { recipeRepository.initializeRecipes(it.recipeUIDs, null) }
   }
@@ -94,12 +94,12 @@ constructor(
 
   fun signOutUser(context: Context, onSignOutComplete: () -> Unit) {
     val googleSignInClient =
-      GoogleSignIn.getClient(
-        context,
-        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-          .requestIdToken(context.getString(R.string.default_web_client_id))
-          .requestEmail()
-          .build())
+        GoogleSignIn.getClient(
+            context,
+            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(context.getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build())
 
     googleSignInClient.signOut().addOnCompleteListener { task ->
       if (task.isSuccessful) {

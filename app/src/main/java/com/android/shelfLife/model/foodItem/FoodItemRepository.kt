@@ -58,8 +58,7 @@ interface FoodItemRepository {
    */
   fun deleteHouseholdDocument(householdId: String)
 
-    fun setisQuickAdd(value: Boolean)
+  fun setisQuickAdd(value: Boolean)
 
-    suspend fun uploadImageToFirebaseStorage(uri: Uri, context: Context):String?
-
+  suspend fun uploadImageToFirebaseStorage(uri: Uri, context: Context): String?
 }

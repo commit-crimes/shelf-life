@@ -34,7 +34,7 @@ constructor(
   private val _state = MutableStateFlow<RecipeExecutionState>(RecipeExecutionState.SelectServings)
   val state: StateFlow<RecipeExecutionState> = _state
 
-  private  val currentUser = userRepository.user.value
+  private val currentUser = userRepository.user.value
 
   private val originalSelectedRecipe = recipeRepositoryFirestore.selectedRecipe
 
@@ -135,20 +135,21 @@ constructor(
   fun consumeSelectedItems() {
     if (householdUid != null) {
       foodItemsRepository.setFoodItems(householdId = householdUid, _availableFoodItems.value)
-      selectedFoodItemsForIngredients.value.values.forEach{ foodItems ->
-          foodItems.forEach { foodItem ->
-              if(foodItem.owner != currentUser?.uid) {
-                  val newRatPoints = houseHoldRepository.selectedHousehold.value!!.ratPoints.toMutableMap()
-                  if (!newRatPoints.contains(currentUser?.uid!!)) {
-                      newRatPoints[currentUser.uid] = foodItem.foodFacts.quantity.amount.toLong()
-                  } else {
-                      newRatPoints[currentUser.uid] =
-                          foodItem.foodFacts.quantity.amount.toLong() + newRatPoints[currentUser.uid]!!
-                  }
+      selectedFoodItemsForIngredients.value.values.forEach { foodItems ->
+        foodItems.forEach { foodItem ->
+          if (foodItem.owner != currentUser?.uid) {
+            val newRatPoints =
+                houseHoldRepository.selectedHousehold.value!!.ratPoints.toMutableMap()
+            if (!newRatPoints.contains(currentUser?.uid!!)) {
+              newRatPoints[currentUser.uid] = foodItem.foodFacts.quantity.amount.toLong()
+            } else {
+              newRatPoints[currentUser.uid] =
+                  foodItem.foodFacts.quantity.amount.toLong() + newRatPoints[currentUser.uid]!!
+            }
 
-                  houseHoldRepository.updateRatPoints(householdUid, newRatPoints)
-              }
+            houseHoldRepository.updateRatPoints(householdUid, newRatPoints)
           }
+        }
       }
       Log.d(TAG, "Consumed selected items and updated Firestore for household: $householdUid")
     } else {
