@@ -78,10 +78,7 @@ fun FoodItemDetails(foodItem: com.android.shelfLife.model.foodItem.FoodItem) {
               style = textStyle)
           FoodItemDetailText(
               text =
-                  stringResource(
-                      R.string.food_item_quantity_label,
-                      foodItem.foodFacts.quantity.amount,
-                      foodItem.foodFacts.quantity.unit.name),
+                  stringResource(R.string.food_item_quantity_label).plus(" ").plus(foodItem.foodFacts.quantity),
               tag = "quantityText",
               style = textStyle)
         }

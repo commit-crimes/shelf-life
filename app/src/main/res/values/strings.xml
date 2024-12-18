@@ -80,7 +80,7 @@
     <string name="food_item_buy_date_label">Buy Date: %1$s</string>
     <string name="food_item_energy_label">Energy: %1$d Kcal</string>
     <string name="food_item_proteins_label">Proteins: %1$s g</string>
-    <string name="food_item_quantity_label">Quantity: %1$s %2$s</string>
+    <string name="food_item_quantity_label">Quantity: </string>
 
     <string name="title_of_AddRecipeScreen">Add your own recipe</string>
     <string name="title_of_recipe">Recipe title</string>
