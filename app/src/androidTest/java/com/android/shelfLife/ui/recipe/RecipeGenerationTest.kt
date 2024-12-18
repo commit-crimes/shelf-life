@@ -54,7 +54,7 @@ class RecipeGenerationTest {
     @Test
     fun recipeInputStep_renderedCorrectly() {
         composeTestRule.setContent {
-            RecipeInputStep(viewModel = recipeGenerationViewModel, onNext = {})
+            RecipeInputStep(viewModel = recipeGenerationViewModel, onNext = {}, onBack = {})
         }
 
         // Check for the presence of input fields and buttons

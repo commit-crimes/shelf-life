@@ -70,7 +70,8 @@ fun GenerateRecipeScreen(
             modifier = Modifier.padding(paddingValues).padding(16.dp),
         ) {
           composable("input") {
-            RecipeInputStep(viewModel = viewModel, onNext = { navController.navigate("selection") })
+            RecipeInputStep(viewModel = viewModel, onNext = { navController.navigate("selection") },
+                    onBack = { navigationActions.goBack() })
           }
           composable("selection") {
             FoodSelectionStep(
@@ -95,7 +96,7 @@ fun GenerateRecipeScreen(
 }
 
 @Composable
-fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit) {
+fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit, onBack: () -> Unit) {
   val recipePrompt by viewModel.recipePrompt.collectAsState()
   val context = LocalContext.current
   val expanded = rememberSaveable { mutableStateOf(false) }
@@ -117,7 +118,7 @@ fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit) {
       bottomBar = {
         Row(verticalAlignment = Alignment.Bottom) {
           CustomButtons(
-              button1OnClick = {},
+              button1OnClick = {onBack()},
               button1TestTag = "cancelButton",
               button1Text = stringResource(id = R.string.cancel_button),
               button2OnClick = {
