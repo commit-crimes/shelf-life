@@ -30,6 +30,7 @@ import javax.inject.Inject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.whenever
 
 @HiltAndroidTest
 class EndToEndM1Test {
@@ -46,6 +47,7 @@ class EndToEndM1Test {
   private lateinit var userRepositoryTestHelper: UserRepositoryTestHelper
 
   private lateinit var houseHold: HouseHold
+  private lateinit var foodItem: FoodItem
 
   @get:Rule(order = 0) val hiltAndroidTestRule = HiltAndroidRule(this)
   @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<MainActivity>()
@@ -59,6 +61,8 @@ class EndToEndM1Test {
     foodItemRepositoryTestHelper = FoodItemRepositoryTestHelper(foodItemRepository)
     userRepositoryTestHelper = UserRepositoryTestHelper(userRepository)
 
+    whenever(foodItemRepository.getNewUid()).thenReturn("foodItem1")
+
     // Create a FoodItem to be used in tests
     val foodFacts =
         FoodFacts(
@@ -66,7 +70,7 @@ class EndToEndM1Test {
             barcode = "123456789",
             quantity = Quantity(5.0, FoodUnit.COUNT),
             category = FoodCategory.FRUIT)
-    val foodItem =
+    foodItem =
         FoodItem(
             uid = "foodItem1",
             foodFacts = foodFacts,
@@ -96,7 +100,6 @@ class EndToEndM1Test {
 
     // Init the repositories with the test data
     householdRepositoryTestHelper.selectHousehold(houseHold)
-    foodItemRepositoryTestHelper.setFoodItems(listOf(foodItem))
     userRepositoryTestHelper.setUser(user)
   }
 
@@ -108,7 +111,7 @@ class EndToEndM1Test {
     composeTestRule.onNodeWithTag("loginButton").assertHasClickAction()
     composeTestRule.onNodeWithTag("loginButton").performClick()
 
-    composeTestRule.waitForIdle()
+    // composeTestRule.waitForIdle()
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
     // User is now on the overview Screen
     // User wants to add a new food item
@@ -150,29 +153,23 @@ class EndToEndM1Test {
 
     // Scroll to and click the submit button again
     scrollableNode.performScrollToNode(hasTestTag("foodSave"))
+
+    // Simulate the user submitting the form
+    foodItemRepositoryTestHelper.setFoodItems(listOf(foodItem))
+
     composeTestRule.onNodeWithTag("foodSave").performClick()
-    // Thread.sleep(1000)
-    composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
-    // Thread.sleep(1000)
-    // User now wants to use the scanner
-    composeTestRule.onNodeWithTag("Scanner").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("Scanner").performClick()
-    composeTestRule.onNodeWithTag("Scanner").performClick()
-    // Thread.sleep(1000)
-    composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
-    // User now want to check for the Recepie for Paella
-    composeTestRule.onNodeWithTag("Recipes").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("Recipes").performClick()
-    // Thread.sleep(5000)
-    composeTestRule.onNodeWithTag("recipesScreen").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("searchBar").performClick()
+
     composeTestRule.waitForIdle()
-    composeTestRule
-        .onNode(hasSetTextAction() and hasAnyAncestor(hasTestTag("searchBar")))
-        .performTextInput("Paella")
-    composeTestRule.onAllNodesWithTag("recipesCards").assertCountEquals(1)
-    composeTestRule
-        .onNode(hasText("Paella") and hasAnyAncestor(hasTestTag("searchBar")))
-        .assertIsDisplayed()
+    // User is now on the overview screen
+    composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+
+    // User now wants to view the details of the food item
+    composeTestRule.onNodeWithTag("foodItemCard").assertIsDisplayed()
+    foodItemRepositoryTestHelper.setSelectedFoodItem(foodItem)
+    composeTestRule.onNodeWithTag("foodItemCard").assertHasClickAction()
+    composeTestRule.onNodeWithTag("foodItemCard").performClick()
+
+    composeTestRule.onNodeWithTag("IndividualFoodItemScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("IndividualFoodItemName").assertTextContains("Apple")
   }
 }

@@ -21,4 +21,8 @@ class FoodItemRepositoryTestHelper(private val foodItemRepository: FoodItemRepos
   fun setFoodItems(foodItemsList: List<FoodItem>) {
     foodItems.value = foodItemsList
   }
+
+  fun setSelectedFoodItem(foodItem: FoodItem) {
+    selectedFoodItem.value = foodItem
+  }
 }
