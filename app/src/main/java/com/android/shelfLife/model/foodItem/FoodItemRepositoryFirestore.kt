@@ -31,8 +31,8 @@ class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFi
   private val _errorMessage = MutableStateFlow<String?>(null)
   override val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
-  private val _isGenerated = MutableStateFlow<Boolean>(false)
-  override val isGenerated: StateFlow<Boolean> = _isGenerated.asStateFlow()
+  private val _isQuickAdd = MutableStateFlow<Boolean>(false)
+  override val isQuickAdd: StateFlow<Boolean> = _isQuickAdd.asStateFlow()
   // Listener registration
   private var foodItemsListenerRegistration: ListenerRegistration? = null
 
@@ -79,8 +79,8 @@ class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFi
     _selectedFoodItem.value = foodItem
   }
 
-  override fun setIsGenerated(value: Boolean) {
-    _isGenerated.value = value
+  override fun setisQuickAdd(value: Boolean) {
+    _isQuickAdd.value = value
   }
 
 

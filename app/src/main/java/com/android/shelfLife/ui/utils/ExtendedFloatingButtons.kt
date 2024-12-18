@@ -46,7 +46,7 @@ fun ExtendedActionButtons(
           icon = { Icon(firstIcon, contentDescription = firstScreenText) },
           onClick = {
             // Navigate to Generate Recipe screen
-            foodItemViewModel.setIsGenerated(true)
+            foodItemViewModel.setIsQuickAdd(true)
             foodItemViewModel.resetSelectFoodItem()
             navigationActions.navigateTo(firstScreen)
             fabExpanded.value = false
@@ -62,7 +62,7 @@ fun ExtendedActionButtons(
         onClick = {
           if (fabExpanded.value) {
             // Navigate to Add Recipe screen
-            foodItemViewModel.setIsGenerated(false)
+            foodItemViewModel.setIsQuickAdd(false)
             navigationActions.navigateTo(secondScreen)
             fabExpanded.value = false
           } else {

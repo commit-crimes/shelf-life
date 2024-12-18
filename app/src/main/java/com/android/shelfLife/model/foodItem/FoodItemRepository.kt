@@ -9,7 +9,7 @@ interface FoodItemRepository {
   val foodItems: StateFlow<List<FoodItem>>
   val selectedFoodItem: StateFlow<FoodItem?>
   val errorMessage: StateFlow<String?>
-  val isGenerated: StateFlow<Boolean>
+  val isQuickAdd: StateFlow<Boolean>
 
   /** Generates a new unique ID for a food item. */
   fun getNewUid(): String
@@ -51,7 +51,7 @@ interface FoodItemRepository {
 
   fun setFoodItems(householdId: String, value: List<FoodItem>)
 
-  fun setIsGenerated(value: Boolean)
+  fun setisQuickAdd(value: Boolean)
 
   suspend fun uploadImageToFirebaseStorage(uri: Uri, context: Context ):String?
 }

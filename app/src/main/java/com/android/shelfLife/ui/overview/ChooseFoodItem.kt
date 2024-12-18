@@ -267,6 +267,7 @@ fun ChooseFoodItem(
                         foodItemViewModel.selectedImage?.let { selectedImage ->
                             selectedImage.name = foodItemViewModel.selectedFood?.foodFacts?.name ?: ""
                             foodItemViewModel.setFoodItem(
+                                //This is a temporary food item to remember the state of the Food Item at this screen
                                 FoodItem(
                                     foodFacts = selectedImage, owner = "", uid = ""
                                 )

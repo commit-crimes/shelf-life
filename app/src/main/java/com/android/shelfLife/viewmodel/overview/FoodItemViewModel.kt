@@ -215,7 +215,7 @@ var isLoading by mutableStateOf(false)
       val newFoodItem =
           FoodItem(
               uid =
-                  if (isSelected && !foodItemRepository.isGenerated.first()) selectedFood!!.uid
+                  if (isSelected && !foodItemRepository.isQuickAdd.first()) selectedFood!!.uid
                   else foodItemRepository.getNewUid(),
               foodFacts = foodFacts!!,
               location = location,
@@ -223,20 +223,20 @@ var isLoading by mutableStateOf(false)
               openDate = openTimestamp,
               buyDate = buyTimestamp,
               status =
-                  if (isSelected && !foodItemRepository.isGenerated.first()) selectedFood!!.status
+                  if (isSelected && !foodItemRepository.isQuickAdd.first()) selectedFood!!.status
                   else FoodStatus.UNOPENED,
               owner =
-                  if (isSelected && !foodItemRepository.isGenerated.first()) selectedFood!!.owner
+                  if (isSelected && !foodItemRepository.isQuickAdd.first()) selectedFood!!.owner
                   else userRepository.user.value?.uid ?: "")
 
       resetSearchStatus()
       if (isSelected) {
-        if (foodItemRepository.isGenerated.first()) {
+        if (foodItemRepository.isQuickAdd.first()) {
           foodItemRepository.selectFoodItem(null)
           addFoodItem(newFoodItem)
         } else {
           foodItemRepository.selectFoodItem(null)
-          foodItemRepository.setIsGenerated(false)
+          foodItemRepository.setisQuickAdd(false)
           editFoodItem(newFoodItem)
         }
       } else {
@@ -264,16 +264,16 @@ var isLoading by mutableStateOf(false)
             owner = ""))
   }
 
-  fun setIsGenerated(isGenerated: Boolean) {
-    foodItemRepository.setIsGenerated(isGenerated)
+  fun setIsQuickAdd(isQuickAdd: Boolean) {
+    foodItemRepository.setisQuickAdd(isQuickAdd)
   }
 
   fun setFoodItem(foodItem: FoodItem?) {
     foodItemRepository.selectFoodItem(foodItem)
   }
 
-  fun getIsGenerated(): Boolean {
-    return foodItemRepository.isGenerated.value ?: false
+  fun getIsQuickAdd(): Boolean {
+    return foodItemRepository.isQuickAdd.value ?: false
   }
 
     suspend fun uploadImageToFirebaseStorage(uri: Uri, context: Context): String?{

@@ -54,7 +54,7 @@ fun EditFoodItemScreen(
             title =
                 stringResource(
                     id =
-                        if (!foodItemViewModel.getIsGenerated()) R.string.edit_food_item_title
+                        if (!foodItemViewModel.getIsQuickAdd()) R.string.edit_food_item_title
                         else R.string.finalize_food_item_title),
             titleTestTag = "editFoodItemTitle",
             actions = {

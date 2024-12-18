@@ -27,8 +27,8 @@ constructor(
     foodItemRepository.selectFoodItem(null)
   }
 
-  fun setIsGenerated(isGenerated: Boolean) {
-    foodItemRepository.setIsGenerated(isGenerated)
+  fun setIsQuickAdd(isQuickAdd: Boolean) {
+    foodItemRepository.setisQuickAdd(isQuickAdd)
   }
 
   suspend fun deleteFoodItem() {
