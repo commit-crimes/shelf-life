@@ -48,9 +48,10 @@ interface FoodItemRepository {
 
   fun setFoodItems(householdId: String, value: List<FoodItem>)
 
-  /** Deletes all food items from a household.
+  /**
+   * Deletes all food items from a household.
    *
    * @param householdId The ID of the household.
-   * */
+   */
   fun deleteHouseholdDocument(householdId: String)
 }

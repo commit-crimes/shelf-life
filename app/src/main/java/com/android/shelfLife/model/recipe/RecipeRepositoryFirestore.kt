@@ -108,16 +108,13 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
     _recipes.value = currentRecipes
 
     // Perform Firebase operation
-    db.collection(COLLECTION_PATH)
-      .document(recipe.uid)
-      .set(recipe)
-      .addOnFailureListener { exception ->
-        Log.e("RecipeRepository", "Error adding recipe", exception)
-        // Rollback: Remove the recipe from the local cache
-        _recipes.value = _recipes.value.filterNot { it.uid == recipe.uid }
-      }
+    db.collection(COLLECTION_PATH).document(recipe.uid).set(recipe).addOnFailureListener { exception
+      ->
+      Log.e("RecipeRepository", "Error adding recipe", exception)
+      // Rollback: Remove the recipe from the local cache
+      _recipes.value = _recipes.value.filterNot { it.uid == recipe.uid }
+    }
   }
-
 
   /**
    * Updates an existing recipe in Firestore and the local cache. Rolls back local changes if
@@ -141,32 +138,29 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
     _recipes.value = currentRecipes
 
     // Perform Firebase operation
-    db.collection(COLLECTION_PATH)
-      .document(recipe.uid)
-      .set(recipe)
-      .addOnFailureListener { exception ->
-        Log.e("RecipeRepository", "Error updating recipe", exception)
-        // Rollback: Restore the original recipe in the local cache
-        originalRecipe?.let {
-          val rollbackRecipes = _recipes.value.toMutableList()
-          val rollbackIndex = rollbackRecipes.indexOfFirst { it.uid == recipe.uid }
-          if (rollbackIndex != -1) {
-            rollbackRecipes[rollbackIndex] = it
-          } else {
-            rollbackRecipes.remove(recipe)
-          }
-          _recipes.value = rollbackRecipes
+    db.collection(COLLECTION_PATH).document(recipe.uid).set(recipe).addOnFailureListener { exception
+      ->
+      Log.e("RecipeRepository", "Error updating recipe", exception)
+      // Rollback: Restore the original recipe in the local cache
+      originalRecipe?.let {
+        val rollbackRecipes = _recipes.value.toMutableList()
+        val rollbackIndex = rollbackRecipes.indexOfFirst { it.uid == recipe.uid }
+        if (rollbackIndex != -1) {
+          rollbackRecipes[rollbackIndex] = it
+        } else {
+          rollbackRecipes.remove(recipe)
         }
+        _recipes.value = rollbackRecipes
       }
+    }
   }
-
 
   /**
    * Deletes a recipe by its unique ID. Rolls back local changes if Firestore operation fails.
    *
    * @param recipeId The unique ID of the recipe to delete.
    */
-  override fun deleteRecipe(recipeId: String, deleteUID : (String) -> Unit) {
+  override fun deleteRecipe(recipeId: String, deleteUID: (String) -> Unit) {
     // Find the recipe to be deleted
     val deletedRecipe = _recipes.value.find { it.uid == recipeId }
 
@@ -176,19 +170,17 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
 
     // Perform Firebase operation
     db.collection(COLLECTION_PATH)
-      .document(recipeId)
-      .delete()
-      .addOnSuccessListener {
-        deleteUID(recipeId)
-      }
-      .addOnFailureListener { exception ->
-        Log.e("RecipeRepository", "Error deleting recipe", exception)
-        // Rollback: Add the recipe back to the local cache
-        deletedRecipe?.let {
-          val rollbackRecipes = _recipes.value.toMutableList().apply { add(it) }
-          _recipes.value = rollbackRecipes
+        .document(recipeId)
+        .delete()
+        .addOnSuccessListener { deleteUID(recipeId) }
+        .addOnFailureListener { exception ->
+          Log.e("RecipeRepository", "Error deleting recipe", exception)
+          // Rollback: Add the recipe back to the local cache
+          deletedRecipe?.let {
+            val rollbackRecipes = _recipes.value.toMutableList().apply { add(it) }
+            _recipes.value = rollbackRecipes
+          }
         }
-      }
   }
 
   /**
@@ -201,8 +193,8 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
   }
 
   /**
-   * (Meant for shared recipes) Start listening for real-time updates to a given set of recipes. If your app
-   * requires real-time updates, this can be useful.
+   * (Meant for shared recipes) Start listening for real-time updates to a given set of recipes. If
+   * your app requires real-time updates, this can be useful.
    *
    * @param recipeIds List of recipe IDs to listen to.
    */

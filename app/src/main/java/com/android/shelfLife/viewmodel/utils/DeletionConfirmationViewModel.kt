@@ -6,8 +6,8 @@ import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @HiltViewModel
 class DeletionConfirmationViewModel
@@ -30,29 +30,28 @@ constructor(
   fun deleteHouseholdById(householdId: String) {
     val household = households.value.find { it.uid == householdId }
     if (household != null) {
-        val houseHoldIndex = households.value.indexOf(household)
-        if(household.members.size > 1) {
-            houseHoldRepository.updateHousehold(
-                household.copy(members = household.members - userRepository.user.value!!.uid)
-            ) {householdUID ->
-                userRepository.deleteHouseholdUID(householdUID)
+      val houseHoldIndex = households.value.indexOf(household)
+      if (household.members.size > 1) {
+        houseHoldRepository.updateHousehold(
+            household.copy(members = household.members - userRepository.user.value!!.uid)) {
+                householdUID ->
+              userRepository.deleteHouseholdUID(householdUID)
             }
-        } else{
-            houseHoldRepository.deleteHouseholdById(householdId) { householdUID ->
-                userRepository.deleteHouseholdUID(householdUID)
-                foodItemRepository.deleteHouseholdDocument(householdId)
-            }
+      } else {
+        houseHoldRepository.deleteHouseholdById(householdId) { householdUID ->
+          userRepository.deleteHouseholdUID(householdUID)
+          foodItemRepository.deleteHouseholdDocument(householdId)
         }
-        if(selectedHousehold.value?.uid == householdId){
-            val householdToSelect = households.value.getOrElse(houseHoldIndex) { households.value.lastOrNull() }
-            houseHoldRepository.selectHousehold(householdToSelect)
-            userRepository.selectHousehold(householdToSelect?.uid)
-            if(householdToSelect != null){
-                viewModelScope.launch {
-                    foodItemRepository.getFoodItems(householdToSelect.uid)
-                }
-            }
+      }
+      if (selectedHousehold.value?.uid == householdId) {
+        val householdToSelect =
+            households.value.getOrElse(houseHoldIndex) { households.value.lastOrNull() }
+        houseHoldRepository.selectHousehold(householdToSelect)
+        userRepository.selectHousehold(householdToSelect?.uid)
+        if (householdToSelect != null) {
+          viewModelScope.launch { foodItemRepository.getFoodItems(householdToSelect.uid) }
         }
+      }
     }
   }
 }

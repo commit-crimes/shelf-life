@@ -39,17 +39,17 @@ class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFi
 
     // Perform Firestore operation using promises
     db.collection(collectionPath)
-      .document(householdId)
-      .collection("items")
-      .document(foodItem.uid)
-      .set(foodItem.toMap())
-      .addOnFailureListener { exception ->
-        Log.e("FoodItemRepository", "Error adding food item", exception)
-        // Rollback: Remove the item from the local cache
-        _foodItems.value = _foodItems.value.filterNot { it.uid == foodItem.uid }
-        // Notify the user about the error
-        _errorMessage.value = "Failed to add item. Please try again."
-      }
+        .document(householdId)
+        .collection("items")
+        .document(foodItem.uid)
+        .set(foodItem.toMap())
+        .addOnFailureListener { exception ->
+          Log.e("FoodItemRepository", "Error adding food item", exception)
+          // Rollback: Remove the item from the local cache
+          _foodItems.value = _foodItems.value.filterNot { it.uid == foodItem.uid }
+          // Notify the user about the error
+          _errorMessage.value = "Failed to add item. Please try again."
+        }
   }
 
   override suspend fun getFoodItems(householdId: String): List<FoodItem> {
@@ -137,30 +137,29 @@ class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFi
 
     // Perform Firebase operation asynchronously
     db.collection(collectionPath)
-      .document(householdId)
-      .collection("items")
-      .document(foodItem.uid)
-      .set(foodItem.toMap())
-      .addOnSuccessListener {
-        Log.d("FoodItemRepository", "Successfully updated food item: ${foodItem.uid}")
-      }
-      .addOnFailureListener { exception ->
-        Log.e("FoodItemRepository", "Error updating food item", exception)
-        // Rollback: Restore the original item in the local cache
-        if (index != -1 && originalItem != null) {
-          currentFoodItems[index] = originalItem
-        } else if (index == -1) {
-          currentFoodItems.remove(foodItem)
+        .document(householdId)
+        .collection("items")
+        .document(foodItem.uid)
+        .set(foodItem.toMap())
+        .addOnSuccessListener {
+          Log.d("FoodItemRepository", "Successfully updated food item: ${foodItem.uid}")
         }
-        _foodItems.value = currentFoodItems
-        // Notify the user about the error
-        _errorMessage.value = "Failed to update item. Please try again."
-      }
+        .addOnFailureListener { exception ->
+          Log.e("FoodItemRepository", "Error updating food item", exception)
+          // Rollback: Restore the original item in the local cache
+          if (index != -1 && originalItem != null) {
+            currentFoodItems[index] = originalItem
+          } else if (index == -1) {
+            currentFoodItems.remove(foodItem)
+          }
+          _foodItems.value = currentFoodItems
+          // Notify the user about the error
+          _errorMessage.value = "Failed to update item. Please try again."
+        }
   }
 
   override fun deleteHouseholdDocument(householdId: String) {
-    db.collection(collectionPath)
-      .document(householdId).delete()
+    db.collection(collectionPath).document(householdId).delete()
   }
 
   override fun deleteFoodItem(householdId: String, foodItemId: String) {
@@ -173,25 +172,24 @@ class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFi
 
     // Perform Firebase operation asynchronously
     db.collection(collectionPath)
-      .document(householdId)
-      .collection("items")
-      .document(foodItemId)
-      .delete()
-      .addOnSuccessListener {
-        Log.d("FoodItemRepository", "Successfully deleted food item: $foodItemId")
-      }
-      .addOnFailureListener { exception ->
-        Log.e("FoodItemRepository", "Error deleting food item", exception)
-        // Rollback: Restore the deleted item in the local cache
-        if (deletedItem != null) {
-          val rollbackItems = _foodItems.value.toMutableList().apply { add(deletedItem) }
-          _foodItems.value = rollbackItems
+        .document(householdId)
+        .collection("items")
+        .document(foodItemId)
+        .delete()
+        .addOnSuccessListener {
+          Log.d("FoodItemRepository", "Successfully deleted food item: $foodItemId")
         }
-        // Notify the user about the error
-        _errorMessage.value = "Failed to delete item. Please try again."
-      }
+        .addOnFailureListener { exception ->
+          Log.e("FoodItemRepository", "Error deleting food item", exception)
+          // Rollback: Restore the deleted item in the local cache
+          if (deletedItem != null) {
+            val rollbackItems = _foodItems.value.toMutableList().apply { add(deletedItem) }
+            _foodItems.value = rollbackItems
+          }
+          // Notify the user about the error
+          _errorMessage.value = "Failed to delete item. Please try again."
+        }
   }
-
 
   /**
    * Starts listening for real-time updates to the food items collection.

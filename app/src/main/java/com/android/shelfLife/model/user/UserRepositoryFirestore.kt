@@ -177,82 +177,82 @@ constructor(
     _currentAudioMode.value = mode
   }
 
-    private fun updateUserField(fieldName: String, value: Any) {
-        val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
+  private fun updateUserField(fieldName: String, value: Any) {
+    val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
 
-        // Optimistically update local cache
-        val currentUserData = _user.value
+    // Optimistically update local cache
+    val currentUserData =
+        _user.value
             ?: User(uid = currentUser.uid, username = "", email = "", selectedHouseholdUID = "")
-        val updatedUserData = when (fieldName) {
-            "username" -> currentUserData.copy(username = value as String)
-            "photoURL" -> currentUserData.copy(photoUrl = value as String)
-            "email" -> currentUserData.copy(email = value as String)
-            "selectedHouseholdUID" -> currentUserData.copy(selectedHouseholdUID = value as String)
-            else -> currentUserData
+    val updatedUserData =
+        when (fieldName) {
+          "username" -> currentUserData.copy(username = value as String)
+          "photoURL" -> currentUserData.copy(photoUrl = value as String)
+          "email" -> currentUserData.copy(email = value as String)
+          "selectedHouseholdUID" -> currentUserData.copy(selectedHouseholdUID = value as String)
+          else -> currentUserData
         }
-        _user.value = updatedUserData
+    _user.value = updatedUserData
 
-        // Perform Firebase operation
-        userCollection.document(currentUser.uid)
-            .update(fieldName, value)
-            .addOnFailureListener { exception ->
-                Log.e("UserRepository", "Error updating user field: $fieldName", exception)
-                // Rollback: Restore original user data
-                _user.value = currentUserData
-            }
+    // Perform Firebase operation
+    userCollection.document(currentUser.uid).update(fieldName, value).addOnFailureListener {
+        exception ->
+      Log.e("UserRepository", "Error updating user field: $fieldName", exception)
+      // Rollback: Restore original user data
+      _user.value = currentUserData
     }
+  }
 
+  private fun updateArrayField(fieldName: String, value: String, operation: ArrayOperation) {
+    val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
 
-    private fun updateArrayField(
-        fieldName: String,
-        value: String,
-        operation: ArrayOperation
-    ) {
-        val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
-
-        // Determine Firestore array operation
-        val updateValue = when (operation) {
-            ArrayOperation.ADD -> FieldValue.arrayUnion(value)
-            ArrayOperation.REMOVE -> FieldValue.arrayRemove(value)
+    // Determine Firestore array operation
+    val updateValue =
+        when (operation) {
+          ArrayOperation.ADD -> FieldValue.arrayUnion(value)
+          ArrayOperation.REMOVE -> FieldValue.arrayRemove(value)
         }
 
-        // Optimistically update local cache
-        val currentUserData = _user.value
+    // Optimistically update local cache
+    val currentUserData =
+        _user.value
             ?: User(uid = currentUser.uid, username = "", email = "", selectedHouseholdUID = "")
-        val updatedArray = when (fieldName) {
-            "householdUIDs" -> {
-                val currentList = currentUserData.householdUIDs
-                if (operation == ArrayOperation.ADD) currentList + value else currentList - value
-            }
-            "recipeUIDs" -> {
-                val currentList = currentUserData.recipeUIDs
-                if (operation == ArrayOperation.ADD) currentList + value else currentList - value
-            }
-            else -> emptyList()
+    val updatedArray =
+        when (fieldName) {
+          "householdUIDs" -> {
+            val currentList = currentUserData.householdUIDs
+            if (operation == ArrayOperation.ADD) currentList + value else currentList - value
+          }
+          "recipeUIDs" -> {
+            val currentList = currentUserData.recipeUIDs
+            if (operation == ArrayOperation.ADD) currentList + value else currentList - value
+          }
+          else -> emptyList()
         }
 
-        val updatedUserData = when (fieldName) {
-            "householdUIDs" -> currentUserData.copy(householdUIDs = updatedArray)
-            "recipeUIDs" -> currentUserData.copy(recipeUIDs = updatedArray)
-            else -> currentUserData
+    val updatedUserData =
+        when (fieldName) {
+          "householdUIDs" -> currentUserData.copy(householdUIDs = updatedArray)
+          "recipeUIDs" -> currentUserData.copy(recipeUIDs = updatedArray)
+          else -> currentUserData
         }
-        _user.value = updatedUserData
+    _user.value = updatedUserData
 
-        // Perform Firebase operation
-        userCollection.document(currentUser.uid)
-            .update(fieldName, updateValue)
-            .addOnSuccessListener {
-                Log.d("UserRepository", "Successfully updated array field: $fieldName")
-            }
-            .addOnFailureListener { exception ->
-                Log.e("UserRepository", "Error updating array field: $fieldName", exception)
-                // Rollback: Restore original user data
-                _user.value = currentUserData
-            }
-    }
+    // Perform Firebase operation
+    userCollection
+        .document(currentUser.uid)
+        .update(fieldName, updateValue)
+        .addOnSuccessListener {
+          Log.d("UserRepository", "Successfully updated array field: $fieldName")
+        }
+        .addOnFailureListener { exception ->
+          Log.e("UserRepository", "Error updating array field: $fieldName", exception)
+          // Rollback: Restore original user data
+          _user.value = currentUserData
+        }
+  }
 
-
-    private enum class ArrayOperation {
+  private enum class ArrayOperation {
     ADD,
     REMOVE
   }
@@ -303,29 +303,28 @@ constructor(
     householdUid?.let { updateSelectedHousehold(it) }
   }
 
-    override fun addCurrentUserToHouseHold(householdUID: String, userUID: String) {
-        // Optimistically update local cache
-        val currentUser = _user.value
-        val updatedHouseholdUIDs = currentUser?.householdUIDs?.plus(householdUID).orEmpty()
-        _user.value = currentUser?.copy(householdUIDs = updatedHouseholdUIDs)
+  override fun addCurrentUserToHouseHold(householdUID: String, userUID: String) {
+    // Optimistically update local cache
+    val currentUser = _user.value
+    val updatedHouseholdUIDs = currentUser?.householdUIDs?.plus(householdUID).orEmpty()
+    _user.value = currentUser?.copy(householdUIDs = updatedHouseholdUIDs)
 
-        // Perform Firebase operation
-        db.collection("users")
-            .document(userUID)
-            .update("householdUIDs", FieldValue.arrayUnion(householdUID))
-            .addOnSuccessListener {
-                Log.d("UserRepositoryFirestore", "Successfully added user to household: $householdUID")
-            }
-            .addOnFailureListener { exception ->
-                Log.e("UserRepositoryFirestore", "Error adding user to household", exception)
-                // Rollback: Remove the household UID from the local cache
-                val rolledBackHouseholdUIDs = _user.value?.householdUIDs?.minus(householdUID).orEmpty()
-                _user.value = currentUser?.copy(householdUIDs = rolledBackHouseholdUIDs)
-            }
-    }
+    // Perform Firebase operation
+    db.collection("users")
+        .document(userUID)
+        .update("householdUIDs", FieldValue.arrayUnion(householdUID))
+        .addOnSuccessListener {
+          Log.d("UserRepositoryFirestore", "Successfully added user to household: $householdUID")
+        }
+        .addOnFailureListener { exception ->
+          Log.e("UserRepositoryFirestore", "Error adding user to household", exception)
+          // Rollback: Remove the household UID from the local cache
+          val rolledBackHouseholdUIDs = _user.value?.householdUIDs?.minus(householdUID).orEmpty()
+          _user.value = currentUser?.copy(householdUIDs = rolledBackHouseholdUIDs)
+        }
+  }
 
-
-    private fun convertToUser(doc: DocumentSnapshot): User? {
+  private fun convertToUser(doc: DocumentSnapshot): User? {
     return try {
       val uid = doc.id
       val username = doc.getString("username") ?: ""

@@ -39,11 +39,11 @@ class OpenFoodFactsRepository(
     _searchStatus.value = SearchStatus.Idle
   }
 
-    override fun setFailureStatus() {
+  override fun setFailureStatus() {
     _searchStatus.value = SearchStatus.Failure
-    }
+  }
 
-    // Modified search function
+  // Modified search function
   override fun searchByBarcode(barcode: Long) {
     searchFoodFacts(
         searchInput = FoodSearchInput.Barcode(barcode),
