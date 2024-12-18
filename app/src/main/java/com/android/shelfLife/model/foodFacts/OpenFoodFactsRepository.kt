@@ -26,7 +26,7 @@ class OpenFoodFactsRepository(
 ) : FoodFactsRepository {
 
   companion object {
-    private val MAX_RESULTS = 7 // Adjust the number of results as needed
+    private const val MAX_RESULTS = 7 // Adjust the number of results as needed
   }
 
   private val _searchStatus = MutableStateFlow<SearchStatus>(SearchStatus.Idle)
@@ -162,7 +162,10 @@ class OpenFoodFactsRepository(
     val name = productObject.optString("product_name", "Unknown Product")
     val barcode = productObject.optString("code", "")
     val imageUrl = productObject.optString("image_url", FoodFacts.DEFAULT_IMAGE_URL)
-    val quantity = Quantity(amount = 1.0) // Assuming default quantity, adjust as needed
+
+    val quantityString = productObject.optString("quantity", "1")
+    Log.d("OpenFoodFactsRepository", "Quantity String: $quantityString")
+    val quantity = parseOpenFoodFactsQuantity(quantityString)
 
     // Map nutrition facts
     val nutritionFacts =
@@ -189,4 +192,34 @@ class OpenFoodFactsRepository(
         nutritionFacts = nutritionFacts,
         imageUrl = imageUrl)
   }
+
+  fun parseOpenFoodFactsQuantity(quantityString: String): Quantity {
+    // Normalize the string (remove leading/trailing spaces, and convert to lowercase)
+    val normalizedString = quantityString.trim().lowercase()
+
+    // Regex to match a number (integer or decimal) followed by an optional space and unit
+    val regex = Regex("""(\d+(\.\d+)?)(\s*)?(g|kg|ml|l|dl|cl)""")
+
+    val matchResult = regex.find(normalizedString)
+    return if (matchResult != null) {
+      val (amountString, _, _, unitString) = matchResult.destructured
+
+      val amount = amountString.toDoubleOrNull() ?: 1.0 // Fallback to 1.0 if parsing fails
+      val unit = when (unitString) {
+        "g" -> FoodUnit.GRAM
+        "kg" -> FoodUnit.GRAM.also { return Quantity(amount * 1000, it) } // Convert kg -> g
+        "ml" -> FoodUnit.ML
+        "l" -> FoodUnit.ML.also { return Quantity(amount * 1000, it) } // Convert l -> ml
+        "dl" -> FoodUnit.ML.also { return Quantity(amount * 100, it) } // Convert dl -> ml
+        "cl" -> FoodUnit.ML.also { return Quantity(amount * 10, it) }  // Convert cl -> ml
+        else -> FoodUnit.COUNT // Default fallback
+      }
+
+      Quantity(amount, unit)
+    } else {
+      // Default quantity in case of invalid input
+      Quantity(1.0, FoodUnit.COUNT)
+    }
+  }
+
 }
