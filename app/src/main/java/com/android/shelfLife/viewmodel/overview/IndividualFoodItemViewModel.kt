@@ -25,7 +25,7 @@ constructor(
 
   suspend fun deleteFoodItem() {
     val householdId = userRepository.user.value?.selectedHouseholdUID
-    if (householdId != null) {
+    if (householdId != null && selectedFood != null) {
       foodItemRepository.deleteFoodItem(householdId, selectedFood!!.uid)
       foodItemRepository.selectFoodItem(null)
     }

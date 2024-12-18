@@ -198,11 +198,7 @@ constructor(
     _user.value = updatedUserData
   }
 
-  private suspend fun updateArrayField(
-      fieldName: String,
-      value: String,
-      operation: ArrayOperation
-  ) {
+  private fun updateArrayField(fieldName: String, value: String, operation: ArrayOperation) {
     val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
     val updateValue =
         when (operation) {
@@ -261,7 +257,7 @@ constructor(
     updateArrayField("recipeUIDs", uid, ArrayOperation.REMOVE)
   }
 
-  override suspend fun deleteInvitationUID(uid: String) {
+  override fun deleteInvitationUID(uid: String) {
     updateArrayField("invitationUIDs", uid, ArrayOperation.REMOVE)
   }
 
