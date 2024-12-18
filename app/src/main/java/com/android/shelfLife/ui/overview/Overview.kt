@@ -5,8 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +29,7 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
+import com.android.shelfLife.ui.newutils.ExtendedActionButtons
 import com.android.shelfLife.ui.utils.CustomSearchBar
 import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import kotlinx.coroutines.launch
@@ -95,7 +97,10 @@ fun OverviewScreen(
                     ) {
                       // Leaderboard
                       FloatingActionButton(
-                          onClick = { navigationActions.navigateTo(Screen.LEADERBOARD) },
+                          onClick = {
+                            overviewScreenViewModel.selectFoodItem(null)
+                            navigationActions.navigateTo(Screen.LEADERBOARD)
+                          },
                           containerColor = MaterialTheme.colorScheme.secondaryContainer,
                           modifier = Modifier.testTag("leaderboardFab")) {
                             Icon(
@@ -106,12 +111,15 @@ fun OverviewScreen(
                           }
 
                       // Add
-                      FloatingActionButton(
-                          onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
-                          containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                          modifier = Modifier.testTag("addFoodFab")) {
-                            Icon(Icons.Default.Add, contentDescription = "Add")
-                          }
+                      ExtendedActionButtons(
+                          fabExpanded = overviewScreenViewModel.fabExpanded,
+                          navigationActions = navigationActions,
+                          firstIcon = Icons.Default.Search,
+                          firstScreenText = "Quick Add",
+                          firstScreen = Screen.FIRST_FOOD_ITEM,
+                          secondScreen = Screen.ADD_FOOD,
+                          firstScreenTestTag = "addFirstName",
+                          secondScreenTestTag = "addFoodFab")
                     }
               },
           ) { paddingValues ->

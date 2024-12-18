@@ -59,6 +59,7 @@ fun TopNavigationBar(
   var showFilterBar by remember { mutableStateOf(false) }
   Column {
     TopAppBar(
+        modifier = Modifier.testTag("NavigationTopAppBar"),
         colors =
             TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
