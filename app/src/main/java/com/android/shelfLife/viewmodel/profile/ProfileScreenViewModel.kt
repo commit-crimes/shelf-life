@@ -20,16 +20,11 @@ import kotlinx.coroutines.flow.StateFlow
 class ProfileScreenViewModel
 @Inject
 constructor(
-    private val invitationRepository: InvitationRepository,
     private val userRepository: UserRepository,
 ) : ViewModel() {
   var changeThemeMenuState = mutableStateOf(false)
   val invitationUIDS: StateFlow<List<String>> = userRepository.invitations
   val currentUser = userRepository.user
-
-  init {
-    Log.d("ProfileScreenViewModel", "init" + userRepository.invitations.value)
-  }
 
   /** Signs out the user. */
   fun signOut(context: Context) {

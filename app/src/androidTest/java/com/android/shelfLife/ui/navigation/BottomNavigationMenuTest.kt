@@ -73,7 +73,7 @@ class BottomNavigationMenuTest {
      * following the same pattern as the InvitationScreenTest.
      */
     private fun createViewModel(): ProfileScreenViewModel {
-        return ProfileScreenViewModel(invitationRepository, userRepository)
+        return ProfileScreenViewModel(userRepository)
     }
 
     @Test
