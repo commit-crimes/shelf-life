@@ -61,20 +61,16 @@ fun ChooseFoodItem(
 ) {
   val coroutineScope = rememberCoroutineScope()
   val context = LocalContext.current
-  val permissionGranted = cameraViewModel.permissionGranted
 
-    var isLoading by remember {mutableStateOf(false)}
-  var capturedImageUri by remember { mutableStateOf<Uri?>(null) }
-    val imageURL by remember {mutableStateOf<String?>(null)}
   val selectImageLauncher =
       rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri?
         ->
-        capturedImageUri = uri
+        foodItemViewModel.capturedImageUri = uri
       }
 
-    LaunchedEffect(capturedImageUri) {
-        capturedImageUri?.let { uri ->
-            isLoading = true
+    LaunchedEffect(foodItemViewModel.capturedImageUri) {
+        foodItemViewModel.capturedImageUri?.let { uri ->
+            foodItemViewModel.isLoading = true
             val uploadedUrl = foodItemViewModel.uploadImageToFirebaseStorage(uri, context)
             if (uploadedUrl != null) {
                 foodItemViewModel.selectedImage = FoodFacts(
@@ -86,8 +82,8 @@ fun ChooseFoodItem(
             } else {
                 Toast.makeText(context, "Failed to upload image", Toast.LENGTH_SHORT).show()
             }
-            isLoading = false
-            capturedImageUri = null // Reset the URI
+            foodItemViewModel.isLoading = false
+            foodItemViewModel.capturedImageUri = null // Reset the URI
         }
     }
 
@@ -202,11 +198,11 @@ fun ChooseFoodItem(
                                               color = Color.Gray,
                                               shape = RoundedCornerShape(8.dp))
                                           .clickable {
-                                              if (!isLoading) selectImageLauncher.launch("image/*")
+                                              if (!foodItemViewModel.isLoading) selectImageLauncher.launch("image/*")
                                           }
                                           .testTag("uploadImage"),
                                   contentAlignment = Alignment.Center) {
-                                  if (isLoading) {
+                                  if (foodItemViewModel.isLoading) {
                                       CircularProgressIndicator() // Show loading during upload
                                   } else {
                                       Icon(
@@ -255,16 +251,6 @@ fun ChooseFoodItem(
                     }
               }
 
-
-//              item {
-//                capturedImageUri?.let { uri ->
-//                  Image(
-//                      painter = rememberAsyncImagePainter(uri),
-//                      contentDescription = null,
-//                      modifier = Modifier.size(150.dp).padding(8.dp))
-//                }
-//              }
-
               item {
                 CustomButtons(
                     button1OnClick = {
@@ -276,7 +262,7 @@ fun ChooseFoodItem(
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(id = R.string.cancel_button),
                     button2OnClick = {
-                        if(!isLoading){
+                        if(!foodItemViewModel.isLoading){
                         foodItemViewModel.selectedImage?.let { selectedImage ->
                             selectedImage.name = foodItemViewModel.selectedFood?.foodFacts?.name ?: ""
                             foodItemViewModel.setFoodItem(

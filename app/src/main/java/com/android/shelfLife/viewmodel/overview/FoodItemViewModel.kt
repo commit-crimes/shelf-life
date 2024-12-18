@@ -48,8 +48,10 @@ constructor(
   var isScanned by mutableStateOf(false)
   var isQuickAdd by mutableStateOf(false)
   val searchStatus: StateFlow<SearchStatus> = foodFactsRepository.searchStatus
-
   val foodFactsSuggestions: StateFlow<List<FoodFacts>> = foodFactsRepository.foodFactsSuggestions
+var isLoading by mutableStateOf(false)
+    var capturedImageUri by mutableStateOf<Uri?>(null)
+
 
   var foodName by mutableStateOf("")
   var amount by mutableStateOf("")
