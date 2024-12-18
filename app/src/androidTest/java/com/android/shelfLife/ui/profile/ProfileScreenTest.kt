@@ -10,6 +10,7 @@ import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.user.User
 import com.android.shelfLife.model.user.UserRepository
+import com.android.shelfLife.model.user.UserRepositoryFirestore
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.viewmodel.profile.ProfileScreenViewModel
@@ -20,7 +21,10 @@ import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.junit.*
+import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
+import javax.inject.Inject
 
 
 @HiltAndroidTest
@@ -33,37 +37,29 @@ class ProfileScreenTest {
     val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
 
     private lateinit var mockViewModel: ProfileScreenViewModel
+    @Inject
+    lateinit var userRepository: UserRepository
     private lateinit var navigationActions: NavigationActions
 
     @Before
     fun setUp() {
         hiltRule.inject()
 
-        // Mock the NavigationActions
-        navigationActions = mockk(relaxed = true)
+        navigationActions = mock(NavigationActions::class.java)
 
-        // Create real StateFlow objects
-        val userFlow = MutableStateFlow(
-            User(
-                uid = "currentUserId",
-                username = "Current User",
-                email = "currentUser@example.com",
-                photoUrl = null,
-                householdUIDs = emptyList(),
-                selectedHouseholdUID = null,
-                recipeUIDs = emptyList()
-            )
+        whenever (userRepository.user).thenReturn(
+            MutableStateFlow(
+                User(
+                    "currentUserId",
+                    "Current User",
+                    "currentuser@gmail.com",
+                    null,
+                    "",
+                    emptyList(),
+                    emptyList()))
         )
-        val invitationsFlow = MutableStateFlow(emptyList<String>())
-        val themeMenuStateFlow = mutableStateOf(false)
-
-        // Mock the ViewModel with real StateFlows
-        mockViewModel = mockk(relaxed = true) {
-            every { currentUser } returns userFlow.asStateFlow()
-            every { invitationUIDS } returns invitationsFlow.asStateFlow()
-            every { changeThemeMenuState } returns themeMenuStateFlow
-            every { signOut(any()) } returns Unit
-        }
+        whenever (userRepository.invitations).thenReturn(MutableStateFlow(emptyList()))
+        mockViewModel = ProfileScreenViewModel(userRepository)
     }
 
     @Test
@@ -92,11 +88,9 @@ class ProfileScreenTest {
             )
         }
 
-        // Click the logout button
         composeTestRule.onNodeWithTag("logoutButton").performClick()
 
-        // Verify the navigation action
-        verify { navigationActions.navigateToAndClearBackStack(Screen.AUTH) }
+        verify(navigationActions).navigateToAndClearBackStack(Screen.AUTH)
     }
 
     @Test
