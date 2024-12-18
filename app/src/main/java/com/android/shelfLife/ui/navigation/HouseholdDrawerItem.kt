@@ -86,6 +86,5 @@ fun HouseholdDrawerItem(
           onHouseholdSelected(household)
         }
       },
-      modifier = modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-  )
+      modifier = modifier.padding(NavigationDrawerItemDefaults.ItemPadding))
 }

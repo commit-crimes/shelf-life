@@ -8,7 +8,6 @@ import io.mockk.coEvery
 import io.mockk.every
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import org.mockito.kotlin.whenever
 
 class UserRepositoryTestHelper(private val userRepository: UserRepository) {
   private val user = MutableStateFlow<User?>(null)
@@ -48,11 +47,11 @@ class UserRepositoryTestHelper(private val userRepository: UserRepository) {
     this.currentAudioMode.value = mode
   }
 
-    fun setUserEmails(emails: Map<String, String>) {
-        this.userEmails = emails
-    }
+  fun setUserEmails(emails: Map<String, String>) {
+    this.userEmails = emails
+  }
 
-    fun setUserIds(ids: Map<String, String>) {
-        this.userIds = ids
-    }
+  fun setUserIds(ids: Map<String, String>) {
+    this.userIds = ids
+  }
 }

@@ -19,7 +19,6 @@ import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.permission.PermissionRepository
 import com.android.shelfLife.model.user.User
 import com.android.shelfLife.model.user.UserRepository
-import com.android.shelfLife.ui.utils.formatTimestampToDate
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.Timestamp
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -183,89 +182,115 @@ class EndToEndM3Test {
     composeTestRule.onNodeWithTag("signInScreen").assertIsDisplayed()
   }
 
-    @Test
-    fun testEndToEnd_household_management() {
-        //User logs in and navigates to the profile screen
-        householdRepositoryTestHelper.selectHousehold(null)
-        composeTestRule.onNodeWithTag("signInScreen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("loginButton").performClick()
-        //User arrives at the first time welcome screen
-        composeTestRule.onNodeWithTag("firstTimeWelcomeScreen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("householdNameSaveButton").performClick()
+  @Test
+  fun testEndToEnd_household_management() {
+    // User logs in and navigates to the profile screen
+    householdRepositoryTestHelper.selectHousehold(null)
+    composeTestRule.onNodeWithTag("signInScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginButton").performClick()
+    // User arrives at the first time welcome screen
+    composeTestRule.onNodeWithTag("firstTimeWelcomeScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("householdNameSaveButton").performClick()
 
-        //User arrives at household creation screen
-        composeTestRule.onNodeWithTag("HouseHoldCreationScreen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextInput("New test Household")
-        composeTestRule.onNodeWithTag("ConfirmButton").performClick()
-        householdRepositoryTestHelper.selectHousehold(HouseHold("1", "New test Household", emptyList(), emptyList(), emptyMap(), emptyMap()))
+    // User arrives at household creation screen
+    composeTestRule.onNodeWithTag("HouseHoldCreationScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextInput("New test Household")
+    composeTestRule.onNodeWithTag("ConfirmButton").performClick()
+    householdRepositoryTestHelper.selectHousehold(
+        HouseHold("1", "New test Household", emptyList(), emptyList(), emptyMap(), emptyMap()))
 
-        //User arrives at the overview screen
-        composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+    // User arrives at the overview screen
+    composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
 
-        //User opens the hamburger menu and adds a new household
-        composeTestRule.onNodeWithTag("hamburgerIcon").assertIsDisplayed().performClick()
-        composeTestRule.onNodeWithTag("householdSelectionDrawer").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("addHouseholdIcon").assertIsDisplayed().performClick()
+    // User opens the hamburger menu and adds a new household
+    composeTestRule.onNodeWithTag("hamburgerIcon").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("householdSelectionDrawer").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addHouseholdIcon").assertIsDisplayed().performClick()
 
-        //User adds a new household
-        composeTestRule.onNodeWithTag("HouseHoldCreationScreen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextInput("New test Household")
-        composeTestRule.onNodeWithTag("ConfirmButton").performClick()
+    // User adds a new household
+    composeTestRule.onNodeWithTag("HouseHoldCreationScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextInput("New test Household")
+    composeTestRule.onNodeWithTag("ConfirmButton").performClick()
 
-        //Correct household name
-        composeTestRule.onNodeWithTag("HouseHoldCreationScreen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextClearance()
-        composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextInput("New test Household 2")
-        composeTestRule.onNodeWithTag("ConfirmButton").performClick()
-        householdRepositoryTestHelper.selectHousehold(HouseHold("2", "New test Household 2", emptyList(), emptyList(), emptyMap(), emptyMap()))
-        householdRepositoryTestHelper.setHouseholds(listOf(HouseHold("1", "New test Household", emptyList(), emptyList(), emptyMap(), emptyMap()), HouseHold("2", "New test Household 2", emptyList(), emptyList(), emptyMap(), emptyMap())))
+    // Correct household name
+    composeTestRule.onNodeWithTag("HouseHoldCreationScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextClearance()
+    composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextInput("New test Household 2")
+    composeTestRule.onNodeWithTag("ConfirmButton").performClick()
+    householdRepositoryTestHelper.selectHousehold(
+        HouseHold("2", "New test Household 2", emptyList(), emptyList(), emptyMap(), emptyMap()))
+    householdRepositoryTestHelper.setHouseholds(
+        listOf(
+            HouseHold("1", "New test Household", emptyList(), emptyList(), emptyMap(), emptyMap()),
+            HouseHold(
+                "2", "New test Household 2", emptyList(), emptyList(), emptyMap(), emptyMap())))
 
-        composeTestRule.waitForIdle()
+    composeTestRule.waitForIdle()
 
-        composeTestRule.onNodeWithTag("hamburgerIcon").assertIsDisplayed().performClick()
-        composeTestRule.onNodeWithTag("householdSelectionDrawer").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("householdElement_0").assertTextEquals("New test Household")
-        composeTestRule.onNodeWithTag("householdElement_1").assertTextEquals("New test Household 2")
+    composeTestRule.onNodeWithTag("hamburgerIcon").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("householdSelectionDrawer").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("householdElement_0").assertTextEquals("New test Household")
+    composeTestRule.onNodeWithTag("householdElement_1").assertTextEquals("New test Household 2")
 
-        //User edits the first household
-        composeTestRule.onNodeWithTag("editHouseholdIcon").performClick()
-        composeTestRule.waitForIdle()
-composeTestRule.onNodeWithTag("householdElement_0").onChildren().filter(hasTestTag("editHouseholdIndicatorIcon")).onFirst()
-    .assertIsDisplayed()
-    .performClick()
-        householdRepositoryTestHelper.setHouseholdToEdit(HouseHold("1", "New test Household", emptyList(), emptyList(), emptyMap(), emptyMap()))
+    // User edits the first household
+    composeTestRule.onNodeWithTag("editHouseholdIcon").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule
+        .onNodeWithTag("householdElement_0")
+        .onChildren()
+        .filter(hasTestTag("editHouseholdIndicatorIcon"))
+        .onFirst()
+        .assertIsDisplayed()
+        .performClick()
+    householdRepositoryTestHelper.setHouseholdToEdit(
+        HouseHold("1", "New test Household", emptyList(), emptyList(), emptyMap(), emptyMap()))
 
-        //User edits the household name
-        composeTestRule.onNodeWithTag("HouseHoldCreationScreen").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("HouseHoldNameTextField").assert(hasText("New test Household"))
-        composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextClearance()
-        composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextInput("New New test Household")
-        composeTestRule.onNodeWithTag("ConfirmButton").performClick()
-        householdRepositoryTestHelper.selectHousehold(HouseHold("1", "New New test Household", emptyList(), emptyList(), emptyMap(), emptyMap()))
-        householdRepositoryTestHelper.setHouseholds(listOf(HouseHold("1", "New New test Household", emptyList(), emptyList(), emptyMap(), emptyMap()), HouseHold("2", "New test Household 2", emptyList(), emptyList(), emptyMap(), emptyMap())))
+    // User edits the household name
+    composeTestRule.onNodeWithTag("HouseHoldCreationScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("HouseHoldNameTextField").assert(hasText("New test Household"))
+    composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextClearance()
+    composeTestRule
+        .onNodeWithTag("HouseHoldNameTextField")
+        .performTextInput("New New test Household")
+    composeTestRule.onNodeWithTag("ConfirmButton").performClick()
+    householdRepositoryTestHelper.selectHousehold(
+        HouseHold("1", "New New test Household", emptyList(), emptyList(), emptyMap(), emptyMap()))
+    householdRepositoryTestHelper.setHouseholds(
+        listOf(
+            HouseHold(
+                "1", "New New test Household", emptyList(), emptyList(), emptyMap(), emptyMap()),
+            HouseHold(
+                "2", "New test Household 2", emptyList(), emptyList(), emptyMap(), emptyMap())))
 
-        //User deletes the second household
-        composeTestRule.onNodeWithTag("hamburgerIcon").assertIsDisplayed().performClick()
-        composeTestRule.onNodeWithTag("householdSelectionDrawer").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("householdElement_1").assertTextEquals("New test Household 2")
-        composeTestRule.onNodeWithTag("editHouseholdIcon").performClick()
-        composeTestRule.onNodeWithTag("householdElement_1").onChildren().filter(hasTestTag("deleteHouseholdIcon")).onFirst().performClick()
-        composeTestRule.onNodeWithTag("DeleteConfirmationDialog").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("confirmDeleteHouseholdButton").performClick()
-        householdRepositoryTestHelper.selectHousehold(HouseHold("1", "New New test Household", emptyList(), emptyList(), emptyMap(), emptyMap()))
-        householdRepositoryTestHelper.setHouseholds(listOf(HouseHold("1", "New New test Household", emptyList(), emptyList(), emptyMap(), emptyMap())))
-        composeTestRule.onNodeWithTag("householdElement_1").assertIsNotDisplayed()
+    // User deletes the second household
+    composeTestRule.onNodeWithTag("hamburgerIcon").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("householdSelectionDrawer").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("householdElement_1").assertTextEquals("New test Household 2")
+    composeTestRule.onNodeWithTag("editHouseholdIcon").performClick()
+    composeTestRule
+        .onNodeWithTag("householdElement_1")
+        .onChildren()
+        .filter(hasTestTag("deleteHouseholdIcon"))
+        .onFirst()
+        .performClick()
+    composeTestRule.onNodeWithTag("DeleteConfirmationDialog").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("confirmDeleteHouseholdButton").performClick()
+    householdRepositoryTestHelper.selectHousehold(
+        HouseHold("1", "New New test Household", emptyList(), emptyList(), emptyMap(), emptyMap()))
+    householdRepositoryTestHelper.setHouseholds(
+        listOf(
+            HouseHold(
+                "1", "New New test Household", emptyList(), emptyList(), emptyMap(), emptyMap())))
+    composeTestRule.onNodeWithTag("householdElement_1").assertIsNotDisplayed()
 
-        Espresso.pressBack()
-        composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+    Espresso.pressBack()
+    composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
 
-        //User logs out
-        composeTestRule.onNodeWithTag("Profile").performClick()
-        composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithTag("profileScaffold").assertIsDisplayed()
-        composeTestRule.onNodeWithTag("logoutButton").assertIsDisplayed().performClick()
-        composeTestRule.onNodeWithTag("signInScreen").assertIsDisplayed()
-    }
-
-
+    // User logs out
+    composeTestRule.onNodeWithTag("Profile").performClick()
+    composeTestRule.waitForIdle()
+    composeTestRule.onNodeWithTag("profileScaffold").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("logoutButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("signInScreen").assertIsDisplayed()
+  }
 }

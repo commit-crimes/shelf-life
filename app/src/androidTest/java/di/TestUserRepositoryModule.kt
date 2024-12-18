@@ -12,8 +12,6 @@ import io.mockk.mockk
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import org.mockito.Mockito.mock
-import org.mockito.kotlin.whenever
 
 @Module
 @TestInstallIn(components = [SingletonComponent::class], replaces = [UserRepositoryModule::class])

@@ -17,7 +17,10 @@ class HouseholdRepositoryTestHelper(private val houseHoldRepository: HouseHoldRe
     every { houseHoldRepository.selectedHousehold } returns selectedHousehold.asStateFlow()
     every { houseHoldRepository.householdToEdit } returns householdToEdit.asStateFlow()
     every { houseHoldRepository.households } returns households.asStateFlow()
-    every { houseHoldRepository.checkIfHouseholdNameExists(any()) } answers   {households.value.any { it.name == args[0] }}
+    every { houseHoldRepository.checkIfHouseholdNameExists(any()) } answers
+        {
+          households.value.any { it.name == args[0] }
+        }
     coEvery { houseHoldRepository.getHouseholdMembers(any()) } returns householdMembers
   }
 
@@ -26,9 +29,9 @@ class HouseholdRepositoryTestHelper(private val houseHoldRepository: HouseHoldRe
     selectedHousehold.value = houseHold
   }
 
-    fun setHouseholds(houseHolds: List<HouseHold>) {
-        households.value = houseHolds
-    }
+  fun setHouseholds(houseHolds: List<HouseHold>) {
+    households.value = houseHolds
+  }
 
   fun setHouseholdToEdit(houseHold: HouseHold?) {
     householdToEdit.value = houseHold

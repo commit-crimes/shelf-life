@@ -2,7 +2,6 @@ package di
 
 import com.android.shelfLife.di.HouseholdRepositoryModule
 import com.android.shelfLife.model.household.HouseHoldRepository
-import com.android.shelfLife.model.household.HouseholdRepositoryFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
