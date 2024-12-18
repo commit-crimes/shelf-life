@@ -54,7 +54,8 @@ fun OverviewScreen(
 
   val drawerState by overviewScreenViewModel.drawerState.collectAsState()
   val scope = rememberCoroutineScope()
-
+  Log.d("OverviewScreen", "selectedHousehold: $selectedHousehold")
+  Log.d("OverviewScreen", "households: $households")
   HouseHoldSelectionDrawer(
       scope = scope, drawerState = drawerState, navigationActions = navigationActions) {
         if (selectedHousehold == null && households.isEmpty()) {

@@ -180,7 +180,7 @@ constructor(
     _currentAudioMode.value = mode
   }
 
-  private suspend fun updateUserField(fieldName: String, value: Any) {
+  private fun updateUserField(fieldName: String, value: Any) {
     val currentUser = firebaseAuth.currentUser ?: throw Exception("User not logged in")
     userCollection.document(currentUser.uid).update(fieldName, value)
 
