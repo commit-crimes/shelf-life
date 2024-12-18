@@ -115,6 +115,10 @@ constructor(
     _signInState.value = SignInState.Success(authResult = authResult)
   }
 
+  fun setSignInSuccessStateForTesting(state: SignInState) {
+    _signInState.value = state
+  }
+
   fun setIsUserLoggedInForTesting(isLoggedIn: Boolean) {
     _isUserLoggedIn.value = isLoggedIn
   }

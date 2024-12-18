@@ -123,20 +123,20 @@ class SignInViewModelTest {
 
   @Test
   fun setSignInStateForTesting_coversAllStates() = runTest {
-    viewModel.setSignInStateForTesting(SignInState.Loading)
+    viewModel.setSignInSuccessStateForTesting(SignInState.Loading)
     assertTrue(viewModel.signInState.first() is SignInState.Loading)
 
     val mockAuthResult = mock(AuthResult::class.java)
-    viewModel.setSignInStateForTesting(SignInState.Success(mockAuthResult))
+    viewModel.setSignInSuccessStateForTesting(SignInState.Success(mockAuthResult))
     val current = viewModel.signInState.first()
     assertTrue(current is SignInState.Success)
 
-    viewModel.setSignInStateForTesting(SignInState.Error("Test error"))
+    viewModel.setSignInSuccessStateForTesting(SignInState.Error("Test error"))
     val errorState = viewModel.signInState.first()
     assertTrue(errorState is SignInState.Error)
     assertEquals("Test error", (errorState as SignInState.Error).message)
 
-    viewModel.setSignInStateForTesting(SignInState.Idle)
+    viewModel.setSignInSuccessStateForTesting(SignInState.Idle)
     assertTrue(viewModel.signInState.first() is SignInState.Idle)
   }
 }
