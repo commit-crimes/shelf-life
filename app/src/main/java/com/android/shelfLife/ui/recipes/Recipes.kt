@@ -62,8 +62,10 @@ import com.android.shelfLife.viewmodel.recipes.RecipesViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun RecipesScreen(navigationActions: NavigationActions) {
-  val recipesViewModel = hiltViewModel<RecipesViewModel>()
+fun RecipesScreen(
+    navigationActions: NavigationActions,
+    recipesViewModel: RecipesViewModel = hiltViewModel<RecipesViewModel>()
+) {
   val overviewScreenViewModel = hiltViewModel<OverviewScreenViewModel>()
 
   val user = recipesViewModel.user.collectAsState()
