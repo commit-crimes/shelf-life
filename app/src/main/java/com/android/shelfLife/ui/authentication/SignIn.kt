@@ -39,14 +39,19 @@ fun SignInScreen(
   val context = LocalContext.current
   val isUserLoggedIn by signInViewModel.isUserLoggedIn.collectAsState()
   val signInState by signInViewModel.signInState.collectAsState()
+  val bypassLogin by signInViewModel.bypassLogin.collectAsState()
+
+  Log.d("SignInScreen", "bypassLogin: $bypassLogin")
   LaunchedEffect(isUserLoggedIn) {
     if (isUserLoggedIn) {
+      Log.d("SignInScreen", "User is already logged in, navigating to overview")
       navigationActions.navigateTo(Route.OVERVIEW)
     }
   }
 
   // Handle sign-in states
   LaunchedEffect(signInState) {
+    Log.d("SignInScreen", "Sign-in state: $signInState")
     when (signInState) {
       is SignInState.Success -> {
         Toast.makeText(context, "Login successful!", Toast.LENGTH_LONG).show()
@@ -108,13 +113,18 @@ fun SignInScreen(
 
           GoogleSignInButton(
               onSignInClick = {
-                val gso =
-                    GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(token)
-                        .requestEmail()
-                        .build()
-                val googleSignInClient = GoogleSignIn.getClient(context, gso)
-                launcher.launch(googleSignInClient.signInIntent)
+                // We now officially got a backdoor in the code :)
+                if (bypassLogin) {
+                  signInViewModel.setIsUserLoggedInForTesting(true)
+                } else {
+                  val gso =
+                      GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                          .requestIdToken(token)
+                          .requestEmail()
+                          .build()
+                  val googleSignInClient = GoogleSignIn.getClient(context, gso)
+                  launcher.launch(googleSignInClient.signInIntent)
+                }
               },
               modifier = Modifier.testTag("loginButton"))
 

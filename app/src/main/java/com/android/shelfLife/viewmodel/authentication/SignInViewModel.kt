@@ -24,7 +24,7 @@ import kotlinx.coroutines.tasks.await
 class SignInViewModel
 @Inject
 constructor(
-    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance(),
+    private val firebaseAuth: FirebaseAuth,
     private val userRepository: UserRepository,
     private val householdRepository: HouseHoldRepository,
     private val recipeRepository: RecipeRepository,
@@ -37,6 +37,8 @@ constructor(
 
   private val _isUserLoggedIn = MutableStateFlow(false)
   val isUserLoggedIn: StateFlow<Boolean> = _isUserLoggedIn
+
+  val bypassLogin = userRepository.bypassLogin
 
   private val authStateListener =
       FirebaseAuth.AuthStateListener { auth ->
@@ -109,8 +111,16 @@ constructor(
     }
   }
 
+  fun setSignInSuccessStateForTesting(authResult: AuthResult) {
+    _signInState.value = SignInState.Success(authResult = authResult)
+  }
+
   fun setSignInStateForTesting(state: SignInState) {
     _signInState.value = state
+  }
+
+  fun setIsUserLoggedInForTesting(isLoggedIn: Boolean) {
+    _isUserLoggedIn.value = isLoggedIn
   }
 }
 

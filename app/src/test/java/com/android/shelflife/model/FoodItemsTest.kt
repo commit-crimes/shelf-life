@@ -26,13 +26,13 @@ import org.robolectric.annotation.Config
 @Config(application = dagger.hilt.android.testing.HiltTestApplication::class)
 class FoodItemTest {
 
-    @get:Rule var hiltRule = HiltAndroidRule(this)
+  @get:Rule var hiltRule = HiltAndroidRule(this)
 
-    @Before
-    fun setUp() {
-        hiltRule.inject()
-    }
-    
+  @Before
+  fun setUp() {
+    hiltRule.inject()
+  }
+
   private val mockFoodFacts =
       FoodFacts(
           name = "Sample Food",

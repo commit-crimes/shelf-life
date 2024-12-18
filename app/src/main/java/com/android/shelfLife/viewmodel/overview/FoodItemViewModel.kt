@@ -33,7 +33,7 @@ constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
-  var selectedFood by mutableStateOf<FoodItem?>(null)
+  var selectedFood = foodItemRepository.selectedFoodItem
 
   var isSelected by mutableStateOf(false)
 
@@ -60,17 +60,16 @@ constructor(
   var selectedImage by mutableStateOf<FoodFacts?>(null)
 
   init {
-    selectedFood = foodItemRepository.selectedFoodItem.value
-    if (selectedFood != null) {
+    if (selectedFood.value != null) {
       isSelected = true
-      foodName = selectedFood!!.foodFacts.name
-      amount = selectedFood!!.foodFacts.quantity.amount.toString()
-      unit = selectedFood!!.foodFacts.quantity.unit
-      category = selectedFood!!.foodFacts.category
-      location = selectedFood!!.location
-      expireDate = selectedFood!!.expiryDate?.let { formatTimestampToDate(it) } ?: ""
-      openDate = selectedFood!!.openDate?.let { formatTimestampToDate(it) } ?: ""
-      buyDate = selectedFood!!.buyDate?.let { formatTimestampToDate(it) } ?: ""
+      foodName = selectedFood.value!!.foodFacts.name
+      amount = selectedFood.value!!.foodFacts.quantity.amount.toString()
+      unit = selectedFood.value!!.foodFacts.quantity.unit
+      category = selectedFood.value!!.foodFacts.category
+      location = selectedFood.value!!.location
+      expireDate = selectedFood.value!!.expiryDate?.let { formatTimestampToDate(it) } ?: ""
+      openDate = selectedFood.value!!.openDate?.let { formatTimestampToDate(it) } ?: ""
+      buyDate = selectedFood.value!!.buyDate?.let { formatTimestampToDate(it) } ?: ""
     } else {
       isSelected = false
     }
@@ -111,7 +110,7 @@ constructor(
   suspend fun deleteFoodItem() {
     val householdId = userRepository.user.value?.selectedHouseholdUID
     if (householdId != null) {
-      foodItemRepository.deleteFoodItem(householdId, selectedFood!!.uid)
+      foodItemRepository.deleteFoodItem(householdId, selectedFood.value!!.uid)
       foodItemRepository.selectFoodItem(null)
     }
   }
@@ -174,27 +173,28 @@ constructor(
               FoodFacts(
                   name = foodName,
                   barcode =
-                      if (isSelected) selectedFood!!.foodFacts.barcode
+                      if (isSelected) selectedFood.value!!.foodFacts.barcode
                       else selectedImage?.barcode ?: "",
                   quantity = Quantity(amount.toDouble(), unit),
                   category = category,
                   nutritionFacts =
-                      if (isSelected) selectedFood!!.foodFacts.nutritionFacts
+                      if (isSelected) selectedFood.value!!.foodFacts.nutritionFacts
                       else selectedImage?.nutritionFacts ?: NutritionFacts(),
                   imageUrl =
-                      if (isSelected) selectedFood!!.foodFacts.imageUrl
+                      if (isSelected) selectedFood.value!!.foodFacts.imageUrl
                       else selectedImage?.imageUrl ?: FoodFacts.DEFAULT_IMAGE_URL)
       val newFoodItem =
           FoodItem(
-              uid = if (isSelected) selectedFood!!.uid else foodItemRepository.getNewUid(),
+              uid = if (isSelected) selectedFood.value!!.uid else foodItemRepository.getNewUid(),
               foodFacts = foodFacts,
               location = location,
               expiryDate = expiryTimestamp,
               openDate = openTimestamp,
               buyDate = buyTimestamp,
-              status = if (isSelected) selectedFood!!.status else FoodStatus.UNOPENED,
+              status = if (isSelected) selectedFood.value!!.status else FoodStatus.UNOPENED,
               owner =
-                  if (isSelected) selectedFood!!.owner else userRepository.user.value?.uid ?: "")
+                  if (isSelected) selectedFood.value!!.owner
+                  else userRepository.user.value?.uid ?: "")
       if (isSelected) {
         foodItemRepository.selectFoodItem(newFoodItem)
         editFoodItem(newFoodItem)
