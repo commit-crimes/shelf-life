@@ -12,6 +12,7 @@ import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -405,4 +406,115 @@ class HouseholdRepositoryFirestoreTest {
     val members = houseHoldRepository.getHouseholdMembers("nope")
     assertTrue(members.isEmpty())
   }
+
+    @Test
+    fun getHouseholdNewUidReturnsNewUid() {
+        val newUid = houseHoldRepository.getNewUid()
+        assertNotNull(newUid)
+    }
+
+    @Test
+    fun `addHousehold rolls back changes on Firestore error`() : Unit = runBlocking {
+        // Arrange
+        val household = HouseHold(
+            uid = "houseError",
+            name = "Test Error Household",
+            members = listOf("user1"),
+            sharedRecipes = emptyList(),
+            ratPoints = emptyMap(),
+            stinkyPoints = emptyMap()
+        )
+
+        val field = HouseholdRepositoryFirestore::class.java.getDeclaredField("_households")
+        field.isAccessible = true
+        field.set(houseHoldRepository, MutableStateFlow(emptyList<HouseHold>()))
+
+        `when`(mockCollection.document(household.uid)).thenReturn(mockDocument)
+        `when`(mockDocument.set(anyMap<String, Any>())).thenThrow(RuntimeException("Test Firestore Error"))
+
+        val initialHouseholds = houseHoldRepository.households.value
+
+        // Act
+        houseHoldRepository.addHousehold(household)
+
+        // Assert
+        val updatedHouseholds = houseHoldRepository.households.value
+        assertEquals("The household list should remain unchanged after rollback", initialHouseholds, updatedHouseholds)
+        verify(mockDocument).set(anyMap<String, Any>())
+    }
+
+    @Test
+    fun `updateHousehold restores original state on Firestore error`() : Unit = runBlocking {
+        // Arrange
+        val originalHousehold = HouseHold(
+            uid = "house123",
+            name = "Original Household",
+            members = listOf("user1"),
+            sharedRecipes = emptyList(),
+            ratPoints = emptyMap(),
+            stinkyPoints = emptyMap()
+        )
+        houseHoldRepository.addHousehold(originalHousehold)
+        val updatedHousehold = originalHousehold.copy(name = "Updated Household")
+
+        val field = HouseholdRepositoryFirestore::class.java.getDeclaredField("_households")
+        field.isAccessible = true
+        field.set(houseHoldRepository, MutableStateFlow(listOf(originalHousehold)))
+
+        `when`(mockCollection.document(updatedHousehold.uid)).thenReturn(mockDocument)
+        `when`(mockDocument.set(anyMap<String, Any>())).thenThrow(RuntimeException("Test Firestore Error"))
+
+        // Act
+        houseHoldRepository.updateHousehold(updatedHousehold)
+
+        // Assert
+        val households = houseHoldRepository.households.value
+        assertEquals("The original household should be restored after rollback", originalHousehold, households.first())
+    }
+
+    @Test
+    fun `deleteHouseholdById restores deleted household on Firestore error`() : Unit = runBlocking {
+        // Arrange
+        val householdToDelete = HouseHold(
+            uid = "houseToDelete",
+            name = "Household to Delete",
+            members = emptyList(),
+            sharedRecipes = emptyList(),
+            ratPoints = emptyMap(),
+            stinkyPoints = emptyMap()
+        )
+        houseHoldRepository.addHousehold(householdToDelete)
+        val field = HouseholdRepositoryFirestore::class.java.getDeclaredField("_households")
+        field.isAccessible = true
+        field.set(houseHoldRepository, MutableStateFlow(listOf(householdToDelete)))
+
+        `when`(mockCollection.document(householdToDelete.uid)).thenReturn(mockDocument)
+        `when`(mockDocument.delete()).thenThrow(RuntimeException("Test Firestore Error"))
+
+        // Act
+        houseHoldRepository.deleteHouseholdById(householdToDelete.uid)
+
+        // Assert
+        val households = houseHoldRepository.households.value
+        assertEquals("The deleted household should be restored after rollback", householdToDelete, households.first())
+        verify(mockDocument).delete()
+    }
+
+    @Test
+    fun `initializeHouseholds handles Firestore error gracefully`() : Unit = runBlocking {
+        // Arrange
+        val householdIds = listOf("house123", "house456")
+        val mockQuery = mock(Query::class.java)
+
+        `when`(mockCollection.whereIn(FieldPath.documentId(), householdIds)).thenReturn(mockQuery)
+        `when`(mockQuery.get()).thenThrow(RuntimeException("Test Initialization Error"))
+
+        // Act
+        houseHoldRepository.initializeHouseholds(householdIds, null)
+
+        // Assert
+        val households = houseHoldRepository.households.value
+        assertTrue("Households should remain empty after error", households.isEmpty())
+        assertNull("Selected household should remain null after error", houseHoldRepository.selectedHousehold.value)
+    }
 }
