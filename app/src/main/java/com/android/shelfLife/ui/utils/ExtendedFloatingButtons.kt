@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.newutils
 
+import android.graphics.drawable.Icon
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.width
@@ -14,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -25,6 +27,8 @@ import com.android.shelfLife.viewmodel.overview.FoodItemViewModel
 fun ExtendedActionButtons(
     fabExpanded: MutableState<Boolean>,
     navigationActions: NavigationActions,
+    firstIcon: ImageVector = Icons.Default.AutoAwesome,
+    firstScreenText: String = "Generate",
     firstScreen: String = Screen.GENERATE_RECIPE,
     secondScreen: String = Screen.ADD_RECIPE,
     firstScreenTestTag: String = "generateRecipeFab",
@@ -38,8 +42,8 @@ fun ExtendedActionButtons(
     // Secondary FAB for "Generate" option
     if (fabExpanded.value) {
       ExtendedFloatingActionButton(
-          text = { Text("Generate") },
-          icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "Generate") },
+          text = { Text(firstScreenText) },
+          icon = { Icon(firstIcon, contentDescription = firstScreenText) },
           onClick = {
             // Navigate to Generate Recipe screen
             foodItemViewModel.setIsGenerated(true)
