@@ -46,13 +46,14 @@ constructor(
     refreshInvitations()
   }
 
-  private suspend fun refreshInvitations() {
+  internal suspend fun refreshInvitations() {
     val invitationUIDs = userRepo.invitations.value
     if (invitationUIDs.isNotEmpty()) {
       try {
         _invitations.value = invitationRepository.getInvitationsBatch(invitationUIDs)
       } catch (e: Exception) {
         Log.e("InvitationViewModel", "Error while refreshing invitations", e)
+        _invitations.value = emptyList()
       }
     } else {
       _invitations.value = emptyList()

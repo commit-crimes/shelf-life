@@ -10,7 +10,7 @@ import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
 import javax.inject.Singleton
-import org.mockito.Mockito.mock
+import kotlinx.coroutines.CoroutineScope
 
 @Module
 @TestInstallIn(components = [SingletonComponent::class], replaces = [UserRepositoryModule::class])
@@ -18,7 +18,11 @@ object TestUserModule {
 
   @Provides
   @Singleton
-  fun provideUserRepository(firestore: FirebaseFirestore, auth: FirebaseAuth): UserRepository {
-    return UserRepositoryFirestore(firestore, auth, mock())
+  fun provideUserRepository(
+      firestore: FirebaseFirestore,
+      auth: FirebaseAuth,
+      coroutineScope: CoroutineScope
+  ): UserRepository {
+    return UserRepositoryFirestore(firestore, auth, coroutineScope)
   }
 }
