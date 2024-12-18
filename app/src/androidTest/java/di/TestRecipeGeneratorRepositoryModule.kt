@@ -11,7 +11,7 @@ import org.mockito.Mockito.mock
 
 @Module
 @TestInstallIn(
-  components = [SingletonComponent::class], replaces = [RecipeGeneratorRepositoryModule::class])
+    components = [SingletonComponent::class], replaces = [RecipeGeneratorRepositoryModule::class])
 object TestRecipeGeneratorRepositoryModule {
   @Provides
   @Singleton

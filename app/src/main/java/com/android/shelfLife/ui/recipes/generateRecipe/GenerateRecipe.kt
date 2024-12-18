@@ -70,8 +70,10 @@ fun GenerateRecipeScreen(
             modifier = Modifier.padding(paddingValues).padding(16.dp),
         ) {
           composable("input") {
-            RecipeInputStep(viewModel = viewModel, onNext = { navController.navigate("selection") },
-                    onBack = { navigationActions.goBack() })
+            RecipeInputStep(
+                viewModel = viewModel,
+                onNext = { navController.navigate("selection") },
+                onBack = { navigationActions.goBack() })
           }
           composable("selection") {
             FoodSelectionStep(
@@ -118,7 +120,7 @@ fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit, on
       bottomBar = {
         Row(verticalAlignment = Alignment.Bottom) {
           CustomButtons(
-              button1OnClick = {onBack()},
+              button1OnClick = { onBack() },
               button1TestTag = "cancelButton",
               button1Text = stringResource(id = R.string.cancel_button),
               button2OnClick = {
