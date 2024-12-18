@@ -15,7 +15,7 @@ package com.android.shelfLife.model.foodFacts
  * @property nutritionFacts Detailed nutritional information per 100g/ml of the product.
  */
 data class FoodFacts(
-    val name: String, // Name of the food item
+    var name: String, // Name of the food item
     val barcode: String = "", // Barcode number
     val quantity: Quantity, // Quantity of the food item
     val category: FoodCategory = FoodCategory.OTHER, // Default category is OTHER

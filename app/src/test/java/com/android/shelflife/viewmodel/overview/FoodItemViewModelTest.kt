@@ -3,6 +3,7 @@ package com.android.shelflife.viewmodel.overview
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.FoodFactsRepository
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
@@ -39,6 +40,8 @@ class FoodItemViewModelTest {
 
   @Mock private lateinit var userRepository: UserRepository
 
+  @Mock private lateinit var foodFactsRepository: FoodFactsRepository
+
   private lateinit var viewModel: FoodItemViewModel
 
   private val userFlow =
@@ -60,7 +63,7 @@ class FoodItemViewModelTest {
     MockitoAnnotations.openMocks(this)
     `when`(userRepository.user).thenReturn(userFlow)
     `when`(foodItemRepository.selectedFoodItem).thenReturn(selectedFoodFlow)
-    viewModel = FoodItemViewModel(foodItemRepository, userRepository)
+    viewModel = FoodItemViewModel(foodItemRepository, userRepository, foodFactsRepository)
   }
 
   @Test
@@ -119,7 +122,7 @@ class FoodItemViewModelTest {
 
   @Test
   fun `init block sets fields if selectedFood is not null`() {
-    viewModel = FoodItemViewModel(foodItemRepository, userRepository)
+    viewModel = FoodItemViewModel(foodItemRepository, userRepository, foodFactsRepository)
     val foodItem =
         FoodItem(
             uid = "food1",
@@ -139,7 +142,7 @@ class FoodItemViewModelTest {
             owner = "userId")
     selectedFoodFlow.value = foodItem
     // Recreate viewModel to trigger init block again
-    viewModel = FoodItemViewModel(foodItemRepository, userRepository)
+    viewModel = FoodItemViewModel(foodItemRepository, userRepository, foodFactsRepository)
 
     assertTrue(viewModel.isSelected)
     assertEquals("Apple", viewModel.foodName)
@@ -154,7 +157,7 @@ class FoodItemViewModelTest {
 
   @Test
   fun `isScanned sets isScanned to true`() {
-    viewModel = FoodItemViewModel(foodItemRepository, userRepository)
+    viewModel = FoodItemViewModel(foodItemRepository, userRepository, foodFactsRepository)
     assertFalse(viewModel.isScanned)
     viewModel.isScanned()
     assertTrue(viewModel.isScanned)

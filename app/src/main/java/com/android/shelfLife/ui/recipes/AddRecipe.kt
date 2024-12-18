@@ -316,6 +316,7 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
   val ingredientUnit = addRecipeViewModel.ingredientQuantityUnit.collectAsState()
 
   androidx.compose.material3.AlertDialog(
+      modifier = Modifier.testTag("instructionDialog"),
       onDismissRequest = { addRecipeViewModel.createNewIngredient() },
       title = { Text(stringResource(R.string.add_ingredient)) },
       text = {

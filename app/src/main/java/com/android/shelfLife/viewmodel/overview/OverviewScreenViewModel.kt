@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.shelfLife.model.foodFacts.FoodCategory
@@ -44,6 +45,10 @@ constructor(
   private val _multipleSelectedFoodItems = MutableStateFlow<List<FoodItem>>(emptyList())
   val multipleSelectedFoodItems: StateFlow<List<FoodItem>> =
       _multipleSelectedFoodItems.asStateFlow()
+
+  val finishedLoading = MutableStateFlow(false)
+
+  val fabExpanded = mutableStateOf(false)
 
   val households = houseHoldRepository.households
   val selectedHousehold = houseHoldRepository.selectedHousehold

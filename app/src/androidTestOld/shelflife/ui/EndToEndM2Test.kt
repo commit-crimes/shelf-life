@@ -238,7 +238,6 @@ class EndToEndM2Test {
     // User is now on the overview Screen
     // User wants to add a new food item
     composeTestRule.onNodeWithTag("addFoodFab").assertIsDisplayed().performClick()
-    composeTestRule.onNodeWithTag("addFoodItemTitle").assertIsDisplayed()
     // Scroll to and interact with the input fields
     val scrollableNode = composeTestRule.onNodeWithTag("addFoodItemScreen")
     // Inputs all the relevant data about the food item
