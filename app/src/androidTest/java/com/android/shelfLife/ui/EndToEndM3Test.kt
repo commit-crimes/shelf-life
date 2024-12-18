@@ -182,6 +182,15 @@ class EndToEndM3Test {
     composeTestRule.onNodeWithTag("signInScreen").assertIsDisplayed()
   }
 
+    /**
+     * This test goes through the following flow:
+     * 1. User logs in
+     * 2. User adds a new household from the first time welcome screen
+     * 3. User adds a second household
+     * 4. User edits the first households name
+     * 5. User deletes the second household
+     * 6. User logs out
+     */
   @Test
   fun testEndToEnd_household_management() {
     // User logs in and navigates to the profile screen
