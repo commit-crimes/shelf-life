@@ -23,7 +23,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @HiltAndroidTest
-class TopNavigationBarTest {
+class TopBarNavigationBarTest {
 
     @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
     @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
