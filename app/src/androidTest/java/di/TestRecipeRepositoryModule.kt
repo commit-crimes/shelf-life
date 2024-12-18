@@ -6,15 +6,15 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
-import org.mockito.Mockito.mock
 import javax.inject.Singleton
+import org.mockito.Mockito.mock
 
 @Module
 @TestInstallIn(components = [SingletonComponent::class], replaces = [RecipeRepositoryModule::class])
 object TestRecipeRepositoryModule {
-    @Singleton
-    @Provides
-    fun provideRecipeRepository() : RecipeRepository{
-        return mock(RecipeRepository::class.java)
-    }
+  @Singleton
+  @Provides
+  fun provideRecipeRepository(): RecipeRepository {
+    return mock(RecipeRepository::class.java)
+  }
 }
