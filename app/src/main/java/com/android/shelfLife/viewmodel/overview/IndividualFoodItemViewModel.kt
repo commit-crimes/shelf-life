@@ -23,6 +23,14 @@ constructor(
     selectedFood = foodItemRepository.selectedFoodItem.value
   }
 
+  fun unselectFoodItem() {
+    foodItemRepository.selectFoodItem(null)
+  }
+
+  fun setIsQuickAdd(isQuickAdd: Boolean) {
+    foodItemRepository.setisQuickAdd(isQuickAdd)
+  }
+
   suspend fun deleteFoodItem() {
     val householdId = userRepository.user.value?.selectedHouseholdUID
     if (householdId != null && selectedFood != null) {
