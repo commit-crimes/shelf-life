@@ -115,7 +115,7 @@ constructor(
     _signInState.value = SignInState.Success(authResult = authResult)
   }
 
-  fun setSignInSuccessStateForTesting(state: SignInState) {
+  fun setSignInStateForTesting(state: SignInState) {
     _signInState.value = state
   }
 
