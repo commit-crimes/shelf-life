@@ -207,7 +207,9 @@ fun BarcodeScannerScreen(
             },
             sheetPeekHeight = 240.dp,
             modifier =
-                Modifier.padding(innerPadding) // Apply the inner padding from the parent Scaffold
+                Modifier.padding(innerPadding)
+                    .testTag(
+                        "bottomSheetScaffold") // Apply the inner padding from the parent Scaffold
             ) {
               Box(
                   modifier =
