@@ -27,141 +27,122 @@ import org.mockito.kotlin.*
 @HiltAndroidTest
 class SignInTest {
 
-    @get:Rule(order = 0) val hiltAndroidTestRule = HiltAndroidRule(this)
-    @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
+  @get:Rule(order = 0) val hiltAndroidTestRule = HiltAndroidRule(this)
+  @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
 
-    private lateinit var navigationActions: NavigationActions
+  private lateinit var navigationActions: NavigationActions
 
-    @Inject lateinit var houseHoldRepository: HouseHoldRepository
-    @Inject lateinit var listFoodItemsRepository: FoodItemRepository
-    @Inject lateinit var userRepository: UserRepository
-    @Inject lateinit var firebaseAuth: FirebaseAuth
-    @Inject lateinit var recipeRepository: RecipeRepository
+  @Inject lateinit var houseHoldRepository: HouseHoldRepository
+  @Inject lateinit var listFoodItemsRepository: FoodItemRepository
+  @Inject lateinit var userRepository: UserRepository
+  @Inject lateinit var firebaseAuth: FirebaseAuth
+  @Inject lateinit var recipeRepository: RecipeRepository
 
-    private lateinit var signInViewModel: SignInViewModel
-    private lateinit var instrumentationContext: Context
+  private lateinit var signInViewModel: SignInViewModel
+  private lateinit var instrumentationContext: Context
 
+  @Before
+  fun setUp() {
+    hiltAndroidTestRule.inject()
+    navigationActions = mock()
 
-    @Before
-    fun setUp() {
-        hiltAndroidTestRule.inject()
-        navigationActions = mock()
+    instrumentationContext = InstrumentationRegistry.getInstrumentation().context
+    whenever(navigationActions.currentRoute()).thenReturn(Route.OVERVIEW)
 
-        instrumentationContext = InstrumentationRegistry.getInstrumentation().context
-        whenever(navigationActions.currentRoute()).thenReturn(Route.OVERVIEW)
-
-        signInViewModel = SignInViewModel(
+    signInViewModel =
+        SignInViewModel(
             firebaseAuth = firebaseAuth,
             userRepository = userRepository,
             householdRepository = houseHoldRepository,
             foodItemRepository = listFoodItemsRepository,
             recipeRepository = recipeRepository,
-            appContext = instrumentationContext
-        )
+            appContext = instrumentationContext)
+  }
+
+  @Test
+  fun signInScreenDisplaysCorrectUIElements() {
+    composeTestRule.setContent {
+      SignInScreen(navigationActions = navigationActions, signInViewModel = signInViewModel)
     }
 
+    // Check that the sign in screen is displayed
+    composeTestRule.onNodeWithTag("signInScreen").assertIsDisplayed()
 
-    @Test
-    fun signInScreenDisplaysCorrectUIElements() {
-        composeTestRule.setContent {
-            SignInScreen(
-                navigationActions = navigationActions,
-                signInViewModel = signInViewModel
-            )
-        }
+    // Check that the login title is displayed
+    composeTestRule.onNodeWithTag("loginTitle").assertIsDisplayed()
 
-        // Check that the sign in screen is displayed
-        composeTestRule.onNodeWithTag("signInScreen").assertIsDisplayed()
+    // Check that the login button is displayed
+    composeTestRule.onNodeWithTag("loginButton").assertIsDisplayed()
+  }
 
-        // Check that the login title is displayed
-        composeTestRule.onNodeWithTag("loginTitle").assertIsDisplayed()
-
-        // Check that the login button is displayed
-        composeTestRule.onNodeWithTag("loginButton").assertIsDisplayed()
+  @Test
+  fun signInScreenShowsLoadingIndicatorWhenInLoadingState(): Unit = runBlocking {
+    composeTestRule.setContent {
+      SignInScreen(navigationActions = navigationActions, signInViewModel = signInViewModel)
     }
 
-    @Test
-    fun signInScreenShowsLoadingIndicatorWhenInLoadingState(): Unit = runBlocking {
-        composeTestRule.setContent {
-            SignInScreen(
-                navigationActions = navigationActions,
-                signInViewModel = signInViewModel
-            )
-        }
+    // Set the SignInState to Loading
+    composeTestRule.runOnUiThread { signInViewModel.setSignInStateForTesting(SignInState.Loading) }
 
-        // Set the SignInState to Loading
-        composeTestRule.runOnUiThread {
-            signInViewModel.setSignInStateForTesting(SignInState.Loading)
-        }
+    // Wait for UI updates
+    composeTestRule.waitForIdle()
 
-        // Wait for UI updates
-        composeTestRule.waitForIdle()
+    // Check that the loading indicator is displayed
+    composeTestRule.onNodeWithTag("signInLoadingIndicator").assertIsDisplayed()
+  }
 
-        // Check that the loading indicator is displayed
-        composeTestRule.onNodeWithTag("signInLoadingIndicator").assertIsDisplayed()
+  @Test
+  fun signInSuccessNavigatesToOverview() = runBlocking {
+    composeTestRule.setContent {
+      SignInScreen(navigationActions = navigationActions, signInViewModel = signInViewModel)
     }
 
-    @Test
-    fun signInSuccessNavigatesToOverview() = runBlocking {
-        composeTestRule.setContent {
-            SignInScreen(
-                navigationActions = navigationActions,
-                signInViewModel = signInViewModel
-            )
-        }
-
-        // Set the SignInState to Success
-        composeTestRule.runOnUiThread {
-            signInViewModel.setSignInStateForTesting(SignInState.Success(mock()))
-        }
-
-        // Wait for UI updates
-        composeTestRule.waitForIdle()
-
-        // Verify that navigation to OVERVIEW is triggered
-        verify(navigationActions).navigateTo(TopLevelDestinations.OVERVIEW)
+    // Set the SignInState to Success
+    composeTestRule.runOnUiThread {
+      signInViewModel.setSignInStateForTesting(SignInState.Success(mock()))
     }
 
-    @Test
-    fun signInErrorDoesNotNavigateToOverview() = runBlocking {
-        composeTestRule.setContent {
-            SignInScreen(
-                navigationActions = navigationActions,
-                signInViewModel = signInViewModel
-            )
-        }
+    // Wait for UI updates
+    composeTestRule.waitForIdle()
 
-        // Set the SignInState to Error
-        composeTestRule.runOnUiThread {
-            signInViewModel.setSignInStateForTesting(SignInState.Error("Test Error"))
-        }
+    // Verify that navigation to OVERVIEW is triggered
+    verify(navigationActions).navigateTo(TopLevelDestinations.OVERVIEW)
+  }
 
-        // Wait for UI updates
-        composeTestRule.waitForIdle()
-
-        // Verify that navigation to OVERVIEW is not called in case of Error
-        verify(navigationActions, never()).navigateTo(TopLevelDestinations.OVERVIEW)
+  @Test
+  fun signInErrorDoesNotNavigateToOverview() = runBlocking {
+    composeTestRule.setContent {
+      SignInScreen(navigationActions = navigationActions, signInViewModel = signInViewModel)
     }
 
-    @Test
-    fun userAlreadyLoggedInNavigatesToOverviewOnLaunch() = runBlocking {
-        // Set the SignInState to Success before composing
-        composeTestRule.runOnUiThread {
-            signInViewModel.setSignInStateForTesting(SignInState.Success(mock()))
-        }
-
-        // Render the SignInScreen
-        composeTestRule.setContent {
-            SignInScreen(
-                navigationActions = navigationActions,
-                signInViewModel = signInViewModel
-            )
-        }
-
-        // Wait for UI updates
-        composeTestRule.waitForIdle()
-
-        // Verify that navigation to OVERVIEW is triggered
-        verify(navigationActions).navigateTo(eq(TopLevelDestinations.OVERVIEW))
+    // Set the SignInState to Error
+    composeTestRule.runOnUiThread {
+      signInViewModel.setSignInStateForTesting(SignInState.Error("Test Error"))
     }
+
+    // Wait for UI updates
+    composeTestRule.waitForIdle()
+
+    // Verify that navigation to OVERVIEW is not called in case of Error
+    verify(navigationActions, never()).navigateTo(TopLevelDestinations.OVERVIEW)
+  }
+
+  @Test
+  fun userAlreadyLoggedInNavigatesToOverviewOnLaunch() = runBlocking {
+    // Set the SignInState to Success before composing
+    composeTestRule.runOnUiThread {
+      signInViewModel.setSignInStateForTesting(SignInState.Success(mock()))
+    }
+
+    // Render the SignInScreen
+    composeTestRule.setContent {
+      SignInScreen(navigationActions = navigationActions, signInViewModel = signInViewModel)
+    }
+
+    // Wait for UI updates
+    composeTestRule.waitForIdle()
+
+    // Verify that navigation to OVERVIEW is triggered
+    verify(navigationActions).navigateTo(eq(TopLevelDestinations.OVERVIEW))
+  }
 }
