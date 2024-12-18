@@ -38,21 +38,21 @@ interface RecipeRepository {
    *
    * @param recipe The `Recipe` object to add.
    */
-  suspend fun addRecipe(recipe: Recipe)
+  fun addRecipe(recipe: Recipe)
 
   /**
    * Updates an existing recipe in the repository and Firestore.
    *
    * @param recipe The `Recipe` object with updated data.
    */
-  suspend fun updateRecipe(recipe: Recipe)
+  fun updateRecipe(recipe: Recipe)
 
   /**
    * Deletes a recipe from the repository and Firestore by its unique ID.
    *
    * @param recipeId The unique ID of the recipe to delete.
    */
-  suspend fun deleteRecipe(recipeId: String): Boolean
+  fun deleteRecipe(recipeId: String, deleteUID: (String) -> Unit = {})
 
   /**
    * Selects a recipe in the local state. This does not affect Firestore.
