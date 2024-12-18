@@ -12,6 +12,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -58,8 +59,9 @@ fun OverviewScreen(
       scope = scope, drawerState = drawerState, navigationActions = navigationActions) {
         if (selectedHousehold == null && households.isEmpty()) {
           Log.d("OverviewScreen", households.toString())
-          navigationActions.navigateTo(Screen.FIRST_TIME_USER)
+          LaunchedEffect(Unit) { navigationActions.navigateTo(Screen.FIRST_TIME_USER) }
         } else {
+          Log.d("OverviewScreen", "selectedHousehold: $selectedHousehold")
           Scaffold(
               modifier = Modifier.testTag("overviewScreen"),
               topBar = {
