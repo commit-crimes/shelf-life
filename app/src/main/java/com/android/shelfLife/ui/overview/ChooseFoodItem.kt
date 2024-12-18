@@ -261,6 +261,7 @@ fun ChooseFoodItem(
                     },
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(id = R.string.cancel_button),
+
                     button2OnClick = {
                         if(!foodItemViewModel.isLoading){
                         foodItemViewModel.selectedImage?.let { selectedImage ->

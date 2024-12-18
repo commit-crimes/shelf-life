@@ -64,6 +64,7 @@ fun ShelfLifeApp() {
     }
     navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
       composable(Screen.OVERVIEW) { OverviewScreen(navigationActions) }
+      composable(Screen.FIRST_TIME_USER) { FirstTimeWelcomeScreen(navigationActions) }
       composable(Screen.ADD_FOOD) { AddFoodItemScreen(navigationActions) }
       composable(Screen.EDIT_FOOD) { EditFoodItemScreen(navigationActions) }
       composable(Screen.HOUSEHOLD_CREATION) { HouseHoldCreationScreen(navigationActions) }
@@ -93,9 +94,6 @@ fun ShelfLifeApp() {
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
       composable(Screen.PROFILE) { ProfileScreen(navigationActions, context) }
       composable(Route.INVITATIONS) { InvitationScreen(navigationActions) }
-    }
-    navigation(startDestination = Screen.FIRST_TIME_USER, route = Route.FIRST_TIME_USER) {
-      composable(Screen.FIRST_TIME_USER) { FirstTimeWelcomeScreen(navigationActions) }
     }
     navigation(startDestination = Screen.EASTER_EGG, route = Route.EASTEREGG) {
       composable(Screen.EASTER_EGG) { EasterEggScreen(navigationActions) }

@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.overview
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.viewmodel.overview.FirstTimeWelcomeScreenViewModel
 import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 
 /**
@@ -29,9 +31,13 @@ import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
  * @param navigationActions The actions to navigate between screens.
  */
 @Composable
-fun FirstTimeWelcomeScreen(navigationActions: NavigationActions) {
-  val overviewScreenViewModel = hiltViewModel<OverviewScreenViewModel>()
+fun FirstTimeWelcomeScreen(
+    navigationActions: NavigationActions,
+) {
+  val overviewScreenViewModel = hiltViewModel<FirstTimeWelcomeScreenViewModel>()
   val currentContext = LocalContext.current
+
+  Log.d("FirstTimeWelcomeScreen", "FirstTimeWelcomeScreen")
   Column(
       modifier = Modifier.fillMaxSize().padding(16.dp).testTag("firstTimeWelcomeScreen"),
       verticalArrangement = Arrangement.Center,
