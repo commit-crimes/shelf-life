@@ -1,5 +1,7 @@
 package com.android.shelfLife.model.foodItem
 
+import android.content.Context
+import android.net.Uri
 import kotlinx.coroutines.flow.StateFlow
 
 interface FoodItemRepository {
@@ -7,6 +9,7 @@ interface FoodItemRepository {
   val foodItems: StateFlow<List<FoodItem>>
   val selectedFoodItem: StateFlow<FoodItem?>
   val errorMessage: StateFlow<String?>
+  val isQuickAdd: StateFlow<Boolean>
 
   /** Generates a new unique ID for a food item. */
   fun getNewUid(): String
@@ -54,4 +57,9 @@ interface FoodItemRepository {
    * @param householdId The ID of the household.
    */
   fun deleteHouseholdDocument(householdId: String)
+
+    fun setisQuickAdd(value: Boolean)
+
+    suspend fun uploadImageToFirebaseStorage(uri: Uri, context: Context):String?
+
 }
