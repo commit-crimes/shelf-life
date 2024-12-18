@@ -49,13 +49,13 @@ jobs:
           echo $ENCODED_STRING > keystore-b64.txt
           base64 -d keystore-b64.txt > keystore.jks
 
-      # Set environment variable OPENAI_KEY
-      - name: Export OPENAI_KEY as an environment variable
+      # Set environment variable OPENAI_API_KEY
+      - name: Export OPENAI_API_KEY as an environment variable
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          echo "OPENAI_KEY=$OPENAI_KEY" >> $GITHUB_ENV
-          echo "Environment variable OPENAI_KEY set successfully."
+          echo "OPENAI_API_KEY=$OPENAI_API_KEY" >> $GITHUB_ENV
+          echo "Environment variable OPENAI_API_KEY set successfully."
 
       # Grant execute permission for gradlew
       - name: Grant execute permission for gradlew
