@@ -41,7 +41,10 @@ fun FirstFoodItem(
   Scaffold(
       topBar = {
         CustomTopAppBar(
-            onClick = { navigationActions.goBack() },
+            onClick = {
+                foodItemViewModel.setFoodItem(null)
+                foodItemViewModel.resetSearchStatus()
+                navigationActions.goBack() },
             title = stringResource(id = R.string.first_food_item_title),
             titleTestTag = "firstFoodItemTitle")
       },

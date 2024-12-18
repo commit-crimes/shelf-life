@@ -57,7 +57,6 @@ import kotlinx.coroutines.tasks.await
 fun ChooseFoodItem(
     navigationActions: NavigationActions,
     foodItemViewModel: FoodItemViewModel = hiltViewModel(),
-    cameraViewModel: BarcodeScannerViewModel = hiltViewModel()
 ) {
   val coroutineScope = rememberCoroutineScope()
   val context = LocalContext.current
@@ -91,7 +90,11 @@ fun ChooseFoodItem(
     Scaffold(
       topBar = {
         CustomTopAppBar(
-            onClick = { navigationActions.goBack() },
+            onClick = {
+                foodItemViewModel.selectedImage = null
+                foodItemViewModel.setFoodItem(null)
+                foodItemViewModel.resetSearchStatus()
+                navigationActions.goBack() },
             title = stringResource(R.string.choose_food_item_title),
             titleTestTag = "chooseFoodItemTitle")
       },
