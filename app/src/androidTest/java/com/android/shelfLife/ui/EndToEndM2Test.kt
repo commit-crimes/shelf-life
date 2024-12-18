@@ -1,143 +1,84 @@
-package com.android.shelflife.ui
+package com.android.shelfLife.ui
 
-import android.content.Context
 import android.net.Uri
 import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.ComposeNavigator
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.testing.TestNavHostController
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.idling.CountingIdlingResource
-import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.android.shelfLife.model.camera.BarcodeScannerViewModel
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import com.android.shelfLife.MainActivity
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodFactsRepository
-import com.android.shelfLife.model.foodFacts.FoodFactsViewModel
-import com.android.shelfLife.model.foodFacts.FoodSearchInput
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.newFoodItem.FoodItem
-import com.android.shelfLife.model.newFoodItem.FoodItemRepository
-import com.android.shelfLife.model.newFoodItem.ListFoodItemsViewModel
-import com.android.shelfLife.model.newInvitations.InvitationRepositoryFirestore
-import com.android.shelfLife.model.newInvitations.InvitationViewModel
-import com.android.shelfLife.model.newRecipe.RecipeRepository
-import com.android.shelfLife.model.newhousehold.HouseHold
-import com.android.shelfLife.model.newhousehold.HouseHoldRepository
-import com.android.shelfLife.model.newhousehold.HouseholdRepositoryFirestore
-import com.android.shelfLife.model.newhousehold.HouseholdViewModel
-import com.android.shelfLife.model.recipe.ListRecipesViewModel
-import com.android.shelfLife.model.recipe.RecipeGeneratorRepository
-import com.android.shelfLife.ui.camera.BarcodeScannerScreen
-import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.newProfile.ProfileScreen
-import com.android.shelfLife.ui.newoverview.AddFoodItemScreen
-import com.android.shelfLife.ui.newoverview.EditFoodItemScreen
-import com.android.shelfLife.ui.newoverview.HouseHoldCreationScreen
-import com.android.shelfLife.ui.newoverview.IndividualFoodItemScreen
-import com.android.shelfLife.ui.newoverview.OverviewScreen
-import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
-import com.android.shelfLife.ui.recipes.RecipesScreen
-import com.android.shelfLife.ui.recipes.addRecipe.AddRecipeScreen
+import com.android.shelfLife.model.foodItem.FoodItem
+import com.android.shelfLife.model.foodItem.FoodItemRepository
+import com.android.shelfLife.model.household.HouseHold
+import com.android.shelfLife.model.household.HouseHoldRepository
+import com.android.shelfLife.model.user.User
+import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.utils.formatTimestampToDate
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.Timestamp
-import io.mockk.Runs
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import helpers.FoodFactsRepositoryTestHelper
+import helpers.FoodItemRepositoryTestHelper
+import helpers.HouseholdRepositoryTestHelper
+import helpers.UserRepositoryTestHelper
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
 import java.util.*
+import javax.inject.Inject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doAnswer
-import org.mockito.kotlin.whenever
 
-@RunWith(AndroidJUnit4::class)
+@HiltAndroidTest
 class EndToEndM2Test {
+  @Inject lateinit var foodItemRepository: FoodItemRepository
+  @Inject lateinit var houseHoldRepository: HouseHoldRepository
+  @Inject lateinit var userRepository: UserRepository
+  @Inject lateinit var foodFactsRepository: FoodFactsRepository
 
-  private lateinit var foodItemRepository: FoodItemRepository
-  private lateinit var navigationActions: NavigationActions
-  private lateinit var listFoodItemsViewModel: ListFoodItemsViewModel
-  private lateinit var dataStore: DataStore<Preferences>
-  private lateinit var houseHoldRepository: HouseHoldRepository
-  private lateinit var householdViewModel: HouseholdViewModel
-  private lateinit var foodFactsViewModel: FoodFactsViewModel
-  private lateinit var foodFactsRepository: FakeFoodFactsRepository
-  private lateinit var recipeRepository: RecipeRepository
-  private lateinit var recipeGeneratorRepository: RecipeGeneratorRepository
-  private lateinit var listRecipesViewModel: ListRecipesViewModel
-  private lateinit var invitationViewModel: InvitationViewModel
-  private lateinit var invitationRepository: InvitationRepositoryFirestore
+  private lateinit var householdRepositoryTestHelper: HouseholdRepositoryTestHelper
+  private lateinit var foodItemRepositoryTestHelper: FoodItemRepositoryTestHelper
+  private lateinit var userRepositoryTestHelper: UserRepositoryTestHelper
+  private lateinit var foodFactsRepositoryTestHelper: FoodFactsRepositoryTestHelper
 
-  private lateinit var navController: NavHostController
+  private lateinit var foodItem: FoodItem
   private lateinit var houseHold: HouseHold
-  private lateinit var barcodeScannerViewModel: BarcodeScannerViewModel
-  private val idlingResource = CountingIdlingResource("DataLoader")
+  private lateinit var foodFacts: FoodFacts
 
-  @get:Rule val composeTestRule = createComposeRule()
+  @get:Rule(order = 0) val hiltAndroidTestRule = HiltAndroidRule(this)
+  @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<MainActivity>()
 
   @Before
   fun setUp() {
-    val context = ApplicationProvider.getApplicationContext<Context>()
-    // Initialize the class-level navController
-    navController = TestNavHostController(context)
-    navController.navigatorProvider.addNavigator(ComposeNavigator())
+    hiltAndroidTestRule.inject()
 
-    // Initialize NavigationActions with the properly initialized navController
-    navigationActions = NavigationActions(navController)
-    // Initialize repositories and view models
-    barcodeScannerViewModel = mockk(relaxed = true)
-    foodItemRepository = mock(FoodItemRepository::class.java)
-    listFoodItemsViewModel = ListFoodItemsViewModel(foodItemRepository)
+    householdRepositoryTestHelper = HouseholdRepositoryTestHelper(houseHoldRepository)
+    foodItemRepositoryTestHelper = FoodItemRepositoryTestHelper(foodItemRepository)
+    userRepositoryTestHelper = UserRepositoryTestHelper(userRepository)
+    foodFactsRepositoryTestHelper = FoodFactsRepositoryTestHelper(foodFactsRepository)
 
-    recipeRepository = mock(RecipeRepository::class.java)
-    recipeGeneratorRepository = mock(RecipeGeneratorRepository::class.java)
-    listRecipesViewModel = ListRecipesViewModel(recipeRepository, recipeGeneratorRepository)
-
-    houseHoldRepository = mock(HouseholdRepositoryFirestore::class.java)
-    dataStore = mock<DataStore<Preferences>>()
-    invitationRepository = mockk<InvitationRepositoryFirestore>()
-    every { invitationRepository.removeInvitationListener() } just Runs
-    householdViewModel =
-        HouseholdViewModel(
-            houseHoldRepository as HouseholdRepositoryFirestore,
-            listFoodItemsViewModel,
-            invitationRepository = invitationRepository,
-            dataStore)
-    invitationViewModel = InvitationViewModel(invitationRepository)
-
-    foodFactsRepository = FakeFoodFactsRepository()
-    foodFactsViewModel = FoodFactsViewModel(foodFactsRepository)
-
-    `when`(foodItemRepository.getNewUid()).thenReturn("mockedUid")
+    /*
     every { barcodeScannerViewModel.permissionGranted } returns true
 
+       */
+
     // Create a FoodItem to be used in tests
-    val foodFacts =
+    foodFacts =
         FoodFacts(
             name = "Apple",
             barcode = "123456789",
             quantity = Quantity(5.0, FoodUnit.COUNT),
             category = FoodCategory.FRUIT)
-    val foodItem =
+    foodItem =
         FoodItem(
             uid = "foodItem1",
             foodFacts = foodFacts,
-            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)) // Expires in 1 day
-            )
+            expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)), // Expires in 1 day
+            owner = "John",
+        )
 
     // Initialize the household with the food item
     houseHold =
@@ -145,17 +86,10 @@ class EndToEndM2Test {
             uid = "1",
             name = "Test Household",
             members = listOf("John", "Doe"),
-            foodItems = listOf(foodItem))
+            sharedRecipes = emptyList(),
+            stinkyPoints = emptyMap(),
+            ratPoints = emptyMap())
 
-    foodFactsRepository.foodFactsList = listOf(foodFacts)
-    householdViewModel.finishedLoading.value = true
-    doAnswer { invocation ->
-          val callback = invocation.arguments[0] as (Map<String, String>) -> Unit
-          callback(mapOf("dogwaterson@gmail.com" to "mockedUserId"))
-          null
-        }
-        .whenever(houseHoldRepository)
-        .getUserEmails(any(), any())
     var signOutCalled = false
     val signOutUser = { signOutCalled = true }
     val account =
@@ -166,74 +100,31 @@ class EndToEndM2Test {
                   Uri.parse(
                       "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg")
             })
-    composeTestRule.setContent {
-      NavHost(navController = navController, startDestination = Route.OVERVIEW) {
-        composable(Route.OVERVIEW) {
-          OverviewScreen(navigationActions, householdViewModel, listFoodItemsViewModel)
-        }
-        composable(Screen.ADD_FOOD) {
-          AddFoodItemScreen(
-              navigationActions, householdViewModel, listFoodItemsViewModel, foodFactsViewModel)
-        }
-        composable(Route.SCANNER) {
-          BarcodeScannerScreen(
-              navigationActions = navigationActions,
-              cameraViewModel = barcodeScannerViewModel,
-              foodFactsViewModel = foodFactsViewModel,
-              householdViewModel = householdViewModel,
-              foodItemViewModel = listFoodItemsViewModel)
-        }
-        composable(Route.RECIPES) {
-          RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
-        }
-        composable(Route.PROFILE) {
-          ProfileScreen(
-              navigationActions = navigationActions, invitationViewModel = invitationViewModel)
-        }
-        composable(Screen.HOUSEHOLD_CREATION) {
-          HouseHoldCreationScreen(navigationActions, householdViewModel = householdViewModel)
-        }
-        composable(Screen.INDIVIDUAL_FOOD_ITEM) {
-          IndividualFoodItemScreen(
-              navigationActions = navigationActions,
-              houseHoldViewModel = householdViewModel,
-              foodItemViewModel = listFoodItemsViewModel)
-        }
-        composable(Route.RECIPES) {
-          RecipesScreen(navigationActions, listRecipesViewModel, householdViewModel)
-        }
-        composable(Screen.INDIVIDUAL_RECIPE) {
-          IndividualRecipeScreen(navigationActions, listRecipesViewModel, householdViewModel)
-        }
-        composable(Screen.ADD_RECIPE) { AddRecipeScreen(navigationActions, listRecipesViewModel) }
-        composable(Screen.EDIT_FOOD) {
-          EditFoodItemScreen(
-              navigationActions = navigationActions,
-              houseHoldViewModel = householdViewModel,
-              foodItemViewModel = listFoodItemsViewModel)
-        }
-      }
-    }
 
-    // Mock the repository to return the initial household
-    mockHouseHoldRepositoryGetHouseholds(listOf(houseHold))
-    householdViewModel.selectHousehold(houseHold)
-  }
+    val user =
+        User(
+            uid = "1",
+            username = "John",
+            email = "",
+            householdUIDs = listOf("1"),
+            selectedHouseholdUID = "1",
+        )
 
-  private fun mockHouseHoldRepositoryGetHouseholds(households: List<HouseHold>) {
-    doAnswer { invocation ->
-          val onSuccess = invocation.arguments[0] as (List<HouseHold>) -> Unit
-          onSuccess(households)
-          null
-        }
-        .whenever(houseHoldRepository)
-        .getHouseholds(any(), any())
+    // Init the repositories with the test data
+    householdRepositoryTestHelper.selectHousehold(houseHold)
+    userRepositoryTestHelper.setUser(user)
   }
 
   // In this test an user tries to manually add a food item to their household and later not
   // satisfied with the manual approach tries rather to scan the item.
   @Test
   fun testEndToEnd_see_add_food_item() {
+    // User starts at the login screen
+    composeTestRule.onNodeWithTag("signInScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag("loginButton").performClick()
+
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
     // User is now on the overview Screen
     // User wants to add a new food item
@@ -266,11 +157,14 @@ class EndToEndM2Test {
     // Scroll to and click the submit button again
     scrollableNode.performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").performClick()
+    // Simulate the user submitting the form
+    foodItemRepositoryTestHelper.setFoodItems(listOf(foodItem))
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+
     // Goes and Scans the item
     composeTestRule.onNodeWithTag("Scanner").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithTag("barcodeScannerScreen").assertIsDisplayed()
-    composeTestRule.runOnUiThread { foodFactsViewModel.searchByBarcode(1234567890L) }
+    foodFactsRepositoryTestHelper.setFoodFactsSuggestions(listOf(foodFacts))
     composeTestRule.onNodeWithTag("locationDropdown").performClick()
     composeTestRule.onNodeWithTag("dropDownItem_Pantry").performClick()
     composeTestRule.onNodeWithTag("dropdownMenu_Select location").assertTextContains("Pantry")
@@ -365,22 +259,4 @@ class EndToEndM2Test {
         .onNode(hasText("Paella") and hasAnyAncestor(hasTestTag("recipeSearchBar")))
         .assertIsDisplayed()
   }*/
-
-  // Include the FakeFoodFactsRepository within the test class or as a nested class
-  inner class FakeFoodFactsRepository : FoodFactsRepository {
-    var shouldReturnError = false
-    var foodFactsList = listOf<FoodFacts>()
-
-    override fun searchFoodFacts(
-        searchInput: FoodSearchInput,
-        onSuccess: (List<FoodFacts>) -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-      if (shouldReturnError) {
-        onFailure(Exception("Test exception"))
-      } else {
-        onSuccess(foodFactsList)
-      }
-    }
-  }
 }

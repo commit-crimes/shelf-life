@@ -51,7 +51,7 @@ fun BarcodeScannerScreen(
     cameraViewModel: BarcodeScannerViewModel = hiltViewModel()
 ) {
   val context = LocalContext.current
-  val permissionGranted = cameraViewModel.permissionGranted
+  val permissionGranted by cameraViewModel.permissionGranted.collectAsState()
 
   // Create a Saver for FoodFacts. We'll store it as a Map<String, Any?>.
   val FoodFactsSaver =
