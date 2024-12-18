@@ -63,7 +63,8 @@ import kotlinx.coroutines.launch
  */
 fun IndividualRecipeScreen(
     navigationActions: NavigationActions,
-    individualRecipeViewModel: IndividualRecipeViewModel = hiltViewModel<IndividualRecipeViewModel>()
+    individualRecipeViewModel: IndividualRecipeViewModel =
+        hiltViewModel<IndividualRecipeViewModel>()
 ) {
 
   val coroutineScope = rememberCoroutineScope()
@@ -74,7 +75,8 @@ fun IndividualRecipeScreen(
         modifier = Modifier.testTag("individualRecipesScreen"),
         topBar = {
           CustomTopAppBar(
-              onClick = { navigationActions.goBack() },
+              onClick = { navigationActions.goBack()
+                        individualRecipeViewModel.deselectRecipe()},
               title = individualRecipeViewModel.getRecipeName(),
               titleTestTag = "individualRecipeTitle",
               actions = {
