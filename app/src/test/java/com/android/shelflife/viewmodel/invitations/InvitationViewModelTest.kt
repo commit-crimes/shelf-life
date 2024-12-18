@@ -54,7 +54,8 @@ class InvitationViewModelTest {
         .`when`(userRepository)
         .deleteInvitationUID(anyString())
 
-    invitationViewModel = InvitationViewModel(invitationRepository, userRepository, houseHoldRepository)
+    invitationViewModel =
+        InvitationViewModel(invitationRepository, userRepository, houseHoldRepository)
   }
 
   @Test
