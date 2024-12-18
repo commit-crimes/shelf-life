@@ -205,15 +205,28 @@ class OpenFoodFactsRepository(
       val (amountString, _, _, unitString) = matchResult.destructured
 
       val amount = amountString.toDoubleOrNull() ?: 1.0 // Fallback to 1.0 if parsing fails
-      val unit = when (unitString) {
-        "g" -> FoodUnit.GRAM
-        "kg" -> FoodUnit.GRAM.also { return Quantity(amount * 1000, it) } // Convert kg -> g
-        "ml" -> FoodUnit.ML
-        "l" -> FoodUnit.ML.also { return Quantity(amount * 1000, it) } // Convert l -> ml
-        "dl" -> FoodUnit.ML.also { return Quantity(amount * 100, it) } // Convert dl -> ml
-        "cl" -> FoodUnit.ML.also { return Quantity(amount * 10, it) }  // Convert cl -> ml
-        else -> FoodUnit.COUNT // Default fallback
-      }
+      val unit =
+          when (unitString) {
+            "g" -> FoodUnit.GRAM
+            "kg" ->
+                FoodUnit.GRAM.also {
+                  return Quantity(amount * 1000, it)
+                } // Convert kg -> g
+            "ml" -> FoodUnit.ML
+            "l" ->
+                FoodUnit.ML.also {
+                  return Quantity(amount * 1000, it)
+                } // Convert l -> ml
+            "dl" ->
+                FoodUnit.ML.also {
+                  return Quantity(amount * 100, it)
+                } // Convert dl -> ml
+            "cl" ->
+                FoodUnit.ML.also {
+                  return Quantity(amount * 10, it)
+                } // Convert cl -> ml
+            else -> FoodUnit.COUNT // Default fallback
+          }
 
       Quantity(amount, unit)
     } else {
@@ -221,5 +234,4 @@ class OpenFoodFactsRepository(
       Quantity(1.0, FoodUnit.COUNT)
     }
   }
-
 }
