@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Leaderboard
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -95,8 +94,9 @@ fun OverviewScreen(
                       // Leaderboard
                       FloatingActionButton(
                           onClick = {
-                              overviewScreenViewModel.selectFoodItem(null)
-                              navigationActions.navigateTo(Screen.LEADERBOARD) },
+                            overviewScreenViewModel.selectFoodItem(null)
+                            navigationActions.navigateTo(Screen.LEADERBOARD)
+                          },
                           containerColor = MaterialTheme.colorScheme.secondaryContainer,
                           modifier = Modifier.testTag("leaderboardFab")) {
                             Icon(
@@ -107,15 +107,13 @@ fun OverviewScreen(
                           }
 
                       // Add
-                        ExtendedActionButtons(
-                            fabExpanded = overviewScreenViewModel.fabExpanded,
-                            navigationActions = navigationActions,
-                            firstScreen = Screen.FIRST_FOOD_ITEM,
-                            secondScreen = Screen.ADD_FOOD,
-                            firstScreenTestTag = "addFirstName",
-                            secondScreenTestTag = "addFoodFab"
-                        )
-
+                      ExtendedActionButtons(
+                          fabExpanded = overviewScreenViewModel.fabExpanded,
+                          navigationActions = navigationActions,
+                          firstScreen = Screen.FIRST_FOOD_ITEM,
+                          secondScreen = Screen.ADD_FOOD,
+                          firstScreenTestTag = "addFirstName",
+                          secondScreenTestTag = "addFoodFab")
                     }
               },
           ) { paddingValues ->

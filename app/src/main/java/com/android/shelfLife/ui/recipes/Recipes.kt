@@ -3,7 +3,6 @@ package com.android.shelfLife.ui.recipes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,13 +17,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -103,8 +97,9 @@ fun RecipesScreen(navigationActions: NavigationActions) {
                 },
                 // Floating Action Button to add a new food item
                 floatingActionButton = {
-                    ExtendedActionButtons(
-                    fabExpanded = recipesViewModel.fabExpanded, navigationActions = navigationActions,
+                  ExtendedActionButtons(
+                      fabExpanded = recipesViewModel.fabExpanded,
+                      navigationActions = navigationActions,
                   )
                 },
                 content = { paddingValues ->

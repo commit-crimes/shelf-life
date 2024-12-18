@@ -1,6 +1,5 @@
 package com.android.shelfLife.ui.newoverview
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -68,7 +67,7 @@ fun FirstFoodItem(
                 CustomButtons(
                     button1OnClick = {
                       foodItemViewModel.foodName = ""
-                        foodItemViewModel.resetSelectFoodItem()
+                      foodItemViewModel.resetSelectFoodItem()
                       navigationActions.navigateTo(Route.OVERVIEW)
                     },
                     button1TestTag = "cancelButton",
@@ -77,14 +76,15 @@ fun FirstFoodItem(
                       coroutineScope.launch {
                         val success = foodItemViewModel.submbitFoodName()
                         if (success) {
-                            foodItemViewModel.searchByQuery(foodItemViewModel.foodName)
-                            foodItemViewModel.setFoodItem(
-                                FoodItem(
-                                    foodFacts = FoodFacts(name = foodItemViewModel.foodName, quantity = Quantity(0.0, FoodUnit.GRAM)),
-                                    owner = "",
-                                    uid = ""
-                                )
-                            )
+                          foodItemViewModel.searchByQuery(foodItemViewModel.foodName)
+                          foodItemViewModel.setFoodItem(
+                              FoodItem(
+                                  foodFacts =
+                                      FoodFacts(
+                                          name = foodItemViewModel.foodName,
+                                          quantity = Quantity(1.0, FoodUnit.GRAM)),
+                                  owner = "",
+                                  uid = ""))
                           navigationActions.navigateTo(Screen.CHOOSE_FOOD_ITEM)
                         } else {
                           Toast.makeText(

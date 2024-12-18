@@ -48,7 +48,7 @@ constructor(
 
   val finishedLoading = MutableStateFlow(false)
 
-    val fabExpanded = mutableStateOf(false)
+  val fabExpanded = mutableStateOf(false)
 
   val households = houseHoldRepository.households
   val selectedHousehold = houseHoldRepository.selectedHousehold

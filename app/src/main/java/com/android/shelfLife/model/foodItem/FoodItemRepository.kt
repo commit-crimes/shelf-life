@@ -1,5 +1,7 @@
 package com.android.shelfLife.model.foodItem
 
+import android.content.Context
+import android.net.Uri
 import kotlinx.coroutines.flow.StateFlow
 
 interface FoodItemRepository {
@@ -50,4 +52,6 @@ interface FoodItemRepository {
   fun setFoodItems(householdId: String, value: List<FoodItem>)
 
   fun setIsGenerated(value: Boolean)
+
+  suspend fun uploadImageToFirebaseStorage(uri: Uri, context: Context ):String?
 }

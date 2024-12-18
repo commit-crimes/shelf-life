@@ -41,14 +41,15 @@ fun IndividualFoodItemScreen(
   val coroutineScope = rememberCoroutineScope()
 
   if (individualFoodItemViewModel.selectedFood != null) {
-      individualFoodItemViewModel.setIsGenerated(false)
+    individualFoodItemViewModel.setIsGenerated(false)
     Scaffold(
         modifier = Modifier.testTag("IndividualFoodItemScreen"),
         topBar = {
           CustomTopAppBar(
               onClick = {
-                  individualFoodItemViewModel.unselectFoodItem()
-                  navigationActions.goBack() },
+                individualFoodItemViewModel.unselectFoodItem()
+                navigationActions.goBack()
+              },
               title =
                   if (individualFoodItemViewModel.selectedFood != null)
                       individualFoodItemViewModel.selectedFood!!.foodFacts.name

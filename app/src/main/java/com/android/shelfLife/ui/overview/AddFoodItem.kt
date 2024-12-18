@@ -45,7 +45,6 @@ fun AddFoodItemScreen(
 
   val context = LocalContext.current
 
-
   Scaffold(
       modifier = Modifier.fillMaxSize(),
       topBar = {

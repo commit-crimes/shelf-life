@@ -67,8 +67,8 @@ fun ShelfLifeApp() {
       composable(Screen.ADD_FOOD) { AddFoodItemScreen(navigationActions) }
       composable(Screen.EDIT_FOOD) { EditFoodItemScreen(navigationActions) }
       composable(Screen.HOUSEHOLD_CREATION) { HouseHoldCreationScreen(navigationActions) }
-      composable(Screen.FIRST_FOOD_ITEM){ FirstFoodItem(navigationActions)}
-      composable(Screen.CHOOSE_FOOD_ITEM){ChooseFoodItem(navigationActions)}
+      composable(Screen.FIRST_FOOD_ITEM) { FirstFoodItem(navigationActions) }
+      composable(Screen.CHOOSE_FOOD_ITEM) { ChooseFoodItem(navigationActions) }
       composable(Screen.INDIVIDUAL_FOOD_ITEM) { IndividualFoodItemScreen(navigationActions) }
       composable(Screen.LEADERBOARD) { LeaderboardScreen(navigationActions) }
     }
