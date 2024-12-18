@@ -8,12 +8,15 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.tasks.await
 
-open class InvitationRepositoryFirestore(
-    private val db: FirebaseFirestore,
-    private val auth: FirebaseAuth
-) : InvitationRepository {
+@Singleton
+open class InvitationRepositoryFirestore
+@Inject
+constructor(private val db: FirebaseFirestore, private val auth: FirebaseAuth) :
+    InvitationRepository {
 
   private val invitationPath = "invitations"
 
