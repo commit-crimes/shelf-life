@@ -375,6 +375,7 @@ class EndToEndM3Test {
     composeTestRule.onNodeWithTag("addButton").assertIsDisplayed().performClick()
 
     composeTestRule.waitForIdle()
+
     // User clicks on the recipe
     composeTestRule.onNodeWithTag("recipesCards").assertIsDisplayed().performClick()
     recipeRepositoryTestHelper.setSelectedRecipe(
