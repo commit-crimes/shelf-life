@@ -24,7 +24,6 @@ import com.android.shelfLife.model.user.User
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
-import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.recipes.IndividualRecipe.IndividualRecipeScreen
 import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
 import com.google.firebase.Timestamp
@@ -38,7 +37,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -176,17 +174,17 @@ class IndividualRecipeScreenTest {
     composeTestRule.onNodeWithTag("recipeInstructions").isDisplayed()
     composeTestRule.onAllNodesWithTag("recipeIngredient").onFirst().assertExists()
     composeTestRule.onAllNodesWithTag("recipeInstruction").onFirst().assertExists()
+  }
+
+  @Test
+  fun arrowBackNavigateBack() {
+    composeTestRule.setContent {
+      IndividualRecipeScreen(navigationActions, individualRecipeViewModel)
     }
 
-    @Test
-    fun arrowBackNavigateBack(){
-        composeTestRule.setContent {
-            IndividualRecipeScreen(navigationActions, individualRecipeViewModel)
-        }
+    composeTestRule.onNodeWithTag("goBackArrow").isDisplayed()
+    composeTestRule.onNodeWithTag("goBackArrow").performClick()
 
-        composeTestRule.onNodeWithTag("goBackArrow").isDisplayed()
-        composeTestRule.onNodeWithTag("goBackArrow").performClick()
-
-        verify(navigationActions).goBack()
-    }
+    verify(navigationActions).goBack()
+  }
 }

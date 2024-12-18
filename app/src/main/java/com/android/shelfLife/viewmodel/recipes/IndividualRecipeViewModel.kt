@@ -78,7 +78,7 @@ constructor(
     return selectedRecipe!!.instructions
   }
 
-  fun deselectRecipe(){
+  fun deselectRecipe() {
     recipeRepository.selectRecipe(null)
   }
 

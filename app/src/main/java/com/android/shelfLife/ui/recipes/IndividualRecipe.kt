@@ -75,8 +75,10 @@ fun IndividualRecipeScreen(
         modifier = Modifier.testTag("individualRecipesScreen"),
         topBar = {
           CustomTopAppBar(
-              onClick = { navigationActions.goBack()
-                        individualRecipeViewModel.deselectRecipe()},
+              onClick = {
+                navigationActions.goBack()
+                individualRecipeViewModel.deselectRecipe()
+              },
               title = individualRecipeViewModel.getRecipeName(),
               titleTestTag = "individualRecipeTitle",
               actions = {
