@@ -156,16 +156,11 @@ constructor(
             val rollbackHouseholds = _households.value.toMutableList()
             val rollbackIndex = rollbackHouseholds.indexOfFirst { it.uid == household.uid }
             if (rollbackIndex != -1) {
-              println("oopsie $rollbackIndex")
               rollbackHouseholds[rollbackIndex] = it
-              println("$rollbackHouseholds")
             } else {
-              println("jacaca")
               rollbackHouseholds.remove(household)
             }
             _households.value = rollbackHouseholds
-            println("this is the update: ${_households.value}")
-            println("this is the gamer: ${households.value}")
           }
         }
   }

@@ -78,6 +78,10 @@ constructor(
     return selectedRecipe!!.instructions
   }
 
+  fun deselectRecipe() {
+    recipeRepository.selectRecipe(null)
+  }
+
   fun deleteSelectedRecipe() {
     if (selectedRecipe != null) {
       recipeRepository.deleteRecipe(selectedRecipe!!.uid) { recipeUID ->

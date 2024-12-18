@@ -118,10 +118,10 @@ class EndToEndM1Test {
     composeTestRule.onNodeWithTag("addFoodFab").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addFoodFab").assertHasClickAction()
     composeTestRule.onNodeWithTag("addFoodFab").performClick()
-    // Thread.sleep(1000)
+
+    composeTestRule.onNodeWithTag("addFoodFab").performClick()
     composeTestRule.onNodeWithTag("addFoodItemTitle").assertIsDisplayed()
 
-    // Scroll to and interact with the input fields
     val scrollableNode = composeTestRule.onNodeWithTag("addFoodItemScreen")
 
     scrollableNode.performScrollToNode(hasTestTag("inputFoodName"))

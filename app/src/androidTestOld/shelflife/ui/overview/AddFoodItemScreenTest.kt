@@ -5,7 +5,6 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -431,47 +430,6 @@ class AddFoodItemScreenTest {
     composeTestRule.onNodeWithTag("cancelButton").performClick()
 
     verify { navigationActions.goBack() }
-  }
-
-  @Test
-  fun testImageSelection() {
-
-    composeTestRule.setContent {
-      AddFoodItemScreen(
-          navigationActions = navigationActions,
-          houseHoldViewModel = houseHoldViewModel,
-          foodItemViewModel = foodItemViewModel,
-          foodFactsViewModel = foodFactsViewModel)
-    }
-
-    // Scroll to the image selection section
-    composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Bananas")
-    composeTestRule
-        .onNodeWithTag("addFoodItemScreen")
-        .performScrollToNode(hasTestTag("selectImage"))
-    composeTestRule.onNodeWithTag("selectImage").assertIsDisplayed()
-    // Select the first image
-    composeTestRule.onAllNodesWithTag("foodImage")[0].performClick()
-
-    // Verify that the selected image is displayed
-  }
-
-  @Test
-  fun testNoImageOptionSelection() {
-    composeTestRule.setContent {
-      AddFoodItemScreen(
-          navigationActions = navigationActions,
-          houseHoldViewModel = houseHoldViewModel,
-          foodItemViewModel = foodItemViewModel,
-          foodFactsViewModel = foodFactsViewModel)
-    }
-
-    // Scroll to the "No Image" option
-    composeTestRule.onNodeWithTag("addFoodItemScreen").performScrollToNode(hasTestTag("noImage"))
-
-    // Select the "No Image" option
-    composeTestRule.onNodeWithTag("noImage").performClick()
-    // Verify that the default image is displayed
   }
 
   fun testDateReValidation() {
