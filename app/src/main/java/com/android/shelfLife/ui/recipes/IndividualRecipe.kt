@@ -63,7 +63,7 @@ import kotlinx.coroutines.launch
  */
 fun IndividualRecipeScreen(
     navigationActions: NavigationActions,
-    individualRecipeViewModel: IndividualRecipeViewModel = hiltViewModel()
+    individualRecipeViewModel: IndividualRecipeViewModel = hiltViewModel<IndividualRecipeViewModel>()
 ) {
 
   val coroutineScope = rememberCoroutineScope()
