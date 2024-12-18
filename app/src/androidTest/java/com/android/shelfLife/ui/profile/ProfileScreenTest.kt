@@ -155,4 +155,26 @@ class ProfileScreenTest {
         composeTestRule.onNodeWithText("Dark Mode").performClick()
         verify(navigationActions).navigateToAndClearBackStack(Route.PROFILE)
     }
+
+    @Test
+    fun invitationsPopUp(){
+        whenever(userRepository.user)
+            .thenReturn(
+                MutableStateFlow(
+                    User(
+                        "currentUserId",
+                        "Current User",
+                        "currentuser@gmail.com",
+                        "",
+                        "",
+                        listOf("i1"),
+                        emptyList())))
+        composeTestRule.setContent {
+            ProfileScreen(
+                navigationActions = navigationActions,
+                context = composeTestRule.activity.applicationContext,
+                profileViewModel = viewModel)
+        }
+
+    }
 }

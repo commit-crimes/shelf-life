@@ -284,8 +284,8 @@ constructor(
   }
 
   override suspend fun addCurrentUserToHouseHold(householdUID: String, userUID: String) {
+    _user.value?.householdUIDs?.plus(householdUID)
     try {
-      _user.value?.householdUIDs?.plus(householdUID)
       db.collection("users")
           .document(userUID)
           .update("householdUIDs", FieldValue.arrayUnion(householdUID))
