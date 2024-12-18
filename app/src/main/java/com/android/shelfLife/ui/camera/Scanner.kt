@@ -12,6 +12,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,7 +22,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.FoodUnit
+import com.android.shelfLife.model.foodFacts.NutritionFacts
+import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodFacts.SearchStatus
 import com.android.shelfLife.ui.navigation.BottomNavigationMenu
 import com.android.shelfLife.ui.navigation.LIST_TOP_LEVEL_DESTINATION
@@ -48,11 +53,74 @@ fun BarcodeScannerScreen(
   val context = LocalContext.current
   val permissionGranted = cameraViewModel.permissionGranted
 
+  // Create a Saver for FoodFacts. We'll store it as a Map<String, Any?>.
+  val FoodFactsSaver =
+      Saver<FoodFacts?, Map<String, Any?>>(
+          save = { value: FoodFacts? ->
+            if (value == null) {
+              mapOf("isNull" to true)
+            } else {
+              mapOf(
+                  "isNull" to false,
+                  "name" to value.name,
+                  "barcode" to value.barcode,
+                  "quantity_amount" to value.quantity.amount,
+                  "quantity_unit" to value.quantity.unit.name,
+                  "category" to value.category.name,
+                  "nutrition_energyKcal" to value.nutritionFacts.energyKcal,
+                  "nutrition_fat" to value.nutritionFacts.fat,
+                  "nutrition_saturatedFat" to value.nutritionFacts.saturatedFat,
+                  "nutrition_carbohydrates" to value.nutritionFacts.carbohydrates,
+                  "nutrition_sugars" to value.nutritionFacts.sugars,
+                  "nutrition_proteins" to value.nutritionFacts.proteins,
+                  "nutrition_salt" to value.nutritionFacts.salt,
+                  "imageUrl" to value.imageUrl)
+            }
+          },
+          restore = { map: Map<String, Any?> ->
+            val isNull = map["isNull"] as? Boolean ?: true
+            if (isNull) {
+              null
+            } else {
+              val name = map["name"] as? String ?: return@Saver null
+              val barcode = map["barcode"] as? String ?: ""
+              val amount = (map["quantity_amount"] as? Double) ?: 0.0
+              val unitName = map["quantity_unit"] as? String ?: FoodUnit.GRAM.name
+              val unit = FoodUnit.valueOf(unitName)
+              val categoryName = map["category"] as? String ?: FoodCategory.OTHER.name
+              val category = FoodCategory.valueOf(categoryName)
+
+              val energyKcal = (map["nutrition_energyKcal"] as? Int) ?: 0
+              val fat = (map["nutrition_fat"] as? Double) ?: 0.0
+              val saturatedFat = (map["nutrition_saturatedFat"] as? Double) ?: 0.0
+              val carbohydrates = (map["nutrition_carbohydrates"] as? Double) ?: 0.0
+              val sugars = (map["nutrition_sugars"] as? Double) ?: 0.0
+              val proteins = (map["nutrition_proteins"] as? Double) ?: 0.0
+              val salt = (map["nutrition_salt"] as? Double) ?: 0.0
+              val imageUrl = map["imageUrl"] as? String ?: FoodFacts.DEFAULT_IMAGE_URL
+
+              FoodFacts(
+                  name = name,
+                  barcode = barcode,
+                  quantity = Quantity(amount = amount, unit = unit),
+                  category = category,
+                  nutritionFacts =
+                      NutritionFacts(
+                          energyKcal = energyKcal,
+                          fat = fat,
+                          saturatedFat = saturatedFat,
+                          carbohydrates = carbohydrates,
+                          sugars = sugars,
+                          proteins = proteins,
+                          salt = salt),
+                  imageUrl = imageUrl)
+            }
+          })
   // State variables
   val isScanningState = rememberSaveable { mutableStateOf(true) }
   val foodScanned = rememberSaveable { mutableStateOf(false) }
   val barcodeScanned = rememberSaveable { mutableStateOf<String?>(null) }
-  val foodFacts = rememberSaveable { mutableStateOf<FoodFacts?>(null) }
+  val foodFacts = rememberSaveable(stateSaver = FoodFactsSaver) { mutableStateOf<FoodFacts?>(null) }
   val searchInProgress = rememberSaveable { mutableStateOf(false) }
 
   val showFailureDialog = rememberSaveable { mutableStateOf(false) }

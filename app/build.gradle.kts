@@ -250,6 +250,7 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.hilt.android.testing)
+    implementation(libs.androidx.navigation.testing)
 
     // Global test implementation
     androidTestImplementation(libs.compose.test.junit)
@@ -330,6 +331,8 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.mockk)
     androidTestImplementation(libs.androidx.runner)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.androidx.lifecycle.runtime.testing)
 
     // AndroidJUnitRunner and JUnit Rules
     testImplementation(libs.androidx.runner)

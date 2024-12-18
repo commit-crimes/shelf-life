@@ -16,6 +16,8 @@ interface UserRepository {
 
   var currentAudioMode: StateFlow<LeaderboardMode?>
 
+  var bypassLogin: StateFlow<Boolean>
+
   /** Generates a new unique ID for a user. */
   fun getNewUid(): String
 
@@ -40,7 +42,7 @@ interface UserRepository {
 
   suspend fun deleteRecipeUID(uid: String)
 
-  suspend fun deleteInvitationUID(uid: String)
+  fun deleteInvitationUID(uid: String)
 
   suspend fun updateUsername(username: String)
 
