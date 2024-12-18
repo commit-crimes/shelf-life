@@ -16,6 +16,8 @@ interface UserRepository {
 
   var currentAudioMode: StateFlow<LeaderboardMode?>
 
+  var bypassLogin: StateFlow<Boolean>
+
   /** Generates a new unique ID for a user. */
   fun getNewUid(): String
 

@@ -47,6 +47,9 @@ constructor(
   private val _currentAudioMode = MutableStateFlow<LeaderboardMode?>(null)
   override var currentAudioMode: StateFlow<LeaderboardMode?> = _currentAudioMode.asStateFlow()
 
+  private val _bypassLogin = MutableStateFlow(false)
+  override var bypassLogin: StateFlow<Boolean> = _bypassLogin.asStateFlow()
+
   override fun getNewUid(): String {
     return userCollection.document().id
   }
