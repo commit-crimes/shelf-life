@@ -8,12 +8,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodFactsRepository
 import com.android.shelfLife.model.foodFacts.SearchStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.flow.StateFlow
 
@@ -26,17 +26,16 @@ import kotlinx.coroutines.flow.StateFlow
 class BarcodeScannerViewModel
 @Inject
 constructor(
-    @ApplicationContext private val context: Context,
+    private val application: Application,
     private val foodFactsRepository: FoodFactsRepository
-) : ViewModel() {
+) : ViewModel(), LifecycleObserver {
 
-  private val application = context as Application
   private val sharedPreferences =
       application.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
 
   var permissionGranted by
       mutableStateOf(
-          ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+          ContextCompat.checkSelfPermission(application, Manifest.permission.CAMERA) ==
               PackageManager.PERMISSION_GRANTED)
     private set
 
@@ -68,7 +67,7 @@ constructor(
   /** Checks if the camera permission is granted. */
   fun checkCameraPermission() {
     permissionGranted =
-        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+        ContextCompat.checkSelfPermission(application, Manifest.permission.CAMERA) ==
             PackageManager.PERMISSION_GRANTED
   }
 

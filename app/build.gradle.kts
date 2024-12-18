@@ -330,6 +330,8 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.mockk)
     androidTestImplementation(libs.androidx.runner)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.androidx.lifecycle.runtime.testing)
 
     // AndroidJUnitRunner and JUnit Rules
     testImplementation(libs.androidx.runner)

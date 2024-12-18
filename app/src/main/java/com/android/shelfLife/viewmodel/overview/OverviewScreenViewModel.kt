@@ -112,7 +112,7 @@ constructor(
     userRepository.addHouseholdUID(houseHold.uid)
   }
 
-  fun checkItemStatus() {
+  private fun checkItemStatus() {
     val selectedHousehold = selectedHousehold.value
     if (selectedHousehold != null) {
       viewModelScope.launch {
