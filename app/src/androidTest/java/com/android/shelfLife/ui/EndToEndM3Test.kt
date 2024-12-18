@@ -1,7 +1,7 @@
 package com.android.shelfLife.ui
 
-import android.net.Uri
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.espresso.Espresso
@@ -17,9 +17,11 @@ import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.permission.PermissionRepository
+import com.android.shelfLife.model.recipe.Ingredient
+import com.android.shelfLife.model.recipe.Recipe
+import com.android.shelfLife.model.recipe.RecipeRepository
 import com.android.shelfLife.model.user.User
 import com.android.shelfLife.model.user.UserRepository
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.Timestamp
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -27,11 +29,11 @@ import helpers.FoodFactsRepositoryTestHelper
 import helpers.FoodItemRepositoryTestHelper
 import helpers.HouseholdRepositoryTestHelper
 import helpers.PermissionRepositoryTestHelper
+import helpers.RecipeRepositoryTestHelper
 import helpers.UserRepositoryTestHelper
-import io.mockk.every
-import io.mockk.mockk
 import java.util.*
 import javax.inject.Inject
+import kotlin.time.Duration
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -43,12 +45,14 @@ class EndToEndM3Test {
   @Inject lateinit var userRepository: UserRepository
   @Inject lateinit var foodFactsRepository: FoodFactsRepository
   @Inject lateinit var permissionRepository: PermissionRepository
+  @Inject lateinit var recipeRepository: RecipeRepository
 
   private lateinit var householdRepositoryTestHelper: HouseholdRepositoryTestHelper
   private lateinit var foodItemRepositoryTestHelper: FoodItemRepositoryTestHelper
   private lateinit var userRepositoryTestHelper: UserRepositoryTestHelper
   private lateinit var foodFactsRepositoryTestHelper: FoodFactsRepositoryTestHelper
   private lateinit var permissionRepositoryTestHelper: PermissionRepositoryTestHelper
+  private lateinit var recipeRepositoryTestHelper: RecipeRepositoryTestHelper
 
   private lateinit var foodItem: FoodItem
   private lateinit var houseHold: HouseHold
@@ -66,6 +70,7 @@ class EndToEndM3Test {
     userRepositoryTestHelper = UserRepositoryTestHelper(userRepository)
     foodFactsRepositoryTestHelper = FoodFactsRepositoryTestHelper(foodFactsRepository)
     permissionRepositoryTestHelper = PermissionRepositoryTestHelper(permissionRepository)
+    recipeRepositoryTestHelper = RecipeRepositoryTestHelper(recipeRepository)
 
     // Create a FoodItem to be used in tests
     foodFacts =
@@ -91,17 +96,6 @@ class EndToEndM3Test {
             sharedRecipes = emptyList(),
             stinkyPoints = emptyMap(),
             ratPoints = emptyMap())
-
-    var signOutCalled = false
-    val signOutUser = { signOutCalled = true }
-    val account =
-        mockk<GoogleSignInAccount>(
-            block = {
-              every { email } returns "test@example.com"
-              every { photoUrl } returns
-                  Uri.parse(
-                      "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg")
-            })
 
     val user =
         User(
@@ -182,15 +176,15 @@ class EndToEndM3Test {
     composeTestRule.onNodeWithTag("signInScreen").assertIsDisplayed()
   }
 
-    /**
-     * This test goes through the following flow:
-     * 1. User logs in
-     * 2. User adds a new household from the first time welcome screen
-     * 3. User adds a second household
-     * 4. User edits the first households name
-     * 5. User deletes the second household
-     * 6. User logs out
-     */
+  /**
+   * This test goes through the following flow:
+   * 1. User logs in
+   * 2. User adds a new household from the first time welcome screen
+   * 3. User adds a second household
+   * 4. User edits the first households name
+   * 5. User deletes the second household
+   * 6. User logs out
+   */
   @Test
   fun testEndToEnd_household_management() {
     // User logs in and navigates to the profile screen
@@ -303,8 +297,128 @@ class EndToEndM3Test {
     composeTestRule.onNodeWithTag("signInScreen").assertIsDisplayed()
   }
 
-    @Test
-    fun testEndToEnd_add_food_then_create_recipe(){
+  @Test
+  fun testEndToEnd_add_food_manually_then_create_recipe() {
 
-    }
+    // User logs in and navigates to the profile screen
+    householdRepositoryTestHelper.selectHousehold(houseHold)
+    composeTestRule.onNodeWithTag("signInScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginButton").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("loginButton").assertHasClickAction()
+    composeTestRule.onNodeWithTag("loginButton").performClick()
+
+    // User arrives at the overview screen
+    composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+
+    // User navigates to the add food item screen
+    composeTestRule.onNodeWithTag("addFoodFab").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("addFoodItemScreen").assertIsDisplayed()
+
+    // User adds a food item manually
+    // Scroll to and interact with the input fields
+    val scrollableNode = composeTestRule.onNodeWithTag("addFoodItemScreen")
+
+    scrollableNode.performScrollToNode(hasTestTag("inputFoodName"))
+    composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Apple")
+
+    scrollableNode.performScrollToNode(hasTestTag("inputFoodAmount"))
+    composeTestRule.onNodeWithTag("inputFoodAmount").performTextInput("5")
+
+    scrollableNode.performScrollToNode(hasTestTag("inputFoodExpireDate"))
+    composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextClearance()
+    composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextInput("29122025")
+
+    scrollableNode.performScrollToNode(hasTestTag("inputFoodOpenDate"))
+    composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextClearance()
+    composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextInput("01122025")
+
+    scrollableNode.performScrollToNode(hasTestTag("inputFoodBuyDate"))
+    composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextClearance()
+    composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextInput("30112025")
+
+    // Scroll to and click the submit button
+    scrollableNode.performScrollToNode(hasTestTag("foodSave"))
+    composeTestRule.onNodeWithTag("foodSave").performClick()
+    foodItemRepositoryTestHelper.setFoodItems(listOf(foodItem))
+    composeTestRule.waitForIdle()
+
+    // User navigates back to the overview screen
+    composeTestRule.onNodeWithTag("Overview").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+
+    // User navigates to the recipe
+    composeTestRule.onNodeWithTag("Recipes").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("recipesScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("addRecipeFab").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("addRecipeFab").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("addRecipeScreen").assertIsDisplayed()
+
+    // User adds a recipe
+
+    composeTestRule.onNodeWithTag("inputRecipeTitle").performTextInput("Apple Pie")
+    composeTestRule.onNodeWithTag("inputRecipeServings").performTextInput("5")
+    composeTestRule.onNodeWithTag("inputRecipeTime").performTextInput("45")
+    composeTestRule.onNodeWithTag("addIngredientButton").performClick()
+    composeTestRule.onNodeWithTag("addIngredientPopUp").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("inputIngredientName").performTextInput("Apple")
+    composeTestRule.onNodeWithTag("inputIngredientQuantity").performTextInput("500")
+    composeTestRule.onNodeWithTag("addIngredientButton2").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("ingredientItem").assertIsDisplayed()
+
+    // User adds instructions
+    composeTestRule.onNodeWithTag("addInstructionButton").performClick()
+    composeTestRule.onNodeWithTag("inputRecipeInstruction").performTextInput("Bake the apple")
+
+    // User adds the recipe
+    recipeRepositoryTestHelper.setRecipes(
+        listOf(Recipe("1", "Apple Pie", emptyList(), 5.0f, Duration.parse("PT45M"), emptyList())))
+    composeTestRule.onNodeWithTag("addButton").assertIsDisplayed().performClick()
+
+    composeTestRule.waitForIdle()
+    // User clicks on the recipe
+    composeTestRule.onNodeWithTag("recipesCards").assertIsDisplayed().performClick()
+    recipeRepositoryTestHelper.setSelectedRecipe(
+        Recipe(
+            "1",
+            "Apple Pie",
+            listOf("Bake the apple"),
+            5.0f,
+            Duration.parse("PT45M"),
+            listOf(Ingredient("Apple", Quantity(500.0, FoodUnit.GRAM)))))
+    composeTestRule.onNodeWithTag("individualRecipesScreen").assertIsDisplayed()
+
+    // User starts the recipe
+    composeTestRule.onNodeWithTag("startButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("servingsScreen").assertIsDisplayed()
+
+    // User selects the number of servings
+    composeTestRule.onNodeWithTag("increaseButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("increaseButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("increaseButton").assertIsDisplayed().performClick()
+
+    composeTestRule.onNodeWithTag("servingsText").assertIsDisplayed().assertTextEquals("8.0")
+    composeTestRule.onNodeWithTag("decreaseButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("servingsText").assertIsDisplayed().assertTextEquals("7.0")
+
+    // User continues the recipe
+    composeTestRule.onNodeWithTag("nextFab").assertIsDisplayed().performClick()
+
+    composeTestRule.onNodeWithTag("selectFoodItemsScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("foodItemCard").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("amountSlider").performSemanticsAction(
+        SemanticsActions.SetProgress) { progress ->
+          progress.invoke(5f)
+        }
+    composeTestRule.onNodeWithTag("doneButton").assertIsDisplayed().performClick()
+    // User arrives at the recipe execution screen
+    composeTestRule.onNodeWithTag("instructionScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("instructionText").assert(hasText("Bake the apple"))
+    // User finishes the recipe
+    composeTestRule.onNodeWithTag("finishButton").assertIsDisplayed().performClick()
+    foodItemRepositoryTestHelper.setFoodItems(emptyList())
+
+    // User navigates back to the overview screen
+    composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("foodItemCard").assertIsNotDisplayed()
+  }
 }
