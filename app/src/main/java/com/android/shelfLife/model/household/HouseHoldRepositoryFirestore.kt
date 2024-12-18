@@ -225,6 +225,7 @@ constructor(
   }
 
   override suspend fun updateStinkyPoints(householdId: String, stinkyPoints: Map<String, Long>) {
+    val oldStinkyPoints = _selectedHousehold.value?.stinkyPoints
     try {
       _selectedHousehold.value = _selectedHousehold.value?.copy(stinkyPoints = stinkyPoints)
       db.collection(collectionPath).document(householdId).update("stinkyPoints", stinkyPoints)
