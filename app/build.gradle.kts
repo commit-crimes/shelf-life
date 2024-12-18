@@ -250,6 +250,7 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.hilt.android.testing)
+    implementation(libs.androidx.navigation.testing)
 
     // Global test implementation
     androidTestImplementation(libs.compose.test.junit)
