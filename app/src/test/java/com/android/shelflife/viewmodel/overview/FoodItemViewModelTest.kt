@@ -26,86 +26,85 @@ import org.robolectric.annotation.Config
 @Config(application = dagger.hilt.android.testing.HiltTestApplication::class)
 class FoodItemViewModelTest {
 
-    @get:Rule
-    val instantExecutorRule = InstantTaskExecutorRule()
+  @get:Rule val instantExecutorRule = InstantTaskExecutorRule()
 
-    @Mock
-    private lateinit var foodItemRepository: FoodItemRepository
+  @Mock private lateinit var foodItemRepository: FoodItemRepository
 
-    @Mock
-    private lateinit var userRepository: UserRepository
+  @Mock private lateinit var userRepository: UserRepository
 
-    private lateinit var viewModel: FoodItemViewModel
+  private lateinit var viewModel: FoodItemViewModel
 
-    @Before
-    fun setUp() {
-        MockitoAnnotations.openMocks(this)
-        val userFlow = MutableStateFlow<User?>(User(
-            uid = "userId", username = "TestUser", email = "test@example.com",
-            photoUrl = "",
-            selectedHouseholdUID = "householdId",
-            householdUIDs = listOf("householdId"),
-            recipeUIDs = listOf(),
-            invitationUIDs = listOf()
-        ))
-        `when`(userRepository.user).thenReturn(userFlow)
-        val selectedFoodFlow = MutableStateFlow<FoodItem?>(null)
-        `when`(foodItemRepository.selectedFoodItem).thenReturn(selectedFoodFlow)
-        viewModel = FoodItemViewModel(foodItemRepository, userRepository)
-    }
+  @Before
+  fun setUp() {
+    MockitoAnnotations.openMocks(this)
+    val userFlow =
+        MutableStateFlow<User?>(
+            User(
+                uid = "userId",
+                username = "TestUser",
+                email = "test@example.com",
+                photoUrl = "",
+                selectedHouseholdUID = "householdId",
+                householdUIDs = listOf("householdId"),
+                recipeUIDs = listOf(),
+                invitationUIDs = listOf()))
+    `when`(userRepository.user).thenReturn(userFlow)
+    val selectedFoodFlow = MutableStateFlow<FoodItem?>(null)
+    `when`(foodItemRepository.selectedFoodItem).thenReturn(selectedFoodFlow)
+    viewModel = FoodItemViewModel(foodItemRepository, userRepository)
+  }
 
-    @Test
-    fun `validate fields when submit button clicked`() {
-        viewModel.foodName = ""
-        viewModel.amount = "abc"
-        viewModel.buyDate = "2023-01-01"
-        viewModel.expireDate = "2022-12-31"
+  @Test
+  fun `validate fields when submit button clicked`() {
+    viewModel.foodName = ""
+    viewModel.amount = "abc"
+    viewModel.buyDate = "2023-01-01"
+    viewModel.expireDate = "2022-12-31"
 
-        viewModel.validateAllFieldsWhenSubmitButton()
+    viewModel.validateAllFieldsWhenSubmitButton()
 
-        assertNotNull(viewModel.foodNameErrorResId)
-        assertNotNull(viewModel.amountErrorResId)
-        assertNotNull(viewModel.expireDateErrorResId)
-        assertNull(viewModel.openDateErrorResId)
-    }
+    assertNotNull(viewModel.foodNameErrorResId)
+    assertNotNull(viewModel.amountErrorResId)
+    assertNotNull(viewModel.expireDateErrorResId)
+    assertNull(viewModel.openDateErrorResId)
+  }
 
-    @Test
-    fun `change food name triggers validation`() {
-        viewModel.changeFoodName("New Name")
-        assertEquals("New Name", viewModel.foodName)
-        assertNull(viewModel.foodNameErrorResId)
-    }
+  @Test
+  fun `change food name triggers validation`() {
+    viewModel.changeFoodName("New Name")
+    assertEquals("New Name", viewModel.foodName)
+    assertNull(viewModel.foodNameErrorResId)
+  }
 
-    @Test
-    fun `change amount triggers validation`() {
-        viewModel.changeAmount("123")
-        assertEquals("123", viewModel.amount)
-        assertNull(viewModel.amountErrorResId)
-    }
+  @Test
+  fun `change amount triggers validation`() {
+    viewModel.changeAmount("123")
+    assertEquals("123", viewModel.amount)
+    assertNull(viewModel.amountErrorResId)
+  }
 
+  @Test
+  fun `reset for scanner`() {
+    viewModel.resetForScanner()
 
-    @Test
-    fun `reset for scanner`() {
-        viewModel.resetForScanner()
+    assertEquals(FoodStorageLocation.PANTRY, viewModel.location)
+    assertEquals("", viewModel.expireDate)
+    assertEquals("", viewModel.openDate)
+    assertNotNull(viewModel.buyDate)
+    assertNull(viewModel.expireDateErrorResId)
+    assertNull(viewModel.openDateErrorResId)
+    assertNull(viewModel.buyDateErrorResId)
+  }
 
-        assertEquals(FoodStorageLocation.PANTRY, viewModel.location)
-        assertEquals("", viewModel.expireDate)
-        assertEquals("", viewModel.openDate)
-        assertNotNull(viewModel.buyDate)
-        assertNull(viewModel.expireDateErrorResId)
-        assertNull(viewModel.openDateErrorResId)
-        assertNull(viewModel.buyDateErrorResId)
-    }
+  @Test
+  fun `submit food item fails validation`() = runTest {
+    viewModel.foodName = ""
+    viewModel.amount = "abc"
+    viewModel.buyDate = "2023-01-01"
+    viewModel.expireDate = "2022-12-31"
 
-    @Test
-    fun `submit food item fails validation`() = runTest {
-        viewModel.foodName = ""
-        viewModel.amount = "abc"
-        viewModel.buyDate = "2023-01-01"
-        viewModel.expireDate = "2022-12-31"
+    val result = viewModel.submitFoodItem()
 
-        val result = viewModel.submitFoodItem()
-
-        assertFalse(result)
-    }
+    assertFalse(result)
+  }
 }

@@ -18,13 +18,10 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.runner.RunWith
 import org.mockito.MockedStatic
 import org.mockito.Mockito.*
-import org.mockito.kotlin.argumentCaptor
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -584,7 +581,7 @@ class UserRepositoryFirestoreTest {
   }
 
   @Test
-  fun addCurrentUserToHouseHoldAddsUIDToFirestore() : Unit = runBlocking {
+  fun addCurrentUserToHouseHoldAddsUIDToFirestore(): Unit = runBlocking {
     val mockCurrentUser = mock(FirebaseUser::class.java)
     `when`(mockCurrentUser.uid).thenReturn("testUserId")
     `when`(mockAuth.currentUser).thenReturn(mockCurrentUser)
@@ -593,13 +590,12 @@ class UserRepositoryFirestoreTest {
     val mockUpdateTask = Tasks.forResult<Void>(null)
     val mockUserDocument = mockFirestore.collection("users").document("testUserId")
     `when`(mockUserDocument.update(eq("householdUIDs"), any(FieldValue::class.java)))
-      .thenReturn(mockUpdateTask)
+        .thenReturn(mockUpdateTask)
 
     userRepository.addCurrentUserToHouseHold(householdUID, "testUserId")
 
     verify(mockUserDocument).update(eq("householdUIDs"), any(FieldValue::class.java))
   }
-
 
   @Test
   fun getUserNamesReturnsCorrectUsernames() = runBlocking {

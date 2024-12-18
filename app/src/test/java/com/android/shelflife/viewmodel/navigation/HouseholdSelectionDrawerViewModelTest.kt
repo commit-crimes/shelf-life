@@ -28,74 +28,69 @@ import org.robolectric.annotation.Config
 @Config(application = dagger.hilt.android.testing.HiltTestApplication::class)
 class HouseholdSelectionDrawerViewModelTest {
 
-    @get:Rule
-    val instantExecutorRule = InstantTaskExecutorRule()
+  @get:Rule val instantExecutorRule = InstantTaskExecutorRule()
 
-    @Mock
-    private lateinit var houseHoldRepository: HouseHoldRepository
+  @Mock private lateinit var houseHoldRepository: HouseHoldRepository
 
-    @Mock
-    private lateinit var userRepository: UserRepository
+  @Mock private lateinit var userRepository: UserRepository
 
-    @Mock
-    private lateinit var foodItemRepository: FoodItemRepository
+  @Mock private lateinit var foodItemRepository: FoodItemRepository
 
-    private lateinit var viewModel: HouseholdSelectionDrawerViewModel
-    private val testDispatcher = UnconfinedTestDispatcher()
-    private val testScope = TestScope(testDispatcher)
+  private lateinit var viewModel: HouseholdSelectionDrawerViewModel
+  private val testDispatcher = UnconfinedTestDispatcher()
+  private val testScope = TestScope(testDispatcher)
 
-    @Before
-    fun setUp() {
-        MockitoAnnotations.openMocks(this)
-        `when`(houseHoldRepository.households).thenReturn(mock())
-        `when`(houseHoldRepository.selectedHousehold).thenReturn(mock())
-        viewModel = HouseholdSelectionDrawerViewModel(
-            houseHoldRepository,
-            userRepository,
-            foodItemRepository
-        )
-    }
+  @Before
+  fun setUp() {
+    MockitoAnnotations.openMocks(this)
+    `when`(houseHoldRepository.households).thenReturn(mock())
+    `when`(houseHoldRepository.selectedHousehold).thenReturn(mock())
+    viewModel =
+        HouseholdSelectionDrawerViewModel(houseHoldRepository, userRepository, foodItemRepository)
+  }
 
-    @Test
-    fun `households returns data from repository`() {
-        assertEquals(houseHoldRepository.households, viewModel.households)
-    }
+  @Test
+  fun `households returns data from repository`() {
+    assertEquals(houseHoldRepository.households, viewModel.households)
+  }
 
-    @Test
-    fun `selectedHousehold returns data from repository`() {
-        assertEquals(houseHoldRepository.selectedHousehold, viewModel.selectedHousehold)
-    }
+  @Test
+  fun `selectedHousehold returns data from repository`() {
+    assertEquals(houseHoldRepository.selectedHousehold, viewModel.selectedHousehold)
+  }
 
-    @Test
-    fun `selectHousehold invokes repository methods`() = runTest {
-        val household = HouseHold("house1", "Test Household", emptyList(), emptyList(), emptyMap(), emptyMap())
-        viewModel.selectHousehold(household)
+  @Test
+  fun `selectHousehold invokes repository methods`() = runTest {
+    val household =
+        HouseHold("house1", "Test Household", emptyList(), emptyList(), emptyMap(), emptyMap())
+    viewModel.selectHousehold(household)
 
-        verify(houseHoldRepository).selectHousehold(household)
-        verify(userRepository).selectHousehold(household.uid)
-        verify(foodItemRepository).getFoodItems(household.uid)
-    }
+    verify(houseHoldRepository).selectHousehold(household)
+    verify(userRepository).selectHousehold(household.uid)
+    verify(foodItemRepository).getFoodItems(household.uid)
+  }
 
-    @Test
-    fun `selectHousehold does nothing when household is null`() = runTest {
-        viewModel.selectHousehold(null)
+  @Test
+  fun `selectHousehold does nothing when household is null`() = runTest {
+    viewModel.selectHousehold(null)
 
-        verifyNoInteractions(userRepository)
-        verifyNoInteractions(foodItemRepository)
-    }
+    verifyNoInteractions(userRepository)
+    verifyNoInteractions(foodItemRepository)
+  }
 
-    @Test
-    fun `selectHouseholdToEdit invokes repository methods`() = runTest {
-        val household = HouseHold("house2", "Editable Household", emptyList(), emptyList(), emptyMap(), emptyMap())
-        viewModel.selectHouseholdToEdit(household)
+  @Test
+  fun `selectHouseholdToEdit invokes repository methods`() = runTest {
+    val household =
+        HouseHold("house2", "Editable Household", emptyList(), emptyList(), emptyMap(), emptyMap())
+    viewModel.selectHouseholdToEdit(household)
 
-        verify(houseHoldRepository).selectHouseholdToEdit(household)
-    }
+    verify(houseHoldRepository).selectHouseholdToEdit(household)
+  }
 
-    @Test
-    fun `selectHouseholdToEdit does nothing when household is null`() = runTest {
-        viewModel.selectHouseholdToEdit(null)
+  @Test
+  fun `selectHouseholdToEdit does nothing when household is null`() = runTest {
+    viewModel.selectHouseholdToEdit(null)
 
-        verify(houseHoldRepository).selectHouseholdToEdit(null)
-    }
+    verify(houseHoldRepository).selectHouseholdToEdit(null)
+  }
 }

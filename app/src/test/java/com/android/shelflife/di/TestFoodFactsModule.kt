@@ -1,7 +1,6 @@
 package com.android.shelflife.di
 
 import com.android.shelfLife.di.FoodFactsRepositoryModule
-import com.android.shelfLife.di.FoodItemRepositoryModule
 import com.android.shelfLife.model.foodFacts.FoodFactsRepository
 import com.android.shelfLife.model.foodFacts.OpenFoodFactsRepository
 import dagger.Module
@@ -15,8 +14,8 @@ import org.mockito.Mockito.mock
     components = [SingletonComponent::class], replaces = [FoodFactsRepositoryModule::class])
 object TestFoodFactsModule {
 
-    @Provides
-    fun provideFoodFactsRepository(): FoodFactsRepository {
-        return OpenFoodFactsRepository(mock(), mock())
-    }
+  @Provides
+  fun provideFoodFactsRepository(): FoodFactsRepository {
+    return OpenFoodFactsRepository(mock(), mock())
+  }
 }
