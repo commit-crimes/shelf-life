@@ -302,4 +302,9 @@ class EndToEndM3Test {
     composeTestRule.onNodeWithTag("logoutButton").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithTag("signInScreen").assertIsDisplayed()
   }
+
+    @Test
+    fun testEndToEnd_add_food_then_create_recipe(){
+
+    }
 }
