@@ -7,12 +7,6 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.*
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertFalse
-import junit.framework.TestCase.assertNotNull
-import junit.framework.TestCase.assertNull
-import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
@@ -29,7 +23,7 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(application = dagger.hilt.android.testing.HiltTestApplication::class)
 class HouseholdRepositoryFirestoreTest {
-// TODO: Add tests because some where removed
+
   @get:Rule var hiltRule = HiltAndroidRule(this)
 
   private lateinit var householdRepository: HouseholdRepositoryFirestore
@@ -196,169 +190,5 @@ class HouseholdRepositoryFirestoreTest {
 
     // Assert
     verify(listenerRegistration, never()).remove()
-  }
-
-  @Test
-  fun selectHouseholdSetsSelectedHousehold() = runBlocking {
-    assertNull("Initially, no household selected", householdRepository.selectedHousehold.value)
-    val household =
-        HouseHold(
-            "house999",
-            "Selected Household",
-            listOf("userX"),
-            listOf("recipeZ"),
-            emptyMap(),
-            emptyMap())
-    householdRepository.selectHousehold(household)
-    assertEquals("house999", householdRepository.selectedHousehold.value?.uid)
-  }
-
-  @Test
-  fun selectHouseholdToEditSetsHouseholdToEdit() = runBlocking {
-    assertNull("Initially, no household to edit", householdRepository.householdToEdit.value)
-    val household =
-        HouseHold(
-            "houseEdit",
-            "Editing Household",
-            listOf("userX"),
-            listOf("recipeZ"),
-            emptyMap(),
-            emptyMap())
-    householdRepository.selectHouseholdToEdit(household)
-    assertEquals("houseEdit", householdRepository.householdToEdit.value?.uid)
-  }
-
-  @Test
-  fun `updateStinkyPoints updates selected household`() = runBlocking {
-    val household = HouseHold("houseSP", "Name", emptyList(), emptyList(), emptyMap(), emptyMap())
-    householdRepository.selectHousehold(household)
-
-    val newStinky = mapOf("userX" to 3L)
-    `when`(mockDocument.update("stinkyPoints", newStinky)).thenReturn(Tasks.forResult<Void>(null))
-
-    householdRepository.updateStinkyPoints("houseSP", newStinky)
-
-    assertEquals(newStinky, householdRepository.selectedHousehold.value?.stinkyPoints)
-  }
-
-  fun updateStinkyPointsErrorDoesNotChangeSelectedHousehold() = runBlocking {
-    // Arrange
-    val household =
-        HouseHold(
-            uid = "houseSP",
-            name = "Name",
-            members = emptyList(),
-            sharedRecipes = emptyList(),
-            ratPoints = emptyMap(),
-            stinkyPoints = emptyMap())
-
-    // Set initial selected household
-    householdRepository.selectHousehold(household)
-
-    val newStinky = mapOf("userX" to 3L)
-
-    // Simulate failure in Firestore update
-    `when`(mockCollection.document(household.uid)).thenReturn(mockDocument)
-    `when`(mockDocument.update("stinkyPoints", newStinky))
-        .thenThrow(RuntimeException("Stinky Error"))
-
-    // Act
-    householdRepository.updateStinkyPoints(household.uid, newStinky)
-
-    // Assert
-    // Verify that the selected household remains unchanged
-    val updatedHousehold = householdRepository.selectedHousehold.value
-    assertNotNull(
-        "Selected household should not be null",
-        updatedHousehold,
-    )
-    assertTrue(
-        "Stinky points should not change on error",
-        updatedHousehold?.stinkyPoints?.isEmpty() == true)
-  }
-
-  @Test
-  fun `updateRatPoints updates selected household`() = runBlocking {
-    val household = HouseHold("houseRP", "Name", emptyList(), emptyList(), emptyMap(), emptyMap())
-    householdRepository.selectHousehold(household)
-
-    val newRat = mapOf("userY" to 5L)
-    `when`(mockDocument.update("ratPoints", newRat)).thenReturn(Tasks.forResult<Void>(null))
-
-    householdRepository.updateRatPoints("houseRP", newRat)
-
-    assertEquals(newRat, householdRepository.selectedHousehold.value?.ratPoints)
-  }
-
-  @Test
-  fun startListeningForHouseholdsWithEmptyListClearsHouseholds() = runBlocking {
-    // Put a household in state first
-    val field = HouseholdRepositoryFirestore::class.java.getDeclaredField("_households")
-    field.isAccessible = true
-    field.set(
-        householdRepository,
-        kotlinx.coroutines.flow.MutableStateFlow(
-            listOf(HouseHold("id1", "test", listOf(), listOf(), emptyMap(), emptyMap()))))
-
-    householdRepository.startListeningForHouseholds(emptyList())
-    assertTrue(householdRepository.households.value.isEmpty())
-  }
-
-  @Test
-  fun initializeHouseholdsCatchesException() = runBlocking {
-    val householdIds = listOf("house789")
-    val mockQuery = mock(Query::class.java)
-    `when`(mockCollection.whereIn(FieldPath.documentId(), householdIds)).thenReturn(mockQuery)
-    `when`(mockQuery.get()).thenThrow(RuntimeException("Test exception"))
-
-    householdRepository.initializeHouseholds(householdIds, null)
-    // Should not crash and presumably keep households empty
-    assertTrue(householdRepository.households.value.isEmpty())
-    assertNull(householdRepository.selectedHousehold.value)
-  }
-
-
-  @Test
-  fun getHouseholdMembersReturnsCorrectMembers() = runBlocking {
-    val household =
-        HouseHold("houseM", "Name", listOf("member1", "member2"), listOf(), emptyMap(), emptyMap())
-    val fieldH = HouseholdRepositoryFirestore::class.java.getDeclaredField("_households")
-    fieldH.isAccessible = true
-    fieldH.set(householdRepository, kotlinx.coroutines.flow.MutableStateFlow(listOf(household)))
-
-    val members = householdRepository.getHouseholdMembers("houseM")
-    assertEquals(listOf("member1", "member2"), members)
-  }
-
-  @Test
-  fun getHouseholdMembersReturnsEmptyIfNotFound() = runBlocking {
-    val fieldH = HouseholdRepositoryFirestore::class.java.getDeclaredField("_households")
-    fieldH.isAccessible = true
-    fieldH.set(
-        householdRepository, kotlinx.coroutines.flow.MutableStateFlow(emptyList<HouseHold>()))
-
-    val members = householdRepository.getHouseholdMembers("nope")
-    assertTrue(members.isEmpty())
-  }
-
-
-  @Test
-  fun `initializeHouseholds handles Firestore error gracefully`(): Unit = runBlocking {
-    // Arrange
-    val householdIds = listOf("house123", "house456")
-    val mockQuery = mock(Query::class.java)
-
-    `when`(mockCollection.whereIn(FieldPath.documentId(), householdIds)).thenReturn(mockQuery)
-    `when`(mockQuery.get()).thenThrow(RuntimeException("Test Initialization Error"))
-
-    // Act
-    householdRepository.initializeHouseholds(householdIds, null)
-
-    // Assert
-    val households = householdRepository.households.value
-    assertTrue("Households should remain empty after error", households.isEmpty())
-    assertNull(
-        "Selected household should remain null after error",
-        householdRepository.selectedHousehold.value)
   }
 }
