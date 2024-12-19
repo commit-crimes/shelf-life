@@ -1,10 +1,13 @@
-package com.android.shelfLife.ui.recipes
+package com.android.shelfLife.ui.recipes.generation
 
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.ComposeNavigator
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import com.android.shelfLife.HiltTestActivity
 import com.android.shelfLife.model.foodFacts.FoodCategory
@@ -22,7 +25,9 @@ import com.android.shelfLife.model.recipe.RecipeType
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
+import com.android.shelfLife.ui.recipes.generateRecipe.CompletionStep
 import com.android.shelfLife.ui.recipes.generateRecipe.FoodSelectionStep
+import com.android.shelfLife.ui.recipes.generateRecipe.GenerateRecipeScreen
 import com.android.shelfLife.ui.recipes.generateRecipe.RecipeInputStep
 import com.android.shelfLife.ui.recipes.generateRecipe.ReviewStep
 import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
@@ -33,6 +38,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import helpers.FoodItemRepositoryTestHelper
 import helpers.HouseholdRepositoryTestHelper
 import helpers.RecipeRepositoryTestHelper
+import io.mockk.mockk
 import java.util.Date
 import javax.inject.Inject
 import junit.framework.TestCase.assertEquals
@@ -117,6 +123,7 @@ class RecipeGenerationTest {
         OverviewScreenViewModel(
             houseHoldRepository, foodItemRepository, userRepository, instrumentationContext)
   }
+
 
   /** TESTING FIRST STEP: BASIC RECIPE OPTIONS */
   @Test
@@ -377,4 +384,70 @@ class RecipeGenerationTest {
     // Verify onNext callback
     assertTrue(nextCalled)
   }
+
+  /**
+   * TESTING COMPLETION STEP
+   */
+
+  @Test
+  fun completionStep_loadingState_showsSpinnerAndText() {
+    // Set ViewModel state for generating recipe
+    recipeGenerationViewModel._isGeneratingRecipe.value = true
+
+    composeTestRule.setContent {
+      CompletionStep(
+        viewModel = recipeGenerationViewModel,
+        onBack = {},
+        navigationActions = mockk()
+      )
+    }
+
+    // Check for "Generating..." text
+    composeTestRule.onNodeWithText("Generating...").assertExists()
+
+    // Check for CircularProgressIndicator
+    composeTestRule.onNodeWithTag("loadingSpinner").assertExists()
+  }
+
+  @Test
+  fun completionStep_nullGeneratedRecipe_triggersOnBack() {
+    var backCalled = false
+
+    recipeGenerationViewModel._isGeneratingRecipe.value = false
+
+    composeTestRule.setContent {
+      CompletionStep(
+        viewModel = recipeGenerationViewModel,
+        onBack = { backCalled = true },
+        navigationActions = mockk()
+      )
+    }
+
+    // Click on the Back button
+    composeTestRule.onNodeWithTag("regenerateButton").performClick()
+    composeTestRule.waitForIdle()
+
+
+    // Verify onBack callback was triggered
+    assertTrue(backCalled)
+  }
+
+
+  /**
+   * TESTING OVERALL SCREEN
+   */
+  @Test
+  fun generateRecipeScreen_initialState_displaysInputStep() {
+    composeTestRule.setContent {
+      GenerateRecipeScreen(
+        navigationActions = navigationActions,
+      )
+    }
+
+    // Verify the initial step (RecipeInputStep) is displayed
+    composeTestRule.onNodeWithText("Recipe Name").assertExists()
+    composeTestRule.onNodeWithText("Servings").assertExists()
+  }
+
+
 }
