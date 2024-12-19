@@ -20,6 +20,8 @@ import com.android.shelfLife.ui.leaderboard.LeaderboardScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.newoverview.ChooseFoodItem
+import com.android.shelfLife.ui.newoverview.FirstFoodItem
 import com.android.shelfLife.ui.overview.AddFoodItemScreen
 import com.android.shelfLife.ui.overview.EditFoodItemScreen
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
@@ -66,6 +68,8 @@ fun ShelfLifeApp() {
       composable(Screen.ADD_FOOD) { AddFoodItemScreen(navigationActions) }
       composable(Screen.EDIT_FOOD) { EditFoodItemScreen(navigationActions) }
       composable(Screen.HOUSEHOLD_CREATION) { HouseHoldCreationScreen(navigationActions) }
+      composable(Screen.FIRST_FOOD_ITEM) { FirstFoodItem(navigationActions) }
+      composable(Screen.CHOOSE_FOOD_ITEM) { ChooseFoodItem(navigationActions) }
       composable(Screen.INDIVIDUAL_FOOD_ITEM) { IndividualFoodItemScreen(navigationActions) }
       composable(Screen.LEADERBOARD) { LeaderboardScreen(navigationActions) }
     }

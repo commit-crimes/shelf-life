@@ -267,6 +267,7 @@ fun BarcodeScannerScreen(
           coroutineScope.launch { sheetScaffoldState.bottomSheetState.partialExpand() }
         } else {
           Toast.makeText(context, "Food Not Found in Database", Toast.LENGTH_SHORT).show()
+
           navigationActions.navigateTo(Screen.ADD_FOOD)
         }
         // Reset states

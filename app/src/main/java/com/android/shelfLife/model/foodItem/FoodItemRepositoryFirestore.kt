@@ -1,9 +1,14 @@
 package com.android.shelfLife.model.foodItem
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +30,8 @@ class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFi
   private val _errorMessage = MutableStateFlow<String?>(null)
   override val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
+  private val _isQuickAdd = MutableStateFlow<Boolean>(false)
+  override val isQuickAdd: StateFlow<Boolean> = _isQuickAdd.asStateFlow()
   // Listener registration
   private var foodItemsListenerRegistration: ListenerRegistration? = null
 
@@ -69,6 +76,10 @@ class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFi
 
   override fun selectFoodItem(foodItem: FoodItem?) {
     _selectedFoodItem.value = foodItem
+  }
+
+  override fun setisQuickAdd(value: Boolean) {
+    _isQuickAdd.value = value
   }
 
   override fun setFoodItems(householdId: String, value: List<FoodItem>) {
@@ -215,6 +226,26 @@ class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFi
                 _foodItems.value = updatedFoodItems
               }
             }
+  }
+
+  override suspend fun uploadImageToFirebaseStorage(uri: Uri, context: Context): String? {
+    try {
+      // Create a reference to Firebase Storage
+      val storageReference =
+          FirebaseStorage.getInstance("gs://shelf-life-687aa.firebasestorage.app").reference
+
+      val fileName = "images/${System.currentTimeMillis()}.jpg"
+      val imageReference: StorageReference = storageReference.child(fileName)
+
+      // Upload the file to Firebase Storage
+      imageReference.putFile(uri).await()
+
+      // Get the download URL
+      return imageReference.downloadUrl.await().toString()
+    } catch (e: Exception) {
+      Toast.makeText(context, "Error uploading image", Toast.LENGTH_SHORT).show()
+      return null
+    }
   }
 
   /** Stops listening for real-time updates. */

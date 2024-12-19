@@ -285,6 +285,7 @@ dependencies {
     implementation(libs.camerax.view)
     implementation(libs.guava)
 
+
     // Navigation
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.navigation.fragment.ktx)
@@ -293,6 +294,7 @@ dependencies {
     // Google Service
     implementation(libs.play.services.auth)
     // Firebase
+    implementation(libs.firebase.storage)
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.ui.auth)
@@ -332,6 +334,8 @@ dependencies {
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.mockk)
     androidTestImplementation(libs.androidx.runner)
+    testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.androidx.lifecycle.runtime.testing)
 
     // AndroidJUnitRunner and JUnit Rules
     testImplementation(libs.androidx.runner)

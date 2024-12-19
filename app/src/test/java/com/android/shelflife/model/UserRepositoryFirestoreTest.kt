@@ -579,4 +579,51 @@ class UserRepositoryFirestoreTest {
     assertNotNull(user)
     assertEquals("initialHousehold", user?.selectedHouseholdUID)
   }
+
+  @Test
+  fun addCurrentUserToHouseHoldAddsUIDToFirestore(): Unit = runBlocking {
+    val mockCurrentUser = mock(FirebaseUser::class.java)
+    `when`(mockCurrentUser.uid).thenReturn("testUserId")
+    `when`(mockAuth.currentUser).thenReturn(mockCurrentUser)
+
+    val householdUID = "household123"
+    val mockUpdateTask = Tasks.forResult<Void>(null)
+    val mockUserDocument = mockFirestore.collection("users").document("testUserId")
+    `when`(mockUserDocument.update(eq("householdUIDs"), any(FieldValue::class.java)))
+        .thenReturn(mockUpdateTask)
+
+    userRepository.addCurrentUserToHouseHold(householdUID, "testUserId")
+
+    verify(mockUserDocument).update(eq("householdUIDs"), any(FieldValue::class.java))
+  }
+
+  @Test
+  fun getUserNamesReturnsCorrectUsernames() = runBlocking {
+    val userIds = listOf("userId1", "userId2")
+
+    // Mock Firestore query results
+    val mockQuerySnapshot = mock(QuerySnapshot::class.java)
+    val mockDoc1 = mock(DocumentSnapshot::class.java)
+    val mockDoc2 = mock(DocumentSnapshot::class.java)
+
+    `when`(mockDoc1.id).thenReturn("userId1")
+    `when`(mockDoc2.id).thenReturn("userId2")
+    `when`(mockDoc1.getString("username")).thenReturn("User One")
+    `when`(mockDoc2.getString("username")).thenReturn("User Two")
+
+    val docs = listOf(mockDoc1, mockDoc2)
+    `when`(mockQuerySnapshot.documents).thenReturn(docs)
+
+    val mockTask: Task<QuerySnapshot> = Tasks.forResult(mockQuerySnapshot)
+    val mockCollection = mockFirestore.collection("users")
+    `when`(mockCollection.whereIn(FieldPath.documentId(), userIds)).thenReturn(mockCollection)
+    `when`(mockCollection.get()).thenReturn(mockTask)
+
+    // Call getUserNames
+    val result = userRepository.getUserNames(userIds)
+
+    // Assertions
+    assertEquals("User One", result["userId1"])
+    assertEquals("User Two", result["userId2"])
+  }
 }
