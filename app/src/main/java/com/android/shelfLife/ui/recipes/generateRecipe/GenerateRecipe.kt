@@ -19,6 +19,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -41,10 +42,10 @@ import kotlin.math.floor
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenerateRecipeScreen(
-    navigationActions: NavigationActions,
-    viewModel: RecipeGenerationViewModel = hiltViewModel(),
+  navigationActions: NavigationActions,
+  viewModel: RecipeGenerationViewModel = hiltViewModel(),
+  navController: NavHostController = rememberNavController(),
 ) {
-  val navController = rememberNavController()
 
   Scaffold(
       topBar = {
@@ -491,7 +492,7 @@ fun CompletionStep(
                             )
                         // Loading Spinner
                         CircularProgressIndicator(
-                            modifier = Modifier.size(64.dp), // Visible size
+                            modifier = Modifier.size(64.dp).testTag("loadingSpinner"), // Visible size
                             strokeWidth = 6.dp // Thicker for better visibility
                             )
                       }
