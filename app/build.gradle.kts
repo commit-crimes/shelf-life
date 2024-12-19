@@ -16,14 +16,19 @@ android {
     namespace = "com.android.shelfLife"
     compileSdk = 34
 
-    // Load the API key from local.properties
-    val localProperties = Properties()
-    val localPropertiesFile = rootProject.file("local.properties")
-    if (localPropertiesFile.exists()) {
-        localProperties.load(FileInputStream(localPropertiesFile))
-    }
 
-    val openAIApiKey: String = localProperties.getProperty("OPENAI_API_KEY") ?: ""
+    var openAIApiKey: String = System.getenv("OPENAI_API_KEY") ?: ""
+
+    val isCI = System.getenv("GITHUB_ACTIONS")?.toBoolean() ?: false
+    if(!isCI) { //if not on CI load from local properties
+        // Load the API key from local.properties
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(FileInputStream(localPropertiesFile))
+        }
+        openAIApiKey = localProperties.getProperty("OPENAI_API_KEY") ?: ""
+    }
 
     defaultConfig {
         applicationId = "com.android.shelfLife"
@@ -39,12 +44,10 @@ android {
             useSupportLibrary = true
         }
 
-        // Add the API key to the BuildConfig class
-        buildConfigField(
-            type = "String",
-            name = "OPENAI_API_KEY",
-            value = "\"${openAIApiKey}\""
-        )
+        // Add the API key dynamically from environment variable
+
+        buildConfigField("String", "OPENAI_API_KEY", "\"$openAIApiKey\"")
+
     }
 
     testOptions {
@@ -53,7 +56,6 @@ android {
         }
     }
     signingConfigs{
-        val isCI = System.getenv("GITHUB_ACTIONS")?.toBoolean() ?: false
         if(isCI && System.getenv("GITHUB_WORKFLOW") == "Build Android APK"){
             named("debug"){
                 storeFile = file("../keystore.jks")
