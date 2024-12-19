@@ -170,7 +170,7 @@ constructor(
         }
   }
 
-  override fun deleteHouseholdById(id: String, function: (String) -> Unit) {
+  override fun deleteHouseholdById(id: String, onSuccess: (String) -> Unit) {
     // Find the household to be deleted
     val deletedHouseHold = _households.value.find { it.uid == id }
 
@@ -183,7 +183,7 @@ constructor(
         .document(id)
         .delete()
         .addOnSuccessListener {
-          function(id)
+          onSuccess(id)
           Log.d("HouseholdRepository", "Successfully deleted household: $id")
         }
         .addOnFailureListener { exception ->

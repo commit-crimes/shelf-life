@@ -35,7 +35,7 @@ interface HouseHoldRepository {
   fun updateHousehold(household: HouseHold, function: (String) -> Unit = {})
 
   /** Deletes a household by its unique ID. */
-  fun deleteHouseholdById(id: String, function: (String) -> Unit = {})
+  fun deleteHouseholdById(id: String, onSuccess: (String) -> Unit = {})
 
   /**
    * Fetches the list of members for a specific household.
