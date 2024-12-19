@@ -50,104 +50,104 @@ fun InstructionScreen(
     viewModel: ExecuteRecipeViewModel = hiltViewModel(),
     onFinish: () -> Unit
 ) {
-    val currentInstruction by viewModel.currentInstruction.collectAsState()
+  val currentInstruction by viewModel.currentInstruction.collectAsState()
 
-    Scaffold(
-        modifier = Modifier.testTag("instructionScreen"),
-        topBar = {
-            TopAppBar(
-                colors =
+  Scaffold(
+      modifier = Modifier.testTag("instructionScreen"),
+      topBar = {
+        TopAppBar(
+            colors =
                 TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                     navigationIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer),
-                modifier = Modifier.testTag("topBar"),
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            Log.d("InstructionScreen", "TopAppBar Back button clicked")
-                            navigationActions.goBack()
-                        },
-                        modifier = Modifier.testTag("goBackArrow")) {
-                        Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
-                    }
-                },
-                title = {
-                    Text(
-                        text = "Instructions",
-                        style =
-                        MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = 24.sp, fontWeight = FontWeight.Bold))
-                })
-        },
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { destination ->
-                    navigationActions.navigateTo(destination)
-                    Log.d("InstructionScreen", "BottomNavigationMenu: Navigated to $destination")
-                },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.RECIPES)
-        }) { paddingValues ->
+            modifier = Modifier.testTag("topBar"),
+            navigationIcon = {
+              IconButton(
+                  onClick = {
+                    Log.d("InstructionScreen", "TopAppBar Back button clicked")
+                    navigationActions.goBack()
+                  },
+                  modifier = Modifier.testTag("goBackArrow")) {
+                    Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
+                  }
+            },
+            title = {
+              Text(
+                  text = "Instructions",
+                  style =
+                      MaterialTheme.typography.bodyLarge.copy(
+                          fontSize = 24.sp, fontWeight = FontWeight.Bold))
+            })
+      },
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { destination ->
+              navigationActions.navigateTo(destination)
+              Log.d("InstructionScreen", "BottomNavigationMenu: Navigated to $destination")
+            },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = Route.RECIPES)
+      }) { paddingValues ->
         Column(
             modifier = Modifier.fillMaxSize().padding(paddingValues),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally) {
-            // Display the current instruction with animation
-            AnimatedContent(
-                targetState = currentInstruction,
-                transitionSpec = {
+              // Display the current instruction with animation
+              AnimatedContent(
+                  targetState = currentInstruction,
+                  transitionSpec = {
                     fadeIn() togetherWith fadeOut() // Define fade animations
-                },
-                modifier = Modifier.weight(1f).padding(16.dp)) { instruction ->
-                Text(
-                    modifier = Modifier.testTag("instructionText"),
-                    text = instruction ?: "No instructions available",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp))
-            }
+                  },
+                  modifier = Modifier.weight(1f).padding(16.dp)) { instruction ->
+                    Text(
+                        modifier = Modifier.testTag("instructionText"),
+                        text = instruction ?: "No instructions available",
+                        style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp))
+                  }
 
-            // Navigation Buttons
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(16.dp)) {
-                // Back button
-                if (viewModel.hasPreviousInstructions()) {
-                    Button(
-                        onClick = {
+              // Navigation Buttons
+              Row(
+                  horizontalArrangement = Arrangement.spacedBy(16.dp),
+                  verticalAlignment = Alignment.CenterVertically,
+                  modifier = Modifier.padding(16.dp)) {
+                    // Back button
+                    if (viewModel.hasPreviousInstructions()) {
+                      Button(
+                          onClick = {
                             viewModel.previousInstruction()
                             Log.d(
                                 "InstructionScreen",
                                 "Back button clicked. Current Index: ${viewModel.currentInstructionIndex.value}")
-                        },
-                        modifier = Modifier.testTag("backButton")) {
-                        Text("Back")
+                          },
+                          modifier = Modifier.testTag("backButton")) {
+                            Text("Back")
+                          }
                     }
-                }
 
-                // Next/Finish button
-                if (viewModel.hasMoreInstructions()) {
-                    Button(
-                        onClick = {
+                    // Next/Finish button
+                    if (viewModel.hasMoreInstructions()) {
+                      Button(
+                          onClick = {
                             viewModel.nextInstruction()
                             Log.d(
                                 "InstructionScreen",
                                 "Next button clicked. Current Index: ${viewModel.currentInstructionIndex.value}")
-                        },
-                        modifier = Modifier.testTag("nextButton")) {
-                        Text("Next")
-                    }
-                } else {
-                    Button(
-                        onClick = {
+                          },
+                          modifier = Modifier.testTag("nextButton")) {
+                            Text("Next")
+                          }
+                    } else {
+                      Button(
+                          onClick = {
                             onFinish()
                             Log.d("InstructionScreen", "Finish button clicked.")
-                        },
-                        modifier = Modifier.testTag("finishButton")) {
-                        Text("Finish")
+                          },
+                          modifier = Modifier.testTag("finishButton")) {
+                            Text("Finish")
+                          }
                     }
-                }
+                  }
             }
-        }
-    }
+      }
 }

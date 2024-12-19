@@ -48,24 +48,24 @@ fun InvitationScreen(
     navigationActions: NavigationActions,
     viewModel: InvitationViewModel = hiltViewModel()
 ) {
-    val invitations by viewModel.invitations.collectAsState()
-    Scaffold(topBar = { TopAppBar(title = { Text("Invitations") }) }) { paddingValues ->
-        if (invitations.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize().padding(paddingValues),
-                contentAlignment = Alignment.Center) {
-                Text("No pending invitations")
-            }
-        } else {
-            // Show list of invitations
-            LazyColumn(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
-                items(invitations) { invitation ->
-                    InvitationCard(invitation, viewModel, navigationActions)
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
-            }
+  val invitations by viewModel.invitations.collectAsState()
+  Scaffold(topBar = { TopAppBar(title = { Text("Invitations") }) }) { paddingValues ->
+    if (invitations.isEmpty()) {
+      Box(
+          modifier = Modifier.fillMaxSize().padding(paddingValues),
+          contentAlignment = Alignment.Center) {
+            Text("No pending invitations")
+          }
+    } else {
+      // Show list of invitations
+      LazyColumn(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
+        items(invitations) { invitation ->
+          InvitationCard(invitation, viewModel, navigationActions)
+          Spacer(modifier = Modifier.height(8.dp))
         }
+      }
     }
+  }
 }
 
 /**
@@ -81,40 +81,40 @@ fun InvitationCard(
     invitationViewModel: InvitationViewModel,
     navigationActions: NavigationActions
 ) {
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-    Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation()) {
-        Column(modifier = Modifier.padding(16.dp).testTag("invitationCard")) {
-            Text(
-                text = "You have been invited to join household: ${invitation.householdName}",
-                style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(8.dp))
-            Row {
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            invitationViewModel.acceptInvitation(invitation)
-                            Toast.makeText(context, "Invitation accepted", Toast.LENGTH_SHORT).show()
-                            navigationActions.goBack()
-                        }
-                    },
-                    modifier = Modifier.weight(1f)) {
-                    Text("Accept")
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(
-                    onClick = {
-                        coroutineScope.launch {
-                            invitationViewModel.declineInvitation(invitation)
-                            Toast.makeText(context, "Invitation declined", Toast.LENGTH_SHORT).show()
-                            navigationActions.goBack()
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                    modifier = Modifier.weight(1f)) {
-                    Text("Decline")
-                }
+  val context = LocalContext.current
+  val coroutineScope = rememberCoroutineScope()
+  Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation()) {
+    Column(modifier = Modifier.padding(16.dp).testTag("invitationCard")) {
+      Text(
+          text = "You have been invited to join household: ${invitation.householdName}",
+          style = MaterialTheme.typography.titleMedium)
+      Spacer(modifier = Modifier.height(8.dp))
+      Row {
+        Button(
+            onClick = {
+              coroutineScope.launch {
+                invitationViewModel.acceptInvitation(invitation)
+                Toast.makeText(context, "Invitation accepted", Toast.LENGTH_SHORT).show()
+                navigationActions.goBack()
+              }
+            },
+            modifier = Modifier.weight(1f)) {
+              Text("Accept")
             }
-        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Button(
+            onClick = {
+              coroutineScope.launch {
+                invitationViewModel.declineInvitation(invitation)
+                Toast.makeText(context, "Invitation declined", Toast.LENGTH_SHORT).show()
+                navigationActions.goBack()
+              }
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+            modifier = Modifier.weight(1f)) {
+              Text("Decline")
+            }
+      }
     }
+  }
 }

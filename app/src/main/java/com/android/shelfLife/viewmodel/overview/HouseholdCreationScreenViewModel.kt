@@ -29,28 +29,28 @@ import kotlinx.coroutines.launch
 class HouseholdCreationScreenViewModel
 @Inject
 constructor(
-  private val houseHoldRepository: HouseHoldRepository,
-  private val foodItemRepository: FoodItemRepository,
-  private val invitationRepository: InvitationRepository,
-  private val userRepository: UserRepository
+    private val houseHoldRepository: HouseHoldRepository,
+    private val foodItemRepository: FoodItemRepository,
+    private val invitationRepository: InvitationRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
   private val _emailList = MutableStateFlow<Set<String>>(emptySet())
   val emailList: StateFlow<Set<String>> = _emailList.asStateFlow()
 
   val householdToEdit: StateFlow<HouseHold?> =
-    houseHoldRepository.householdToEdit.stateIn(
-      viewModelScope, started = SharingStarted.Eagerly, null)
+      houseHoldRepository.householdToEdit.stateIn(
+          viewModelScope, started = SharingStarted.Eagerly, null)
 
   val selectedHousehold =
-    houseHoldRepository.selectedHousehold.stateIn(
-      viewModelScope, started = SharingStarted.Eagerly, null)
+      houseHoldRepository.selectedHousehold.stateIn(
+          viewModelScope, started = SharingStarted.Eagerly, null)
 
   val households =
-    houseHoldRepository.households.stateIn(
-      viewModelScope, started = SharingStarted.Eagerly, emptyList())
+      houseHoldRepository.households.stateIn(
+          viewModelScope, started = SharingStarted.Eagerly, emptyList())
   private val currentUser =
-    userRepository.user.stateIn(viewModelScope, started = SharingStarted.Eagerly, null)
+      userRepository.user.stateIn(viewModelScope, started = SharingStarted.Eagerly, null)
 
   private var finishedLoading = MutableStateFlow(false)
 
@@ -89,8 +89,8 @@ constructor(
    */
   private fun isNewHouseholdNameIsInvalid(householdName: String): Boolean {
     return (householdName.isBlank() ||
-            (houseHoldRepository.checkIfHouseholdNameExists(householdName) &&
-                    (householdToEdit.value == null || householdName != householdToEdit.value!!.name)))
+        (houseHoldRepository.checkIfHouseholdNameExists(householdName) &&
+            (householdToEdit.value == null || householdName != householdToEdit.value!!.name)))
   }
 
   /**
@@ -104,8 +104,8 @@ constructor(
   }
 
   /**
-   * Attempts to add an email card, returning true if successful and false otherwise.
-   * This encapsulates the logic for checking duplicates and blank inputs.
+   * Attempts to add an email card, returning true if successful and false otherwise. This
+   * encapsulates the logic for checking duplicates and blank inputs.
    *
    * @param emailInput The email input to add.
    * @return True if the email card was added, false otherwise.
@@ -168,16 +168,16 @@ constructor(
   private fun addNewHousehold(householdName: String, friendEmails: Set<String?> = emptySet()) {
     viewModelScope.launch {
       val user =
-        currentUser.value
-          ?: run {
-            Log.e("HouseholdViewModel", "User not logged in")
-            return@launch
-          }
+          currentUser.value
+              ?: run {
+                Log.e("HouseholdViewModel", "User not logged in")
+                return@launch
+              }
 
       val householdUid = houseHoldRepository.getNewUid()
       val household =
-        HouseHold(
-          householdUid, householdName, listOf(user.uid), emptyList(), emptyMap(), emptyMap())
+          HouseHold(
+              householdUid, householdName, listOf(user.uid), emptyList(), emptyMap(), emptyMap())
 
       houseHoldRepository.addHousehold(household)
       userRepository.addHouseholdUID(household.uid)
@@ -194,9 +194,9 @@ constructor(
           Log.w("HouseholdViewModel", "Emails not found: $emailsNotFound")
         }
         emailToUid
-          .filterKeys { it != user.email }
-          .values
-          .forEach { invitationRepository.sendInvitation(household, it) }
+            .filterKeys { it != user.email }
+            .values
+            .forEach { invitationRepository.sendInvitation(household, it) }
       }
     }
   }
@@ -215,8 +215,8 @@ constructor(
         if (newMemberUIDs.isNotEmpty()) {
           for (uid in newMemberUIDs) {
             invitationRepository.sendInvitation(
-              household = household,
-              invitedUserID = uid,
+                household = household,
+                invitedUserID = uid,
             )
           }
         }

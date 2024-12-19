@@ -30,8 +30,8 @@ import com.android.shelfLife.viewmodel.camera.BarcodeScannerViewModel
  */
 @Composable
 fun CameraPermissionHandler(
-  navigationActions: NavigationActions,
-  viewModel: BarcodeScannerViewModel = hiltViewModel()
+    navigationActions: NavigationActions,
+    viewModel: BarcodeScannerViewModel = hiltViewModel()
 ) {
   val context = LocalContext.current
   val activity = context as Activity
@@ -40,10 +40,10 @@ fun CameraPermissionHandler(
 
   // For triggering permission requests
   val launcher =
-    rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
-        isGranted: Boolean ->
-      viewModel.onPermissionResult(isGranted) // Update permission result in ViewModel
-    }
+      rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
+          isGranted: Boolean ->
+        viewModel.onPermissionResult(isGranted) // Update permission result in ViewModel
+      }
 
   // Observe lifecycle to detect when the app resumes
   OnLifecycleEvent(onResume = { viewModel.checkCameraPermission() })
@@ -53,7 +53,7 @@ fun CameraPermissionHandler(
 
   LaunchedEffect(Unit) {
     shouldShowRationale =
-      ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.CAMERA)
+        ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.CAMERA)
   }
 
   // Core logic for handling permission states
@@ -63,7 +63,7 @@ fun CameraPermissionHandler(
       navigationActions.navigateTo(Screen.BARCODE_SCANNER)
     } else {
       val currentPermissionStatus =
-        ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+          ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
 
       when {
         // "Don't allow" state (no pop-up, just show PermissionDeniedScreen)

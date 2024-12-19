@@ -6,8 +6,8 @@ import com.google.firebase.firestore.DocumentSnapshot
 /**
  * Interface for managing invitations within the application.
  *
- * This interface defines the contract for a repository that handles the operations related to invitations,
- * including sending, accepting, and declining invitations, as well as retrieving them.
+ * This interface defines the contract for a repository that handles the operations related to
+ * invitations, including sending, accepting, and declining invitations, as well as retrieving them.
  */
 interface InvitationRepository {
 

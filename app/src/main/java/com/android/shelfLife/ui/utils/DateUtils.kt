@@ -47,21 +47,21 @@ class DateVisualTransformation : VisualTransformation {
 
     // Create an OffsetMapping for the cursor position
     val offsetMapping =
-      object : OffsetMapping {
-        override fun originalToTransformed(offset: Int): Int {
-          var transformedOffset = offset
-          if (offset > 2) transformedOffset++
-          if (offset > 4) transformedOffset++
-          return transformedOffset.coerceAtMost(formattedText.length)
-        }
+        object : OffsetMapping {
+          override fun originalToTransformed(offset: Int): Int {
+            var transformedOffset = offset
+            if (offset > 2) transformedOffset++
+            if (offset > 4) transformedOffset++
+            return transformedOffset.coerceAtMost(formattedText.length)
+          }
 
-        override fun transformedToOriginal(offset: Int): Int {
-          var originalOffset = offset
-          if (offset > 2) originalOffset--
-          if (offset > 5) originalOffset--
-          return originalOffset.coerceAtMost(digits.length)
+          override fun transformedToOriginal(offset: Int): Int {
+            var originalOffset = offset
+            if (offset > 2) originalOffset--
+            if (offset > 5) originalOffset--
+            return originalOffset.coerceAtMost(digits.length)
+          }
         }
-      }
 
     return TransformedText(AnnotatedString(formattedText), offsetMapping)
   }
@@ -129,14 +129,14 @@ fun isValidDate(dateStr: String): Boolean {
 
   // Check if day is valid for the given month
   val daysInMonth =
-    when (month) {
-      4,
-      6,
-      9,
-      11 -> 30
-      2 -> if (isLeapYear(year)) 29 else 28
-      else -> 31
-    }
+      when (month) {
+        4,
+        6,
+        9,
+        11 -> 30
+        2 -> if (isLeapYear(year)) 29 else 28
+        else -> 31
+      }
 
   return day in 1..daysInMonth
 
@@ -179,18 +179,18 @@ fun isDateAfterOrEqual(dateStr1: String, dateStr2: String): Boolean {
   sdf.isLenient = false // Strict date parsing
 
   val date1 =
-    try {
-      sdf.parse(insertSlashes(dateStr1))
-    } catch (e: Exception) {
-      return false // dateStr1 is invalid
-    }
+      try {
+        sdf.parse(insertSlashes(dateStr1))
+      } catch (e: Exception) {
+        return false // dateStr1 is invalid
+      }
 
   val date2 =
-    try {
-      sdf.parse(insertSlashes(dateStr2))
-    } catch (e: Exception) {
-      return false // dateStr2 is invalid
-    }
+      try {
+        sdf.parse(insertSlashes(dateStr2))
+      } catch (e: Exception) {
+        return false // dateStr2 is invalid
+      }
 
   return !date1.before(date2)
 }

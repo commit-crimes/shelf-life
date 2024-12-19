@@ -21,8 +21,8 @@ import javax.inject.Inject
 class IndividualRecipeViewModel
 @Inject
 constructor(
-  private val recipeRepository: RecipeRepository,
-  private val userRepository: UserRepository
+    private val recipeRepository: RecipeRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
   /** The currently selected recipe. */
@@ -31,8 +31,8 @@ constructor(
   var selectedRecipeIsNonEmpty by mutableStateOf<Boolean>(true)
 
   /**
-   * Initializes the ViewModel, setting the selected recipe from the repository.
-   * If no recipe is selected, it marks the recipe as empty.
+   * Initializes the ViewModel, setting the selected recipe from the repository. If no recipe is
+   * selected, it marks the recipe as empty.
    */
   init {
     selectedRecipe = recipeRepository.selectedRecipe.value
@@ -86,16 +86,12 @@ constructor(
     return selectedRecipe!!.instructions
   }
 
-  /**
-   * Deselects the currently selected recipe.
-   */
+  /** Deselects the currently selected recipe. */
   fun deselectRecipe() {
     recipeRepository.selectRecipe(null)
   }
 
-  /**
-   * Deletes the currently selected recipe.
-   */
+  /** Deletes the currently selected recipe. */
   fun deleteSelectedRecipe() {
     if (selectedRecipe != null) {
       recipeRepository.deleteRecipe(selectedRecipe!!.uid) { recipeUID ->

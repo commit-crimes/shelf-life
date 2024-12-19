@@ -32,49 +32,49 @@ fun LeaderboardScreen(
     navigationActions: NavigationActions,
     viewModel: LeaderboardViewModel = hiltViewModel()
 ) {
-    val mode by viewModel.mode.collectAsState()
-    val topLeaders by viewModel.topLeaders.collectAsState()
-    val currentUserId = viewModel.currentUserId
-    val context = LocalContext.current
+  val mode by viewModel.mode.collectAsState()
+  val topLeaders by viewModel.topLeaders.collectAsState()
+  val currentUserId = viewModel.currentUserId
+  val context = LocalContext.current
 
-    Scaffold(
-        topBar = {
-            CustomTopAppBar(
-                onClick = { navigationActions.goBack() },
-                title = "Leaderboards",
-                titleTestTag = "Leaderboards",
-            )
-        }) { paddingValues ->
+  Scaffold(
+      topBar = {
+        CustomTopAppBar(
+            onClick = { navigationActions.goBack() },
+            title = "Leaderboards",
+            titleTestTag = "Leaderboards",
+        )
+      }) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
-            ModeToggle(currentMode = mode, onModeChange = { viewModel.switchMode(it) })
+          ModeToggle(currentMode = mode, onModeChange = { viewModel.switchMode(it) })
 
-            Spacer(modifier = Modifier.height(16.dp))
+          Spacer(modifier = Modifier.height(16.dp))
 
-            if (topLeaders.isEmpty()) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No data available")
-                }
-            } else {
-                val firstLeader = topLeaders.first()
-                val kingUID = viewModel.kingUID
-                Log.d("LeaderboardScreen", "First leader: ${firstLeader.first}")
-                val userIsKing = kingUID == currentUserId
-                val isDark = isSystemInDarkTheme()
-
-                HighlightFirstPlace(
-                    viewModel = viewModel,
-                    leader = firstLeader,
-                    mode = mode,
-                    userIsKing = userIsKing,
-                    onTogglePrize = { viewModel.togglePrize(context, isDark) })
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                val remainingLeaders = topLeaders.drop(1)
-                LeaderboardList(leaders = remainingLeaders)
+          if (topLeaders.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+              Text("No data available")
             }
+          } else {
+            val firstLeader = topLeaders.first()
+            val kingUID = viewModel.kingUID
+            Log.d("LeaderboardScreen", "First leader: ${firstLeader.first}")
+            val userIsKing = kingUID == currentUserId
+            val isDark = isSystemInDarkTheme()
+
+            HighlightFirstPlace(
+                viewModel = viewModel,
+                leader = firstLeader,
+                mode = mode,
+                userIsKing = userIsKing,
+                onTogglePrize = { viewModel.togglePrize(context, isDark) })
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            val remainingLeaders = topLeaders.drop(1)
+            LeaderboardList(leaders = remainingLeaders)
+          }
         }
-    }
+      }
 }
 
 /**
@@ -94,41 +94,41 @@ fun HighlightFirstPlace(
     userIsKing: Boolean,
     onTogglePrize: () -> Unit
 ) {
-    val (username, points) = leader
+  val (username, points) = leader
 
-    val kingGif =
-        when (mode) {
-            LeaderboardMode.RAT -> R.drawable.king_rat
-            LeaderboardMode.STINKY -> R.drawable.king_stinky
-        }
+  val kingGif =
+      when (mode) {
+        LeaderboardMode.RAT -> R.drawable.king_rat
+        LeaderboardMode.STINKY -> R.drawable.king_stinky
+      }
 
-    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        // Display the image
-        AsyncImage(
-            model = kingGif,
-            contentDescription = "${mode.name} King GIF",
-            modifier = Modifier.fillMaxWidth().height(200.dp),
-        )
+  Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+    // Display the image
+    AsyncImage(
+        model = kingGif,
+        contentDescription = "${mode.name} King GIF",
+        modifier = Modifier.fillMaxWidth().height(200.dp),
+    )
 
-        // King info below the image
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "$username 👑",
-            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurface)
-        Text(
-            text = "${points.toInt()} points",
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-            color = MaterialTheme.colorScheme.onSurface)
+    // King info below the image
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(
+        text = "$username 👑",
+        style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.Bold),
+        textAlign = TextAlign.Center,
+        color = MaterialTheme.colorScheme.onSurface)
+    Text(
+        text = "${points.toInt()} points",
+        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+        color = MaterialTheme.colorScheme.onSurface)
 
-        // Prize Button
-        if (userIsKing) {
-            Spacer(modifier = Modifier.height(16.dp))
-            val buttonText = viewModel.buttonText.value
-            Button(onClick = onTogglePrize) { Text(buttonText) }
-        }
+    // Prize Button
+    if (userIsKing) {
+      Spacer(modifier = Modifier.height(16.dp))
+      val buttonText = viewModel.buttonText.value
+      Button(onClick = onTogglePrize) { Text(buttonText) }
     }
+  }
 }
 
 /**
@@ -138,12 +138,12 @@ fun HighlightFirstPlace(
  */
 @Composable
 fun LeaderboardList(leaders: List<Pair<String, Long>>) {
-    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-        leaders.forEachIndexed { index, leader ->
-            val rank = index + 2
-            LeaderboardItem(rank = rank, memberId = leader.first, points = leader.second.toInt())
-        }
+  Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+    leaders.forEachIndexed { index, leader ->
+      val rank = index + 2
+      LeaderboardItem(rank = rank, memberId = leader.first, points = leader.second.toInt())
     }
+  }
 }
 
 /**
@@ -155,24 +155,24 @@ fun LeaderboardList(leaders: List<Pair<String, Long>>) {
  */
 @Composable
 fun LeaderboardItem(rank: Int, memberId: String, points: Int) {
-    val emoji =
-        when (rank) {
-            2 -> "🥈"
-            3 -> "🥉"
-            else -> ""
-        }
+  val emoji =
+      when (rank) {
+        2 -> "🥈"
+        3 -> "🥉"
+        else -> ""
+      }
 
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically) {
+  Row(
+      modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+      horizontalArrangement = Arrangement.SpaceBetween,
+      verticalAlignment = Alignment.CenterVertically) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("$rank. ", style = MaterialTheme.typography.headlineSmall)
-            Text("$memberId $emoji", style = MaterialTheme.typography.headlineSmall)
+          Text("$rank. ", style = MaterialTheme.typography.headlineSmall)
+          Text("$memberId $emoji", style = MaterialTheme.typography.headlineSmall)
         }
         Text(
             "$points", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-    }
+      }
 }
 
 /**
@@ -183,33 +183,33 @@ fun LeaderboardItem(rank: Int, memberId: String, points: Int) {
  */
 @Composable
 fun ModeToggle(currentMode: LeaderboardMode, onModeChange: (LeaderboardMode) -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
-        horizontalArrangement = Arrangement.Center) {
+  Row(
+      modifier = Modifier.fillMaxWidth().padding(8.dp),
+      horizontalArrangement = Arrangement.Center) {
         Button(
             onClick = { onModeChange(LeaderboardMode.RAT) },
             colors =
-            if (currentMode == LeaderboardMode.RAT) {
-                ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
-            } else {
-                ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surfaceVariant)
-            },
+                if (currentMode == LeaderboardMode.RAT) {
+                  ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
+                } else {
+                  ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surfaceVariant)
+                },
             modifier = Modifier.weight(1f)) {
-            Text("Rat Leaderboard")
-        }
+              Text("Rat Leaderboard")
+            }
 
         Spacer(modifier = Modifier.width(8.dp))
 
         Button(
             onClick = { onModeChange(LeaderboardMode.STINKY) },
             colors =
-            if (currentMode == LeaderboardMode.STINKY) {
-                ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
-            } else {
-                ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surfaceVariant)
-            },
+                if (currentMode == LeaderboardMode.STINKY) {
+                  ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
+                } else {
+                  ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surfaceVariant)
+                },
             modifier = Modifier.weight(1f)) {
-            Text("Stinky Leaderboard")
-        }
-    }
+              Text("Stinky Leaderboard")
+            }
+      }
 }

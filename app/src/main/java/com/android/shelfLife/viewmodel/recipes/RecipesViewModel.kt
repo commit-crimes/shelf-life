@@ -34,96 +34,96 @@ constructor(
     private val houseHoldRepository: HouseHoldRepository
 ) : ViewModel() {
 
-    /** Flow of user recipes. */
-    val userRecipes = recipeRepository.recipes
+  /** Flow of user recipes. */
+  val userRecipes = recipeRepository.recipes
 
-    /** State for the Floating Action Button (FAB) expansion. */
-    val fabExpanded = mutableStateOf(false)
+  /** State for the Floating Action Button (FAB) expansion. */
+  val fabExpanded = mutableStateOf(false)
 
-    /** State for the drawer. */
-    private val _drawerState = MutableStateFlow(DrawerState(DrawerValue.Closed))
-    val drawerState = _drawerState.asStateFlow()
+  /** State for the drawer. */
+  private val _drawerState = MutableStateFlow(DrawerState(DrawerValue.Closed))
+  val drawerState = _drawerState.asStateFlow()
 
-    /** Map of available filters. */
-    private val FILTERS =
-        mapOf(
-            "Basic" to RecipeType.BASIC,
-            "High protein" to RecipeType.HIGH_PROTEIN,
-            "Low calories" to RecipeType.LOW_CALORIE,
-            "Personal" to RecipeType.PERSONAL)
+  /** Map of available filters. */
+  private val FILTERS =
+      mapOf(
+          "Basic" to RecipeType.BASIC,
+          "High protein" to RecipeType.HIGH_PROTEIN,
+          "Low calories" to RecipeType.LOW_CALORIE,
+          "Personal" to RecipeType.PERSONAL)
 
-    /** List of filter keys. */
-    var filters = FILTERS.keys.toList()
+  /** List of filter keys. */
+  var filters = FILTERS.keys.toList()
 
-    /** State for selected filters. */
-    private val _selectedFilters = MutableStateFlow<List<String>>(emptyList())
-    val selectedFilters = _selectedFilters.asStateFlow()
+  /** State for selected filters. */
+  private val _selectedFilters = MutableStateFlow<List<String>>(emptyList())
+  val selectedFilters = _selectedFilters.asStateFlow()
 
-    /** State for the search query. */
-    private val _query = MutableStateFlow("")
-    val query = _query.asStateFlow()
+  /** State for the search query. */
+  private val _query = MutableStateFlow("")
+  val query = _query.asStateFlow()
 
-    /** Flow of filtered recipes based on selected filters and search query. */
-    val filteredRecipes =
-        combine(userRecipes, selectedFilters, query) { recipes, currentFilters, currentQuery ->
+  /** Flow of filtered recipes based on selected filters and search query. */
+  val filteredRecipes =
+      combine(userRecipes, selectedFilters, query) { recipes, currentFilters, currentQuery ->
             recipes.filter { recipe ->
-                // Check if the recipe matches selected filters
-                (currentFilters.isEmpty() ||
-                        currentFilters.any { filter -> recipe.recipeType == FILTERS[filter] }) &&
-                        // Check if the recipe matches the search query
-                        (currentQuery.isEmpty() || recipe.name.contains(currentQuery, ignoreCase = true))
+              // Check if the recipe matches selected filters
+              (currentFilters.isEmpty() ||
+                  currentFilters.any { filter -> recipe.recipeType == FILTERS[filter] }) &&
+                  // Check if the recipe matches the search query
+                  (currentQuery.isEmpty() || recipe.name.contains(currentQuery, ignoreCase = true))
             }
+          }
+          .stateIn(
+              scope = viewModelScope,
+              started = SharingStarted.WhileSubscribed(5000),
+              initialValue = emptyList())
+
+  /** Flow of the current user. */
+  val user = userRepository.user
+
+  /** Flow of the selected household. */
+  val household = houseHoldRepository.selectedHousehold
+
+  /**
+   * Selects a recipe.
+   *
+   * @param recipe The recipe to select.
+   */
+  fun selectRecipe(recipe: Recipe?) {
+    recipeRepository.selectRecipe(recipe)
+  }
+
+  /** Expands the Floating Action Button (FAB). */
+  fun expandFab() {
+    fabExpanded.value = true
+  }
+
+  /** Shrinks the Floating Action Button (FAB). */
+  fun shrinkFab() {
+    fabExpanded.value = false
+  }
+
+  /**
+   * Toggles the selection of a filter.
+   *
+   * @param filter The filter to toggle.
+   */
+  fun clickOnFilter(filter: String) {
+    _selectedFilters.value =
+        if (selectedFilters.value.contains(filter)) {
+          selectedFilters.value - filter // Remove filter
+        } else {
+          selectedFilters.value + filter // Add filter
         }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
-                initialValue = emptyList())
+  }
 
-    /** Flow of the current user. */
-    val user = userRepository.user
-
-    /** Flow of the selected household. */
-    val household = houseHoldRepository.selectedHousehold
-
-    /**
-     * Selects a recipe.
-     *
-     * @param recipe The recipe to select.
-     */
-    fun selectRecipe(recipe: Recipe?) {
-        recipeRepository.selectRecipe(recipe)
-    }
-
-    /** Expands the Floating Action Button (FAB). */
-    fun expandFab() {
-        fabExpanded.value = true
-    }
-
-    /** Shrinks the Floating Action Button (FAB). */
-    fun shrinkFab() {
-        fabExpanded.value = false
-    }
-
-    /**
-     * Toggles the selection of a filter.
-     *
-     * @param filter The filter to toggle.
-     */
-    fun clickOnFilter(filter: String) {
-        _selectedFilters.value =
-            if (selectedFilters.value.contains(filter)) {
-                selectedFilters.value - filter // Remove filter
-            } else {
-                selectedFilters.value + filter // Add filter
-            }
-    }
-
-    /**
-     * Updates the search query.
-     *
-     * @param newQuery The new search query.
-     */
-    fun changeQuery(newQuery: String) {
-        _query.value = newQuery
-    }
+  /**
+   * Updates the search query.
+   *
+   * @param newQuery The new search query.
+   */
+  fun changeQuery(newQuery: String) {
+    _query.value = newQuery
+  }
 }

@@ -21,9 +21,9 @@ import kotlinx.coroutines.launch
 class HouseholdSelectionDrawerViewModel
 @Inject
 constructor(
-  private val houseHoldRepository: HouseHoldRepository,
-  private val userRepository: UserRepository,
-  private val foodItemRepository: FoodItemRepository
+    private val houseHoldRepository: HouseHoldRepository,
+    private val userRepository: UserRepository,
+    private val foodItemRepository: FoodItemRepository
 ) : ViewModel() {
   val households = houseHoldRepository.households
   val selectedHousehold = houseHoldRepository.selectedHousehold

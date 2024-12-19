@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 class ProfileScreenViewModel
 @Inject
 constructor(
-  private val userRepository: UserRepository,
+    private val userRepository: UserRepository,
 ) : ViewModel() {
   /** State for managing the visibility of the change theme menu. */
   var changeThemeMenuState = mutableStateOf(false)
@@ -41,7 +41,7 @@ constructor(
    */
   fun signOut(context: Context) {
     val googleSignInClient: GoogleSignInClient =
-      GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN)
+        GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN)
     FirebaseAuth.getInstance().signOut()
 
     googleSignInClient.revokeAccess().addOnCompleteListener { task: Task<Void> ->

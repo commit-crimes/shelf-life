@@ -48,191 +48,191 @@ fun HouseHoldCreationScreen(
     navigationActions: NavigationActions,
     viewModel: HouseholdCreationScreenViewModel = hiltViewModel()
 ) {
-    val householdToEdit by viewModel.householdToEdit.collectAsState()
+  val householdToEdit by viewModel.householdToEdit.collectAsState()
 
-    var isError by rememberSaveable { mutableStateOf(false) }
-    var houseHoldName by rememberSaveable { mutableStateOf(householdToEdit?.name ?: "") }
+  var isError by rememberSaveable { mutableStateOf(false) }
+  var houseHoldName by rememberSaveable { mutableStateOf(householdToEdit?.name ?: "") }
 
-    var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
+  var showConfirmationDialog by rememberSaveable { mutableStateOf(false) }
 
-    val memberEmailList by viewModel.emailList.collectAsState()
-    var emailInput by rememberSaveable { mutableStateOf("") }
-    var showEmailTextField by rememberSaveable { mutableStateOf(false) }
+  val memberEmailList by viewModel.emailList.collectAsState()
+  var emailInput by rememberSaveable { mutableStateOf("") }
+  var showEmailTextField by rememberSaveable { mutableStateOf(false) }
 
-    val coroutineScope = rememberCoroutineScope()
-    val columnScrollState = rememberScrollState()
-    val focusRequester = remember { FocusRequester() }
+  val coroutineScope = rememberCoroutineScope()
+  val columnScrollState = rememberScrollState()
+  val focusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(showEmailTextField) {
-        if (showEmailTextField) {
-            coroutineScope.launch { columnScrollState.animateScrollTo(columnScrollState.maxValue) }
-            focusRequester.requestFocus()
-        }
+  LaunchedEffect(showEmailTextField) {
+    if (showEmailTextField) {
+      coroutineScope.launch { columnScrollState.animateScrollTo(columnScrollState.maxValue) }
+      focusRequester.requestFocus()
     }
+  }
 
-    fun addEmailCard() {
-        val added = viewModel.tryAddEmailCard(emailInput)
-        if (added) {
-            emailInput = ""
-        }
-        showEmailTextField = false
-        coroutineScope.launch { columnScrollState.scrollTo(columnScrollState.maxValue) }
+  fun addEmailCard() {
+    val added = viewModel.tryAddEmailCard(emailInput)
+    if (added) {
+      emailInput = ""
     }
+    showEmailTextField = false
+    coroutineScope.launch { columnScrollState.scrollTo(columnScrollState.maxValue) }
+  }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("") },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
-                navigationIcon = {
-                    IconButton(
-                        modifier = Modifier.testTag("CloseButton"),
-                        onClick = { navigationActions.goBack() }) {
-                        Icon(Icons.Outlined.Close, contentDescription = "Close")
+  Scaffold(
+      topBar = {
+        TopAppBar(
+            title = { Text("") },
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
+            navigationIcon = {
+              IconButton(
+                  modifier = Modifier.testTag("CloseButton"),
+                  onClick = { navigationActions.goBack() }) {
+                    Icon(Icons.Outlined.Close, contentDescription = "Close")
+                  }
+            },
+            actions = {
+              if (householdToEdit != null) {
+                IconButton(
+                    modifier = Modifier.testTag("DeleteButton"),
+                    onClick = { showConfirmationDialog = true }) {
+                      Icon(
+                          Icons.Outlined.Delete,
+                          contentDescription = "Delete",
+                          tint = MaterialTheme.colorScheme.error)
                     }
-                },
-                actions = {
-                    if (householdToEdit != null) {
-                        IconButton(
-                            modifier = Modifier.testTag("DeleteButton"),
-                            onClick = { showConfirmationDialog = true }) {
-                            Icon(
-                                Icons.Outlined.Delete,
-                                contentDescription = "Delete",
-                                tint = MaterialTheme.colorScheme.error)
-                        }
-                    }
-                })
-        },
-        modifier = Modifier.testTag("HouseHoldCreationScreen")) { paddingValues ->
+              }
+            })
+      },
+      modifier = Modifier.testTag("HouseHoldCreationScreen")) { paddingValues ->
         Column(
             modifier =
-            Modifier.padding(paddingValues).padding(30.dp).padding(top = 50.dp).fillMaxSize(),
+                Modifier.padding(paddingValues).padding(30.dp).padding(top = 50.dp).fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally) {
-            OutlinedTextField(
-                value = houseHoldName,
-                onValueChange = { houseHoldName = it },
-                textStyle = TextStyle(fontSize = 30.sp, textAlign = TextAlign.Start),
-                singleLine = true,
-                isError = isError,
-                supportingText = {
+              OutlinedTextField(
+                  value = houseHoldName,
+                  onValueChange = { houseHoldName = it },
+                  textStyle = TextStyle(fontSize = 30.sp, textAlign = TextAlign.Start),
+                  singleLine = true,
+                  isError = isError,
+                  supportingText = {
                     if (isError) {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = "Household name already exists or is empty",
-                            color = MaterialTheme.colorScheme.error)
+                      Text(
+                          modifier = Modifier.fillMaxWidth(),
+                          text = "Household name already exists or is empty",
+                          color = MaterialTheme.colorScheme.error)
                     }
-                },
-                label = { Text("Household Name") },
-                placeholder = { Text("Enter Household Name") },
-                modifier =
-                Modifier.padding(30.dp).fillMaxWidth().testTag("HouseHoldNameTextField"))
+                  },
+                  label = { Text("Household Name") },
+                  placeholder = { Text("Enter Household Name") },
+                  modifier =
+                      Modifier.padding(30.dp).fillMaxWidth().testTag("HouseHoldNameTextField"))
 
-            Text(
-                "Household Members",
-                style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
-                textAlign = TextAlign.Start,
-                modifier =
-                Modifier.fillMaxWidth().padding(top = 20.dp).testTag("HouseHoldMembersText"))
+              Text(
+                  "Household Members",
+                  style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
+                  textAlign = TextAlign.Start,
+                  modifier =
+                      Modifier.fillMaxWidth().padding(top = 20.dp).testTag("HouseHoldMembersText"))
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier =
-                Modifier.fillMaxWidth()
-                    .padding(top = 20.dp)
-                    .verticalScroll(columnScrollState)
-                    .weight(1f)) {
-                memberEmailList.forEach { email ->
-                    ElevatedCard(
-                        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
-                        modifier =
-                        Modifier.fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .background(MaterialTheme.colorScheme.background)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier =
-                            Modifier.fillMaxWidth()
-                                .padding(horizontal = 20.dp, vertical = 8.dp)) {
-                            Text(
-                                text = email,
-                                style = TextStyle(fontSize = 16.sp),
-                                modifier = Modifier.weight(1f))
-                            if (email != FirebaseAuth.getInstance().currentUser?.email ||
-                                householdToEdit != null) {
-                                IconButton(
-                                    onClick = { viewModel.removeEmail(email) },
-                                    modifier = Modifier.testTag("RemoveEmailButton")) {
-                                    Icon(
-                                        imageVector = Icons.Default.Delete,
-                                        contentDescription = "Remove Email")
+              Column(
+                  horizontalAlignment = Alignment.CenterHorizontally,
+                  modifier =
+                      Modifier.fillMaxWidth()
+                          .padding(top = 20.dp)
+                          .verticalScroll(columnScrollState)
+                          .weight(1f)) {
+                    memberEmailList.forEach { email ->
+                      ElevatedCard(
+                          elevation = CardDefaults.elevatedCardElevation(defaultElevation = 8.dp),
+                          modifier =
+                              Modifier.fillMaxWidth()
+                                  .padding(horizontal = 16.dp, vertical = 8.dp)
+                                  .background(MaterialTheme.colorScheme.background)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier =
+                                    Modifier.fillMaxWidth()
+                                        .padding(horizontal = 20.dp, vertical = 8.dp)) {
+                                  Text(
+                                      text = email,
+                                      style = TextStyle(fontSize = 16.sp),
+                                      modifier = Modifier.weight(1f))
+                                  if (email != FirebaseAuth.getInstance().currentUser?.email ||
+                                      householdToEdit != null) {
+                                    IconButton(
+                                        onClick = { viewModel.removeEmail(email) },
+                                        modifier = Modifier.testTag("RemoveEmailButton")) {
+                                          Icon(
+                                              imageVector = Icons.Default.Delete,
+                                              contentDescription = "Remove Email")
+                                        }
+                                  }
                                 }
-                            }
-                        }
+                          }
                     }
-                }
 
-                if (showEmailTextField) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                    if (showEmailTextField) {
+                      Row(
+                          verticalAlignment = Alignment.CenterVertically,
+                          modifier =
+                              Modifier.fillMaxWidth()
+                                  .padding(horizontal = 16.dp, vertical = 8.dp)
+                                  .focusRequester(focusRequester)) {
+                            OutlinedTextField(
+                                value = emailInput,
+                                onValueChange = { emailInput = it },
+                                label = { Text("Friend's Email") },
+                                placeholder = { Text("Enter email") },
+                                singleLine = true,
+                                keyboardActions = KeyboardActions(onDone = { addEmailCard() }),
+                                modifier = Modifier.weight(1f).testTag("EmailInputField"))
+                            IconButton(
+                                onClick = { addEmailCard() },
+                                modifier = Modifier.testTag("AddEmailButton")) {
+                                  Icon(
+                                      imageVector = Icons.Default.Check,
+                                      contentDescription = "Add Email")
+                                }
+                          }
+                    }
+
+                    FloatingActionButton(
                         modifier =
-                        Modifier.fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .focusRequester(focusRequester)) {
-                        OutlinedTextField(
-                            value = emailInput,
-                            onValueChange = { emailInput = it },
-                            label = { Text("Friend's Email") },
-                            placeholder = { Text("Enter email") },
-                            singleLine = true,
-                            keyboardActions = KeyboardActions(onDone = { addEmailCard() }),
-                            modifier = Modifier.weight(1f).testTag("EmailInputField"))
-                        IconButton(
-                            onClick = { addEmailCard() },
-                            modifier = Modifier.testTag("AddEmailButton")) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                contentDescription = "Add Email")
+                            Modifier.padding(top = 20.dp, bottom = 20.dp).testTag("AddEmailFab"),
+                        onClick = { showEmailTextField = !showEmailTextField },
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer) {
+                          Icon(
+                              imageVector = Icons.Default.Add,
+                              contentDescription = "Add Email",
+                              tint = MaterialTheme.colorScheme.onSecondaryContainer)
                         }
-                    }
-                }
+                  }
 
-                FloatingActionButton(
-                    modifier =
-                    Modifier.padding(top = 20.dp, bottom = 20.dp).testTag("AddEmailFab"),
-                    onClick = { showEmailTextField = !showEmailTextField },
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add Email",
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer)
-                }
-            }
-
-            CustomButtons(
-                button1OnClick = { navigationActions.goBack() },
-                button1TestTag = "CancelButton",
-                button1Text = stringResource(R.string.cancel_button),
-                button2OnClick = {
+              CustomButtons(
+                  button1OnClick = { navigationActions.goBack() },
+                  button1TestTag = "CancelButton",
+                  button1Text = stringResource(R.string.cancel_button),
+                  button2OnClick = {
                     coroutineScope.launch {
-                        val success = viewModel.confirmHouseholdActions(houseHoldName)
-                        if (!success) {
-                            isError = true
-                        } else {
-                            navigationActions.navigateTo(Screen.OVERVIEW)
-                        }
+                      val success = viewModel.confirmHouseholdActions(houseHoldName)
+                      if (!success) {
+                        isError = true
+                      } else {
+                        navigationActions.navigateTo(Screen.OVERVIEW)
+                      }
                     }
-                },
-                button2TestTag = "ConfirmButton",
-                button2Text = stringResource(R.string.save_button))
+                  },
+                  button2TestTag = "ConfirmButton",
+                  button2Text = stringResource(R.string.save_button))
 
-            DeletionConfirmationPopUp(
-                showDeleteDialog = showConfirmationDialog,
-                onDismiss = { showConfirmationDialog = false },
-                onConfirm = {
+              DeletionConfirmationPopUp(
+                  showDeleteDialog = showConfirmationDialog,
+                  onDismiss = { showConfirmationDialog = false },
+                  onConfirm = {
                     navigationActions.goBack()
                     showConfirmationDialog = false
-                })
-        }
-    }
+                  })
+            }
+      }
 }

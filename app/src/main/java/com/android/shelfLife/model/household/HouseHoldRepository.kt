@@ -5,8 +5,9 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * Interface for managing households within the application.
  *
- * This interface defines the contract for a repository that handles the operations related to households,
- * including adding, updating, deleting, and retrieving households, as well as managing their state.
+ * This interface defines the contract for a repository that handles the operations related to
+ * households, including adding, updating, deleting, and retrieving households, as well as managing
+ * their state.
  */
 interface HouseHoldRepository {
 

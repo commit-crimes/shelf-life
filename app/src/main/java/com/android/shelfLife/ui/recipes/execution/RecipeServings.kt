@@ -50,82 +50,82 @@ fun ServingsScreen(
     executeRecipeViewModel: ExecuteRecipeViewModel = hiltViewModel(),
     onNext: () -> Unit
 ) {
-    val servings by executeRecipeViewModel.servings.collectAsState()
+  val servings by executeRecipeViewModel.servings.collectAsState()
 
-    Log.d("ServingsScreen", "Current servings: $servings")
+  Log.d("ServingsScreen", "Current servings: $servings")
 
-    Scaffold(
-        modifier = Modifier.testTag("servingsScreen"),
-        topBar = {
-            TopAppBar(
-                colors =
+  Scaffold(
+      modifier = Modifier.testTag("servingsScreen"),
+      topBar = {
+        TopAppBar(
+            colors =
                 TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                     navigationIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer),
-                modifier = Modifier.testTag("topBar"),
-                navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            Log.d("ServingsScreen", "Back button clicked")
-                            navigationActions.goBack()
-                        },
-                        modifier = Modifier.testTag("goBackArrow")) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Go back Icon")
-                    }
-                },
-                title = {
-                    Text(
-                        text = "Choose number of servings",
-                        style =
-                        MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = 24.sp, fontWeight = FontWeight.Bold))
-                })
-        },
-        bottomBar = {
-            BottomNavigationMenu(
-                onTabSelect = { destination ->
-                    Log.d("ServingsScreen", "Navigating to $destination")
-                    navigationActions.navigateTo(destination)
-                },
-                tabList = LIST_TOP_LEVEL_DESTINATION,
-                selectedItem = Route.RECIPES)
-        },
-        floatingActionButton = {
-            androidx.compose.material3.FloatingActionButton(
-                onClick = {
-                    Log.d("ServingsScreen", "FloatingActionButton clicked: next state")
-                    onNext()
-                },
-                modifier =
+            modifier = Modifier.testTag("topBar"),
+            navigationIcon = {
+              IconButton(
+                  onClick = {
+                    Log.d("ServingsScreen", "Back button clicked")
+                    navigationActions.goBack()
+                  },
+                  modifier = Modifier.testTag("goBackArrow")) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Go back Icon")
+                  }
+            },
+            title = {
+              Text(
+                  text = "Choose number of servings",
+                  style =
+                      MaterialTheme.typography.bodyLarge.copy(
+                          fontSize = 24.sp, fontWeight = FontWeight.Bold))
+            })
+      },
+      bottomBar = {
+        BottomNavigationMenu(
+            onTabSelect = { destination ->
+              Log.d("ServingsScreen", "Navigating to $destination")
+              navigationActions.navigateTo(destination)
+            },
+            tabList = LIST_TOP_LEVEL_DESTINATION,
+            selectedItem = Route.RECIPES)
+      },
+      floatingActionButton = {
+        androidx.compose.material3.FloatingActionButton(
+            onClick = {
+              Log.d("ServingsScreen", "FloatingActionButton clicked: next state")
+              onNext()
+            },
+            modifier =
                 Modifier.testTag("nextFab").padding(horizontal = 16.dp).height(48.dp).width(120.dp),
-                shape = MaterialTheme.shapes.medium,
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary) {
-                Text(
-                    text = "Next",
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
+            shape = MaterialTheme.shapes.medium,
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary) {
+              Text(
+                  text = "Next",
+                  style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
             }
-        },
-        content = { paddingValues ->
-            ServingsSelector(
-                servings = servings,
-                onIncrease = {
-                    Log.d("ServingsScreen", "Increasing servings from $servings to ${servings + 1}")
-                    executeRecipeViewModel.updateServings(servings + 1)
-                },
-                onDecrease = {
-                    if (servings > 1) {
-                        Log.d("ServingsScreen", "Decreasing servings from $servings to ${servings - 1}")
-                        executeRecipeViewModel.updateServings(servings - 1)
-                    } else {
-                        Log.d("ServingsScreen", "Servings cannot be decreased below 1")
-                    }
-                },
-                modifier = Modifier.padding(paddingValues))
-        })
+      },
+      content = { paddingValues ->
+        ServingsSelector(
+            servings = servings,
+            onIncrease = {
+              Log.d("ServingsScreen", "Increasing servings from $servings to ${servings + 1}")
+              executeRecipeViewModel.updateServings(servings + 1)
+            },
+            onDecrease = {
+              if (servings > 1) {
+                Log.d("ServingsScreen", "Decreasing servings from $servings to ${servings - 1}")
+                executeRecipeViewModel.updateServings(servings - 1)
+              } else {
+                Log.d("ServingsScreen", "Servings cannot be decreased below 1")
+              }
+            },
+            modifier = Modifier.padding(paddingValues))
+      })
 }
 
 /**
@@ -143,38 +143,38 @@ fun ServingsSelector(
     onDecrease: () -> Unit,
     modifier: Modifier
 ) {
-    Column(
-        modifier = modifier.fillMaxWidth().padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally) {
+  Column(
+      modifier = modifier.fillMaxWidth().padding(16.dp),
+      horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = "Select Servings", modifier = Modifier.padding(bottom = 16.dp))
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.padding(vertical = 8.dp)) {
-            IconButton(
-                modifier = Modifier.testTag("decreaseButton"),
-                onClick = {
+              IconButton(
+                  modifier = Modifier.testTag("decreaseButton"),
+                  onClick = {
                     Log.d("ServingsSelector", "Decrease button clicked")
                     onDecrease()
-                }) {
-                Icon(
-                    imageVector = Icons.Default.Remove,
-                    contentDescription = "Decrease Servings")
-            }
+                  }) {
+                    Icon(
+                        imageVector = Icons.Default.Remove,
+                        contentDescription = "Decrease Servings")
+                  }
 
-            Text(
-                text = servings.toString(),
-                modifier = Modifier.padding(horizontal = 16.dp).testTag("servingsText"))
+              Text(
+                  text = servings.toString(),
+                  modifier = Modifier.padding(horizontal = 16.dp).testTag("servingsText"))
 
-            IconButton(
-                modifier = Modifier.testTag("increaseButton"),
-                onClick = {
+              IconButton(
+                  modifier = Modifier.testTag("increaseButton"),
+                  onClick = {
                     Log.d("ServingsSelector", "Increase button clicked")
                     onIncrease()
-                }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Increase Servings")
+                  }) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "Increase Servings")
+                  }
             }
-        }
-    }
+      }
 }

@@ -20,9 +20,9 @@ import kotlinx.coroutines.launch
 class DeletionConfirmationViewModel
 @Inject
 constructor(
-  private val houseHoldRepository: HouseHoldRepository,
-  private val userRepository: UserRepository,
-  private val foodItemRepository: FoodItemRepository
+    private val houseHoldRepository: HouseHoldRepository,
+    private val userRepository: UserRepository,
+    private val foodItemRepository: FoodItemRepository
 ) : ViewModel() {
 
   /** The household currently being edited. */
@@ -33,7 +33,6 @@ constructor(
 
   /** List of all households. */
   val households = houseHoldRepository.households
-
 
   /**
    * Deletes a household by its unique ID and refreshes the household list.

@@ -19,9 +19,11 @@ import androidx.compose.ui.platform.testTag
  * @param label The label of the dropdown field.
  * @param options An array of elements to be displayed in the dropdown menu.
  * @param selectedOption The currently selected option.
- * @param onOptionSelected A lambda function that describes the behavior when an element is selected.
+ * @param onOptionSelected A lambda function that describes the behavior when an element is
+ *   selected.
  * @param expanded A boolean indicating if the dropdown is expanded or not.
- * @param onExpandedChange A lambda function that describes the behavior when the menu changes state.
+ * @param onExpandedChange A lambda function that describes the behavior when the menu changes
+ *   state.
  * @param optionLabel A function to format how the label is displayed in the UI.
  * @param modifier A modifier for the dropdown field.
  */
@@ -37,8 +39,8 @@ fun <T> DropdownFields(
     optionLabel: (T) -> String,
     modifier: Modifier = Modifier
 ) {
-    ExposedDropdownMenuBox(
-        expanded = expanded, onExpandedChange = onExpandedChange, modifier = modifier) {
+  ExposedDropdownMenuBox(
+      expanded = expanded, onExpandedChange = onExpandedChange, modifier = modifier) {
         TextField(
             readOnly = true,
             value = optionLabel(selectedOption),
@@ -46,19 +48,19 @@ fun <T> DropdownFields(
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
             modifier =
-            Modifier.fillMaxWidth()
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                .testTag("dropdownMenu_$label"))
+                Modifier.fillMaxWidth()
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                    .testTag("dropdownMenu_$label"))
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { onExpandedChange(false) }) {
-            options.forEach { selectionOption ->
-                DropdownMenuItem(
-                    text = { Text(optionLabel(selectionOption)) },
-                    onClick = {
-                        onOptionSelected(selectionOption)
-                        onExpandedChange(false)
-                    },
-                    modifier = Modifier.testTag("dropDownItem_${optionLabel(selectionOption)}"))
-            }
+          options.forEach { selectionOption ->
+            DropdownMenuItem(
+                text = { Text(optionLabel(selectionOption)) },
+                onClick = {
+                  onOptionSelected(selectionOption)
+                  onExpandedChange(false)
+                },
+                modifier = Modifier.testTag("dropDownItem_${optionLabel(selectionOption)}"))
+          }
         }
-    }
+      }
 }

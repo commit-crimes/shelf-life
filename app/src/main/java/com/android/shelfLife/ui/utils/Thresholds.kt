@@ -17,8 +17,8 @@ import java.util.*
  * @return A pair containing the expiry message and a pair of the progress bar fill level and color.
  */
 fun getExpiryInfo(
-  expiryDateString: String?,
-  currentDate: Date = Date()
+    expiryDateString: String?,
+    currentDate: Date = Date()
 ): Pair<String, Pair<Float, Color>> {
   if (expiryDateString.isNullOrBlank()) {
     return Pair("No Expiry Date", Pair(0f, expired))
@@ -26,11 +26,11 @@ fun getExpiryInfo(
 
   val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
   val expiryDate: Date =
-    try {
-      formatter.parse(expiryDateString)!!
-    } catch (e: Exception) {
-      return Pair("Invalid Date Format", Pair(0f, expired))
-    }
+      try {
+        formatter.parse(expiryDateString)!!
+      } catch (e: Exception) {
+        return Pair("Invalid Date Format", Pair(0f, expired))
+      }
 
   val todayCalendar = Calendar.getInstance().apply { time = currentDate }
   val expiryCalendar = Calendar.getInstance().apply { time = expiryDate }

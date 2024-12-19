@@ -60,8 +60,8 @@ import kotlinx.coroutines.launch
 /**
  * Composable function to display the Recipes screen.
  *
- * This screen shows a list of recipes, a search bar, and navigation options.
- * It also handles the selection of a household and displays the appropriate UI elements.
+ * This screen shows a list of recipes, a search bar, and navigation options. It also handles the
+ * selection of a household and displays the appropriate UI elements.
  *
  * @param navigationActions The navigation actions to handle navigation events.
  * @param recipesViewModel The ViewModel for managing the state of the Recipes screen.
@@ -71,84 +71,84 @@ fun RecipesScreen(
     navigationActions: NavigationActions,
     recipesViewModel: RecipesViewModel = hiltViewModel<RecipesViewModel>()
 ) {
-    val overviewScreenViewModel = hiltViewModel<OverviewScreenViewModel>()
+  val overviewScreenViewModel = hiltViewModel<OverviewScreenViewModel>()
 
-    val user = recipesViewModel.user.collectAsState()
-    val selectedHousehold = recipesViewModel.household.collectAsState()
+  val user = recipesViewModel.user.collectAsState()
+  val selectedHousehold = recipesViewModel.household.collectAsState()
 
-    val query by recipesViewModel.query.collectAsState()
-    val filteredRecipeList by recipesViewModel.filteredRecipes.collectAsState()
-    val selectedFilters by recipesViewModel.selectedFilters.collectAsState()
+  val query by recipesViewModel.query.collectAsState()
+  val filteredRecipeList by recipesViewModel.filteredRecipes.collectAsState()
+  val selectedFilters by recipesViewModel.selectedFilters.collectAsState()
 
-    val drawerState by overviewScreenViewModel.drawerState.collectAsState()
-    val scope = rememberCoroutineScope()
+  val drawerState by overviewScreenViewModel.drawerState.collectAsState()
+  val scope = rememberCoroutineScope()
 
-    HouseHoldSelectionDrawer(
-        scope = scope, drawerState = drawerState, navigationActions = navigationActions) {
+  HouseHoldSelectionDrawer(
+      scope = scope, drawerState = drawerState, navigationActions = navigationActions) {
         if (selectedHousehold.value == null) {
-            LaunchedEffect(Unit) { navigationActions.navigateTo(Screen.FIRST_TIME_USER) }
+          LaunchedEffect(Unit) { navigationActions.navigateTo(Screen.FIRST_TIME_USER) }
         } else {
-            if (user.value != null) {
-                Scaffold(
-                    modifier = Modifier.testTag("recipesScreen"),
-                    topBar = {
-                        selectedHousehold.value?.let {
-                            TopNavigationBar(
-                                houseHold = it,
-                                onHamburgerClick = { scope.launch { drawerState.open() } },
-                                filters = recipesViewModel.filters,
-                                selectedFilters = selectedFilters,
-                                onFilterChange = { filter, _ -> recipesViewModel.clickOnFilter(filter) })
-                        }
-                    },
-                    bottomBar = {
-                        BottomNavigationMenu(
-                            onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                            tabList = LIST_TOP_LEVEL_DESTINATION,
-                            selectedItem = Route.RECIPES)
-                    },
-                    // Floating Action Button to add a new food item
-                    floatingActionButton = {
-                        ExtendedActionButtons(
-                            fabExpanded = recipesViewModel.fabExpanded,
-                            navigationActions = navigationActions,
-                        )
-                    },
-                    content = { paddingValues ->
-                        Column(
-                            modifier =
-                            Modifier.padding(paddingValues).fillMaxSize().pointerInput(Unit) {
-                                detectTapGestures(onTap = { recipesViewModel.shrinkFab() })
-                            }) {
-                            CustomSearchBar(
-                                query = query,
-                                onQueryChange = { newQuery -> recipesViewModel.changeQuery(newQuery) },
-                                placeholder = "Search recipe",
-                                searchBarTestTag = "searchBar",
-                                onDeleteTextClicked = { recipesViewModel.changeQuery("") })
+          if (user.value != null) {
+            Scaffold(
+                modifier = Modifier.testTag("recipesScreen"),
+                topBar = {
+                  selectedHousehold.value?.let {
+                    TopNavigationBar(
+                        houseHold = it,
+                        onHamburgerClick = { scope.launch { drawerState.open() } },
+                        filters = recipesViewModel.filters,
+                        selectedFilters = selectedFilters,
+                        onFilterChange = { filter, _ -> recipesViewModel.clickOnFilter(filter) })
+                  }
+                },
+                bottomBar = {
+                  BottomNavigationMenu(
+                      onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+                      tabList = LIST_TOP_LEVEL_DESTINATION,
+                      selectedItem = Route.RECIPES)
+                },
+                // Floating Action Button to add a new food item
+                floatingActionButton = {
+                  ExtendedActionButtons(
+                      fabExpanded = recipesViewModel.fabExpanded,
+                      navigationActions = navigationActions,
+                  )
+                },
+                content = { paddingValues ->
+                  Column(
+                      modifier =
+                          Modifier.padding(paddingValues).fillMaxSize().pointerInput(Unit) {
+                            detectTapGestures(onTap = { recipesViewModel.shrinkFab() })
+                          }) {
+                        CustomSearchBar(
+                            query = query,
+                            onQueryChange = { newQuery -> recipesViewModel.changeQuery(newQuery) },
+                            placeholder = "Search recipe",
+                            searchBarTestTag = "searchBar",
+                            onDeleteTextClicked = { recipesViewModel.changeQuery("") })
 
-                            if (filteredRecipeList.isEmpty()) {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    content = {
-                                        Text(
-                                            text = "No recipes available",
-                                            modifier = Modifier.testTag("noRecipesAvailableText"))
-                                    },
-                                    contentAlignment = Alignment.Center)
-                            } else {
-                                // LazyColumn for displaying the list of filtered recipes
-                                LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
-                                    items(filteredRecipeList) { recipe ->
-                                        RecipeItem(recipe, navigationActions, recipesViewModel)
-                                    }
-                                }
+                        if (filteredRecipeList.isEmpty()) {
+                          Box(
+                              modifier = Modifier.fillMaxSize(),
+                              content = {
+                                Text(
+                                    text = "No recipes available",
+                                    modifier = Modifier.testTag("noRecipesAvailableText"))
+                              },
+                              contentAlignment = Alignment.Center)
+                        } else {
+                          // LazyColumn for displaying the list of filtered recipes
+                          LazyColumn(modifier = Modifier.fillMaxSize().testTag("recipesList")) {
+                            items(filteredRecipeList) { recipe ->
+                              RecipeItem(recipe, navigationActions, recipesViewModel)
                             }
+                          }
                         }
-                    })
-            }
+                      }
+                })
+          }
         }
-    }
+      }
 }
 
 /**
@@ -166,98 +166,98 @@ fun RecipeItem(
     navigationActions: NavigationActions,
     recipesViewModel: RecipesViewModel
 ) {
-    var clickOnRecipe by remember { mutableStateOf(false) } // State to track if the recipe is clicked
-    val cardColor =
-        if (clickOnRecipe) MaterialTheme.colorScheme.primaryContainer
-        else MaterialTheme.colorScheme.background
-    val elevation = if (clickOnRecipe) 16.dp else 8.dp
+  var clickOnRecipe by remember { mutableStateOf(false) } // State to track if the recipe is clicked
+  val cardColor =
+      if (clickOnRecipe) MaterialTheme.colorScheme.primaryContainer
+      else MaterialTheme.colorScheme.background
+  val elevation = if (clickOnRecipe) 16.dp else 8.dp
 
-    // The card that visually represents the recipe item
-    ElevatedCard(
-        colors = CardDefaults.elevatedCardColors(containerColor = cardColor),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = elevation),
-        modifier =
-        Modifier.fillMaxWidth() // Make the card fill the available width
-            .padding(horizontal = 16.dp, vertical = 8.dp) // Add padding around the card
-            .clickable(
-                onClick = {
+  // The card that visually represents the recipe item
+  ElevatedCard(
+      colors = CardDefaults.elevatedCardColors(containerColor = cardColor),
+      elevation = CardDefaults.elevatedCardElevation(defaultElevation = elevation),
+      modifier =
+          Modifier.fillMaxWidth() // Make the card fill the available width
+              .padding(horizontal = 16.dp, vertical = 8.dp) // Add padding around the card
+              .clickable(
+                  onClick = {
                     recipesViewModel.selectRecipe(recipe)
                     clickOnRecipe = true
                     navigationActions.navigateTo(
                         Screen.INDIVIDUAL_RECIPE) // Navigate to the individual recipe screen
-                }) // Handle clicks on the card
-            .testTag("recipesCards")) {
+                  }) // Handle clicks on the card
+              .testTag("recipesCards")) {
         // Layout for the content inside the card
         Row(
             modifier =
-            Modifier.fillMaxWidth() // Fill the width inside the card
-                .padding(2.dp)) {
-            // Column for recipe details: name, servings, and time
-            Column(
-                modifier =
-                Modifier.width(240.dp) // Set the width of the column
-                    .size(80.dp) // Set the size of the column
-                    .padding(vertical = 12.dp) // Add vertical padding inside the column
-                    .padding(horizontal = 18.dp) // Add horizontal padding inside the column
-            ) {
-                // Display the recipe name with a specific font size, weight, and overflow
-                // handling
-                Text(
-                    text = recipe.name,
-                    fontSize = 24.sp,
-                    lineHeight = 24.sp,
-                    fontWeight = FontWeight(500),
-                    maxLines = 1, // Ensure only one line is shown
-                    overflow = TextOverflow.Ellipsis, // Show ellipsis when the text is too long
-                    modifier = Modifier.fillMaxWidth() // Fill available width
-                )
-
-                Spacer(
-                    modifier =
-                    Modifier.height(4.dp)) // Add a small vertical space between elements
-
-                // Row for servings and time information
-                Row(
-                    modifier =
-                    Modifier.fillMaxWidth() // Fill the available width for the row
-                        .fillMaxHeight() // Fill the available height for the row
-                ) {
-                    // Display the servings information
+                Modifier.fillMaxWidth() // Fill the width inside the card
+                    .padding(2.dp)) {
+              // Column for recipe details: name, servings, and time
+              Column(
+                  modifier =
+                      Modifier.width(240.dp) // Set the width of the column
+                          .size(80.dp) // Set the size of the column
+                          .padding(vertical = 12.dp) // Add vertical padding inside the column
+                          .padding(horizontal = 18.dp) // Add horizontal padding inside the column
+                  ) {
+                    // Display the recipe name with a specific font size, weight, and overflow
+                    // handling
                     Text(
-                        "Servings : ${recipe.servings}",
-                        overflow =
-                        TextOverflow.Ellipsis // Show ellipsis if the text overflows
-                    )
+                        text = recipe.name,
+                        fontSize = 24.sp,
+                        lineHeight = 24.sp,
+                        fontWeight = FontWeight(500),
+                        maxLines = 1, // Ensure only one line is shown
+                        overflow = TextOverflow.Ellipsis, // Show ellipsis when the text is too long
+                        modifier = Modifier.fillMaxWidth() // Fill available width
+                        )
 
                     Spacer(
                         modifier =
-                        Modifier.width(
-                            2.dp)) // Add a horizontal space between servings and time
+                            Modifier.height(4.dp)) // Add a small vertical space between elements
 
-                    // Display the total cooking time
-                    Text(
-                        "Time : ${recipe.time.inWholeMinutes} min",
-                        overflow =
-                        TextOverflow.Ellipsis // Show ellipsis if the text overflows
-                    )
-                }
+                    // Row for servings and time information
+                    Row(
+                        modifier =
+                            Modifier.fillMaxWidth() // Fill the available width for the row
+                                .fillMaxHeight() // Fill the available height for the row
+                        ) {
+                          // Display the servings information
+                          Text(
+                              "Servings : ${recipe.servings}",
+                              overflow =
+                                  TextOverflow.Ellipsis // Show ellipsis if the text overflows
+                              )
+
+                          Spacer(
+                              modifier =
+                                  Modifier.width(
+                                      2.dp)) // Add a horizontal space between servings and time
+
+                          // Display the total cooking time
+                          Text(
+                              "Time : ${recipe.time.inWholeMinutes} min",
+                              overflow =
+                                  TextOverflow.Ellipsis // Show ellipsis if the text overflows
+                              )
+                        }
+                  }
+
+              Spacer(modifier = Modifier.width(16.dp)) // Add space between the text and the image
+
+              // Display an image for the recipe (using a placeholder image)
+              Image(
+                  painter =
+                      painterResource(
+                          R.drawable.recipe_placeholder_small), // Placeholder image resource
+                  contentDescription = "Recipe Image", // Content description for accessibility
+                  modifier =
+                      Modifier.size(80.dp) // Set the size for the image
+                          .clip(
+                              RoundedCornerShape(
+                                  8.dp)), // Optionally clip the image with rounded corners
+                  contentScale = ContentScale.Fit // Fit the image to the available space
+                  )
             }
-
-            Spacer(modifier = Modifier.width(16.dp)) // Add space between the text and the image
-
-            // Display an image for the recipe (using a placeholder image)
-            Image(
-                painter =
-                painterResource(
-                    R.drawable.recipe_placeholder_small), // Placeholder image resource
-                contentDescription = "Recipe Image", // Content description for accessibility
-                modifier =
-                Modifier.size(80.dp) // Set the size for the image
-                    .clip(
-                        RoundedCornerShape(
-                            8.dp)), // Optionally clip the image with rounded corners
-                contentScale = ContentScale.Fit // Fit the image to the available space
-            )
-        }
-    }
+      }
 }

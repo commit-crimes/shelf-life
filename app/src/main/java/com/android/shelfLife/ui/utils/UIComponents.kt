@@ -54,32 +54,32 @@ fun CustomTopAppBar(
     titleTestTag: String,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
-    TopAppBar(
-        colors =
-        TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            navigationIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            actionIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer),
-        modifier = Modifier.testTag("topBar"),
-        navigationIcon = {
-            // Back button to return to the previous screen
-            IconButton(onClick = onClick, modifier = Modifier.testTag("goBackArrow")) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.go_back_button_description))
-            }
-        },
-        // title of TopappBar
-        title = {
-            Text(
-                text = title,
-                modifier = Modifier.testTag(titleTestTag),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        },
-        actions = actions)
+  TopAppBar(
+      colors =
+          TopAppBarDefaults.topAppBarColors(
+              containerColor = MaterialTheme.colorScheme.secondaryContainer,
+              titleContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+              navigationIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+              actionIconContentColor = MaterialTheme.colorScheme.onSecondaryContainer),
+      modifier = Modifier.testTag("topBar"),
+      navigationIcon = {
+        // Back button to return to the previous screen
+        IconButton(onClick = onClick, modifier = Modifier.testTag("goBackArrow")) {
+          Icon(
+              imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+              contentDescription = stringResource(R.string.go_back_button_description))
+        }
+      },
+      // title of TopappBar
+      title = {
+        Text(
+            text = title,
+            modifier = Modifier.testTag(titleTestTag),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+      },
+      actions = actions)
 }
 
 /**
@@ -100,51 +100,51 @@ fun CustomSearchBar(
     placeholder: String,
     searchBarTestTag: String
 ) {
-    Box(
-        modifier = Modifier.fillMaxWidth().padding(16.dp), // Outer padding for spacing
-        contentAlignment = Alignment.Center // Center the SearchBar within the Box
-    ) {
+  Box(
+      modifier = Modifier.fillMaxWidth().padding(16.dp), // Outer padding for spacing
+      contentAlignment = Alignment.Center // Center the SearchBar within the Box
+      ) {
         val colors1 =
             SearchBarDefaults.colors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
             )
         SearchBar(
             inputField = {
-                SearchBarDefaults.InputField(
-                    modifier = Modifier.testTag("searchBarInputField"),
-                    query = query,
-                    onQueryChange = onQueryChange,
-                    onSearch = {},
-                    expanded = false,
-                    onExpandedChange = {},
-                    enabled = true,
-                    placeholder = { Text(placeholder) },
-                    leadingIcon = {},
-                    trailingIcon = {
-                        if (query.isBlank()) {
-                            IconButton(onClick = {}) {
-                                Icon(Icons.Default.Search, contentDescription = "Search Icon")
-                            }
-                        } else {
-                            IconButton(
-                                modifier = Modifier.testTag("deleteTextButton"),
-                                onClick = onDeleteTextClicked) {
-                                Icon(Icons.Default.Close, contentDescription = "Delete text Icon")
-                            }
-                        }
-                    },
-                    colors = colors1.inputFieldColors,
-                    interactionSource = null,
-                )
+              SearchBarDefaults.InputField(
+                  modifier = Modifier.testTag("searchBarInputField"),
+                  query = query,
+                  onQueryChange = onQueryChange,
+                  onSearch = {},
+                  expanded = false,
+                  onExpandedChange = {},
+                  enabled = true,
+                  placeholder = { Text(placeholder) },
+                  leadingIcon = {},
+                  trailingIcon = {
+                    if (query.isBlank()) {
+                      IconButton(onClick = {}) {
+                        Icon(Icons.Default.Search, contentDescription = "Search Icon")
+                      }
+                    } else {
+                      IconButton(
+                          modifier = Modifier.testTag("deleteTextButton"),
+                          onClick = onDeleteTextClicked) {
+                            Icon(Icons.Default.Close, contentDescription = "Delete text Icon")
+                          }
+                    }
+                  },
+                  colors = colors1.inputFieldColors,
+                  interactionSource = null,
+              )
             },
             expanded = false,
             onExpandedChange = {},
             modifier =
-            Modifier.widthIn(
-                max = 600.dp) // Restrict max width to prevent over-stretching on large
-                // screens
-                .fillMaxWidth(0.9f) // Make it responsive and occupy 90% of available width
-                .testTag(searchBarTestTag),
+                Modifier.widthIn(
+                        max = 600.dp) // Restrict max width to prevent over-stretching on large
+                    // screens
+                    .fillMaxWidth(0.9f) // Make it responsive and occupy 90% of available width
+                    .testTag(searchBarTestTag),
             shape = SearchBarDefaults.inputFieldShape,
             colors = colors1,
             tonalElevation = SearchBarDefaults.TonalElevation,
@@ -152,7 +152,7 @@ fun CustomSearchBar(
             windowInsets = SearchBarDefaults.windowInsets,
             content = {},
         )
-    }
+      }
 }
 
 /**
@@ -174,18 +174,18 @@ fun CustomButtons(
     button2TestTag: String,
     button2Text: String,
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp).fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center) {
+  Row(
+      modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp).fillMaxWidth(),
+      horizontalArrangement = Arrangement.Center) {
         // Button 1
         Button(
             onClick = button1OnClick,
             modifier = Modifier.height(50.dp).weight(1f).testTag(button1TestTag),
             colors =
-            ButtonDefaults.buttonColors(
-                containerColor = secondaryContainerLight, contentColor = onSecondaryDark)) {
-            Text(text = button1Text, fontSize = 18.sp)
-        }
+                ButtonDefaults.buttonColors(
+                    containerColor = secondaryContainerLight, contentColor = onSecondaryDark)) {
+              Text(text = button1Text, fontSize = 18.sp)
+            }
 
         Spacer(Modifier.width(24.dp))
 
@@ -194,10 +194,10 @@ fun CustomButtons(
             onClick = button2OnClick,
             modifier = Modifier.height(50.dp).weight(1f).testTag(button2TestTag),
             colors =
-            ButtonDefaults.buttonColors(
-                containerColor = primaryContainerDark,
-                contentColor = secondaryContainerLight)) {
-            Text(text = button2Text, fontSize = 18.sp)
-        }
-    }
+                ButtonDefaults.buttonColors(
+                    containerColor = primaryContainerDark,
+                    contentColor = secondaryContainerLight)) {
+              Text(text = button2Text, fontSize = 18.sp)
+            }
+      }
 }

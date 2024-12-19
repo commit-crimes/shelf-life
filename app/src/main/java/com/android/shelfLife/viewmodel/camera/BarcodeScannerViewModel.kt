@@ -21,8 +21,8 @@ import kotlinx.coroutines.flow.StateFlow
 class BarcodeScannerViewModel
 @Inject
 constructor(
-  private val foodFactsRepository: FoodFactsRepository,
-  private val permissionRepository: PermissionRepository
+    private val foodFactsRepository: FoodFactsRepository,
+    private val permissionRepository: PermissionRepository
 ) : ViewModel() {
 
   private val permissionRequested = permissionRepository.permissionRequested
@@ -47,16 +47,12 @@ constructor(
     foodFactsRepository.searchByBarcode(barcode)
   }
 
-  /**
-   * Resets the search status to its initial state.
-   */
+  /** Resets the search status to its initial state. */
   fun resetSearchStatus() {
     foodFactsRepository.resetSearchStatus()
   }
 
-  /**
-   * Sets the search status to failure.
-   */
+  /** Sets the search status to failure. */
   fun setFailureStatus() {
     foodFactsRepository.setFailureStatus()
   }

@@ -50,7 +50,8 @@ import kotlinx.coroutines.launch
  *
  * @param navigationActions The navigation actions for handling navigation events, such as going
  *   back.
- * @param individualRecipeViewModel The ViewModel for managing the state of the Individual Recipe screen.
+ * @param individualRecipeViewModel The ViewModel for managing the state of the Individual Recipe
+ *   screen.
  */
 @Composable
 fun IndividualRecipeScreen(
@@ -59,77 +60,77 @@ fun IndividualRecipeScreen(
         hiltViewModel<IndividualRecipeViewModel>()
 ) {
 
-    val coroutineScope = rememberCoroutineScope()
+  val coroutineScope = rememberCoroutineScope()
 
-    if (individualRecipeViewModel.selectedRecipeIsNonEmpty) {
-        // Scaffold that provides the structure for the screen, including top and bottom bars.
-        Scaffold(
-            modifier = Modifier.testTag("individualRecipesScreen"),
-            topBar = {
-                CustomTopAppBar(
+  if (individualRecipeViewModel.selectedRecipeIsNonEmpty) {
+    // Scaffold that provides the structure for the screen, including top and bottom bars.
+    Scaffold(
+        modifier = Modifier.testTag("individualRecipesScreen"),
+        topBar = {
+          CustomTopAppBar(
+              onClick = {
+                navigationActions.goBack()
+                individualRecipeViewModel.deselectRecipe()
+              },
+              title = individualRecipeViewModel.getRecipeName(),
+              titleTestTag = "individualRecipeTitle",
+              actions = {
+                IconButton(
                     onClick = {
+                      coroutineScope.launch {
+                        individualRecipeViewModel.deleteSelectedRecipe()
                         navigationActions.goBack()
-                        individualRecipeViewModel.deselectRecipe()
+                      }
                     },
-                    title = individualRecipeViewModel.getRecipeName(),
-                    titleTestTag = "individualRecipeTitle",
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                coroutineScope.launch {
-                                    individualRecipeViewModel.deleteSelectedRecipe()
-                                    navigationActions.goBack()
-                                }
-                            },
-                            modifier = Modifier.testTag("deleteFoodItem")) {
-                            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
-                        }
-                    })
-            },
-            bottomBar = {
-                BottomNavigationMenu(
-                    onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                    tabList = LIST_TOP_LEVEL_DESTINATION,
-                    selectedItem = Route.RECIPES)
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigationActions.navigateTo(Route.RECIPE_EXECUTION) },
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    modifier = Modifier.testTag("startButton")) {
-                    Icon(
-                        imageVector = Icons.Default.PlayArrow, // Replace with a suitable icon
-                        contentDescription = "Start Recipe")
-                }
-            },
-            content = { paddingValues ->
-                Column(modifier = Modifier.padding(paddingValues).fillMaxSize().testTag("recipe")) {
-                    // Use the extracted RecipeContent composable
-                    RecipeContent(individualRecipeViewModel)
-                }
-            })
-    } else {
-        // If no recipe is selected, navigate to the easter egg screen
-        navigationActions.navigateTo(Screen.EASTER_EGG)
-    }
+                    modifier = Modifier.testTag("deleteFoodItem")) {
+                      Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
+                    }
+              })
+        },
+        bottomBar = {
+          BottomNavigationMenu(
+              onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+              tabList = LIST_TOP_LEVEL_DESTINATION,
+              selectedItem = Route.RECIPES)
+        },
+        floatingActionButton = {
+          FloatingActionButton(
+              onClick = { navigationActions.navigateTo(Route.RECIPE_EXECUTION) },
+              containerColor = MaterialTheme.colorScheme.secondaryContainer,
+              modifier = Modifier.testTag("startButton")) {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow, // Replace with a suitable icon
+                    contentDescription = "Start Recipe")
+              }
+        },
+        content = { paddingValues ->
+          Column(modifier = Modifier.padding(paddingValues).fillMaxSize().testTag("recipe")) {
+            // Use the extracted RecipeContent composable
+            RecipeContent(individualRecipeViewModel)
+          }
+        })
+  } else {
+    // If no recipe is selected, navigate to the easter egg screen
+    navigationActions.navigateTo(Screen.EASTER_EGG)
+  }
 }
 
 /**
  * Composable function to display the content of a recipe.
  *
- * This function displays the recipe image, servings, cooking time, ingredients, and instructions
- * in a scrollable layout.
+ * This function displays the recipe image, servings, cooking time, ingredients, and instructions in
+ * a scrollable layout.
  *
  * @param viewModel The ViewModel for managing the state of the Individual Recipe screen.
  */
 @Composable
 fun RecipeContent(viewModel: IndividualRecipeViewModel) {
-    Column(
-        modifier =
-        Modifier.padding(8.dp)
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()) // Enable vertical scrolling
-            .testTag("recipeContent")) {
+  Column(
+      modifier =
+          Modifier.padding(8.dp)
+              .fillMaxSize()
+              .verticalScroll(rememberScrollState()) // Enable vertical scrolling
+              .testTag("recipeContent")) {
         // Display the recipe image
         Image(
             painter = painterResource(R.drawable.individual_recipe_pot),
@@ -139,31 +140,31 @@ fun RecipeContent(viewModel: IndividualRecipeViewModel) {
 
         // Row displaying servings and time information
         Row(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = "Servings: ${viewModel.getRecipeServing()}",
-                modifier = Modifier.testTag("recipeServings"))
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(
-                text = "Time: ${viewModel.getRecipeTime()} min",
-                modifier = Modifier.testTag("recipeTime"))
+          Text(
+              text = "Servings: ${viewModel.getRecipeServing()}",
+              modifier = Modifier.testTag("recipeServings"))
+          Spacer(modifier = Modifier.width(16.dp))
+          Text(
+              text = "Time: ${viewModel.getRecipeTime()} min",
+              modifier = Modifier.testTag("recipeTime"))
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Ingredients section
         Column(modifier = Modifier.testTag("recipeIngredients")) {
-            viewModel.getRecipeIngredients().forEach { ingredient ->
-                DisplayIngredientNew(ingredient)
-            }
+          viewModel.getRecipeIngredients().forEach { ingredient ->
+            DisplayIngredientNew(ingredient)
+          }
         }
 
         // Instructions section
         Column(modifier = Modifier.testTag("recipeInstructions")) {
-            viewModel.getRecipeInstruction().forEach { instruction ->
-                DisplayInstructionNew(instruction)
-            }
+          viewModel.getRecipeInstruction().forEach { instruction ->
+            DisplayInstructionNew(instruction)
+          }
         }
-    }
+      }
 }
 
 /**
@@ -175,19 +176,19 @@ fun RecipeContent(viewModel: IndividualRecipeViewModel) {
  */
 @Composable
 fun DisplayIngredientNew(ingredient: Ingredient) {
-    val unit =
-        when (ingredient.quantity.unit) {
-            FoodUnit.GRAM -> "gr"
-            FoodUnit.ML -> "ml"
-            FoodUnit.COUNT -> ""
-        }
+  val unit =
+      when (ingredient.quantity.unit) {
+        FoodUnit.GRAM -> "gr"
+        FoodUnit.ML -> "ml"
+        FoodUnit.COUNT -> ""
+      }
 
-    val amount = ingredient.quantity.amount
-    val quantity = if (floor(amount) == amount) amount.toInt().toString() else amount.toString()
+  val amount = ingredient.quantity.amount
+  val quantity = if (floor(amount) == amount) amount.toInt().toString() else amount.toString()
 
-    Text(
-        text = " - ${quantity}${unit} of ${ingredient.name}",
-        modifier = Modifier.testTag("recipeIngredient"))
+  Text(
+      text = " - ${quantity}${unit} of ${ingredient.name}",
+      modifier = Modifier.testTag("recipeIngredient"))
 }
 
 /**
@@ -199,7 +200,7 @@ fun DisplayIngredientNew(ingredient: Ingredient) {
  */
 @Composable
 fun DisplayInstructionNew(instruction: String) {
-    // Display recipe instructions, scrollable if long
-    Text(
-        text = instruction, modifier = Modifier.padding(vertical = 8.dp).testTag("recipeInstruction"))
+  // Display recipe instructions, scrollable if long
+  Text(
+      text = instruction, modifier = Modifier.padding(vertical = 8.dp).testTag("recipeInstruction"))
 }

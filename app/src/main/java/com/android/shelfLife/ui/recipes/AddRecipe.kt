@@ -58,166 +58,166 @@ fun AddRecipeScreen(
     navigationActions: NavigationActions,
     addRecipeViewModel: AddRecipeViewModel = hiltViewModel() // default in production
 ) {
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
+  val context = LocalContext.current
+  val coroutineScope = rememberCoroutineScope()
 
-    val ingredients by addRecipeViewModel.ingredients.collectAsState()
-    val instructions by addRecipeViewModel.instructions.collectAsState()
+  val ingredients by addRecipeViewModel.ingredients.collectAsState()
+  val instructions by addRecipeViewModel.instructions.collectAsState()
 
-    Scaffold(
-        modifier = Modifier.testTag("addRecipeScreen"),
-        topBar = {
-            CustomTopAppBar(
-                onClick = { navigationActions.goBack() },
-                title = stringResource(R.string.title_of_AddRecipeScreen),
-                titleTestTag = "addRecipeTitle")
-        },
-        content = { paddingValues -> // New content parameter
-            LazyColumn(
-                modifier = Modifier.padding(paddingValues).padding(horizontal = 20.dp).fillMaxSize()) {
-                // Recipe title
-                item {
-                    OutlinedTextField(
-                        value = addRecipeViewModel.title.collectAsState().value,
-                        onValueChange = { newTitle -> addRecipeViewModel.changeTitle(newTitle) },
-                        label = { Text(stringResource(R.string.title_of_recipe)) },
-                        modifier =
+  Scaffold(
+      modifier = Modifier.testTag("addRecipeScreen"),
+      topBar = {
+        CustomTopAppBar(
+            onClick = { navigationActions.goBack() },
+            title = stringResource(R.string.title_of_AddRecipeScreen),
+            titleTestTag = "addRecipeTitle")
+      },
+      content = { paddingValues -> // New content parameter
+        LazyColumn(
+            modifier = Modifier.padding(paddingValues).padding(horizontal = 20.dp).fillMaxSize()) {
+              // Recipe title
+              item {
+                OutlinedTextField(
+                    value = addRecipeViewModel.title.collectAsState().value,
+                    onValueChange = { newTitle -> addRecipeViewModel.changeTitle(newTitle) },
+                    label = { Text(stringResource(R.string.title_of_recipe)) },
+                    modifier =
                         Modifier.fillMaxWidth()
                             .padding(vertical = 10.dp)
                             .testTag("inputRecipeTitle"))
-                }
+              }
 
-                // Error message for title
-                item {
-                    ErrorTextBoxNEW(
-                        addRecipeViewModel.titleError.collectAsState().value, "titleErrorMessage")
-                }
+              // Error message for title
+              item {
+                ErrorTextBoxNEW(
+                    addRecipeViewModel.titleError.collectAsState().value, "titleErrorMessage")
+              }
 
-                // Recipe servings
-                item {
-                    OutlinedTextField(
-                        value = addRecipeViewModel.servings.collectAsState().value,
-                        onValueChange = { newServings ->
-                            addRecipeViewModel.changeServings(newServings)
-                        },
-                        label = { Text(stringResource(R.string.servings)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier =
+              // Recipe servings
+              item {
+                OutlinedTextField(
+                    value = addRecipeViewModel.servings.collectAsState().value,
+                    onValueChange = { newServings ->
+                      addRecipeViewModel.changeServings(newServings)
+                    },
+                    label = { Text(stringResource(R.string.servings)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier =
                         Modifier.fillMaxWidth()
                             .padding(vertical = 10.dp)
                             .testTag("inputRecipeServings"))
-                }
+              }
 
-                // Error message for servings
-                item {
-                    ErrorTextBoxNEW(
-                        addRecipeViewModel.servingsError.collectAsState().value, "servingsErrorMessage")
-                }
+              // Error message for servings
+              item {
+                ErrorTextBoxNEW(
+                    addRecipeViewModel.servingsError.collectAsState().value, "servingsErrorMessage")
+              }
 
-                // Recipe time
-                item {
-                    OutlinedTextField(
-                        value = addRecipeViewModel.time.collectAsState().value,
-                        onValueChange = { newTime -> addRecipeViewModel.changeTime(newTime) },
-                        label = { Text(stringResource(R.string.time)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier =
+              // Recipe time
+              item {
+                OutlinedTextField(
+                    value = addRecipeViewModel.time.collectAsState().value,
+                    onValueChange = { newTime -> addRecipeViewModel.changeTime(newTime) },
+                    label = { Text(stringResource(R.string.time)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier =
                         Modifier.fillMaxWidth()
                             .padding(vertical = 10.dp)
                             .testTag("inputRecipeTime"))
-                }
+              }
 
-                // Error message for time
-                item {
-                    ErrorTextBoxNEW(
-                        addRecipeViewModel.timeError.collectAsState().value, "timeErrorMessage")
-                }
+              // Error message for time
+              item {
+                ErrorTextBoxNEW(
+                    addRecipeViewModel.timeError.collectAsState().value, "timeErrorMessage")
+              }
 
-                // Recipe Ingredients Section
-                item {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = stringResource(R.string.ingredients),
-                            modifier = Modifier.testTag("ingredientSection"))
-                    }
+              // Recipe Ingredients Section
+              item {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                  Text(
+                      text = stringResource(R.string.ingredients),
+                      modifier = Modifier.testTag("ingredientSection"))
                 }
+              }
 
-                itemsIndexed(ingredients) { index, ingredient ->
-                    IngredientItemNEW(
-                        index = index,
-                        ingredient = ingredient,
-                        onRemoveClick = { addRecipeViewModel.removeIngredient(index) })
+              itemsIndexed(ingredients) { index, ingredient ->
+                IngredientItemNEW(
+                    index = index,
+                    ingredient = ingredient,
+                    onRemoveClick = { addRecipeViewModel.removeIngredient(index) })
+              }
+
+              // Add Ingredient Button
+              item {
+                Spacer(modifier = Modifier.height(4.dp))
+                Button(
+                    onClick = { addRecipeViewModel.createNewIngredient() },
+                    modifier = Modifier.height(40.dp).testTag("addIngredientButton"),
+                    content = {
+                      Icon(imageVector = Icons.Default.Add, contentDescription = "Add Ingredient")
+                    })
+              }
+
+              // Instructions Section
+              item {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                  Text(
+                      text = stringResource(R.string.instructions),
+                      modifier = Modifier.testTag("instructionSection"))
                 }
+              }
 
-                // Add Ingredient Button
-                item {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Button(
-                        onClick = { addRecipeViewModel.createNewIngredient() },
-                        modifier = Modifier.height(40.dp).testTag("addIngredientButton"),
-                        content = {
-                            Icon(imageVector = Icons.Default.Add, contentDescription = "Add Ingredient")
-                        })
-                }
+              itemsIndexed(instructions) { index, instruction ->
+                InstructionItem(index = index, addRecipeViewModel = addRecipeViewModel)
+              }
 
-                // Instructions Section
-                item {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = stringResource(R.string.instructions),
-                            modifier = Modifier.testTag("instructionSection"))
-                    }
-                }
+              // Add Instruction Button
+              item {
+                Spacer(modifier = Modifier.height(4.dp))
+                Button(
+                    onClick = { addRecipeViewModel.createNewInstruction() },
+                    modifier = Modifier.height(40.dp).testTag("addInstructionButton"),
+                    content = {
+                      Icon(imageVector = Icons.Default.Add, contentDescription = "Add Instruction")
+                    })
+              }
 
-                itemsIndexed(instructions) { index, instruction ->
-                    InstructionItem(index = index, addRecipeViewModel = addRecipeViewModel)
-                }
+              // Footer Buttons
+              item {
+                CustomButtons(
+                    button1OnClick = { navigationActions.goBack() },
+                    button1TestTag = "cancelButton",
+                    button1Text = stringResource(R.string.cancel_button),
+                    button2OnClick = {
+                      coroutineScope.launch {
+                        addRecipeViewModel.addNewRecipe(
+                            showToast = { messageId ->
+                              val message =
+                                  if (messageId == 0) {
+                                    R.string.submission_error_message
+                                  } else {
+                                    R.string.error_uploading_recipe_message
+                                  }
 
-                // Add Instruction Button
-                item {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Button(
-                        onClick = { addRecipeViewModel.createNewInstruction() },
-                        modifier = Modifier.height(40.dp).testTag("addInstructionButton"),
-                        content = {
-                            Icon(imageVector = Icons.Default.Add, contentDescription = "Add Instruction")
-                        })
-                }
-
-                // Footer Buttons
-                item {
-                    CustomButtons(
-                        button1OnClick = { navigationActions.goBack() },
-                        button1TestTag = "cancelButton",
-                        button1Text = stringResource(R.string.cancel_button),
-                        button2OnClick = {
-                            coroutineScope.launch {
-                                addRecipeViewModel.addNewRecipe(
-                                    showToast = { messageId ->
-                                        val message =
-                                            if (messageId == 0) {
-                                                R.string.submission_error_message
-                                            } else {
-                                                R.string.error_uploading_recipe_message
-                                            }
-
-                                        Toast.makeText(
-                                            context, context.getString(message), Toast.LENGTH_SHORT)
-                                            .show()
-                                    })
-                            }
-                            navigationActions.goBack()
-                        },
-                        button2TestTag = "addButton",
-                        button2Text = stringResource(R.string.add_button))
-                }
+                              Toast.makeText(
+                                      context, context.getString(message), Toast.LENGTH_SHORT)
+                                  .show()
+                            })
+                      }
+                      navigationActions.goBack()
+                    },
+                    button2TestTag = "addButton",
+                    button2Text = stringResource(R.string.add_button))
+              }
             }
 
-            // Ingredient Dialog, inside the composable block
-            if (addRecipeViewModel.showIngredientDialog.collectAsState().value) {
-                IngredientDialog(addRecipeViewModel)
-            }
-        })
+        // Ingredient Dialog, inside the composable block
+        if (addRecipeViewModel.showIngredientDialog.collectAsState().value) {
+          IngredientDialog(addRecipeViewModel)
+        }
+      })
 }
 
 /**
@@ -245,23 +245,23 @@ fun InstructionItem(
     addRecipeViewModel: AddRecipeViewModel,
 ) {
 
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        OutlinedTextField(
-            value = addRecipeViewModel.instructions.collectAsState().value[index],
-            onValueChange = { newInstruction ->
-                addRecipeViewModel.changeInstruction(index, newInstruction)
-            },
-            label = { Text(stringResource(R.string.instruction_step, index + 1)) },
-            modifier = Modifier.weight(1f).testTag("inputRecipeInstruction"))
-        IconButton(
-            onClick = { addRecipeViewModel.removeInstruction(index) },
-            modifier = Modifier.testTag("deleteInstructionButton")) {
-            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Step")
+  Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+    OutlinedTextField(
+        value = addRecipeViewModel.instructions.collectAsState().value[index],
+        onValueChange = { newInstruction ->
+          addRecipeViewModel.changeInstruction(index, newInstruction)
+        },
+        label = { Text(stringResource(R.string.instruction_step, index + 1)) },
+        modifier = Modifier.weight(1f).testTag("inputRecipeInstruction"))
+    IconButton(
+        onClick = { addRecipeViewModel.removeInstruction(index) },
+        modifier = Modifier.testTag("deleteInstructionButton")) {
+          Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Step")
         }
-    }
-    // Display error message if needed
-    ErrorTextBoxNEW(
-        addRecipeViewModel.instructionError.collectAsState().value[index], "instructionErrorMessage")
+  }
+  // Display error message if needed
+  ErrorTextBoxNEW(
+      addRecipeViewModel.instructionError.collectAsState().value[index], "instructionErrorMessage")
 }
 
 val UNITS = mapOf(FoodUnit.GRAM to "gram", FoodUnit.ML to "mL", FoodUnit.COUNT to "")
@@ -287,22 +287,22 @@ val UNITS = mapOf(FoodUnit.GRAM to "gram", FoodUnit.ML to "mL", FoodUnit.COUNT t
  */
 @Composable
 fun IngredientItemNEW(index: Int, ingredient: Ingredient, onRemoveClick: () -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        // title of ingredient
-        Text(
-            text =
+  Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+    // title of ingredient
+    Text(
+        text =
             stringResource(
                 R.string.ingredient_item,
                 index + 1,
                 ingredient.quantity.amount,
                 UNITS.get(ingredient.quantity.unit)!!,
                 ingredient.name),
-            modifier = Modifier.testTag("ingredientItem"))
-        // delete button
-        IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteIngredientButton")) {
-            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Ingredient")
-        }
+        modifier = Modifier.testTag("ingredientItem"))
+    // delete button
+    IconButton(onClick = onRemoveClick, modifier = Modifier.testTag("deleteIngredientButton")) {
+      Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Ingredient")
     }
+  }
 }
 
 /**
@@ -313,95 +313,95 @@ fun IngredientItemNEW(index: Int, ingredient: Ingredient, onRemoveClick: () -> U
  */
 @Composable
 fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
+  val context = LocalContext.current
+  val coroutineScope = rememberCoroutineScope()
 
-    val ingredientUnit = addRecipeViewModel.ingredientQuantityUnit.collectAsState()
+  val ingredientUnit = addRecipeViewModel.ingredientQuantityUnit.collectAsState()
 
-    androidx.compose.material3.AlertDialog(
-        modifier = Modifier.testTag("instructionDialog"),
-        onDismissRequest = { addRecipeViewModel.createNewIngredient() },
-        title = { Text(stringResource(R.string.add_ingredient)) },
-        text = {
-            Column(modifier = Modifier.testTag("addIngredientPopUp")) {
-                // ingredient name
-                OutlinedTextField(
-                    value = addRecipeViewModel.ingredientName.collectAsState().value,
-                    onValueChange = { newName -> addRecipeViewModel.changeIngredientName(newName) },
-                    label = { Text(stringResource(R.string.ingredient_name)) },
-                    modifier = Modifier.fillMaxWidth().testTag("inputIngredientName"))
-                // error message if ingredient name is empty
-                ErrorTextBoxNEW(
-                    addRecipeViewModel.ingredientNameError.collectAsState().value,
-                    "ingredientNameErrorMessage")
+  androidx.compose.material3.AlertDialog(
+      modifier = Modifier.testTag("instructionDialog"),
+      onDismissRequest = { addRecipeViewModel.createNewIngredient() },
+      title = { Text(stringResource(R.string.add_ingredient)) },
+      text = {
+        Column(modifier = Modifier.testTag("addIngredientPopUp")) {
+          // ingredient name
+          OutlinedTextField(
+              value = addRecipeViewModel.ingredientName.collectAsState().value,
+              onValueChange = { newName -> addRecipeViewModel.changeIngredientName(newName) },
+              label = { Text(stringResource(R.string.ingredient_name)) },
+              modifier = Modifier.fillMaxWidth().testTag("inputIngredientName"))
+          // error message if ingredient name is empty
+          ErrorTextBoxNEW(
+              addRecipeViewModel.ingredientNameError.collectAsState().value,
+              "ingredientNameErrorMessage")
 
-                // ingredient quantity (it is a string but will be transformed later on)
-                OutlinedTextField(
-                    value = addRecipeViewModel.ingredientQuantityAmount.collectAsState().value,
-                    onValueChange = { newAmount ->
-                        addRecipeViewModel.changeIngredientQuantityAmount(newAmount)
-                    },
-                    label = { Text(stringResource(R.string.ingredient_quantity)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth().testTag("inputIngredientQuantity"))
+          // ingredient quantity (it is a string but will be transformed later on)
+          OutlinedTextField(
+              value = addRecipeViewModel.ingredientQuantityAmount.collectAsState().value,
+              onValueChange = { newAmount ->
+                addRecipeViewModel.changeIngredientQuantityAmount(newAmount)
+              },
+              label = { Text(stringResource(R.string.ingredient_quantity)) },
+              keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+              modifier = Modifier.fillMaxWidth().testTag("inputIngredientQuantity"))
 
-                // error message if the ingredient quantity is empty
-                ErrorTextBoxNEW(
-                    addRecipeViewModel.ingredientQuantityAmountError.collectAsState().value,
-                    "ingredientQuantityErrorMessage")
+          // error message if the ingredient quantity is empty
+          ErrorTextBoxNEW(
+              addRecipeViewModel.ingredientQuantityAmountError.collectAsState().value,
+              "ingredientQuantityErrorMessage")
 
-                Spacer(Modifier.padding(8.dp))
+          Spacer(Modifier.padding(8.dp))
 
-                // Quantity Unit Dropdown
-                Row {
-                    UnitDropdownField(
-                        unit = ingredientUnit.value,
-                        onUnitChange = { newUnit ->
-                            addRecipeViewModel.changeIngredientQuantityUnit(newUnit)
-                        },
-                        unitExpanded = addRecipeViewModel.unitExpanded,
-                        onUnitExpandedChange = { addRecipeViewModel.changeUnitExpanded() },
-                        modifier = Modifier.weight(1f),
-                        testTag = "inputIngredientUnit")
-                }
-            }
-        },
-        // add button
-        confirmButton = {
-            Button(
-                onClick = {
-                    coroutineScope.launch {
-                        val ingredientAdded = addRecipeViewModel.addNewIngredient()
-                        if (ingredientAdded) {
-                            addRecipeViewModel.closeIngredientDialog()
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "Please correct the errors before submitting.",
-                                Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    }
+          // Quantity Unit Dropdown
+          Row {
+            UnitDropdownField(
+                unit = ingredientUnit.value,
+                onUnitChange = { newUnit ->
+                  addRecipeViewModel.changeIngredientQuantityUnit(newUnit)
                 },
-                modifier = Modifier.testTag("addIngredientButton2"),
-                colors =
+                unitExpanded = addRecipeViewModel.unitExpanded,
+                onUnitExpandedChange = { addRecipeViewModel.changeUnitExpanded() },
+                modifier = Modifier.weight(1f),
+                testTag = "inputIngredientUnit")
+          }
+        }
+      },
+      // add button
+      confirmButton = {
+        Button(
+            onClick = {
+              coroutineScope.launch {
+                val ingredientAdded = addRecipeViewModel.addNewIngredient()
+                if (ingredientAdded) {
+                  addRecipeViewModel.closeIngredientDialog()
+                } else {
+                  Toast.makeText(
+                          context,
+                          "Please correct the errors before submitting.",
+                          Toast.LENGTH_SHORT)
+                      .show()
+                }
+              }
+            },
+            modifier = Modifier.testTag("addIngredientButton2"),
+            colors =
                 ButtonDefaults.buttonColors(
                     containerColor = primaryContainerDark,
                     contentColor = secondaryContainerLight)) {
-                Text(stringResource(R.string.add_ingredient))
+              Text(stringResource(R.string.add_ingredient))
             }
-        },
-        // Cancel button
-        dismissButton = {
-            Button(
-                onClick = { addRecipeViewModel.closeIngredientDialog() },
-                modifier = Modifier.testTag("cancelIngredientButton"),
-                colors =
+      },
+      // Cancel button
+      dismissButton = {
+        Button(
+            onClick = { addRecipeViewModel.closeIngredientDialog() },
+            modifier = Modifier.testTag("cancelIngredientButton"),
+            colors =
                 ButtonDefaults.buttonColors(
                     containerColor = secondaryContainerLight, contentColor = onSecondaryDark)) {
-                Text(stringResource(R.string.cancel_button))
+              Text(stringResource(R.string.cancel_button))
             }
-        })
+      })
 }
 
 /**
@@ -416,12 +416,12 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
  */
 @Composable
 fun ErrorTextBoxNEW(errorMessageId: Int?, testTag: String) {
-    if (errorMessageId != null) {
-        Text(
-            text = stringResource(errorMessageId),
-            modifier = Modifier.testTag(testTag),
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodySmall,
-        )
-    }
+  if (errorMessageId != null) {
+    Text(
+        text = stringResource(errorMessageId),
+        modifier = Modifier.testTag(testTag),
+        color = MaterialTheme.colorScheme.error,
+        style = MaterialTheme.typography.bodySmall,
+    )
+  }
 }

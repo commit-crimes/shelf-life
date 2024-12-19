@@ -13,9 +13,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-/**
- * Enum class representing the different leaderboard modes.
- */
+/** Enum class representing the different leaderboard modes. */
 enum class LeaderboardMode {
   RAT,
   STINKY
@@ -31,8 +29,8 @@ enum class LeaderboardMode {
 class LeaderboardViewModel
 @Inject
 constructor(
-  private val houseHoldRepository: HouseHoldRepository,
-  private val userRepository: UserRepository
+    private val houseHoldRepository: HouseHoldRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
   private val _mode = MutableStateFlow(LeaderboardMode.RAT)
@@ -56,17 +54,17 @@ constructor(
 
   init {
     buttonText.value =
-      if (!isAudioPlaying.value || currentAudioMode.value != mode.value) "Receive Your Prize"
-      else "Stop"
+        if (!isAudioPlaying.value || currentAudioMode.value != mode.value) "Receive Your Prize"
+        else "Stop"
     viewModelScope.launch {
       combine(selectedHousehold, mode) { household, currentMode ->
-        if (household == null) {
-          emptyList<Pair<String, Long>>()
-        } else {
-          calculateTopFive(household, currentMode)
-        }
-      }
-        .collect { _topLeaders.value = it }
+            if (household == null) {
+              emptyList<Pair<String, Long>>()
+            } else {
+              calculateTopFive(household, currentMode)
+            }
+          }
+          .collect { _topLeaders.value = it }
     }
   }
 
@@ -116,17 +114,17 @@ constructor(
    * @return A list of pairs containing user IDs and their points.
    */
   private suspend fun calculateTopFive(
-    household: HouseHold,
-    currentMode: LeaderboardMode
+      household: HouseHold,
+      currentMode: LeaderboardMode
   ): List<Pair<String, Long>> {
     val pointsMap =
-      when (currentMode) {
-        LeaderboardMode.RAT -> household.ratPoints
-        LeaderboardMode.STINKY -> household.stinkyPoints
-      }
+        when (currentMode) {
+          LeaderboardMode.RAT -> household.ratPoints
+          LeaderboardMode.STINKY -> household.stinkyPoints
+        }
 
     val sortedLeaders =
-      pointsMap.entries.sortedByDescending { it.value }.take(5).map { it.key to it.value }
+        pointsMap.entries.sortedByDescending { it.value }.take(5).map { it.key to it.value }
 
     if (sortedLeaders.isEmpty()) return emptyList()
 

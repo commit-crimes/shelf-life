@@ -20,8 +20,8 @@ import javax.inject.Inject
 class IndividualFoodItemViewModel
 @Inject
 constructor(
-  private val foodItemRepository: FoodItemRepository,
-  private val userRepository: UserRepository
+    private val foodItemRepository: FoodItemRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
   /** The currently selected food item. */

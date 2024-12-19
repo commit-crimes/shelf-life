@@ -7,8 +7,9 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * Interface for managing food items within a household.
  *
- * This interface defines the contract for a repository that handles the operations related to food items,
- * including adding, updating, deleting, and retrieving food items, as well as managing their state.
+ * This interface defines the contract for a repository that handles the operations related to food
+ * items, including adding, updating, deleting, and retrieving food items, as well as managing their
+ * state.
  */
 interface FoodItemRepository {
 

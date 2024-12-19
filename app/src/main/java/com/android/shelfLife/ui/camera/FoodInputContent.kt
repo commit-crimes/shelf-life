@@ -44,31 +44,31 @@ fun FoodInputContent(
     onCancel: () -> Unit,
     onExpandRequested: () -> Unit
 ) {
-    foodItemViewModel.isScanned()
+  foodItemViewModel.isScanned()
 
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
+  val coroutineScope = rememberCoroutineScope()
+  val context = LocalContext.current
 
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp).clickable { onExpandRequested() },
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top) {
+  Column(
+      modifier = Modifier.fillMaxWidth().padding(16.dp).clickable { onExpandRequested() },
+      horizontalAlignment = Alignment.CenterHorizontally,
+      verticalArrangement = Arrangement.Top) {
         // Food information
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = foodFacts.name, style = TextStyle(fontSize = 20.sp))
+          Column(modifier = Modifier.weight(1f)) {
+            Text(text = foodFacts.name, style = TextStyle(fontSize = 20.sp))
 
-                Text(text = foodFacts.category.name, style = TextStyle(fontSize = 13.sp))
-            }
+            Text(text = foodFacts.category.name, style = TextStyle(fontSize = 13.sp))
+          }
 
-            AsyncImage(
-                model = foodFacts.imageUrl,
-                contentDescription = "Food Image",
-                modifier =
-                Modifier.size(80.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .align(Alignment.CenterVertically),
-                contentScale = ContentScale.Crop)
+          AsyncImage(
+              model = foodFacts.imageUrl,
+              contentDescription = "Food Image",
+              modifier =
+                  Modifier.size(80.dp)
+                      .clip(RoundedCornerShape(8.dp))
+                      .align(Alignment.CenterVertically),
+              contentScale = ContentScale.Crop)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -119,20 +119,20 @@ fun FoodInputContent(
             button1TestTag = "cancelButton",
             button1Text = stringResource(R.string.cancel_button),
             button2OnClick = {
-                coroutineScope.launch {
-                    val success = foodItemViewModel.submitFoodItem(foodFacts)
-                    if (success) {
-                        // foodFactsViewModel.clearFoodFactsSuggestions()
-                        Log.d("FoodInputContent", "Food item submitted successfully")
-                        onSubmit()
-                    } else {
-                        Toast.makeText(context, R.string.submission_error_message, Toast.LENGTH_SHORT)
-                            .show()
-                    }
+              coroutineScope.launch {
+                val success = foodItemViewModel.submitFoodItem(foodFacts)
+                if (success) {
+                  // foodFactsViewModel.clearFoodFactsSuggestions()
+                  Log.d("FoodInputContent", "Food item submitted successfully")
+                  onSubmit()
+                } else {
+                  Toast.makeText(context, R.string.submission_error_message, Toast.LENGTH_SHORT)
+                      .show()
                 }
+              }
             },
             button2TestTag = "submitButton",
             button2Text = stringResource(R.string.submit_button_text),
         )
-    }
+      }
 }

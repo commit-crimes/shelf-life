@@ -27,9 +27,9 @@ data class Recipe(
     val recipeType: RecipeType = RecipeType.PERSONAL,
     val workInProgress: Boolean = false, // if the recipe is currently being worked on
 ) {
-    companion object {
-        const val MAX_SERVINGS: Float = 20.0f
-    }
+  companion object {
+    const val MAX_SERVINGS: Float = 20.0f
+  }
 }
 
 /**
@@ -74,21 +74,19 @@ data class Ingredient(
     // (and allow dynamic updates to macros when executing a recipe)
 )
 
-/**
- * Enum class representing the type of a recipe.
- */
+/** Enum class representing the type of a recipe. */
 enum class RecipeType {
-    BASIC,
-    HIGH_PROTEIN,
-    LOW_CALORIE,
-    PERSONAL;
+  BASIC,
+  HIGH_PROTEIN,
+  LOW_CALORIE,
+  PERSONAL;
 
-    /**
-     * Returns the string representation of the enum value.
-     *
-     * @return The string representation of the enum value.
-     */
-    override fun toString(): String {
-        return name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
-    }
+  /**
+   * Returns the string representation of the enum value.
+   *
+   * @return The string representation of the enum value.
+   */
+  override fun toString(): String {
+    return name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
+  }
 }

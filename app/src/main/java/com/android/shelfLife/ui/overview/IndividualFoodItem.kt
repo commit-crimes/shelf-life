@@ -37,81 +37,82 @@ import kotlinx.coroutines.launch
  * Composable function to display the individual food item screen.
  *
  * @param navigationActions The navigation actions to be used in the screen.
- * @param individualFoodItemViewModel The ViewModel for managing the state of the individual food item.
+ * @param individualFoodItemViewModel The ViewModel for managing the state of the individual food
+ *   item.
  */
 @Composable
 fun IndividualFoodItemScreen(
     navigationActions: NavigationActions,
     individualFoodItemViewModel: IndividualFoodItemViewModel = hiltViewModel()
 ) {
-    val coroutineScope = rememberCoroutineScope()
+  val coroutineScope = rememberCoroutineScope()
 
-    if (individualFoodItemViewModel.selectedFood != null) {
-        individualFoodItemViewModel.setIsQuickAdd(false)
-        Scaffold(
-            modifier = Modifier.testTag("IndividualFoodItemScreen"),
-            topBar = {
-                CustomTopAppBar(
+  if (individualFoodItemViewModel.selectedFood != null) {
+    individualFoodItemViewModel.setIsQuickAdd(false)
+    Scaffold(
+        modifier = Modifier.testTag("IndividualFoodItemScreen"),
+        topBar = {
+          CustomTopAppBar(
+              onClick = {
+                individualFoodItemViewModel.unselectFoodItem()
+                navigationActions.goBack()
+              },
+              title =
+                  if (individualFoodItemViewModel.selectedFood != null)
+                      individualFoodItemViewModel.selectedFood!!.foodFacts.name
+                  else "",
+              titleTestTag = "IndividualFoodItemName",
+              actions = {
+                IconButton(
                     onClick = {
-                        individualFoodItemViewModel.unselectFoodItem()
-                        navigationActions.goBack()
-                    },
-                    title =
-                    if (individualFoodItemViewModel.selectedFood != null)
-                        individualFoodItemViewModel.selectedFood!!.foodFacts.name
-                    else "",
-                    titleTestTag = "IndividualFoodItemName",
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                individualFoodItemViewModel.selectedFood?.let {
-                                    coroutineScope.launch {
-                                        individualFoodItemViewModel.deleteFoodItem()
-                                        navigationActions.goBack()
-                                    }
-                                }
-                            },
-                            modifier = Modifier.testTag("deleteFoodItem")) {
-                            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
+                      individualFoodItemViewModel.selectedFood?.let {
+                        coroutineScope.launch {
+                          individualFoodItemViewModel.deleteFoodItem()
+                          navigationActions.goBack()
                         }
-                    })
-            },
-            // Floating Action Button to edit the food item
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navigationActions.navigateTo(Screen.EDIT_FOOD) },
-                    content = { Icon(Icons.Default.Edit, contentDescription = "Edit") },
-                    modifier = Modifier.testTag("editFoodFab"),
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer)
-            },
-            bottomBar = {
-                BottomNavigationMenu(
-                    onTabSelect = { destination -> navigationActions.navigateTo(destination) },
-                    tabList = LIST_TOP_LEVEL_DESTINATION,
-                    selectedItem = Route.OVERVIEW)
-            }) { paddingValues ->
-            LazyColumn(modifier = Modifier.padding(paddingValues)) {
-                item {
-                    if (individualFoodItemViewModel.selectedFood != null) {
-                        AsyncImage(
-                            model = individualFoodItemViewModel.selectedFood!!.foodFacts.imageUrl,
-                            contentDescription = "Food Image",
-                            modifier =
-                            Modifier.fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                                .aspectRatio(1f)
-                                .clip(RoundedCornerShape(8.dp))
-                                .testTag("IndividualFoodItemImage"),
-                            contentScale = ContentScale.Crop)
-
-                        FoodItemDetails(foodItem = individualFoodItemViewModel.selectedFood!!)
-                    } else {
-                        CircularProgressIndicator(modifier = Modifier.testTag("CircularProgressIndicator"))
+                      }
+                    },
+                    modifier = Modifier.testTag("deleteFoodItem")) {
+                      Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
                     }
-                }
+              })
+        },
+        // Floating Action Button to edit the food item
+        floatingActionButton = {
+          FloatingActionButton(
+              onClick = { navigationActions.navigateTo(Screen.EDIT_FOOD) },
+              content = { Icon(Icons.Default.Edit, contentDescription = "Edit") },
+              modifier = Modifier.testTag("editFoodFab"),
+              containerColor = MaterialTheme.colorScheme.secondaryContainer)
+        },
+        bottomBar = {
+          BottomNavigationMenu(
+              onTabSelect = { destination -> navigationActions.navigateTo(destination) },
+              tabList = LIST_TOP_LEVEL_DESTINATION,
+              selectedItem = Route.OVERVIEW)
+        }) { paddingValues ->
+          LazyColumn(modifier = Modifier.padding(paddingValues)) {
+            item {
+              if (individualFoodItemViewModel.selectedFood != null) {
+                AsyncImage(
+                    model = individualFoodItemViewModel.selectedFood!!.foodFacts.imageUrl,
+                    contentDescription = "Food Image",
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .aspectRatio(1f)
+                            .clip(RoundedCornerShape(8.dp))
+                            .testTag("IndividualFoodItemImage"),
+                    contentScale = ContentScale.Crop)
+
+                FoodItemDetails(foodItem = individualFoodItemViewModel.selectedFood!!)
+              } else {
+                CircularProgressIndicator(modifier = Modifier.testTag("CircularProgressIndicator"))
+              }
             }
+          }
         }
-    } else {
-        navigationActions.navigateTo(Screen.EASTER_EGG)
-    }
+  } else {
+    navigationActions.navigateTo(Screen.EASTER_EGG)
+  }
 }

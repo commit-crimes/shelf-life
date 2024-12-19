@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * Interface for managing permissions within the application.
  *
- * This interface defines the contract for a repository that handles the operations related to permissions,
- * including checking and handling the result of permission requests.
+ * This interface defines the contract for a repository that handles the operations related to
+ * permissions, including checking and handling the result of permission requests.
  */
 interface PermissionRepository {
 

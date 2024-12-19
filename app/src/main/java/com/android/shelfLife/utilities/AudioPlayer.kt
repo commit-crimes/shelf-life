@@ -3,9 +3,7 @@ import android.media.MediaPlayer
 import android.util.Log
 import com.android.shelfLife.R
 
-/**
- * Object responsible for playing audio files.
- */
+/** Object responsible for playing audio files. */
 object AudioPlayer {
   private var mediaPlayer: MediaPlayer? = null
 
@@ -34,9 +32,7 @@ object AudioPlayer {
     mediaPlayer?.start()
   }
 
-  /**
-   * Stops any currently playing audio and releases the media player resources.
-   */
+  /** Stops any currently playing audio and releases the media player resources. */
   fun stopAudio() {
     mediaPlayer?.stop()
     mediaPlayer?.release()

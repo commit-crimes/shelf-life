@@ -5,8 +5,8 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * Interface for managing recipes within the repository.
  *
- * This interface defines the contract for a repository that handles the operations related to recipes,
- * including fetching, adding, updating, deleting, and selecting recipes.
+ * This interface defines the contract for a repository that handles the operations related to
+ * recipes, including fetching, adding, updating, deleting, and selecting recipes.
  */
 interface RecipeRepository {
 

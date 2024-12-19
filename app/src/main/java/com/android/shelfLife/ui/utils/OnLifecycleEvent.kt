@@ -12,7 +12,8 @@ import androidx.lifecycle.LifecycleOwner
  * This function observes the lifecycle of a given `LifecycleOwner` and triggers the provided
  * callbacks when the lifecycle events `ON_RESUME` and `ON_PAUSE` occur.
  *
- * @param lifecycleOwner The `LifecycleOwner` whose lifecycle is being observed. Defaults to the current `LocalLifecycleOwner`.
+ * @param lifecycleOwner The `LifecycleOwner` whose lifecycle is being observed. Defaults to the
+ *   current `LocalLifecycleOwner`.
  * @param onResume A lambda function to be called when the `ON_RESUME` event occurs.
  * @param onPause A lambda function to be called when the `ON_PAUSE` event occurs.
  */
@@ -22,15 +23,15 @@ fun OnLifecycleEvent(
     onResume: () -> Unit = {},
     onPause: () -> Unit = {}
 ) {
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_RESUME -> onResume()
-                Lifecycle.Event.ON_PAUSE -> onPause()
-                else -> {}
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+  DisposableEffect(lifecycleOwner) {
+    val observer = LifecycleEventObserver { _, event ->
+      when (event) {
+        Lifecycle.Event.ON_RESUME -> onResume()
+        Lifecycle.Event.ON_PAUSE -> onPause()
+        else -> {}
+      }
     }
+    lifecycleOwner.lifecycle.addObserver(observer)
+    onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+  }
 }
