@@ -35,11 +35,11 @@ fun FirstTimeWelcomeScreen(
     overviewScreenViewModel: FirstTimeWelcomeScreenViewModel = hiltViewModel()
 ) {
 
-    Log.d("FirstTimeWelcomeScreen", "FirstTimeWelcomeScreen")
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp).testTag("firstTimeWelcomeScreen"),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally) {
+  Log.d("FirstTimeWelcomeScreen", "FirstTimeWelcomeScreen")
+  Column(
+      modifier = Modifier.fillMaxSize().padding(16.dp).testTag("firstTimeWelcomeScreen"),
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally) {
         // Welcome Text
         Text(
             text = "Welcome to ShelfLife!",
@@ -62,13 +62,12 @@ fun FirstTimeWelcomeScreen(
         // Create Household Button
         Button(
             onClick = {
-                overviewScreenViewModel.selectHouseholdToEdit(null)
-                navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
+              overviewScreenViewModel.selectHouseholdToEdit(null)
+              navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
             },
             modifier = Modifier.fillMaxWidth(0.6f).height(48.dp).testTag("householdNameSaveButton"),
             shape = MaterialTheme.shapes.medium) {
-            Text(text = "Create Household", style = MaterialTheme.typography.labelLarge)
-        }
-    }
+              Text(text = "Create Household", style = MaterialTheme.typography.labelLarge)
+            }
+      }
 }
-

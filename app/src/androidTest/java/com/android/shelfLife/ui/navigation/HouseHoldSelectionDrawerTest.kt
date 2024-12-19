@@ -27,9 +27,12 @@ import com.android.shelfLife.viewmodel.navigation.HouseholdSelectionDrawerViewMo
 import com.android.shelfLife.viewmodel.utils.DeletionConfirmationViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import helpers.FoodItemRepositoryTestHelper
+import helpers.HouseholdRepositoryTestHelper
+import helpers.UserRepositoryTestHelper
+import io.mockk.verify
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -47,6 +50,10 @@ class HouseHoldSelectionDrawerTest {
   @Inject lateinit var userRepository: UserRepository
   @Inject lateinit var foodItemRepository: FoodItemRepository
 
+  private lateinit var householdRepositoryTestHelper: HouseholdRepositoryTestHelper
+  private lateinit var userRepositoryTestHelper: UserRepositoryTestHelper
+  private lateinit var foodItemRepositoryTestHelper: FoodItemRepositoryTestHelper
+
   lateinit var navigationActions: NavigationActions
 
   private lateinit var instrumentationContext: android.content.Context
@@ -63,22 +70,9 @@ class HouseHoldSelectionDrawerTest {
     navigationActions = mock()
     instrumentationContext = InstrumentationRegistry.getInstrumentation().context
 
-    // Mock repository flows
-    whenever(houseHoldRepository.households).thenReturn(householdsFlow.asStateFlow())
-    whenever(houseHoldRepository.selectedHousehold).thenReturn(selectedHouseholdFlow.asStateFlow())
-    whenever(houseHoldRepository.householdToEdit).thenReturn(householdToEditFlow.asStateFlow())
-
-    runBlocking {
-      // Stubs for repository calls
-      whenever(houseHoldRepository.selectHousehold(any())).thenAnswer {}
-      whenever(userRepository.selectHousehold(any())).thenAnswer {}
-      whenever(foodItemRepository.getFoodItems(any())).thenAnswer {}
-      whenever(houseHoldRepository.selectHouseholdToEdit(anyOrNull())).thenAnswer {}
-
-      // For deletion scenario
-      whenever(houseHoldRepository.deleteHouseholdById(any())).thenAnswer {}
-      whenever(userRepository.deleteHouseholdUID(any())).thenAnswer {}
-    }
+    householdRepositoryTestHelper = HouseholdRepositoryTestHelper(houseHoldRepository)
+    userRepositoryTestHelper = UserRepositoryTestHelper(userRepository)
+    foodItemRepositoryTestHelper = FoodItemRepositoryTestHelper(foodItemRepository)
   }
 
   // Create the HouseholdSelectionDrawerViewModel after flows and mocks
@@ -112,8 +106,8 @@ class HouseHoldSelectionDrawerTest {
             stinkyPoints = emptyMap())
 
     // Setup data before creating ViewModel
-    householdsFlow.value = listOf(household1, household2)
-    selectedHouseholdFlow.value = household1
+    householdRepositoryTestHelper.selectHousehold(household1)
+    householdRepositoryTestHelper.setHouseholds(listOf(household1, household2))
     val drawerViewModel = createHouseholdSelectionDrawerViewModel()
 
     composeTestRule.setContent {
@@ -162,8 +156,8 @@ class HouseHoldSelectionDrawerTest {
             ratPoints = emptyMap(),
             stinkyPoints = emptyMap())
 
-    householdsFlow.value = listOf(household1, household2)
-    selectedHouseholdFlow.value = household1
+    householdRepositoryTestHelper.selectHousehold(household1)
+    householdRepositoryTestHelper.setHouseholds(listOf(household1, household2))
     val drawerViewModel = createHouseholdSelectionDrawerViewModel()
 
     composeTestRule.setContent {
@@ -184,9 +178,7 @@ class HouseHoldSelectionDrawerTest {
     composeTestRule.onNodeWithTag("householdElement_1").performClick()
 
     // Verify selectHousehold was called via repository interactions
-    verify(houseHoldRepository).selectHousehold(household2)
-    verify(userRepository).selectHousehold("2")
-    verify(foodItemRepository).getFoodItems("2")
+    verify { houseHoldRepository.selectHousehold(household2) }
   }
 
   @Test
@@ -223,8 +215,8 @@ class HouseHoldSelectionDrawerTest {
             sharedRecipes = emptyList(),
             ratPoints = emptyMap(),
             stinkyPoints = emptyMap())
-    householdsFlow.value = listOf(household1)
-    selectedHouseholdFlow.value = household1
+    householdRepositoryTestHelper.selectHousehold(household1)
+    householdRepositoryTestHelper.setHouseholds(listOf(household1))
 
     val drawerViewModel = createHouseholdSelectionDrawerViewModel()
 
@@ -260,8 +252,8 @@ class HouseHoldSelectionDrawerTest {
             sharedRecipes = emptyList(),
             ratPoints = emptyMap(),
             stinkyPoints = emptyMap())
-    householdsFlow.value = listOf(household1)
-    selectedHouseholdFlow.value = household1
+    householdRepositoryTestHelper.selectHousehold(household1)
+    householdRepositoryTestHelper.setHouseholds(listOf(household1))
 
     // Set the householdToEdit before creating DeletionConfirmationViewModel
     // Later, when we click delete, we show the pop-up
@@ -305,12 +297,7 @@ class HouseHoldSelectionDrawerTest {
 
     // Click the delete icon
     // At this moment, selectHouseholdToEdit will be called, we must set householdToEditFlow now
-    runBlocking {
-      // Mock that selectHouseholdToEdit sets householdToEditFlow.value
-      // In real scenario, we must ensure that when selectHouseholdToEdit is called,
-      // householdToEditFlow is updated. Since we're testing UI only, let's just simulate this:
-      householdToEditFlow.value = household1
-    }
+    householdRepositoryTestHelper.setHouseholdToEdit(household1)
 
     composeTestRule.onNodeWithTag("deleteHouseholdIcon").performClick()
 
@@ -325,7 +312,7 @@ class HouseHoldSelectionDrawerTest {
     // Confirm deletion
     composeTestRule.onNodeWithTag("confirmDeleteHouseholdButton").performClick()
 
-    verify(houseHoldRepository).deleteHouseholdById("1")
+    verify { houseHoldRepository.deleteHouseholdById(any(), any()) }
   }
 
   @Test
@@ -338,8 +325,8 @@ class HouseHoldSelectionDrawerTest {
             sharedRecipes = emptyList(),
             ratPoints = emptyMap(),
             stinkyPoints = emptyMap())
-    householdsFlow.value = listOf(household1)
-    selectedHouseholdFlow.value = household1
+    householdRepositoryTestHelper.selectHousehold(household1)
+    householdRepositoryTestHelper.setHouseholds(listOf(household1))
 
     val drawerViewModel = createHouseholdSelectionDrawerViewModel()
     val deletionViewModel = createDeletionConfirmationViewModel()
@@ -370,7 +357,7 @@ class HouseHoldSelectionDrawerTest {
     composeTestRule.onNodeWithTag("editHouseholdIcon").performClick()
 
     // Set the householdToEditFlow for deletion
-    runBlocking { householdToEditFlow.value = household1 }
+    householdRepositoryTestHelper.setHouseholdToEdit(household1)
 
     // Click the delete icon
     composeTestRule.onNodeWithTag("deleteHouseholdIcon").performClick()
