@@ -29,11 +29,12 @@ import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
 import com.google.firebase.Timestamp
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import helpers.FoodItemRepositoryTestHelper
+import helpers.HouseholdRepositoryTestHelper
+import helpers.RecipeRepositoryTestHelper
 import java.util.Date
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -48,22 +49,18 @@ class IndividualRecipeScreenTest {
 
   private lateinit var navigationActions: NavigationActions
   private lateinit var houseHold: HouseHold
+  private lateinit var user: User
 
   @Inject lateinit var userRepository: UserRepository
   @Inject lateinit var recipeRepository: RecipeRepository
   @Inject lateinit var houseHoldRepository: HouseHoldRepository
   @Inject lateinit var listFoodItemsRepository: FoodItemRepository
 
-  private lateinit var individualRecipeViewModel: IndividualRecipeViewModel
+  private lateinit var householdRepositoryTestHelper: HouseholdRepositoryTestHelper
+  private lateinit var recipeRepositoryTestHelper: RecipeRepositoryTestHelper
+  private lateinit var listFoodItemRepositoryTestHelper: FoodItemRepositoryTestHelper
 
-  // This section might need to be moved to it's own file
-  private val selectedHousehold = MutableStateFlow<HouseHold?>(null)
-  private val householdToEdit = MutableStateFlow<HouseHold?>(null)
-  private val households = MutableStateFlow<List<HouseHold>>(emptyList())
-  private val foodItems = MutableStateFlow<List<FoodItem>>(emptyList())
-  private val user = MutableStateFlow<User?>(null)
-  private val selectedRecipe = MutableStateFlow<Recipe?>(null)
-  private val recipeList = MutableStateFlow<List<Recipe>>(emptyList())
+  private lateinit var individualRecipeViewModel: IndividualRecipeViewModel
 
   private lateinit var instrumentationContext: android.content.Context
 
@@ -71,17 +68,13 @@ class IndividualRecipeScreenTest {
   fun setUp() {
     hiltAndroidTestRule.inject()
     navigationActions = mock()
-    recipeRepository = mock()
+
+    householdRepositoryTestHelper = HouseholdRepositoryTestHelper(houseHoldRepository)
+    recipeRepositoryTestHelper = RecipeRepositoryTestHelper(recipeRepository)
+    listFoodItemRepositoryTestHelper = FoodItemRepositoryTestHelper(listFoodItemsRepository)
 
     instrumentationContext = InstrumentationRegistry.getInstrumentation().context
     whenever(navigationActions.currentRoute()).thenReturn(Route.RECIPES)
-    whenever(houseHoldRepository.selectedHousehold).thenReturn(selectedHousehold.asStateFlow())
-    whenever(houseHoldRepository.households).thenReturn(households.asStateFlow())
-    whenever(houseHoldRepository.householdToEdit).thenReturn(householdToEdit.asStateFlow())
-    whenever(listFoodItemsRepository.foodItems).thenReturn(foodItems.asStateFlow())
-    whenever(userRepository.user).thenReturn(user.asStateFlow())
-    whenever(recipeRepository.selectedRecipe).thenReturn(selectedRecipe.asStateFlow())
-    whenever(recipeRepository.recipes).thenReturn(recipeList.asStateFlow())
 
     // Create a FoodItem to be used in tests
     val foodFacts =
@@ -123,8 +116,8 @@ class IndividualRecipeScreenTest {
             ingredients = listOf(Ingredient("Pizza", Quantity(1.0, FoodUnit.COUNT))),
             recipeType = RecipeType.BASIC)
 
-    selectedRecipe.value = recipe1
-    recipeList.value = listOf(recipe1, recipe2)
+    recipeRepositoryTestHelper.setSelectedRecipe(recipe1)
+    recipeRepositoryTestHelper.setRecipes(listOf(recipe1, recipe2))
 
     // Initialize the household with the food item
     houseHold =
@@ -135,11 +128,11 @@ class IndividualRecipeScreenTest {
             sharedRecipes = emptyList(),
             ratPoints = emptyMap(),
             stinkyPoints = emptyMap())
-    households.value = listOf(houseHold)
-    selectedHousehold.value = houseHold
-    foodItems.value = listOf(foodItem)
 
-    user.value =
+    householdRepositoryTestHelper.selectHousehold(houseHold)
+    listFoodItemRepositoryTestHelper.setFoodItems(listOf(foodItem))
+
+    user =
         User(
             uid = "user1",
             username = "Tester",
