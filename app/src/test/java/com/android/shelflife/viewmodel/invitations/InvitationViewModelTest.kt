@@ -1,6 +1,7 @@
 package com.android.shelflife.viewmodel.invitations
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.invitations.Invitation
 import com.android.shelfLife.model.invitations.InvitationRepository
 import com.android.shelfLife.model.user.User
@@ -30,6 +31,7 @@ class InvitationViewModelTest {
   private lateinit var userRepository: UserRepository
   private lateinit var invitationRepository: InvitationRepository
   private lateinit var invitationViewModel: InvitationViewModel
+  private lateinit var houseHoldRepository: HouseHoldRepository
 
   private val userInvitations = MutableStateFlow<List<String>>(emptyList())
   private val user = MutableStateFlow<User?>(null)
@@ -38,6 +40,7 @@ class InvitationViewModelTest {
   fun setUp() {
     userRepository = mock(UserRepository::class.java)
     invitationRepository = mock(InvitationRepository::class.java)
+    houseHoldRepository = mock(HouseHoldRepository::class.java)
 
     `when`(userRepository.invitations).thenReturn(userInvitations)
     `when`(userRepository.user).thenReturn(user)
@@ -51,7 +54,8 @@ class InvitationViewModelTest {
         .`when`(userRepository)
         .deleteInvitationUID(anyString())
 
-    invitationViewModel = InvitationViewModel(invitationRepository, userRepository)
+    invitationViewModel =
+        InvitationViewModel(invitationRepository, userRepository, houseHoldRepository)
   }
 
   @Test

@@ -20,7 +20,7 @@ interface FoodItemRepository {
    * @param householdId The ID of the household.
    * @param foodItem The food item to add.
    */
-  suspend fun addFoodItem(householdId: String, foodItem: FoodItem)
+  fun addFoodItem(householdId: String, foodItem: FoodItem)
 
   /**
    * Retrieves all food items for a household.
@@ -36,7 +36,7 @@ interface FoodItemRepository {
    * @param householdId The ID of the household.
    * @param foodItem The updated food item.
    */
-  suspend fun updateFoodItem(householdId: String, foodItem: FoodItem)
+  fun updateFoodItem(householdId: String, foodItem: FoodItem)
 
   /**
    * Deletes a food item from a household.
@@ -44,12 +44,19 @@ interface FoodItemRepository {
    * @param householdId The ID of the household.
    * @param foodItemId The ID of the food item to delete.
    */
-  suspend fun deleteFoodItem(householdId: String, foodItemId: String)
+  fun deleteFoodItem(householdId: String, foodItemId: String)
 
   /** Selects a FoodItem document for individual view */
   fun selectFoodItem(foodItem: FoodItem?)
 
   fun setFoodItems(householdId: String, value: List<FoodItem>)
+
+  /**
+   * Deletes all food items from a household.
+   *
+   * @param householdId The ID of the household.
+   */
+  fun deleteHouseholdDocument(householdId: String)
 
   fun setisQuickAdd(value: Boolean)
 

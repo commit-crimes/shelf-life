@@ -24,10 +24,9 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.viewmodel.recipes.AddRecipeViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import helpers.RecipeRepositoryTestHelper
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -42,14 +41,14 @@ class AddRecipeScreenTest {
 
   private lateinit var navigationActions: NavigationActions
 
+  private lateinit var user: User
+
   @Inject lateinit var userRepository: UserRepository
   @Inject lateinit var recipeRepository: RecipeRepository
 
   private lateinit var addRecipeViewModel: AddRecipeViewModel
 
-  // This section might need to be moved to it's own file
-  private val user = MutableStateFlow<User?>(null)
-  private val recipeList = MutableStateFlow<List<Recipe>>(emptyList())
+  private lateinit var recipeRepositoryTestHelper: RecipeRepositoryTestHelper
 
   private lateinit var instrumentationContext: android.content.Context
 
@@ -57,12 +56,11 @@ class AddRecipeScreenTest {
   fun setUp() {
     hiltAndroidTestRule.inject()
     navigationActions = mock()
-    recipeRepository = mock()
+
+    recipeRepositoryTestHelper = RecipeRepositoryTestHelper(recipeRepository)
 
     instrumentationContext = InstrumentationRegistry.getInstrumentation().context
     whenever(navigationActions.currentRoute()).thenReturn(Route.RECIPES)
-    whenever(userRepository.user).thenReturn(user.asStateFlow())
-    whenever(recipeRepository.recipes).thenReturn(recipeList.asStateFlow())
 
     val recipe1 =
         Recipe(
@@ -89,11 +87,11 @@ class AddRecipeScreenTest {
             ingredients = listOf(Ingredient("Pizza", Quantity(1.0, FoodUnit.COUNT))),
             recipeType = RecipeType.BASIC)
 
-    recipeList.value = listOf(recipe1, recipe2)
+    recipeRepositoryTestHelper.setRecipes(listOf(recipe1, recipe2))
 
     // Initialize the household with the food item
 
-    user.value =
+    user =
         User(
             uid = "user1",
             username = "Tester",
