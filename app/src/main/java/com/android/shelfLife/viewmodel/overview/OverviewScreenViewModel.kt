@@ -27,6 +27,14 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for managing the overview screen.
+ *
+ * @property houseHoldRepository Repository for accessing household data.
+ * @property listFoodItemsRepository Repository for accessing food item data.
+ * @property userRepository Repository for accessing user data.
+ * @property context Application context.
+ */
 @HiltViewModel
 class OverviewScreenViewModel
 @Inject
@@ -104,6 +112,7 @@ constructor(
     Log.d("OverviewScreenViewModel", "Init")
   }
 
+  /** Adds a custom household for testing purposes. */
   suspend fun addCustomHouseholdForTesting() {
     val houseHold =
         HouseHold(
@@ -117,6 +126,7 @@ constructor(
     userRepository.addHouseholdUID(houseHold.uid)
   }
 
+  /** Checks the status of food items and updates them if necessary. */
   private fun checkItemStatus() {
     val selectedHousehold = selectedHousehold.value
     if (selectedHousehold != null) {
@@ -152,14 +162,19 @@ constructor(
   }
 
   /**
-   * Selects a household to edit
+   * Selects a household to edit.
    *
-   * @param household - The household to edit.
+   * @param household The household to edit.
    */
   fun selectHouseholdToEdit(household: HouseHold?) {
     houseHoldRepository.selectHouseholdToEdit(household)
   }
 
+  /**
+   * Deletes multiple food items.
+   *
+   * @param foodItems The list of food items to delete.
+   */
   fun deleteMultipleFoodItems(foodItems: List<FoodItem>) {
     val selectedHousehold = selectedHousehold.value
     if (selectedHousehold != null) {
@@ -170,9 +185,9 @@ constructor(
   }
 
   /**
-   * Toggles the filter on or off
+   * Toggles the filter on or off.
    *
-   * @param filter The filter to toggle
+   * @param filter The filter to toggle.
    */
   fun toggleFilter(filter: String) {
     if (_selectedFilters.value.contains(filter)) {
@@ -182,7 +197,7 @@ constructor(
     }
   }
 
-  /** Selects multiple FoodItem documents for bulk actions */
+  /** Selects multiple FoodItem documents for bulk actions. */
   fun selectMultipleFoodItems(foodItem: FoodItem) {
     if (_multipleSelectedFoodItems.value.contains(foodItem)) {
       _multipleSelectedFoodItems.value = _multipleSelectedFoodItems.value.minus(foodItem)
@@ -191,10 +206,16 @@ constructor(
     }
   }
 
+  /** Clears the list of multiple selected food items. */
   fun clearMultipleSelectedFoodItems() {
     _multipleSelectedFoodItems.value = emptyList()
   }
 
+  /**
+   * Edits a food item.
+   *
+   * @param newFoodItem The new food item to update.
+   */
   fun editFoodItem(newFoodItem: FoodItem) {
     val selectedHousehold = selectedHousehold.value
     if (selectedHousehold != null) {
@@ -204,11 +225,20 @@ constructor(
     }
   }
 
-  /** Selects a FoodItem document for individual view */
+  /**
+   * Selects a FoodItem document for individual view.
+   *
+   * @param foodItem The food item to select.
+   */
   fun selectFoodItem(foodItem: FoodItem?) {
     listFoodItemsRepository.selectFoodItem(foodItem)
   }
 
+  /**
+   * Changes the search query.
+   *
+   * @param newQuery The new search query.
+   */
   fun changeQuery(newQuery: String) {
     _query.value = newQuery
     // No need to manually call filterFoodItems(), as filteredFoodItems is now reactive.

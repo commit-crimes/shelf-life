@@ -18,12 +18,16 @@ sealed class FoodSearchInput {
 
 interface FoodFactsRepository {
 
+  /** StateFlow representing the current search status. */
   val searchStatus: StateFlow<SearchStatus>
 
+  /** Resets the search status to its initial state. */
   fun resetSearchStatus()
 
+  /** Sets the search status to a failure state. */
   fun setFailureStatus()
 
+  /** StateFlow representing the list of food facts suggestions. */
   val foodFactsSuggestions: StateFlow<List<FoodFacts>>
 
   /**
@@ -39,7 +43,17 @@ interface FoodFactsRepository {
       onFailure: (Exception) -> Unit
   )
 
+  /**
+   * Searches for food facts based on the provided barcode.
+   *
+   * @param barcode The barcode to use for querying food facts.
+   */
   fun searchByBarcode(barcode: Long)
 
+  /**
+   * Searches for food facts based on the provided query string.
+   *
+   * @param query The query string to use for querying food facts.
+   */
   fun searchByQuery(query: String)
 }

@@ -11,6 +11,12 @@ import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
+/**
+ * ViewModel for managing individual recipes.
+ *
+ * @property recipeRepository Repository for recipe data.
+ * @property userRepository Repository for user data.
+ */
 @HiltViewModel
 class IndividualRecipeViewModel
 @Inject
@@ -19,7 +25,9 @@ constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 
+  /** The currently selected recipe. */
   var selectedRecipe by mutableStateOf<Recipe?>(null)
+  /** Flag indicating if the selected recipe is non-empty. */
   var selectedRecipeIsNonEmpty by mutableStateOf<Boolean>(true)
 
   /**
@@ -33,12 +41,12 @@ constructor(
     }
   }
 
+  /**
+   * Returns the name of the selected recipe.
+   *
+   * @return The name of the recipe as a string.
+   */
   fun getRecipeName(): String {
-    /**
-     * Returns the name of the selected recipe.
-     *
-     * @return The name of the recipe as a string.
-     */
     return selectedRecipe!!.name
   }
 
@@ -78,10 +86,12 @@ constructor(
     return selectedRecipe!!.instructions
   }
 
+  /** Deselects the currently selected recipe. */
   fun deselectRecipe() {
     recipeRepository.selectRecipe(null)
   }
 
+  /** Deletes the currently selected recipe. */
   fun deleteSelectedRecipe() {
     if (selectedRecipe != null) {
       recipeRepository.deleteRecipe(selectedRecipe!!.uid) { recipeUID ->

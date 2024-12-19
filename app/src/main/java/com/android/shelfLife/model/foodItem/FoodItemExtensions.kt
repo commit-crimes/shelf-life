@@ -4,7 +4,11 @@ import com.android.shelfLife.utilities.toFoodFacts
 import com.android.shelfLife.utilities.toMap
 import com.google.firebase.firestore.DocumentSnapshot
 
-// Convert FoodItem to a Map for Firestore
+/**
+ * Converts a `FoodItem` object to a `Map` for Firestore.
+ *
+ * @return A `Map` representation of the `FoodItem`.
+ */
 fun FoodItem.toMap(): Map<String, Any?> {
   return mapOf(
       "uid" to uid,
@@ -17,7 +21,11 @@ fun FoodItem.toMap(): Map<String, Any?> {
       "owner" to owner)
 }
 
-// Convert DocumentSnapshot to FoodItem
+/**
+ * Converts a `DocumentSnapshot` to a `FoodItem` object.
+ *
+ * @return A `FoodItem` object if the conversion is successful, otherwise `null`.
+ */
 fun DocumentSnapshot.toFoodItem(): FoodItem? {
   val data = data ?: return null
 

@@ -13,11 +13,18 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
+/** Enum class representing the different leaderboard modes. */
 enum class LeaderboardMode {
   RAT,
   STINKY
 }
 
+/**
+ * ViewModel for managing the leaderboard.
+ *
+ * @property houseHoldRepository Repository for accessing household data.
+ * @property userRepository Repository for accessing user data.
+ */
 @HiltViewModel
 class LeaderboardViewModel
 @Inject
@@ -61,6 +68,12 @@ constructor(
     }
   }
 
+  /**
+   * Toggles the prize for the current user.
+   *
+   * @param context The context used for playing audio.
+   * @param isDarkMode Boolean indicating if the dark theme should be used.
+   */
   fun togglePrize(context: Context, isDarkMode: Boolean) {
     // Check if user is king
     val leaders = _topLeaders.value
@@ -93,6 +106,13 @@ constructor(
     }
   }
 
+  /**
+   * Calculates the top five leaders based on the current mode.
+   *
+   * @param household The household data.
+   * @param currentMode The current leaderboard mode.
+   * @return A list of pairs containing user IDs and their points.
+   */
   private suspend fun calculateTopFive(
       household: HouseHold,
       currentMode: LeaderboardMode
@@ -119,6 +139,11 @@ constructor(
     }
   }
 
+  /**
+   * Switches the leaderboard mode.
+   *
+   * @param newMode The new leaderboard mode to switch to.
+   */
   fun switchMode(newMode: LeaderboardMode) {
     // Switching mode does not affect currently playing audio
     // If audio is playing RAT and user switches to STINKY, audio remains RAT until user toggles off

@@ -37,9 +37,17 @@ import com.android.shelfLife.ui.recipes.generateRecipe.GenerateRecipeScreen
 import com.example.compose.ShelfLifeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+/** Main activity for the ShelfLife application. */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+  /**
+   * Called when the activity is starting. This is where most initialization should go.
+   *
+   * @param savedInstanceState If the activity is being re-initialized after previously being shut
+   *   down then this Bundle contains the data it most recently supplied in
+   *   onSaveInstanceState(Bundle).
+   */
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
@@ -47,6 +55,7 @@ class MainActivity : ComponentActivity() {
   }
 }
 
+/** Composable function that sets up the navigation for the ShelfLife application. */
 @Composable
 fun ShelfLifeApp() {
   val navController = rememberNavController()

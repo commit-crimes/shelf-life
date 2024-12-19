@@ -22,6 +22,25 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.viewmodel.overview.FoodItemViewModel
 
+/**
+ * Composable function to display extended action buttons.
+ *
+ * This function displays a primary and a secondary floating action button (FAB). The primary FAB
+ * expands to show the secondary FAB when clicked. The secondary FAB navigates to a specified
+ * screen.
+ *
+ * @param fabExpanded A MutableState<Boolean> indicating whether the FABs are expanded.
+ * @param navigationActions The navigation actions to handle navigation events.
+ * @param firstIcon The icon for the secondary FAB. Defaults to Icons.Default.AutoAwesome.
+ * @param firstScreenText The text for the secondary FAB. Defaults to "Generate".
+ * @param firstScreen The screen to navigate to when the secondary FAB is clicked. Defaults to
+ *   Screen.GENERATE_RECIPE.
+ * @param secondScreen The screen to navigate to when the primary FAB is clicked. Defaults to
+ *   Screen.ADD_RECIPE.
+ * @param firstScreenTestTag The test tag for the secondary FAB. Defaults to "generateRecipeFab".
+ * @param secondScreenTestTag The test tag for the primary FAB. Defaults to "addRecipeFab".
+ * @param foodItemViewModel The ViewModel for managing the state of the food item. Defaults to null.
+ */
 @Composable
 fun ExtendedActionButtons(
     fabExpanded: MutableState<Boolean>,

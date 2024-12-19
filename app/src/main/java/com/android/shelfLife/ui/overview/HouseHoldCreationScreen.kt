@@ -36,6 +36,12 @@ import com.android.shelfLife.viewmodel.overview.HouseholdCreationScreenViewModel
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function to display the Household Creation screen.
+ *
+ * @param navigationActions The navigation actions to be used in the screen.
+ * @param viewModel The ViewModel for managing the state of the household creation screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HouseHoldCreationScreen(

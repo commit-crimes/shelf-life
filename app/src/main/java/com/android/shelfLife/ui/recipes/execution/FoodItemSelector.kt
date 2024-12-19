@@ -37,6 +37,14 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
 
+/**
+ * Composable function to display the screen for selecting food items for an ingredient.
+ *
+ * @param navigationActions The actions to handle navigation.
+ * @param viewModel The ViewModel for managing the state of the recipe execution.
+ * @param onNext Callback function to handle the next action.
+ * @param onPrevious Callback function to handle the previous action.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectFoodItemsForIngredientScreen(
@@ -152,6 +160,16 @@ fun SelectFoodItemsForIngredientScreen(
       }
 }
 
+/**
+ * Composable function to display a card for selecting a food item.
+ *
+ * @param foodItem The food item to be displayed.
+ * @param amount The amount of the food item selected.
+ * @param maxAmount The maximum amount of the food item available.
+ * @param expanded Whether the card is expanded to show more details.
+ * @param onCardClick Callback function to handle card click.
+ * @param onAmountChange Callback function to handle amount change.
+ */
 @Composable
 fun FoodItemSelectionCard(
     foodItem: FoodItem,

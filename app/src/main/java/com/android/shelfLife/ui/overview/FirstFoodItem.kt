@@ -27,6 +27,12 @@ import com.android.shelfLife.ui.utils.FoodNameField
 import com.android.shelfLife.viewmodel.overview.FoodItemViewModel
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function to display the First Food Item screen.
+ *
+ * @param navigationActions The navigation actions to be used in the screen.
+ * @param foodItemViewModel The ViewModel for managing the state of the food item.
+ */
 @Composable
 fun FirstFoodItem(
     navigationActions: NavigationActions,

@@ -34,9 +34,10 @@ import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import kotlinx.coroutines.launch
 
 /**
- * Composable function to display the overview screen
+ * Composable function to display the overview screen.
  *
- * @param navigationActions The actions to handle navigation
+ * @param navigationActions The actions to handle navigation.
+ * @param overviewScreenViewModel The ViewModel for managing the state of the overview screen.
  */
 @Composable
 fun OverviewScreen(

@@ -36,6 +36,12 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.viewmodel.invitations.InvitationViewModel
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function to display the Invitation Screen.
+ *
+ * @param navigationActions Actions for navigation.
+ * @param viewModel ViewModel for the invitations.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InvitationScreen(
@@ -62,6 +68,13 @@ fun InvitationScreen(
   }
 }
 
+/**
+ * Composable function to display an individual invitation card.
+ *
+ * @param invitation The invitation data.
+ * @param invitationViewModel ViewModel for the invitations.
+ * @param navigationActions Actions for navigation.
+ */
 @Composable
 fun InvitationCard(
     invitation: Invitation,

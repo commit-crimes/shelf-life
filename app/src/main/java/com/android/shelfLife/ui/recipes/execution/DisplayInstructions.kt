@@ -36,6 +36,13 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
 
+/**
+ * Composable function to display the instruction screen for executing a recipe.
+ *
+ * @param navigationActions The actions to handle navigation.
+ * @param viewModel The ViewModel for managing the state of the recipe execution.
+ * @param onFinish Callback function to handle the finish action.
+ */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun InstructionScreen(

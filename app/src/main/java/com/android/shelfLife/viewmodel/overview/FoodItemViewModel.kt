@@ -31,6 +31,13 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 
+/**
+ * ViewModel for managing food items.
+ *
+ * @property foodItemRepository Repository for accessing food item data.
+ * @property userRepository Repository for accessing user data.
+ * @property foodFactsRepository Repository for accessing food facts data.
+ */
 @HiltViewModel
 class FoodItemViewModel
 @Inject
@@ -41,9 +48,7 @@ constructor(
 ) : ViewModel() {
 
   var selectedFood by mutableStateOf<FoodItem?>(null)
-
   var isSelected by mutableStateOf(false)
-
   var isScanned by mutableStateOf(false)
   var isQuickAdd by mutableStateOf(false)
   val searchStatus: StateFlow<SearchStatus> = foodFactsRepository.searchStatus
@@ -89,6 +94,7 @@ constructor(
     }
   }
 
+  /** Marks the food item as scanned. */
   fun isScanned() {
     isScanned = true
   }
@@ -107,6 +113,11 @@ constructor(
         validateOpenDate(openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
   }
 
+  /**
+   * Adds a new food item to the repository.
+   *
+   * @param foodItem The food item to add.
+   */
   suspend fun addFoodItem(foodItem: FoodItem) {
     val householdId = userRepository.user.value?.selectedHouseholdUID
     if (householdId != null) {
@@ -114,6 +125,11 @@ constructor(
     }
   }
 
+  /**
+   * Edits an existing food item in the repository.
+   *
+   * @param foodItem The food item to edit.
+   */
   suspend fun editFoodItem(foodItem: FoodItem) {
     val householdId = userRepository.user.value?.selectedHouseholdUID
     if (householdId != null) {
@@ -121,6 +137,7 @@ constructor(
     }
   }
 
+  /** Deletes the selected food item from the repository. */
   suspend fun deleteFoodItem() {
     val householdId = userRepository.user.value?.selectedHouseholdUID
     if (householdId != null) {
@@ -129,16 +146,31 @@ constructor(
     }
   }
 
+  /**
+   * Changes the food name and validates it.
+   *
+   * @param newFoodName The new food name.
+   */
   fun changeFoodName(newFoodName: String) {
     foodName = newFoodName
     foodNameErrorResId = validateString(foodName)
   }
 
+  /**
+   * Changes the amount and validates it.
+   *
+   * @param newAmount The new amount.
+   */
   fun changeAmount(newAmount: String) {
     amount = newAmount
     amountErrorResId = validateNumber(amount)
   }
 
+  /**
+   * Changes the expiry date and validates it.
+   *
+   * @param newDate The new expiry date.
+   */
   fun changeExpiryDate(newDate: String) {
     expireDate = newDate.filter { it.isDigit() }
     expireDateErrorResId = validateExpireDate(expireDate, buyDate, buyDateErrorResId)
@@ -147,12 +179,22 @@ constructor(
         validateOpenDate(openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
   }
 
+  /**
+   * Changes the open date and validates it.
+   *
+   * @param newDate The new open date.
+   */
   fun changeOpenDate(newDate: String) {
     openDate = newDate.filter { it.isDigit() }
     openDateErrorResId =
         validateOpenDate(openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
   }
 
+  /**
+   * Changes the buy date and validates it.
+   *
+   * @param newDate The new buy date.
+   */
   fun changeBuyDate(newDate: String) {
     buyDate = newDate.filter { it.isDigit() }
     buyDateErrorResId = validateBuyDate(buyDate)
@@ -162,6 +204,11 @@ constructor(
         validateOpenDate(openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
   }
 
+  /**
+   * Submits the food name after validation.
+   *
+   * @return Boolean indicating if the food name is valid.
+   */
   suspend fun submbitFoodName(): Boolean {
     foodNameErrorResId = validateString(foodName)
     val isFoodNameValid = foodNameErrorResId == null
@@ -172,6 +219,12 @@ constructor(
     }
   }
 
+  /**
+   * Submits the food item after validation.
+   *
+   * @param scannedFoodFacts Optional scanned food facts.
+   * @return Boolean indicating if the food item is valid.
+   */
   suspend fun submitFoodItem(scannedFoodFacts: FoodFacts? = null): Boolean {
     validateAllFieldsWhenSubmitButton()
     val isExpireDateValid = expireDateErrorResId == null && expireDate.isNotEmpty()
@@ -245,14 +298,21 @@ constructor(
     }
   }
 
+  /** Resets the search status. */
   fun resetSearchStatus() {
     foodFactsRepository.resetSearchStatus()
   }
 
+  /**
+   * Searches for food facts by query.
+   *
+   * @param query The search query.
+   */
   fun searchByQuery(query: String) {
     foodFactsRepository.searchByQuery(query)
   }
 
+  /** Resets the selected food item. */
   fun resetSelectFoodItem() {
     foodItemRepository.selectFoodItem(
         FoodItem(
@@ -261,22 +321,45 @@ constructor(
             owner = ""))
   }
 
+  /**
+   * Sets the quick add flag.
+   *
+   * @param isQuickAdd Boolean indicating if quick add is enabled.
+   */
   fun setIsQuickAdd(isQuickAdd: Boolean) {
     foodItemRepository.setisQuickAdd(isQuickAdd)
   }
 
+  /**
+   * Sets the selected food item.
+   *
+   * @param foodItem The food item to select.
+   */
   fun setFoodItem(foodItem: FoodItem?) {
     foodItemRepository.selectFoodItem(foodItem)
   }
 
+  /**
+   * Gets the quick add flag.
+   *
+   * @return Boolean indicating if quick add is enabled.
+   */
   fun getIsQuickAdd(): Boolean {
     return foodItemRepository.isQuickAdd.value ?: false
   }
 
+  /**
+   * Uploads an image to Firebase Storage.
+   *
+   * @param uri The URI of the image.
+   * @param context The context.
+   * @return The URL of the uploaded image.
+   */
   suspend fun uploadImageToFirebaseStorage(uri: Uri, context: Context): String? {
     return foodItemRepository.uploadImageToFirebaseStorage(uri, context)
   }
 
+  /** Resets the fields for the scanner. */
   fun resetForScanner() {
     location = FoodStorageLocation.PANTRY
     expireDate = ""

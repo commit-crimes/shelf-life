@@ -39,14 +39,20 @@ import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import com.android.shelfLife.viewmodel.recipes.RecipeGenerationViewModel
 import kotlin.math.floor
 
+/**
+ * Composable function to display the Generate Recipe screen.
+ *
+ * @param navigationActions Actions for navigation.
+ * @param viewModel ViewModel for recipe generation.
+ * @param navController Navigation controller for managing navigation within the screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenerateRecipeScreen(
-  navigationActions: NavigationActions,
-  viewModel: RecipeGenerationViewModel = hiltViewModel(),
-  navController: NavHostController = rememberNavController(),
+    navigationActions: NavigationActions,
+    viewModel: RecipeGenerationViewModel = hiltViewModel(),
+    navController: NavHostController = rememberNavController(),
 ) {
-
   Scaffold(
       topBar = {
         val currentDestination =
@@ -99,6 +105,13 @@ fun GenerateRecipeScreen(
       }
 }
 
+/**
+ * Composable function to display the Recipe Input Step.
+ *
+ * @param viewModel ViewModel for recipe generation.
+ * @param onNext Callback to proceed to the next step.
+ * @param onBack Callback to go back to the previous step.
+ */
 @Composable
 fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit, onBack: () -> Unit) {
   val recipePrompt by viewModel.recipePrompt.collectAsState()
@@ -239,7 +252,14 @@ fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit, on
         }
       }
 }
-
+/**
+ * Composable function to display the Food Selection Step.
+ *
+ * @param viewModel ViewModel for recipe generation.
+ * @param onNext Callback to proceed to the next step.
+ * @param onBack Callback to go back to the previous step.
+ * @param overviewViewModel ViewModel for the overview screen.
+ */
 @Composable
 fun FoodSelectionStep(
     viewModel: RecipeGenerationViewModel,
@@ -247,10 +267,15 @@ fun FoodSelectionStep(
     onBack: () -> Unit,
     overviewViewModel: OverviewScreenViewModel = hiltViewModel()
 ) {
+  // State to hold the new food item input
   var newFoodItem by rememberSaveable { mutableStateOf("") }
+  // Collect the current recipe prompt from the ViewModel
   val recipePrompt by viewModel.recipePrompt.collectAsState()
+  // Get the current context
   val context = LocalContext.current
+  // Collect the available food items from the ViewModel
   val availableFoodItems by viewModel.availableFoodItems.collectAsState()
+  // Collect the selected food items from the ViewModel
   val selectedFoodItems by viewModel.selectedFoodItems.collectAsState()
 
   // Calculate the height dynamically based on whether the list is empty
@@ -331,10 +356,20 @@ fun FoodSelectionStep(
       }
 }
 
+/**
+ * Composable function to display the Review Step.
+ *
+ * @param viewModel ViewModel for recipe generation.
+ * @param onNext Callback to proceed to the next step.
+ * @param onBack Callback to go back to the previous step.
+ */
 @Composable
 fun ReviewStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit, onBack: () -> Unit) {
+  // Collect the current recipe prompt from the ViewModel
   val recipePrompt by viewModel.recipePrompt.collectAsState()
+  // State to hold custom instructions
   var customInstructions by remember { mutableStateOf(recipePrompt.specialInstruction) }
+  // Get the current context
   val context = LocalContext.current
 
   Scaffold(
@@ -443,14 +478,24 @@ fun ReviewStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit, onBack:
       }
 }
 
+/**
+ * Composable function to display the Completion Step.
+ *
+ * @param viewModel ViewModel for recipe generation.
+ * @param onBack Callback to go back to the previous step.
+ * @param navigationActions Actions for navigation.
+ */
 @Composable
 fun CompletionStep(
     viewModel: RecipeGenerationViewModel,
     onBack: () -> Unit,
     navigationActions: NavigationActions
 ) {
+  // Collect the current recipe prompt from the ViewModel
   val recipePrompt by viewModel.recipePrompt.collectAsState()
+  // Collect the state of recipe generation from the ViewModel
   val isGeneratingRecipe by viewModel.isGeneratingRecipe.collectAsState()
+  // Collect the current generated recipe from the ViewModel
   val currentGeneratedRecipe by viewModel.currentGeneratedRecipe.collectAsState()
   Scaffold(
       bottomBar = {
@@ -492,7 +537,8 @@ fun CompletionStep(
                             )
                         // Loading Spinner
                         CircularProgressIndicator(
-                            modifier = Modifier.size(64.dp).testTag("loadingSpinner"), // Visible size
+                            modifier =
+                                Modifier.size(64.dp).testTag("loadingSpinner"), // Visible size
                             strokeWidth = 6.dp // Thicker for better visibility
                             )
                       }

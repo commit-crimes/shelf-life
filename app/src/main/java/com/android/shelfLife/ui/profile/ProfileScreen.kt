@@ -43,6 +43,13 @@ import com.example.compose.LocalThemeMode
 import com.example.compose.LocalThemeTogglerProvider
 import com.example.compose.ThemeMode
 
+/**
+ * Composable function to display the Profile screen.
+ *
+ * @param navigationActions The navigation actions to be used in the screen.
+ * @param context The context of the application.
+ * @param profileViewModel The ViewModel for managing the state of the profile screen.
+ */
 @Composable
 fun ProfileScreen(
     navigationActions: NavigationActions,
@@ -70,6 +77,10 @@ fun ProfileScreen(
 
   val thresholdTime = 500 // Time in milliseconds between successive clicks
 
+  /**
+   * Function to handle the click count for the easter egg. Navigates to the Easter Egg screen if
+   * clicked 5 times within the threshold time.
+   */
   fun easterEggOnClickCount() {
     val currentTime = System.currentTimeMillis()
     if (currentTime - lastClickTime <= thresholdTime) {

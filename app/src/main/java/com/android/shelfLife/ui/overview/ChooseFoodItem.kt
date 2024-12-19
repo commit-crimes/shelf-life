@@ -46,6 +46,12 @@ import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.overview.FoodItemViewModel
 
+/**
+ * Composable function to display the Choose Food Item screen.
+ *
+ * @param navigationActions The navigation actions to be used in the screen.
+ * @param foodItemViewModel The ViewModel for managing the state of the food item.
+ */
 @Composable
 fun ChooseFoodItem(
     navigationActions: NavigationActions,

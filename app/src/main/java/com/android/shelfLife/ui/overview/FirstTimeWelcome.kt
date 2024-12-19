@@ -28,6 +28,8 @@ import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
  * the [OverviewScreenViewModel].
  *
  * @param navigationActions The actions to navigate between screens.
+ * @param overviewScreenViewModel The ViewModel for managing the state of the first time welcome
+ *   screen.
  */
 @Composable
 fun FirstTimeWelcomeScreen(

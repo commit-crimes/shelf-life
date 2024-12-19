@@ -10,16 +10,27 @@ import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
 
+/** Represents the different states of a search operation. */
 sealed class SearchStatus {
+  /** Represents the idle state of the search. */
   data object Idle : SearchStatus()
 
+  /** Represents the loading state of the search. */
   data object Loading : SearchStatus()
 
+  /** Represents the successful completion of the search. */
   data object Success : SearchStatus()
 
+  /** Represents the failure of the search. */
   data object Failure : SearchStatus()
 }
 
+/**
+ * Repository class for interacting with the OpenFoodFacts API.
+ *
+ * @property client The OkHttpClient used for making network requests.
+ * @property baseUrl The base URL of the OpenFoodFacts API.
+ */
 class OpenFoodFactsRepository(
     private val client: OkHttpClient,
     private val baseUrl: String = "https://world.openfoodfacts.net"
@@ -35,15 +46,21 @@ class OpenFoodFactsRepository(
   private val _foodFactsSuggestions = MutableStateFlow<List<FoodFacts>>(emptyList())
   override val foodFactsSuggestions: StateFlow<List<FoodFacts>> = _foodFactsSuggestions
 
+  /** Resets the search status to idle. */
   override fun resetSearchStatus() {
     _searchStatus.value = SearchStatus.Idle
   }
 
+  /** Sets the search status to failure. */
   override fun setFailureStatus() {
     _searchStatus.value = SearchStatus.Failure
   }
 
-  // Modified search function
+  /**
+   * Searches for food facts by barcode.
+   *
+   * @param barcode The barcode of the food item to search for.
+   */
   override fun searchByBarcode(barcode: Long) {
     searchFoodFacts(
         searchInput = FoodSearchInput.Barcode(barcode),
@@ -54,7 +71,11 @@ class OpenFoodFactsRepository(
         })
   }
 
-  // Function to set a new query and trigger a search using a query string
+  /**
+   * Searches for food facts by query string.
+   *
+   * @param newQuery The query string to search for.
+   */
   override fun searchByQuery(newQuery: String) {
     searchFoodFacts(
         FoodSearchInput.Query(newQuery),
@@ -69,10 +90,23 @@ class OpenFoodFactsRepository(
         })
   }
 
+  /**
+   * Builds a URL from the given path segments.
+   *
+   * @param paths The path segments to join into a URL.
+   * @return The constructed URL string.
+   */
   private fun buildUrl(vararg paths: String): String {
     return paths.joinToString("/") { it.trim('/') }
   }
 
+  /**
+   * Searches for food facts based on the given search input.
+   *
+   * @param searchInput The search input (barcode or query).
+   * @param onSuccess Callback function to handle successful search results.
+   * @param onFailure Callback function to handle search failures.
+   */
   override fun searchFoodFacts(
       searchInput: FoodSearchInput,
       onSuccess: (List<FoodFacts>) -> Unit,
@@ -161,7 +195,12 @@ class OpenFoodFactsRepository(
     return foodFactsList
   }
 
-  /** Extracts FoodFacts details from a JSON object and maps them to the FoodFacts data class. */
+  /**
+   * Extracts FoodFacts details from a JSON object and maps them to the FoodFacts data class.
+   *
+   * @param productObject The JSON object representing a product.
+   * @return The FoodFacts object extracted from the JSON object.
+   */
   fun extractFoodFactsFromJson(productObject: JSONObject): FoodFacts {
     val name = productObject.optString("product_name", "Unknown Product")
     val barcode = productObject.optString("code", "")
@@ -197,6 +236,12 @@ class OpenFoodFactsRepository(
         imageUrl = imageUrl)
   }
 
+  /**
+   * Parses the quantity string from OpenFoodFacts and converts it to a Quantity object.
+   *
+   * @param quantityString The quantity string from OpenFoodFacts.
+   * @return The parsed Quantity object.
+   */
   fun parseOpenFoodFactsQuantity(quantityString: String): Quantity {
     // Normalize the string (remove leading/trailing spaces, and convert to lowercase)
     val normalizedString = quantityString.trim().lowercase()

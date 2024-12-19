@@ -15,6 +15,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Repository class for managing food items in Firestore.
+ *
+ * @property db The Firestore database instance.
+ */
 class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFirestore) :
     FoodItemRepository {
 
@@ -35,10 +40,17 @@ class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFi
   // Listener registration
   private var foodItemsListenerRegistration: ListenerRegistration? = null
 
+  /** Generates a new unique ID for a food item. */
   override fun getNewUid(): String {
     return db.collection(collectionPath).document().id
   }
 
+  /**
+   * Adds a new food item to a household.
+   *
+   * @param householdId The ID of the household.
+   * @param foodItem The food item to add.
+   */
   override fun addFoodItem(householdId: String, foodItem: FoodItem) {
     // Update local cache optimistically
     val currentFoodItems = _foodItems.value.toMutableList().apply { add(foodItem) }
@@ -59,6 +71,12 @@ class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFi
         }
   }
 
+  /**
+   * Retrieves all food items for a household.
+   *
+   * @param householdId The ID of the household.
+   * @return A list of food items.
+   */
   override suspend fun getFoodItems(householdId: String): List<FoodItem> {
     return try {
       val snapshot =
@@ -73,14 +91,30 @@ class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFi
     }
   }
 
+  /**
+   * Selects a FoodItem document for individual view.
+   *
+   * @param foodItem The food item to select.
+   */
   override fun selectFoodItem(foodItem: FoodItem?) {
     _selectedFoodItem.value = foodItem
   }
 
+  /**
+   * Sets the quick add feature state.
+   *
+   * @param value The new state of the quick add feature.
+   */
   override fun setisQuickAdd(value: Boolean) {
     _isQuickAdd.value = value
   }
 
+  /**
+   * Sets the list of food items for a household.
+   *
+   * @param householdId The ID of the household.
+   * @param value The list of food items.
+   */
   override fun setFoodItems(householdId: String, value: List<FoodItem>) {
     try {
       // Update the local cache
@@ -128,6 +162,12 @@ class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFi
     }
   }
 
+  /**
+   * Updates an existing food item in a household.
+   *
+   * @param householdId The ID of the household.
+   * @param foodItem The updated food item.
+   */
   override fun updateFoodItem(householdId: String, foodItem: FoodItem) {
     var originalItem: FoodItem? = null
 
@@ -169,10 +209,21 @@ class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFi
         }
   }
 
+  /**
+   * Deletes all food items from a household.
+   *
+   * @param householdId The ID of the household.
+   */
   override fun deleteHouseholdDocument(householdId: String) {
     db.collection(collectionPath).document(householdId).delete()
   }
 
+  /**
+   * Deletes a food item from a household.
+   *
+   * @param householdId The ID of the household.
+   * @param foodItemId The ID of the food item to delete.
+   */
   override fun deleteFoodItem(householdId: String, foodItemId: String) {
     // Find the item to be deleted
     val deletedItem = _foodItems.value.find { it.uid == foodItemId }
@@ -229,6 +280,13 @@ class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFi
             }
   }
 
+  /**
+   * Uploads an image to Firebase Storage.
+   *
+   * @param uri The URI of the image to upload.
+   * @param context The context in which the upload is performed.
+   * @return The URL of the uploaded image, or null if the upload fails.
+   */
   override suspend fun uploadImageToFirebaseStorage(uri: Uri, context: Context): String? {
     try {
       // Create a reference to Firebase Storage

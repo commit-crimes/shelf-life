@@ -10,6 +10,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Repository class for managing households in Firestore.
+ *
+ * @property db The Firestore database instance.
+ */
 class HouseholdRepositoryFirestore
 @Inject
 constructor(
@@ -31,24 +36,46 @@ constructor(
   // Listener registration for real-time updates
   private var householdsListenerRegistration: ListenerRegistration? = null
 
+  /** Generates a new unique ID for a household. */
   override fun getNewUid(): String {
     return db.collection(collectionPath).document().id
   }
 
+  /**
+   * Selects a household.
+   *
+   * @param household The household to select.
+   */
   override fun selectHousehold(household: HouseHold?) {
     AudioPlayer.stopAudio()
     ThemeManager.resetMode()
     _selectedHousehold.value = household
   }
 
+  /**
+   * Selects a household to edit.
+   *
+   * @param household The household to edit.
+   */
   override fun selectHouseholdToEdit(household: HouseHold?) {
     _householdToEdit.value = household
   }
 
+  /**
+   * Checks if a household name already exists in the list of households.
+   *
+   * @param houseHoldName The name of the household to check.
+   * @return True if the household name already exists, false otherwise.
+   */
   override fun checkIfHouseholdNameExists(houseHoldName: String): Boolean {
     return _households.value.any { it.name == houseHoldName }
   }
 
+  /**
+   * Fetches a household by its UID.
+   *
+   * @param householdId The UID of the household to fetch.
+   */
   override suspend fun getHousehold(householdId: String) {
     try {
       db.collection(collectionPath)
@@ -72,6 +99,12 @@ constructor(
     }
   }
 
+  /**
+   * Initializes households by fetching them from Firestore and updating the local cache.
+   *
+   * @param householdIds List of household IDs to fetch.
+   * @param selectedHouseholdUid The UID of the selected household.
+   */
   override suspend fun initializeHouseholds(
       householdIds: List<String>,
       selectedHouseholdUid: String?
@@ -128,6 +161,7 @@ constructor(
    * Updates an existing household in the repository and updates the local cache.
    *
    * @param household The household with updated data.
+   * @param onSuccess Callback function to be invoked on successful update.
    */
   override fun updateHousehold(household: HouseHold, onSuccess: (String) -> Unit) {
     var originalItem: HouseHold? = null
@@ -174,6 +208,12 @@ constructor(
         }
   }
 
+  /**
+   * Deletes a household by its unique ID.
+   *
+   * @param id The unique ID of the household to delete.
+   * @param onSuccess Callback function to be invoked on successful deletion.
+   */
   override fun deleteHouseholdById(id: String, onSuccess: (String) -> Unit) {
     // Find the household to be deleted
     val deletedHouseHold = _households.value.find { it.uid == id }
@@ -200,6 +240,12 @@ constructor(
         }
   }
 
+  /**
+   * Fetches the list of members for a specific household.
+   *
+   * @param householdId The UID of the household.
+   * @return List of member UIDs in the household.
+   */
   override suspend fun getHouseholdMembers(householdId: String): List<String> {
     val household = _households.value.find { it.uid == householdId }
     return household?.members ?: emptyList()
@@ -241,6 +287,12 @@ constructor(
     householdsListenerRegistration = null
   }
 
+  /**
+   * Updates the stinky points for a household.
+   *
+   * @param householdId The ID of the household.
+   * @param stinkyPoints The updated stinky points.
+   */
   override fun updateStinkyPoints(householdId: String, stinkyPoints: Map<String, Long>) {
     // Save the original points for rollback
     val originalStinkyPoints = _selectedHousehold.value?.stinkyPoints
@@ -265,6 +317,12 @@ constructor(
         }
   }
 
+  /**
+   * Updates the rat points for a household.
+   *
+   * @param householdId The ID of the household.
+   * @param ratPoints The updated rat points.
+   */
   override fun updateRatPoints(householdId: String, ratPoints: Map<String, Long>) {
     // Save the original points for rollback
     val originalRatPoints = _selectedHousehold.value?.ratPoints
@@ -288,6 +346,11 @@ constructor(
         }
   }
 
+  /**
+   * Deletes a household from the local list.
+   *
+   * @param householdId The ID of the household to delete.
+   */
   override fun deleteHouseholdFromLocalList(householdId: String) {
     val currentHouseholds = _households.value.filterNot { it.uid == householdId }
     _households.value = currentHouseholds

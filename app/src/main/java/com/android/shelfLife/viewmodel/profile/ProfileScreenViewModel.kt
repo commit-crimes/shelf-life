@@ -14,17 +14,31 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.StateFlow
 
+/**
+ * ViewModel for managing the profile screen.
+ *
+ * @property userRepository Repository for accessing user data.
+ */
 @HiltViewModel
 class ProfileScreenViewModel
 @Inject
 constructor(
     private val userRepository: UserRepository,
 ) : ViewModel() {
+  /** State for managing the visibility of the change theme menu. */
   var changeThemeMenuState = mutableStateOf(false)
+
+  /** StateFlow containing the list of invitation UIDs. */
   val invitationUIDS: StateFlow<List<String>> = userRepository.invitations
+
+  /** StateFlow containing the current user data. */
   val currentUser = userRepository.user
 
-  /** Signs out the user. */
+  /**
+   * Signs out the user.
+   *
+   * @param context The context used to display Toast messages.
+   */
   fun signOut(context: Context) {
     val googleSignInClient: GoogleSignInClient =
         GoogleSignIn.getClient(context, GoogleSignInOptions.DEFAULT_SIGN_IN)

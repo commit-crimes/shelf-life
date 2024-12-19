@@ -41,7 +41,6 @@ import com.android.shelfLife.viewmodel.recipes.IndividualRecipeViewModel
 import kotlin.math.floor
 import kotlinx.coroutines.launch
 
-@Composable
 /**
  * Composable function to display the screen for an individual recipe.
  *
@@ -51,16 +50,10 @@ import kotlinx.coroutines.launch
  *
  * @param navigationActions The navigation actions for handling navigation events, such as going
  *   back.
- *
- * Structure:
- * - Displays a top bar with the recipe name and a back button.
- * - Shows a bottom navigation bar for switching between main destinations in the app.
- * - If a recipe is selected:
- *     - Displays the recipe image, servings, cooking time, ingredients, and instructions in a
- *       scrollable layout.
- * - If no recipe is selected:
- *     - Shows an error message and an easter egg image.
+ * @param individualRecipeViewModel The ViewModel for managing the state of the Individual Recipe
+ *   screen.
  */
+@Composable
 fun IndividualRecipeScreen(
     navigationActions: NavigationActions,
     individualRecipeViewModel: IndividualRecipeViewModel =
@@ -122,6 +115,14 @@ fun IndividualRecipeScreen(
   }
 }
 
+/**
+ * Composable function to display the content of a recipe.
+ *
+ * This function displays the recipe image, servings, cooking time, ingredients, and instructions in
+ * a scrollable layout.
+ *
+ * @param viewModel The ViewModel for managing the state of the Individual Recipe screen.
+ */
 @Composable
 fun RecipeContent(viewModel: IndividualRecipeViewModel) {
   Column(
@@ -166,6 +167,13 @@ fun RecipeContent(viewModel: IndividualRecipeViewModel) {
       }
 }
 
+/**
+ * Composable function to display a single ingredient in a recipe.
+ *
+ * This function displays the ingredient's quantity, unit, and name.
+ *
+ * @param ingredient The ingredient to display.
+ */
 @Composable
 fun DisplayIngredientNew(ingredient: Ingredient) {
   val unit =
@@ -183,86 +191,16 @@ fun DisplayIngredientNew(ingredient: Ingredient) {
       modifier = Modifier.testTag("recipeIngredient"))
 }
 
+/**
+ * Composable function to display a single instruction in a recipe.
+ *
+ * This function displays the instruction text.
+ *
+ * @param instruction The instruction text to display.
+ */
 @Composable
 fun DisplayInstructionNew(instruction: String) {
   // Display recipe instructions, scrollable if long
   Text(
       text = instruction, modifier = Modifier.padding(vertical = 8.dp).testTag("recipeInstruction"))
 }
-
-// this preview function allows us to see the easter egg screen
-// @Preview()
-// @Composable
-// private fun IndividualRecipeScreenPreviewEasterEgg() {
-//  val navController = rememberNavController()
-//  val navigationActions = NavigationActions(navController)
-//  val firebaseFirestore = FirebaseFirestore.getInstance()
-//  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
-//  val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
-//
-//  // Render the IndividualRecipeScreen with a null selectedRecipe
-//  IndividualRecipeScreen(navigationActions = navigationActions)
-// }
-// this preview shows the example where we do have a selected recipe
-// @Preview()
-// @Composable
-// private fun IndividualRecipeScreenPreview() {
-//  val navController = rememberNavController()
-//  val navigationActions = NavigationActions(navController)
-//  val firebaseFirestore = FirebaseFirestore.getInstance()
-//  val recipeRepository = RecipeRepositoryFirestore(firebaseFirestore)
-//  Log.i("AAAAAAAAA", "1")
-//  val recipe =
-//      Recipe(
-//          uid = "21",
-//          name = "Roast chicken",
-//          instructions =
-//              listOf(
-//                  "Preheat your oven to 425°F (220°C). Position a rack in the center.",
-//                  "Remove the chicken giblets (if present) and pat the chicken dry with paper
-// towels. Dry skin crisps better during roasting.",
-//                  "In a small bowl, mix the salt, pepper, garlic powder, onion powder, paprika,
-// and dried thyme.",
-//                  "Rub the olive oil or melted butter all over the chicken, including under the
-// skin if possible.",
-//                  "Generously sprinkle the seasoning mixture over the chicken, rubbing it into the
-// skin and inside the cavity.",
-//                  "Stuff the cavity with the lemon halves, smashed garlic cloves, and optional
-// fresh herb sprigs.",
-//                  "Tie the chicken legs together with kitchen twine to ensure even cooking.",
-//                  "Place the chicken breast-side up in a roasting pan or oven-safe skillet.",
-//                  "Roast for 75–90 minutes (approximately 40 minutes per kg), or until a meat
-// thermometer inserted into the thickest part of the thigh (without touching the bone) reads
-// 75°C.",
-//                  "For extra crispy skin, baste the chicken with pan drippings every 30 minutes.",
-//                  "Remove the chicken from the oven and let it rest for 10–15 minutes to allow the
-// juices to redistribute.",
-//                  "Carve the chicken and serve with your favorite sides, such as roasted
-// vegetables, mashed potatoes, or a fresh salad."),
-//          servings = 5.0F,
-//          time = 120.minutes,
-//          ingredients =
-//              listOf(
-//                  Ingredient("whole chicken", Quantity(1.0, FoodUnit.COUNT)),
-//                  Ingredient("olive oil", Quantity(30.0, FoodUnit.ML)),
-//                  Ingredient("salt", Quantity(5.0)),
-//                  Ingredient("balck peppet", Quantity(2.0)),
-//                  Ingredient("garlic powder", Quantity(3.0)),
-//                  Ingredient("onion powder", Quantity(3.0)),
-//                  Ingredient("paprika", Quantity(3.0)),
-//                  Ingredient("dried thyme", Quantity(3.0)),
-//                  Ingredient("lemon", Quantity(1.0, FoodUnit.COUNT)),
-//                  Ingredient("garlic cloves", Quantity(4.0, FoodUnit.COUNT)),
-//              ))
-//  Log.i("AAAAAAAAA", "2")
-//
-//  recipeRepository.addRecipe(recipe, {}, {})
-//  recipeRepository.selectRecipe(recipe)
-//  Log.i("AAAAAAAAA", "3")
-//
-//  val individualRecipeViewModel = viewModel { IndividualRecipeViewModel(recipeRepository) }
-//  Log.i("AAAAAAAAA", "4")
-//
-//  // Render the IndividualRecipeScreen with a null selectedRecipe
-//  IndividualRecipeScreen(navigationActions = navigationActions)
-// }

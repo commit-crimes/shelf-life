@@ -12,6 +12,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.tasks.await
 
+/**
+ * Repository class for managing invitations in Firestore.
+ *
+ * @property db The Firestore database instance.
+ * @property auth The FirebaseAuth instance for authentication.
+ */
 @Singleton
 open class InvitationRepositoryFirestore
 @Inject
@@ -24,6 +30,7 @@ constructor(private val db: FirebaseFirestore, private val auth: FirebaseAuth) :
    * Sends an invitation to a user to join a household.
    *
    * @param household The household to invite the user to.
+   * @param invitedUserID The ID of the user to invite.
    */
   override fun sendInvitation(household: HouseHold, invitedUserID: String) {
     val inviterUserId =
@@ -66,6 +73,12 @@ constructor(private val db: FirebaseFirestore, private val auth: FirebaseAuth) :
     db.collection(invitationPath).document(invitation.invitationId).delete()
   }
 
+  /**
+   * Gets a batch of invitations by their UIDs.
+   *
+   * @param invitationUIDs The list of UIDs of the invitations to get.
+   * @return A list of invitations.
+   */
   override suspend fun getInvitationsBatch(invitationUIDs: List<String>): List<Invitation> {
     if (invitationUIDs.isEmpty()) {
       return emptyList()
@@ -75,6 +88,12 @@ constructor(private val db: FirebaseFirestore, private val auth: FirebaseAuth) :
     return querySnapshot.documents.mapNotNull { doc -> convertToInvitation(doc) }
   }
 
+  /**
+   * Gets a specific invitation by its UID.
+   *
+   * @param uid The UID of the invitation to get.
+   * @return The invitation, or null if not found.
+   */
   override suspend fun getInvitation(uid: String): Invitation? {
     return convertToInvitation(db.collection("invitations").document(uid).get().await())
   }
@@ -100,6 +119,11 @@ constructor(private val db: FirebaseFirestore, private val auth: FirebaseAuth) :
     }
   }
 
+  /**
+   * Converts an Invitation object to a map.
+   *
+   * @return A map representation of the Invitation object.
+   */
   private fun Invitation.toMap(): Map<String, Any?> {
     return mapOf(
         "invitationId" to invitationId,

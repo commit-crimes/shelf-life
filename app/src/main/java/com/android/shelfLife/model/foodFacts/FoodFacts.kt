@@ -13,6 +13,7 @@ package com.android.shelfLife.model.foodFacts
  * @property quantity The quantity of the product (e.g., weight, volume, or count).
  * @property category The category of the food item (e.g., FRUIT, VEGETABLE, MEAT).
  * @property nutritionFacts Detailed nutritional information per 100g/ml of the product.
+ * @property imageUrl The URL of the image representing the food item.
  */
 data class FoodFacts(
     var name: String, // Name of the food item
@@ -36,6 +37,12 @@ data class FoodFacts(
   }
 }
 
+/**
+ * Represents the quantity of a food item.
+ *
+ * @property amount The amount of the quantity.
+ * @property unit The unit of the quantity (e.g., GRAM, ML, COUNT).
+ */
 data class Quantity(
     var amount: Double, // Amount of the quantity
     val unit: FoodUnit = FoodUnit.GRAM // Unit of the quantity
@@ -70,12 +77,14 @@ data class Quantity(
   }
 }
 
+/** Enum class representing the unit of a food item's quantity. */
 enum class FoodUnit {
   GRAM, // Gram unit
   ML, // Milliliter unit
   COUNT // Item count (2 pineapples, 3 apples, etc.)
 }
 
+/** Enum class representing the category of a food item. */
 enum class FoodCategory {
   FRUIT, // Fruit category
   VEGETABLE, // Vegetable category
@@ -91,6 +100,14 @@ enum class FoodCategory {
 /**
  * This data class represents the nutrition facts for a food item per 100g/100ml, with default
  * values.
+ *
+ * @property energyKcal The energy content in kilocalories.
+ * @property fat The fat content in grams.
+ * @property saturatedFat The saturated fat content in grams.
+ * @property carbohydrates The carbohydrate content in grams.
+ * @property sugars The sugar content in grams.
+ * @property proteins The protein content in grams.
+ * @property salt The salt content in grams.
  */
 data class NutritionFacts(
     val energyKcal: Int = 0, // Default energy in kilocalories is 0Kcal if not provided

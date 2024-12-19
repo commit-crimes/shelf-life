@@ -17,6 +17,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 
+/**
+ * ViewModel for managing the execution of a recipe.
+ *
+ * @property houseHoldRepository Repository for accessing household data.
+ * @property foodItemsRepository Repository for accessing food item data.
+ * @property recipeRepositoryFirestore Repository for accessing recipe data.
+ * @property userRepository Repository for accessing user data.
+ */
 @HiltViewModel
 class ExecuteRecipeViewModel
 @Inject
@@ -76,7 +84,7 @@ constructor(
     updateCurrentIngredientName()
   }
 
-  // Function to transition to the next state
+  /** Function to transition to the next state. */
   fun nextState() {
     _state.value =
         when (_state.value) {
@@ -87,7 +95,7 @@ constructor(
     Log.d(TAG, "Transitioned to state: ${_state.value}")
   }
 
-  // Function to go back to the previous state
+  /** Function to go back to the previous state. */
   fun previousState() {
     _state.value =
         when (_state.value) {
@@ -98,17 +106,34 @@ constructor(
     Log.d(TAG, "Transitioned to state: ${_state.value}")
   }
 
+  /**
+   * Updates the number of servings.
+   *
+   * @param servings The new number of servings.
+   */
   fun updateServings(servings: Float) {
     _servings.value = servings
     Log.d(TAG, "Updated servings to: $servings")
   }
 
+  /**
+   * Temporarily consumes a list of food items.
+   *
+   * @param listOfFoodItems The list of food items to consume.
+   * @param listOfAmounts The list of amounts to consume for each food item.
+   */
   fun temporarilyConsumeItems(listOfFoodItems: List<FoodItem>, listOfAmounts: List<Float>) {
     for (i in listOfFoodItems.indices) {
       temporarilyConsumeItem(listOfFoodItems[i], listOfAmounts[i])
     }
   }
 
+  /**
+   * Temporarily consumes a specific amount of a food item.
+   *
+   * @param foodItem The food item to consume.
+   * @param amount The amount to consume.
+   */
   private fun temporarilyConsumeItem(foodItem: FoodItem, amount: Float) {
     _availableFoodItems.value =
         _availableFoodItems.value.mapNotNull { currentItem ->
@@ -132,6 +157,7 @@ constructor(
         }
   }
 
+  /** Consumes the selected food items and updates the repository. */
   fun consumeSelectedItems() {
     if (householdUid != null) {
       foodItemsRepository.setFoodItems(householdId = householdUid, _availableFoodItems.value)
@@ -157,6 +183,7 @@ constructor(
     }
   }
 
+  /** Updates the current ingredient name based on the current ingredient index. */
   private fun updateCurrentIngredientName() {
     val ingredients = _executingRecipe.value.ingredients
     _currentIngredientName.value =
@@ -168,6 +195,7 @@ constructor(
     Log.d(TAG, "Current ingredient name updated: ${_currentIngredientName.value}")
   }
 
+  /** Moves to the next ingredient in the recipe. */
   fun nextIngredient() {
     val recipe = _executingRecipe.value
     if (_currentIngredientIndex.value < recipe.ingredients.size - 1) {
@@ -177,10 +205,22 @@ constructor(
     Log.d(TAG, "Moved to next ingredient. Current index: ${_currentIngredientIndex.value}")
   }
 
+  /**
+   * Checks if there are more ingredients to process.
+   *
+   * @return True if there are more ingredients, false otherwise.
+   */
   fun hasMoreIngredients(): Boolean {
     return _currentIngredientIndex.value < _executingRecipe.value.ingredients.size - 1
   }
 
+  /**
+   * Selects a food item for a specific ingredient.
+   *
+   * @param ingredientName The name of the ingredient.
+   * @param foodItem The food item to select.
+   * @param newAmount The amount of the food item to select.
+   */
   fun selectFoodItemForIngredient(ingredientName: String, foodItem: FoodItem, newAmount: Float) {
     val currentSelections = _selectedFoodItemsForIngredients.value.toMutableMap()
     val selectedItemsForIngredient =
@@ -214,6 +254,7 @@ constructor(
     Log.d(TAG, "Selected food items updated for ingredient: $ingredientName")
   }
 
+  /** Moves to the next instruction in the recipe. */
   fun nextInstruction() {
     val instructions = _executingRecipe.value.instructions
     if (_currentInstructionIndex.value < instructions.size - 1) {
@@ -224,6 +265,7 @@ constructor(
     }
   }
 
+  /** Moves to the previous instruction in the recipe. */
   fun previousInstruction() {
     if (_currentInstructionIndex.value > 0) {
       _currentInstructionIndex.value -= 1
@@ -233,15 +275,26 @@ constructor(
     }
   }
 
+  /**
+   * Checks if there are more instructions to process.
+   *
+   * @return True if there are more instructions, false otherwise.
+   */
   fun hasMoreInstructions(): Boolean {
     return _currentInstructionIndex.value < _executingRecipe.value.instructions.size - 1
   }
 
+  /**
+   * Checks if there are previous instructions to process.
+   *
+   * @return True if there are previous instructions, false otherwise.
+   */
   fun hasPreviousInstructions(): Boolean {
     return _currentInstructionIndex.value > 0
   }
 }
 
+/** Sealed class representing the different states of recipe execution. */
 sealed class RecipeExecutionState {
   object SelectServings : RecipeExecutionState()
 

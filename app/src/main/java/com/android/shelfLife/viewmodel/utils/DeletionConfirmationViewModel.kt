@@ -9,6 +9,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for handling deletion confirmation logic.
+ *
+ * @property houseHoldRepository Repository for household data.
+ * @property userRepository Repository for user data.
+ * @property foodItemRepository Repository for food item data.
+ */
 @HiltViewModel
 class DeletionConfirmationViewModel
 @Inject
@@ -18,8 +25,13 @@ constructor(
     private val foodItemRepository: FoodItemRepository
 ) : ViewModel() {
 
+  /** The household currently being edited. */
   val householdToEdit = houseHoldRepository.householdToEdit
+
+  /** The currently selected household. */
   val selectedHousehold = houseHoldRepository.selectedHousehold
+
+  /** List of all households. */
   val households = houseHoldRepository.households
 
   /**

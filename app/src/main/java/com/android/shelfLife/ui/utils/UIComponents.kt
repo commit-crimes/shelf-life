@@ -87,6 +87,7 @@ fun CustomTopAppBar(
  *
  * @param query The current search query text.
  * @param onQueryChange Callback invoked when the query text changes.
+ * @param onDeleteTextClicked Callback invoked when the delete text icon is clicked.
  * @param placeholder The placeholder text displayed when the query is empty.
  * @param searchBarTestTag A test tag identifier for the search bar.
  */

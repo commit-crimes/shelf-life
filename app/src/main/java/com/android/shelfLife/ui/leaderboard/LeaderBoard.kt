@@ -20,6 +20,12 @@ import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.leaderboard.LeaderboardMode
 import com.android.shelfLife.viewmodel.leaderboard.LeaderboardViewModel
 
+/**
+ * Composable function to display the leaderboard screen.
+ *
+ * @param navigationActions Actions for navigation.
+ * @param viewModel ViewModel for the leaderboard.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeaderboardScreen(
@@ -71,6 +77,15 @@ fun LeaderboardScreen(
       }
 }
 
+/**
+ * Composable function to highlight the first place leader.
+ *
+ * @param viewModel ViewModel for the leaderboard.
+ * @param leader The first place leader.
+ * @param mode The current leaderboard mode.
+ * @param userIsKing Boolean indicating if the current user is the king.
+ * @param onTogglePrize Callback function to toggle the prize.
+ */
 @Composable
 fun HighlightFirstPlace(
     viewModel: LeaderboardViewModel,
@@ -116,6 +131,11 @@ fun HighlightFirstPlace(
   }
 }
 
+/**
+ * Composable function to display the leaderboard list.
+ *
+ * @param leaders List of leaders.
+ */
 @Composable
 fun LeaderboardList(leaders: List<Pair<String, Long>>) {
   Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
@@ -126,6 +146,13 @@ fun LeaderboardList(leaders: List<Pair<String, Long>>) {
   }
 }
 
+/**
+ * Composable function to display an individual leaderboard item.
+ *
+ * @param rank The rank of the leader.
+ * @param memberId The ID of the leader.
+ * @param points The points of the leader.
+ */
 @Composable
 fun LeaderboardItem(rank: Int, memberId: String, points: Int) {
   val emoji =
@@ -148,6 +175,12 @@ fun LeaderboardItem(rank: Int, memberId: String, points: Int) {
       }
 }
 
+/**
+ * Composable function to toggle between leaderboard modes.
+ *
+ * @param currentMode The current leaderboard mode.
+ * @param onModeChange Callback function to change the mode.
+ */
 @Composable
 fun ModeToggle(currentMode: LeaderboardMode, onModeChange: (LeaderboardMode) -> Unit) {
   Row(

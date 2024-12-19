@@ -14,7 +14,6 @@ import com.android.shelfLife.model.foodFacts.Quantity
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.doubleOrNull
@@ -26,6 +25,11 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
 
+/**
+ * Repository class for generating recipes using OpenAI.
+ *
+ * @property openai The OpenAI client instance.
+ */
 @Singleton
 class RecipeGeneratorOpenAIRepository @Inject constructor(private val openai: OpenAI) :
     RecipeGeneratorRepository {
@@ -44,12 +48,18 @@ class RecipeGeneratorOpenAIRepository @Inject constructor(private val openai: Op
           ->
           "Create a $recipeDescription recipe with exactly $servings servings. " +
               "The user named the recipe \"$recipeName\" and specified the following special instructions: \"$specialInstructions\". Use the following ingredients: (${ingredients}) ${
-        if (onlyHousehold) "To ensure a valid recipe, stick strictly to the provided ingredients. Do not add any other ingredients."
-        else "To ensure a great tasting recipe, you can add other ingredients you deem relevant and necessary."
-      } Call _createRecipeFunction with a list of ingredients (name + quantity), step-by-step instructions, servings, and cooking time in seconds."
+                            if (onlyHousehold) "To ensure a valid recipe, stick strictly to the provided ingredients. Do not add any other ingredients."
+                            else "To ensure a great tasting recipe, you can add other ingredients you deem relevant and necessary."
+                        } Call _createRecipeFunction with a list of ingredients (name + quantity), step-by-step instructions, servings, and cooking time in seconds."
         }
   }
 
+  /**
+   * Generates the system and user prompts based on the recipe prompt.
+   *
+   * @param recipePrompt The recipe prompt containing user specifications.
+   * @return A pair of system and user prompts.
+   */
   private fun getPromptsForMode(recipePrompt: RecipePrompt): Pair<String, String> {
     val servings = recipePrompt.servings
 
@@ -86,6 +96,12 @@ class RecipeGeneratorOpenAIRepository @Inject constructor(private val openai: Op
     return BASE_SYSTEM_PROMPT(recipeDescriptionFinal) to finalUserPrompt
   }
 
+  /**
+   * Generates a recipe based on the provided recipe prompt.
+   *
+   * @param recipePrompt The recipe prompt containing user specifications.
+   * @return The generated recipe, or null if generation fails.
+   */
   override suspend fun generateRecipe(recipePrompt: RecipePrompt): Recipe? {
     try {
       // Get the custom system and user prompts based on the mode
@@ -211,6 +227,11 @@ class RecipeGeneratorOpenAIRepository @Inject constructor(private val openai: Op
 
   private val availableFunctions = mapOf("_createRecipeFunction" to ::_createRecipeFunction)
 
+  /**
+   * Executes the tool call function and returns the result.
+   *
+   * @return A map containing the function result.
+   */
   private fun ToolCall.Function.execute(): Map<String, Any> {
     val functionToCall =
         availableFunctions[function.name] ?: error("Function ${function.name} not found")
@@ -251,6 +272,15 @@ class RecipeGeneratorOpenAIRepository @Inject constructor(private val openai: Op
     return functionToCall(ingredients, instructions, servings, time)
   }
 
+  /**
+   * Creates a recipe function with the provided ingredients, instructions, servings, and time.
+   *
+   * @param ingredients List of ingredient maps.
+   * @param instructions List of step-by-step instructions.
+   * @param servings Number of servings.
+   * @param time Estimated cooking time.
+   * @return A map containing the recipe details.
+   */
   @JvmName("_createRecipeFunction") // allowing tests to access this function using reflection
   private fun _createRecipeFunction(
       ingredients: List<Map<String, Any>>, // List of ingredient maps

@@ -57,6 +57,15 @@ import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import com.android.shelfLife.viewmodel.recipes.RecipesViewModel
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function to display the Recipes screen.
+ *
+ * This screen shows a list of recipes, a search bar, and navigation options. It also handles the
+ * selection of a household and displays the appropriate UI elements.
+ *
+ * @param navigationActions The navigation actions to handle navigation events.
+ * @param recipesViewModel The ViewModel for managing the state of the Recipes screen.
+ */
 @Composable
 fun RecipesScreen(
     navigationActions: NavigationActions,
@@ -142,15 +151,16 @@ fun RecipesScreen(
       }
 }
 
-@Composable
 /**
- * Displays a recipe item as a card that the user can click to navigate to the recipe's details.
+ * Composable function to display a recipe item as a card.
  *
- * @param recipe The recipe object that contains the recipe data (name, servings, time, etc.).
- * @param navigationActions A navigation controller to handle navigation events (e.g., navigating to
- *   the individual recipe screen).
- * @param listRecipesViewModel The ViewModel that manages the state and logic for the recipe list.
+ * This card is clickable and navigates to the recipe's details when clicked.
+ *
+ * @param recipe The recipe object containing the recipe data.
+ * @param navigationActions The navigation actions to handle navigation events.
+ * @param recipesViewModel The ViewModel for managing the state of the recipe list.
  */
+@Composable
 fun RecipeItem(
     recipe: Recipe,
     navigationActions: NavigationActions,

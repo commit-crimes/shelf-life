@@ -23,6 +23,11 @@ import com.android.shelfLife.R
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 
+/**
+ * Composable function to display the Easter Egg screen.
+ *
+ * @param navigationActions Actions for navigation.
+ */
 @Composable
 fun EasterEggScreen(navigationActions: NavigationActions) {
 

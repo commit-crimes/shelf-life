@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import com.android.shelfLife.viewmodel.leaderboard.LeaderboardMode
 
+/** Manages the theme and color schemes for the leaderboard. */
 object ThemeManager {
   private val RatLightColorScheme =
       lightColorScheme(
@@ -170,6 +171,12 @@ object ThemeManager {
   // When no special mode is active, this is null
   var currentColorScheme: MutableState<ColorScheme?> = mutableStateOf(null)
 
+  /**
+   * Updates the current color scheme based on the leaderboard mode and theme (light or dark).
+   *
+   * @param mode The leaderboard mode to set.
+   * @param isDark Boolean indicating if the dark theme should be used.
+   */
   fun updateScheme(mode: LeaderboardMode, isDark: Boolean) {
     activeMode = mode
     currentColorScheme.value =
@@ -179,6 +186,7 @@ object ThemeManager {
         }
   }
 
+  /** Resets the leaderboard mode and color scheme to default. */
   fun resetMode() {
     activeMode = null
     currentColorScheme.value = null

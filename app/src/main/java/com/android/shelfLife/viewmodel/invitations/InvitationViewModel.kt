@@ -13,6 +13,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for managing invitations.
+ *
+ * @property invitationRepository Repository for accessing invitation data.
+ * @property userRepo Repository for accessing user data.
+ * @property houseHoldRepo Repository for accessing household data.
+ */
 @HiltViewModel
 class InvitationViewModel
 @Inject
@@ -33,6 +40,11 @@ constructor(
     }
   }
 
+  /**
+   * Accepts an invitation and updates the user's household data.
+   *
+   * @param selectedInvitation The invitation to accept.
+   */
   suspend fun acceptInvitation(selectedInvitation: Invitation) {
     userRepo.deleteInvitationUID(selectedInvitation.invitationId)
     invitationRepository.acceptInvitation(selectedInvitation)
@@ -43,12 +55,18 @@ constructor(
     refreshInvitations()
   }
 
+  /**
+   * Declines an invitation and updates the invitation list.
+   *
+   * @param selectedInvitation The invitation to decline.
+   */
   suspend fun declineInvitation(selectedInvitation: Invitation) {
     userRepo.deleteInvitationUID(selectedInvitation.invitationId)
     invitationRepository.declineInvitation(selectedInvitation)
     refreshInvitations()
   }
 
+  /** Refreshes the list of invitations. */
   internal suspend fun refreshInvitations() {
     val invitationUIDs = userRepo.invitations.value
     if (invitationUIDs.isNotEmpty()) {

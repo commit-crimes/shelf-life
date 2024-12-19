@@ -17,6 +17,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for managing household creation and editing.
+ *
+ * @property houseHoldRepository Repository for accessing household data.
+ * @property foodItemRepository Repository for accessing food item data.
+ * @property invitationRepository Repository for accessing invitation data.
+ * @property userRepository Repository for accessing user data.
+ */
 @HiltViewModel
 class HouseholdCreationScreenViewModel
 @Inject
@@ -55,20 +63,42 @@ constructor(
     }
   }
 
+  /**
+   * Adds an email to the email list.
+   *
+   * @param email The email to add.
+   */
   private fun addEmail(email: String) {
     _emailList.value += email
   }
 
+  /**
+   * Removes an email from the email list.
+   *
+   * @param email The email to remove.
+   */
   fun removeEmail(email: String) {
     _emailList.value -= email
   }
 
+  /**
+   * Checks if the new household name is invalid.
+   *
+   * @param householdName The household name to check.
+   * @return True if the household name is invalid, false otherwise.
+   */
   private fun isNewHouseholdNameIsInvalid(householdName: String): Boolean {
     return (householdName.isBlank() ||
         (houseHoldRepository.checkIfHouseholdNameExists(householdName) &&
             (householdToEdit.value == null || householdName != householdToEdit.value!!.name)))
   }
 
+  /**
+   * Gets a map of emails to user IDs.
+   *
+   * @param emails The set of emails.
+   * @return A map of emails to user IDs.
+   */
   private suspend fun getEmailToUserId(emails: Set<String>): Map<String, String> {
     return userRepository.getUserIds(emails)
   }
@@ -76,6 +106,9 @@ constructor(
   /**
    * Attempts to add an email card, returning true if successful and false otherwise. This
    * encapsulates the logic for checking duplicates and blank inputs.
+   *
+   * @param emailInput The email input to add.
+   * @return True if the email card was added, false otherwise.
    */
   fun tryAddEmailCard(emailInput: String): Boolean {
     val trimmedEmail = emailInput.trim()
@@ -87,9 +120,10 @@ constructor(
   }
 
   /**
-   * Handles creating or updating a household when the user clicks "Save". Returns:
-   * - false if household name is invalid
-   * - true if the operation succeeded
+   * Handles creating or updating a household when the user clicks "Save".
+   *
+   * @param householdName The name of the household.
+   * @return False if household name is invalid, true if the operation succeeded.
    */
   suspend fun confirmHouseholdActions(householdName: String): Boolean {
     if (isNewHouseholdNameIsInvalid(householdName)) {
@@ -125,6 +159,12 @@ constructor(
     return true
   }
 
+  /**
+   * Adds a new household.
+   *
+   * @param householdName The name of the new household.
+   * @param friendEmails The set of friend emails to invite.
+   */
   private fun addNewHousehold(householdName: String, friendEmails: Set<String?> = emptySet()) {
     viewModelScope.launch {
       val user =
@@ -161,6 +201,12 @@ constructor(
     }
   }
 
+  /**
+   * Updates an existing household.
+   *
+   * @param household The household to update.
+   * @param shouldUpdateRepo Whether to update the repository.
+   */
   private fun updateHousehold(household: HouseHold, shouldUpdateRepo: Boolean = true) {
     viewModelScope.launch {
       val oldHousehold = houseHoldRepository.households.value.find { it.uid == household.uid }

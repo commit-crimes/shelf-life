@@ -31,6 +31,12 @@ import com.android.shelfLife.viewmodel.authentication.SignInViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
+/**
+ * Composable function for the Sign-In screen.
+ *
+ * @param navigationActions Actions for navigating between screens.
+ * @param signInViewModel ViewModel for handling sign-in logic.
+ */
 @Composable
 fun SignInScreen(
     navigationActions: NavigationActions,
@@ -136,6 +142,12 @@ fun SignInScreen(
   }
 }
 
+/**
+ * Composable function for the Google Sign-In button.
+ *
+ * @param onSignInClick Callback function to handle sign-in button click.
+ * @param modifier Modifier for styling the button.
+ */
 @Composable
 fun GoogleSignInButton(
     onSignInClick: () -> Unit,

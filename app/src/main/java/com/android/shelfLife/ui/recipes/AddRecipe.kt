@@ -47,6 +47,12 @@ import com.android.shelfLife.ui.utils.UnitDropdownField
 import com.android.shelfLife.viewmodel.recipes.AddRecipeViewModel
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function that displays the Add Recipe screen.
+ *
+ * @param navigationActions The navigation actions to handle navigation events.
+ * @param addRecipeViewModel The ViewModel for managing the state of the Add Recipe screen.
+ */
 @Composable
 fun AddRecipeScreen(
     navigationActions: NavigationActions,
@@ -303,10 +309,7 @@ fun IngredientItemNEW(index: Int, ingredient: Ingredient, onRemoveClick: () -> U
  * A composable dialog that allows the user to add an ingredient with its name, quantity, and unit.
  * It validates the inputs and only allows the addition if the data is complete and correct.
  *
- * @param ingredients The mutable list of ingredients where the new ingredient will be added.
- * @param onDismiss A callback function that is called when the dialog is dismissed.
- * @param onAddIngredient A callback function that is called when a new ingredient is successfully
- *   added.
+ * @param addRecipeViewModel The ViewModel for managing the state of the Add Recipe screen.
  */
 @Composable
 fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
@@ -409,6 +412,7 @@ fun IngredientDialog(addRecipeViewModel: AddRecipeViewModel) {
  * body text style to distinguish it as an error.
  *
  * @param errorMessageId The error message to display. If null or empty, no text is shown.
+ * @param testTag The test tag for the error message.
  */
 @Composable
 fun ErrorTextBoxNEW(errorMessageId: Int?, testTag: String) {
@@ -421,25 +425,3 @@ fun ErrorTextBoxNEW(errorMessageId: Int?, testTag: String) {
     )
   }
 }
-
-// @Preview(showBackground = true)
-// @Composable
-// fun AddRecipeScreenPreview() {
-//    val navController = rememberNavController()
-//    val navigationActions = NavigationActions(navController)
-//
-//    // Create mock or fake repositories for testing
-//    val fakeRecipeRepository = FakeRecipeRepository() // Implement a simple fake
-//    val fakeUserRepository = FakeUserRepository()     // Implement a simple fake
-//
-//    // Manually instantiate your ViewModel with fakes
-//    val viewModel = AddRecipeViewModel(
-//        recipeRepository = fakeRecipeRepository,
-//        userRepository = fakeUserRepository
-//    )
-//
-//    AddRecipeScreen(
-//        navigationActions = navigationActions,
-//        addRecipeViewModel = viewModel
-//    )
-// }

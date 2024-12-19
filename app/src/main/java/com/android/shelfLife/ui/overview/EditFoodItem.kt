@@ -24,7 +24,6 @@ import com.android.shelfLife.ui.utils.AmountField
 import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.ui.utils.DateField
-import com.android.shelfLife.ui.utils.NewLocationDropdownField
 import com.android.shelfLife.viewmodel.overview.FoodItemViewModel
 import kotlinx.coroutines.launch
 
@@ -32,9 +31,8 @@ import kotlinx.coroutines.launch
  * Composable function to display the Edit Food Item screen.
  *
  * @param navigationActions The navigation actions to be used in the screen.
- * @param foodItemRepository The food item model.
- * @param userRepository The user model.
  * @param paddingValues The padding values to be applied to the screen.
+ * @param foodItemViewModel The ViewModel for managing the state of the food item.
  */
 @Composable
 fun EditFoodItemScreen(
@@ -103,7 +101,7 @@ fun EditFoodItemScreen(
               }
 
               item(key = "location") {
-                NewLocationDropdownField(
+                LocationDropdownField(
                     location = foodItemViewModel.location,
                     onLocationChange = { foodItemViewModel.location = it },
                     locationExpanded = foodItemViewModel.locationExpanded,

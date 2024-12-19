@@ -45,9 +45,13 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 /**
- * Composable function to display the list of food items
+ * Composable function to display the list of food items.
  *
- * @param foodItems The list of food items to display
+ * @param foodItems The list of food items to display.
+ * @param overviewScreenViewModel The ViewModel for managing the state of the overview screen.
+ * @param onFoodItemClick Callback function to handle food item click events.
+ * @param onFoodItemLongHold Callback function to handle food item long press events.
+ * @param isSelectedItemsList Flag to indicate if the list is for selected items.
  */
 @Composable
 fun ListFoodItems(
@@ -68,7 +72,7 @@ fun ListFoodItems(
     // Display the full list
     LazyColumn(modifier = Modifier.fillMaxSize().testTag("foodItemList")) {
       items(foodItems) { item ->
-        // Call a composable that renders each individual to-do item
+        // Call a composable that renders each individual food item
         FoodItemCard(
             foodItem = item,
             overviewScreenViewModel = overviewScreenViewModel,
@@ -80,6 +84,15 @@ fun ListFoodItems(
   }
 }
 
+/**
+ * Composable function to display a card for a single food item.
+ *
+ * @param foodItem The food item to display.
+ * @param overviewScreenViewModel The ViewModel for managing the state of the overview screen.
+ * @param onClick Callback function to handle click events.
+ * @param onLongPress Callback function to handle long press events.
+ * @param isSelectedItemsList Flag to indicate if the card is for a selected item.
+ */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FoodItemCard(
@@ -112,9 +125,9 @@ fun FoodItemCard(
           ?: "No Expiry Date"
   val expiryDateMessage = getExpiryMessageBasedOnDays(timeRemainingInDays, formattedExpiryDate)
 
-  // checks if the foodItem has expired and its status has not been updated
+  // Check if the food item has expired and its status has not been updated
   if ((expiryDateMessage == "Expired") && (foodItem.status != FoodStatus.EXPIRED)) {
-    // creates a newFoodItem to update the one that's wrong
+    // Create a new food item to update the one that's wrong
     val newFoodItem =
         FoodItem(
             uid = foodItem.uid,

@@ -169,27 +169,6 @@ fun LocationDropdownField(
       modifier = modifier.testTag(testTag))
 }
 
-// TODO Delete this after everything is compatible
-@Composable
-fun NewLocationDropdownField(
-    location: FoodStorageLocation,
-    onLocationChange: (FoodStorageLocation) -> Unit,
-    locationExpanded: Boolean,
-    onExpandedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-    testTag: String = "",
-) {
-  DropdownFields(
-      label = stringResource(id = R.string.location_label),
-      options = FoodStorageLocation.entries.toTypedArray(),
-      selectedOption = location,
-      onOptionSelected = onLocationChange,
-      expanded = locationExpanded,
-      onExpandedChange = onExpandedChange,
-      optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-      modifier = modifier.testTag(testTag))
-}
-
 /**
  * Composable function to display a text field for entering a date.
  *

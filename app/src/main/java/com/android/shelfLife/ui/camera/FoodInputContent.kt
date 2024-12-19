@@ -30,10 +30,11 @@ import kotlinx.coroutines.launch
 /**
  * Composable function to display the food input content.
  *
+ * @param foodItemViewModel The ViewModel for the food items.
  * @param foodFacts The food facts to be displayed.
  * @param onSubmit Callback function to handle the submission of the food item.
  * @param onCancel Callback function to handle the cancellation of the input.
- * @param foodItemViewModel The ViewModel for the food items.
+ * @param onExpandRequested Callback function to handle the request to expand the input.
  */
 @Composable
 fun FoodInputContent(

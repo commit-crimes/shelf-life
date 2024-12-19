@@ -37,6 +37,15 @@ import com.android.shelfLife.viewmodel.navigation.HouseholdSelectionDrawerViewMo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function to display the household selection drawer.
+ *
+ * @param scope The coroutine scope for launching coroutines.
+ * @param drawerState The state of the drawer.
+ * @param navigationActions Actions for navigation.
+ * @param householdSelectionDrawerViewModel ViewModel for the household selection drawer.
+ * @param content The content to be displayed inside the drawer.
+ */
 @Composable
 fun HouseHoldSelectionDrawer(
     scope: CoroutineScope,

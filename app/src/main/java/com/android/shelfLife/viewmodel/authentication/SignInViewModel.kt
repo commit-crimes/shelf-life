@@ -20,6 +20,16 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+/**
+ * ViewModel responsible for handling user sign-in and authentication.
+ *
+ * @property firebaseAuth The FirebaseAuth instance used for authentication.
+ * @property userRepository Repository for user-related data.
+ * @property householdRepository Repository for household-related data.
+ * @property recipeRepository Repository for recipe-related data.
+ * @property foodItemRepository Repository for food item-related data.
+ * @property appContext The application context.
+ */
 @HiltViewModel
 class SignInViewModel
 @Inject
@@ -58,6 +68,11 @@ constructor(
     }
   }
 
+  /**
+   * Populates the model data by initializing user, household, food item, and recipe data.
+   *
+   * @param context The context used for initialization.
+   */
   private suspend fun populateModelData(context: Context) {
     userRepository.initializeUserData(context)
     householdRepository.initializeHouseholds(
@@ -73,6 +88,12 @@ constructor(
     firebaseAuth.removeAuthStateListener(authStateListener)
   }
 
+  /**
+   * Signs in the user with Google using the provided ID token.
+   *
+   * @param idToken The ID token from Google Sign-In.
+   * @param context The context used for initialization.
+   */
   fun signInWithGoogle(idToken: String, context: Context) {
     Log.d("SignInViewModel", "signInWithGoogle called")
 
@@ -92,6 +113,12 @@ constructor(
     }
   }
 
+  /**
+   * Signs out the current user and clears the authentication state.
+   *
+   * @param context The context used for sign-out.
+   * @param onSignOutComplete Callback function invoked when sign-out is complete.
+   */
   fun signOutUser(context: Context, onSignOutComplete: () -> Unit) {
     val googleSignInClient =
         GoogleSignIn.getClient(
@@ -111,19 +138,35 @@ constructor(
     }
   }
 
+  /**
+   * Sets the sign-in success state for testing purposes.
+   *
+   * @param authResult The AuthResult to set as the success state.
+   */
   fun setSignInSuccessStateForTesting(authResult: AuthResult) {
     _signInState.value = SignInState.Success(authResult = authResult)
   }
 
+  /**
+   * Sets the sign-in state for testing purposes.
+   *
+   * @param state The SignInState to set.
+   */
   fun setSignInStateForTesting(state: SignInState) {
     _signInState.value = state
   }
 
+  /**
+   * Sets the user logged-in state for testing purposes.
+   *
+   * @param isLoggedIn Boolean indicating if the user is logged in.
+   */
   fun setIsUserLoggedInForTesting(isLoggedIn: Boolean) {
     _isUserLoggedIn.value = isLoggedIn
   }
 }
 
+/** Represents the different states of the sign-in process. */
 sealed class SignInState {
   object Idle : SignInState()
 

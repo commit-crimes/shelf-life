@@ -8,6 +8,7 @@ import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 
+/** Object containing route constants for navigation. */
 object Route {
   const val OVERVIEW = "Overview"
   const val SCANNER = "Scanner"
@@ -20,6 +21,7 @@ object Route {
   const val RECIPE_EXECUTION = "Recipe Execution"
 }
 
+/** Object containing screen constants for navigation. */
 object Screen {
   const val LEADERBOARD = "Leaderboard Screen"
   const val OVERVIEW = "Overview Screen"
@@ -46,12 +48,20 @@ object Screen {
   // Add other screens as needed
 }
 
+/**
+ * Data class representing a top-level destination in the navigation.
+ *
+ * @param route The route of the destination.
+ * @param icon The icon associated with the destination.
+ * @param textId The text label for the destination.
+ */
 data class TopLevelDestination(
     val route: String,
     val icon: ImageVector, // or any other type you use for icons
     val textId: String
 )
 
+/** Object containing top-level destinations for navigation. */
 object TopLevelDestinations {
   val OVERVIEW =
       TopLevelDestination(
@@ -79,6 +89,7 @@ object TopLevelDestinations {
           )
 }
 
+/** List of top-level destinations. */
 val LIST_TOP_LEVEL_DESTINATION =
     listOf(
         TopLevelDestinations.OVERVIEW,
@@ -86,12 +97,17 @@ val LIST_TOP_LEVEL_DESTINATION =
         TopLevelDestinations.RECIPES,
         TopLevelDestinations.PROFILE)
 
+/**
+ * Class containing navigation actions.
+ *
+ * @param navController The navigation controller.
+ */
 open class NavigationActions(
     private val navController: NavHostController,
 ) {
 
   /**
-   * Navigate to the specified [TopLevelDestination]
+   * Navigate to the specified [TopLevelDestination].
    *
    * @param destination The top-level destination to navigate to.
    *
@@ -105,6 +121,11 @@ open class NavigationActions(
     }
   }
 
+  /**
+   * Navigate to the specified screen and clear the back stack.
+   *
+   * @param screen The screen to navigate to.
+   */
   open fun navigateToAndClearBackStack(screen: String) {
     navController.navigate(screen) {
       popUpTo(navController.graph.id) { saveState = true }
@@ -116,7 +137,7 @@ open class NavigationActions(
   /**
    * Navigate to the specified screen.
    *
-   * @param screen The screen to navigate to
+   * @param screen The screen to navigate to.
    */
   open fun navigateTo(screen: String) {
     navController.navigate(screen)
@@ -130,7 +151,7 @@ open class NavigationActions(
   /**
    * Get the current route of the navigation controller.
    *
-   * @return The current route
+   * @return The current route.
    */
   open fun currentRoute(): String {
     return navController.currentDestination?.route ?: ""

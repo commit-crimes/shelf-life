@@ -33,6 +33,13 @@ import com.android.shelfLife.ui.utils.FoodItemDetails
 import com.android.shelfLife.viewmodel.overview.IndividualFoodItemViewModel
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function to display the individual food item screen.
+ *
+ * @param navigationActions The navigation actions to be used in the screen.
+ * @param individualFoodItemViewModel The ViewModel for managing the state of the individual food
+ *   item.
+ */
 @Composable
 fun IndividualFoodItemScreen(
     navigationActions: NavigationActions,

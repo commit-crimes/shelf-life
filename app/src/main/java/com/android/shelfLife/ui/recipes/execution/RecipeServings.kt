@@ -36,6 +36,13 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.viewmodel.recipes.ExecuteRecipeViewModel
 
+/**
+ * Composable function to display the screen for selecting the number of servings.
+ *
+ * @param navigationActions The actions to handle navigation.
+ * @param executeRecipeViewModel The ViewModel for managing the state of the recipe execution.
+ * @param onNext Callback function to handle the next action.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ServingsScreen(
@@ -121,6 +128,14 @@ fun ServingsScreen(
       })
 }
 
+/**
+ * Composable function to display the selector for the number of servings.
+ *
+ * @param servings The current number of servings.
+ * @param onIncrease Callback function to handle increasing the number of servings.
+ * @param onDecrease Callback function to handle decreasing the number of servings.
+ * @param modifier The modifier to be applied to the layout.
+ */
 @Composable
 fun ServingsSelector(
     servings: Float,

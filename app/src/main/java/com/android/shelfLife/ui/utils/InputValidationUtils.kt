@@ -6,6 +6,10 @@ import com.android.shelfLife.R
  * Validates the food name.
  *
  * @param string The food name to validate.
+ * @param errorMessage1 The resource ID of the error message for an empty food name. Defaults to
+ *   R.string.food_name_empty_error.
+ * @param errorMessage2 The resource ID of the error message for an invalid food name. Defaults to
+ *   R.string.food_name_invalid_error.
  * @return The resource ID of the error message if the food name is invalid, null otherwise.
  */
 fun validateString(
@@ -25,6 +29,12 @@ fun validateString(
  * Validates the amount.
  *
  * @param amount The amount to validate.
+ * @param errorMessage1 The resource ID of the error message for an empty amount. Defaults to
+ *   R.string.amount_empty_error.
+ * @param errorMessage2 The resource ID of the error message for a non-numeric amount. Defaults to
+ *   R.string.amount_not_number_error.
+ * @param errorMessage3 The resource ID of the error message for a negative amount. Defaults to
+ *   R.string.amount_negative_error.
  * @return The resource ID of the error message if the amount is invalid, null otherwise.
  */
 fun validateNumber(

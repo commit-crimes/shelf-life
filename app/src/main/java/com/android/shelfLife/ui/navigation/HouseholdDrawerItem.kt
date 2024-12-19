@@ -22,12 +22,16 @@ import androidx.compose.ui.unit.dp
 import com.android.shelfLife.model.household.HouseHold
 
 /**
- * Composable function for a single household drawer item in the navigation drawer This function
+ * Composable function for a single household drawer item in the navigation drawer. This function
  * displays a single household element in the navigation drawer.
  *
- * @param household The household to display
- * @param selectedHousehold The currently selected household
- * @param onHouseholdSelected The lambda to be called when the household is selected
+ * @param household The household to display.
+ * @param selectedHousehold The currently selected household.
+ * @param editMode Boolean indicating if the edit mode is enabled.
+ * @param onHouseholdSelected The lambda to be called when the household is selected.
+ * @param onHouseholdEditSelected The lambda to be called when the edit button is clicked.
+ * @param onHouseholdDeleteSelected The lambda to be called when the delete button is clicked.
+ * @param modifier The modifier to be applied to the item.
  */
 @Composable
 fun HouseholdDrawerItem(

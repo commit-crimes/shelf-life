@@ -21,6 +21,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+/**
+ * ViewModel for managing the addition of recipes.
+ *
+ * @property recipeRepository Repository for accessing recipe data.
+ * @property userRepository Repository for accessing user data.
+ */
 @HiltViewModel
 class AddRecipeViewModel
 @Inject
@@ -90,7 +96,7 @@ constructor(
   private val _ingredientQuantityAmountError = MutableStateFlow<Int?>(null)
   val ingredientQuantityAmountError: StateFlow<Int?> = _ingredientQuantityAmountError.asStateFlow()
 
-  // Helper function to validate if any instruction is empty
+  /** Helper function to validate if any instruction is empty. */
   fun validateInstructions() {
     _instructionsError.value =
         instructions.value.any {
@@ -99,12 +105,16 @@ constructor(
         }
   }
 
-  // Checks that no ingredient inside the list of ingredients is empty
+  /** Checks that no ingredient inside the list of ingredients is empty. */
   fun validateIngredients() {
     _ingredientsError.value = ingredients.value.any { it.name.isBlank() }
   }
 
-  // Function that allows us to change the title
+  /**
+   * Function that allows us to change the title.
+   *
+   * @param newRecipeTitle The new title for the recipe.
+   */
   fun changeTitle(newRecipeTitle: String) {
     _title.value = newRecipeTitle
     _titleError.value =
@@ -112,7 +122,11 @@ constructor(
             newRecipeTitle, R.string.recipe_title_empty_error, R.string.recipe_title_invalid_error)
   }
 
-  // Function that allows us to change the number of servings
+  /**
+   * Function that allows us to change the number of servings.
+   *
+   * @param newServings The new number of servings.
+   */
   fun changeServings(newServings: String) {
     _servings.value = newServings
     _servingsError.value =
@@ -123,7 +137,11 @@ constructor(
             R.string.amount_negative_error)
   }
 
-  // Function that allows us to change the time
+  /**
+   * Function that allows us to change the time.
+   *
+   * @param newTime The new time for the recipe.
+   */
   fun changeTime(newTime: String) {
     _time.value = newTime
     _timeError.value =
@@ -134,7 +152,11 @@ constructor(
             R.string.time_negative_error)
   }
 
-  // Function that allows us to change the ingredient name
+  /**
+   * Function that allows us to change the ingredient name.
+   *
+   * @param newIngredientName The new name for the ingredient.
+   */
   fun changeIngredientName(newIngredientName: String) {
     _ingredientName.value = newIngredientName
     _ingredientNameError.value =
@@ -144,7 +166,11 @@ constructor(
             R.string.ingredient_name_invalid_error)
   }
 
-  // Function that allows us to change the amount of an ingredient
+  /**
+   * Function that allows us to change the amount of an ingredient.
+   *
+   * @param newIngredientQuantityAmount The new quantity amount for the ingredient.
+   */
   fun changeIngredientQuantityAmount(newIngredientQuantityAmount: String) {
     _ingredientQuantityAmount.value = newIngredientQuantityAmount
     _ingredientQuantityAmountError.value =
@@ -155,12 +181,16 @@ constructor(
             R.string.ingredient_quantity_negative_error)
   }
 
-  // Function that allows us to change the unit of the ingredient
+  /**
+   * Function that allows us to change the unit of the ingredient.
+   *
+   * @param newUnit The new unit for the ingredient.
+   */
   fun changeIngredientQuantityUnit(newUnit: FoodUnit) {
     _ingredientQuantityUnit.value = newUnit
   }
 
-  // Function to validate all ingredient fields when the Add button is clicked
+  /** Function to validate all ingredient fields when the Add button is clicked. */
   fun validateAllIngredientFieldsWhenAddButton() {
     _ingredientNameError.value =
         validateString(
@@ -177,7 +207,7 @@ constructor(
         (_ingredientNameError.value != null) || (_ingredientQuantityAmountError.value != null)
   }
 
-  // Function to validate all fields when the Submit button is clicked
+  /** Function to validate all fields when the Submit button is clicked. */
   fun validateAllFieldsWhenSubmitButton() {
     _titleError.value =
         validateString(
@@ -205,7 +235,7 @@ constructor(
             _ingredientsError.value
   }
 
-  // Function to create a new ingredient
+  /** Function to create a new ingredient. */
   fun createNewIngredient() {
     _showIngredientDialog.value = true
     _ingredientName.value = ""
@@ -213,12 +243,16 @@ constructor(
     _ingredientQuantityUnit.value = FoodUnit.GRAM
   }
 
-  // Function to close the pop-up dialog
+  /** Function to close the pop-up dialog. */
   fun closeIngredientDialog() {
     _showIngredientDialog.value = false
   }
 
-  // Function to add a new ingredient to the list
+  /**
+   * Function to add a new ingredient to the list.
+   *
+   * @return True if the ingredient was added successfully, false otherwise.
+   */
   fun addNewIngredient(): Boolean {
     validateAllIngredientFieldsWhenAddButton()
     if (!_errorIngredient.value) {
@@ -233,20 +267,29 @@ constructor(
     return false
   }
 
-  // Function to remove an ingredient from the list
+  /**
+   * Function to remove an ingredient from the list.
+   *
+   * @param index The index of the ingredient to remove.
+   */
   fun removeIngredient(index: Int) {
     if (ingredients.value.isNotEmpty() && index < ingredients.value.size) {
       _ingredients.value = ingredients.value.toMutableList().apply { removeAt(index) }
     }
   }
 
-  // Function to create a new instruction
+  /** Function to create a new instruction. */
   fun createNewInstruction() {
     _instructions.value = instructions.value + ""
     _instructionError.value = instructionError.value + null
   }
 
-  // Function to modify an instruction
+  /**
+   * Function to modify an instruction.
+   *
+   * @param index The index of the instruction to modify.
+   * @param newInstruction The new instruction text.
+   */
   fun changeInstruction(index: Int, newInstruction: String) {
     val updatedInstructions =
         instructions.value.toMutableList().apply { this[index] = newInstruction }
@@ -263,7 +306,11 @@ constructor(
     validateInstructions()
   }
 
-  // Function to remove an instruction
+  /**
+   * Function to remove an instruction.
+   *
+   * @param index The index of the instruction to remove.
+   */
   fun removeInstruction(index: Int) {
     if (instructions.value.size > index) {
       _instructions.value = instructions.value.toMutableList().apply { removeAt(index) }
@@ -271,6 +318,11 @@ constructor(
     }
   }
 
+  /**
+   * Function to add a new recipe.
+   *
+   * @param showToast Function to show a toast message.
+   */
   suspend fun addNewRecipe(showToast: (Int) -> Unit) {
     validateAllFieldsWhenSubmitButton()
     if (_error.value) {
@@ -293,6 +345,7 @@ constructor(
     userRepository.addRecipeUID(newRecipeUid)
   }
 
+  /** Function to change the state of unit expansion. */
   fun changeUnitExpanded() {
     unitExpanded = !unitExpanded
   }
