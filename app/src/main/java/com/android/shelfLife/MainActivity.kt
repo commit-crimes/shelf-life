@@ -20,10 +20,10 @@ import com.android.shelfLife.ui.leaderboard.LeaderboardScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
-import com.android.shelfLife.ui.newoverview.ChooseFoodItem
-import com.android.shelfLife.ui.newoverview.FirstFoodItem
 import com.android.shelfLife.ui.overview.AddFoodItemScreen
+import com.android.shelfLife.ui.overview.ChooseFoodItem
 import com.android.shelfLife.ui.overview.EditFoodItemScreen
+import com.android.shelfLife.ui.overview.FirstFoodItem
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
 import com.android.shelfLife.ui.overview.HouseHoldCreationScreen
 import com.android.shelfLife.ui.overview.IndividualFoodItemScreen
