@@ -11,8 +11,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.StateFlow
 
 @HiltViewModel
 class ProfileScreenViewModel

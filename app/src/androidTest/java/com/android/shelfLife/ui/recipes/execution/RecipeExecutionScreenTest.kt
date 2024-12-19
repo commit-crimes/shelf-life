@@ -35,174 +35,173 @@ import org.mockito.kotlin.*
 @HiltAndroidTest
 class RecipeExecutionScreenTest {
 
-    @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
+  @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
 
-    // Compose rule for testing UI
-    @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
+  // Compose rule for testing UI
+  @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
 
-    @Inject lateinit var houseHoldRepository: HouseHoldRepository
-    @Inject lateinit var foodItemRepository: FoodItemRepository
-    @Inject lateinit var userRepository: UserRepository
-    @Inject lateinit var recipeRepository: RecipeRepository
+  @Inject lateinit var houseHoldRepository: HouseHoldRepository
+  @Inject lateinit var foodItemRepository: FoodItemRepository
+  @Inject lateinit var userRepository: UserRepository
+  @Inject lateinit var recipeRepository: RecipeRepository
 
-    private lateinit var instrumentationContext: android.content.Context
-    private lateinit var navigationActions: NavigationActions
+  private lateinit var instrumentationContext: android.content.Context
+  private lateinit var navigationActions: NavigationActions
 
-    // Mocked Flows
-    private val userFlow = MutableStateFlow<User?>(null)
-    private val selectedHouseholdFlow = MutableStateFlow<HouseHold?>(null)
-    private val foodItemsFlow = MutableStateFlow<List<FoodItem>>(emptyList())
-    private val selectedRecipeFlow = MutableStateFlow<Recipe?>(null)
+  // Mocked Flows
+  private val userFlow = MutableStateFlow<User?>(null)
+  private val selectedHouseholdFlow = MutableStateFlow<HouseHold?>(null)
+  private val foodItemsFlow = MutableStateFlow<List<FoodItem>>(emptyList())
+  private val selectedRecipeFlow = MutableStateFlow<Recipe?>(null)
 
-    @Before
-    fun setUp() {
-        hiltRule.inject()
-        navigationActions = mock()
-        instrumentationContext = InstrumentationRegistry.getInstrumentation().context
+  @Before
+  fun setUp() {
+    hiltRule.inject()
+    navigationActions = mock()
+    instrumentationContext = InstrumentationRegistry.getInstrumentation().context
 
-        // Provide a user
-        val realUser =
-            User(
-                uid = "currentUserId",
-                username = "Current User",
-                email = "user@example.com",
-                photoUrl = null,
-                householdUIDs = listOf("household123"),
-                selectedHouseholdUID = "household123",
-                recipeUIDs = emptyList())
-        userFlow.value = realUser
-        whenever(userRepository.user).thenReturn(userFlow.asStateFlow())
+    // Provide a user
+    val realUser =
+        User(
+            uid = "currentUserId",
+            username = "Current User",
+            email = "user@example.com",
+            photoUrl = null,
+            householdUIDs = listOf("household123"),
+            selectedHouseholdUID = "household123",
+            recipeUIDs = emptyList())
+    userFlow.value = realUser
+    whenever(userRepository.user).thenReturn(userFlow.asStateFlow())
 
-        // Provide a selected household
-        val exampleSelectedHousehold =
-            HouseHold(
-                uid = "household123",
-                name = "Example Household",
-                members = listOf("currentUserId", "member2"),
-                sharedRecipes = emptyList(),
-                ratPoints = mapOf("currentUserId" to 10),
-                stinkyPoints = mapOf("member2" to 5))
-        selectedHouseholdFlow.value = exampleSelectedHousehold
-        whenever(houseHoldRepository.selectedHousehold).thenReturn(selectedHouseholdFlow.asStateFlow())
+    // Provide a selected household
+    val exampleSelectedHousehold =
+        HouseHold(
+            uid = "household123",
+            name = "Example Household",
+            members = listOf("currentUserId", "member2"),
+            sharedRecipes = emptyList(),
+            ratPoints = mapOf("currentUserId" to 10),
+            stinkyPoints = mapOf("member2" to 5))
+    selectedHouseholdFlow.value = exampleSelectedHousehold
+    whenever(houseHoldRepository.selectedHousehold).thenReturn(selectedHouseholdFlow.asStateFlow())
 
-        // Provide food items
-        val testFoodItem =
-            FoodItem(
-                uid = "foodItem1",
-                foodFacts =
+    // Provide food items
+    val testFoodItem =
+        FoodItem(
+            uid = "foodItem1",
+            foodFacts =
                 FoodFacts(
                     name = "Apple",
                     barcode = "123456789",
                     quantity = Quantity(5.0, FoodUnit.COUNT),
                     category = FoodCategory.FRUIT,
                     nutritionFacts = NutritionFacts()),
-                expiryDate = null,
-                owner = "currentUserId")
-        foodItemsFlow.value = listOf(testFoodItem)
-        whenever(foodItemRepository.foodItems).thenReturn(foodItemsFlow.asStateFlow())
+            expiryDate = null,
+            owner = "currentUserId")
+    foodItemsFlow.value = listOf(testFoodItem)
+    whenever(foodItemRepository.foodItems).thenReturn(foodItemsFlow.asStateFlow())
 
-        val testRecipe =
-            Recipe(
-                uid = "recipe123",
-                name = "Test Recipe",
-                instructions = listOf("Step 1: Do something", "Step 2: Do something else"),
-                servings = 2f,
-                time = Duration.ZERO, // Provide a valid Duration
-                ingredients =
+    val testRecipe =
+        Recipe(
+            uid = "recipe123",
+            name = "Test Recipe",
+            instructions = listOf("Step 1: Do something", "Step 2: Do something else"),
+            servings = 2f,
+            time = Duration.ZERO, // Provide a valid Duration
+            ingredients =
                 listOf(
                     Ingredient(
                         name = "Apple",
                         quantity = Quantity(2.0, FoodUnit.COUNT) // Provide Quantity and FoodUnit
-                    )),
-                recipeType = RecipeType.PERSONAL, // optional since it defaults to PERSONAL
-                workInProgress = false)
-        selectedRecipeFlow.value = testRecipe
-        whenever(recipeRepository.selectedRecipe).thenReturn(selectedRecipeFlow.asStateFlow())
+                        )),
+            recipeType = RecipeType.PERSONAL, // optional since it defaults to PERSONAL
+            workInProgress = false)
+    selectedRecipeFlow.value = testRecipe
+    whenever(recipeRepository.selectedRecipe).thenReturn(selectedRecipeFlow.asStateFlow())
 
-        // Since we use hiltViewModel in the UI,
-        // the ExecuteRecipeViewModel will be constructed with these flows
+    // Since we use hiltViewModel in the UI,
+    // the ExecuteRecipeViewModel will be constructed with these flows
+  }
+
+  private fun setContent() {
+    composeTestRule.setContent {
+      // The UI we want to test is RecipeExecutionScreen
+      RecipeExecutionScreen(navigationActions = navigationActions)
     }
+    composeTestRule.waitForIdle()
+  }
 
-    private fun setContent() {
-        composeTestRule.setContent {
-            // The UI we want to test is RecipeExecutionScreen
-            RecipeExecutionScreen(navigationActions = navigationActions)
-        }
-        composeTestRule.waitForIdle()
-    }
+  @Test
+  fun recipeExecutionScreen_initiallyShowsServingsScreen() {
+    setContent()
 
-    @Test
-    fun recipeExecutionScreen_initiallyShowsServingsScreen() {
-        setContent()
+    // Initially we should be in RecipeExecutionState.SelectServings
+    // Check that the ServingsScreen is displayed
+    composeTestRule.onNodeWithTag("servingsScreen").assertIsDisplayed()
+    // There's a Next FAB to proceed
+    composeTestRule.onNodeWithTag("nextFab").assertIsDisplayed()
+  }
 
-        // Initially we should be in RecipeExecutionState.SelectServings
-        // Check that the ServingsScreen is displayed
-        composeTestRule.onNodeWithTag("servingsScreen").assertIsDisplayed()
-        // There's a Next FAB to proceed
-        composeTestRule.onNodeWithTag("nextFab").assertIsDisplayed()
-    }
+  @Test
+  fun recipeExecutionScreen_canNavigateToSelectFoodItems() {
+    setContent()
 
-    @Test
-    fun recipeExecutionScreen_canNavigateToSelectFoodItems() {
-        setContent()
+    // Click Next on ServingsScreen
+    composeTestRule.onNodeWithTag("nextFab").performClick()
 
-        // Click Next on ServingsScreen
-        composeTestRule.onNodeWithTag("nextFab").performClick()
+    // Now we should be on SelectFoodItemsForIngredientScreen
+    // It shows a top bar with "Select Items for Apple" (the ingredient)
+    composeTestRule.onNodeWithText("Select Items for Apple").assertIsDisplayed()
+    // "Done" button is the FAB to move on
+    composeTestRule.onNodeWithText("Done").assertIsDisplayed()
+  }
 
-        // Now we should be on SelectFoodItemsForIngredientScreen
-        // It shows a top bar with "Select Items for Apple" (the ingredient)
-        composeTestRule.onNodeWithText("Select Items for Apple").assertIsDisplayed()
-        // "Done" button is the FAB to move on
-        composeTestRule.onNodeWithText("Done").assertIsDisplayed()
-    }
+  @Test
+  fun recipeExecutionScreen_selectFoodItemsAndGoToInstructions() {
+    setContent()
 
-    @Test
-    fun recipeExecutionScreen_selectFoodItemsAndGoToInstructions() {
-        setContent()
+    // Move from ServingsScreen to SelectFoodItemsForIngredientScreen
+    composeTestRule.onNodeWithTag("nextFab").performClick()
 
-        // Move from ServingsScreen to SelectFoodItemsForIngredientScreen
-        composeTestRule.onNodeWithTag("nextFab").performClick()
+    // On SelectFoodItemsForIngredientScreen, we have one Apple item:
+    composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
 
-        // On SelectFoodItemsForIngredientScreen, we have one Apple item:
-        composeTestRule.onNodeWithText("Apple").assertIsDisplayed()
+    // Expand Apple card by clicking on it
+    composeTestRule.onNodeWithText("Apple").performClick()
 
-        // Expand Apple card by clicking on it
-        composeTestRule.onNodeWithText("Apple").performClick()
+    // A slider for amount should appear if expanded, but no test tags provided.
+    // We'll assume clicking on Apple toggles expansion and we trust that logic.
+    // For now, just click "Done"
+    composeTestRule.onNodeWithText("Done").performClick()
 
-        // A slider for amount should appear if expanded, but no test tags provided.
-        // We'll assume clicking on Apple toggles expansion and we trust that logic.
-        // For now, just click "Done"
-        composeTestRule.onNodeWithText("Done").performClick()
+    // Now we should be on InstructionScreen
+    composeTestRule.onNodeWithTag("instructionScreen").assertIsDisplayed()
 
-        // Now we should be on InstructionScreen
-        composeTestRule.onNodeWithTag("instructionScreen").assertIsDisplayed()
+    // The first instruction "Step 1: Do something" should appear
+    composeTestRule.onNodeWithText("Step 1: Do something").assertIsDisplayed()
+  }
 
-        // The first instruction "Step 1: Do something" should appear
-        composeTestRule.onNodeWithText("Step 1: Do something").assertIsDisplayed()
-    }
+  @Test
+  fun recipeExecutionScreen_instructionsCanNavigateNextAndFinish() {
+    setContent()
 
-    @Test
-    fun recipeExecutionScreen_instructionsCanNavigateNextAndFinish() {
-        setContent()
+    // Move to SelectFoodItemsForIngredientScreen
+    composeTestRule.onNodeWithTag("nextFab").performClick()
+    // Move to InstructionScreen by "Done" on SelectFood
+    composeTestRule.onNodeWithText("Done").performClick()
 
-        // Move to SelectFoodItemsForIngredientScreen
-        composeTestRule.onNodeWithTag("nextFab").performClick()
-        // Move to InstructionScreen by "Done" on SelectFood
-        composeTestRule.onNodeWithText("Done").performClick()
+    // Initially on Step 1
+    composeTestRule.onNodeWithText("Step 1: Do something").assertIsDisplayed()
 
-        // Initially on Step 1
-        composeTestRule.onNodeWithText("Step 1: Do something").assertIsDisplayed()
+    // Click Next to go to Step 2
+    composeTestRule.onNodeWithTag("nextButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("Step 2: Do something else").assertIsDisplayed()
 
-        // Click Next to go to Step 2
-        composeTestRule.onNodeWithTag("nextButton").assertIsDisplayed().performClick()
-        composeTestRule.onNodeWithText("Step 2: Do something else").assertIsDisplayed()
+    // Click Finish to complete
+    composeTestRule.onNodeWithTag("finishButton").assertIsDisplayed().performClick()
 
-        // Click Finish to complete
-        composeTestRule.onNodeWithTag("finishButton").assertIsDisplayed().performClick()
-
-        // On finish, it navigates back twice and goes to OVERVIEW
-        verify(navigationActions, times(2)).goBack()
-        verify(navigationActions).navigateTo(TopLevelDestinations.OVERVIEW)
-    }
+    // On finish, it navigates back twice and goes to OVERVIEW
+    verify(navigationActions, times(2)).goBack()
+    verify(navigationActions).navigateTo(TopLevelDestinations.OVERVIEW)
+  }
 }
-

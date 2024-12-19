@@ -80,7 +80,8 @@ class FoodInputContentTest {
 
   private fun createViewModel(): FoodItemViewModel {
     // After all flows and mocks are set, create the viewModel
-    return FoodItemViewModel(foodItemRepository, userRepository, foodFactsRepository = foodFactsRepository)
+    return FoodItemViewModel(
+        foodItemRepository, userRepository, foodFactsRepository = foodFactsRepository)
   }
 
   // Helper to set content and return callbacks spies
