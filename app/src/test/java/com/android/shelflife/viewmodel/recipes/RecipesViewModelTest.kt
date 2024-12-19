@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.Quantity
-import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.household.HouseHold
 import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.recipe.Ingredient
