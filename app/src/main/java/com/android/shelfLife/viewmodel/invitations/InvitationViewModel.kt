@@ -27,9 +27,9 @@ constructor(
 
   init {
     viewModelScope.launch {
-        userRepo.invitations.collect { invitationUIDs ->
-          _invitations.value = invitationRepository.getInvitationsBatch(invitationUIDs)
-        }
+      userRepo.invitations.collect { invitationUIDs ->
+        _invitations.value = invitationRepository.getInvitationsBatch(invitationUIDs)
+      }
     }
   }
 
