@@ -26,7 +26,7 @@ interface HouseHoldRepository {
    * @param listOfHouseHoldUid - List of household UIDs to fetch.
    * @return List of households corresponding to the provided UIDs.
    */
-  suspend fun getHouseholds(listOfHouseHoldUid: List<String>): List<HouseHold>
+  suspend fun getHousehold(householdId: String)
 
   /** Adds a new household to the repository. */
   fun addHousehold(household: HouseHold)

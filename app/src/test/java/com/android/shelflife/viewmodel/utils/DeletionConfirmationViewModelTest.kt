@@ -266,5 +266,4 @@ class DeletionConfirmationViewModelTest {
         verify(userRepository, never()).selectHousehold(any())
         verify(foodItemRepository, never()).getFoodItems(any())
       }
-
 }

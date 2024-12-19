@@ -49,22 +49,17 @@ constructor(
     return _households.value.any { it.name == houseHoldName }
   }
 
-  override suspend fun getHouseholds(listOfHouseHoldUid: List<String>): List<HouseHold> {
-    if (listOfHouseHoldUid.isEmpty()) {
-      return emptyList()
-    }
-    return try {
+  override suspend fun getHousehold(householdId: String) {
+    try {
       val querySnapshot =
           db.collection(collectionPath)
-              .whereIn(FieldPath.documentId(), listOfHouseHoldUid)
+              .whereIn(FieldPath.documentId(), listOf(householdId))
               .get()
               .await()
-
-      val fetchedHouseholds = querySnapshot.documents.mapNotNull { convertToHousehold(it) }
-      fetchedHouseholds
+      val household = querySnapshot.documents.mapNotNull { convertToHousehold(it) }
+      _households.value = _households.value.plus(household)
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error fetching households", e)
-      emptyList()
     }
   }
 
@@ -285,12 +280,12 @@ constructor(
         }
   }
 
-    override fun deleteHouseholdFromLocalList(householdId: String) {
-        val currentHouseholds = _households.value.filterNot { it.uid == householdId }
-        _households.value = currentHouseholds
-    }
+  override fun deleteHouseholdFromLocalList(householdId: String) {
+    val currentHouseholds = _households.value.filterNot { it.uid == householdId }
+    _households.value = currentHouseholds
+  }
 
-    /**
+  /**
    * Converts a Firestore document to a HouseHold object.
    *
    * @param doc The Firestore document to convert.

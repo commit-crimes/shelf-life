@@ -67,6 +67,9 @@ constructor(private val db: FirebaseFirestore, private val auth: FirebaseAuth) :
   }
 
   override suspend fun getInvitationsBatch(invitationUIDs: List<String>): List<Invitation> {
+    if (invitationUIDs.isEmpty()) {
+      return emptyList()
+    }
     val querySnapshot =
         db.collection("invitations").whereIn(FieldPath.documentId(), invitationUIDs).get().await()
     return querySnapshot.documents.mapNotNull { doc -> convertToInvitation(doc) }
