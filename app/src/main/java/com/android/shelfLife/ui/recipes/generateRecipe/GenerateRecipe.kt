@@ -12,12 +12,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -40,10 +42,10 @@ import kotlin.math.floor
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenerateRecipeScreen(
-    navigationActions: NavigationActions,
-    viewModel: RecipeGenerationViewModel = hiltViewModel(),
+  navigationActions: NavigationActions,
+  viewModel: RecipeGenerationViewModel = hiltViewModel(),
+  navController: NavHostController = rememberNavController(),
 ) {
-  val navController = rememberNavController()
 
   Scaffold(
       topBar = {
@@ -70,7 +72,10 @@ fun GenerateRecipeScreen(
             modifier = Modifier.padding(paddingValues).padding(16.dp),
         ) {
           composable("input") {
-            RecipeInputStep(viewModel = viewModel, onNext = { navController.navigate("selection") })
+            RecipeInputStep(
+                viewModel = viewModel,
+                onNext = { navController.navigate("selection") },
+                onBack = { navigationActions.goBack() })
           }
           composable("selection") {
             FoodSelectionStep(
@@ -95,7 +100,7 @@ fun GenerateRecipeScreen(
 }
 
 @Composable
-fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit) {
+fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit, onBack: () -> Unit) {
   val recipePrompt by viewModel.recipePrompt.collectAsState()
   val context = LocalContext.current
   val expanded = rememberSaveable { mutableStateOf(false) }
@@ -117,7 +122,7 @@ fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit) {
       bottomBar = {
         Row(verticalAlignment = Alignment.Bottom) {
           CustomButtons(
-              button1OnClick = {},
+              button1OnClick = { onBack() },
               button1TestTag = "cancelButton",
               button1Text = stringResource(id = R.string.cancel_button),
               button2OnClick = {
@@ -205,7 +210,9 @@ fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit) {
                     if (localShortDuration) "Short" else "Long",
                     modifier = Modifier.padding(end = 8.dp))
                 Switch(
-                    checked = !localShortDuration, onCheckedChange = { localShortDuration = !it })
+                    checked = !localShortDuration,
+                    onCheckedChange = { localShortDuration = !it },
+                    modifier = Modifier.testTag("shortLongDurationSwitch"))
               }
 
           // Toggle for only household items
@@ -215,7 +222,8 @@ fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit) {
                 Text("Only household ingredients", modifier = Modifier.weight(1f))
                 Switch(
                     checked = localOnlyHouseHoldItems,
-                    onCheckedChange = { localOnlyHouseHoldItems = it })
+                    onCheckedChange = { localOnlyHouseHoldItems = it },
+                    modifier = Modifier.testTag("onlyHouseholdItemsSwitch"))
               }
 
           // Toggle for prioritise soon to expire
@@ -225,7 +233,8 @@ fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit) {
                 Text("Use expiring ingredients first", modifier = Modifier.weight(1f))
                 Switch(
                     checked = localPrioritiseSoonToExpire,
-                    onCheckedChange = { localPrioritiseSoonToExpire = it })
+                    onCheckedChange = { localPrioritiseSoonToExpire = it },
+                    modifier = Modifier.testTag("prioritiseExpiringItemsSwitch"))
               }
         }
       }
@@ -483,7 +492,7 @@ fun CompletionStep(
                             )
                         // Loading Spinner
                         CircularProgressIndicator(
-                            modifier = Modifier.size(64.dp), // Visible size
+                            modifier = Modifier.size(64.dp).testTag("loadingSpinner"), // Visible size
                             strokeWidth = 6.dp // Thicker for better visibility
                             )
                       }
