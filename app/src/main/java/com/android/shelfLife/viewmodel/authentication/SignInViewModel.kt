@@ -20,16 +20,26 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+/**
+ * ViewModel responsible for handling user sign-in and authentication.
+ *
+ * @property firebaseAuth The FirebaseAuth instance used for authentication.
+ * @property userRepository Repository for user-related data.
+ * @property householdRepository Repository for household-related data.
+ * @property recipeRepository Repository for recipe-related data.
+ * @property foodItemRepository Repository for food item-related data.
+ * @property appContext The application context.
+ */
 @HiltViewModel
 class SignInViewModel
 @Inject
 constructor(
-    private val firebaseAuth: FirebaseAuth,
-    private val userRepository: UserRepository,
-    private val householdRepository: HouseHoldRepository,
-    private val recipeRepository: RecipeRepository,
-    private val foodItemRepository: FoodItemRepository,
-    @ApplicationContext private val appContext: Context
+  private val firebaseAuth: FirebaseAuth,
+  private val userRepository: UserRepository,
+  private val householdRepository: HouseHoldRepository,
+  private val recipeRepository: RecipeRepository,
+  private val foodItemRepository: FoodItemRepository,
+  @ApplicationContext private val appContext: Context
 ) : ViewModel() {
 
   private val _signInState = MutableStateFlow<SignInState>(SignInState.Idle)
@@ -41,12 +51,12 @@ constructor(
   val bypassLogin = userRepository.bypassLogin
 
   private val authStateListener =
-      FirebaseAuth.AuthStateListener { auth ->
-        Log.d("SignInViewModel", "AuthStateListener triggered, user: ${auth.currentUser}")
-        if (auth.currentUser == null) {
-          _isUserLoggedIn.value = false
-        }
+    FirebaseAuth.AuthStateListener { auth ->
+      Log.d("SignInViewModel", "AuthStateListener triggered, user: ${auth.currentUser}")
+      if (auth.currentUser == null) {
+        _isUserLoggedIn.value = false
       }
+    }
 
   init {
     firebaseAuth.addAuthStateListener(authStateListener)
@@ -58,11 +68,16 @@ constructor(
     }
   }
 
+  /**
+   * Populates the model data by initializing user, household, food item, and recipe data.
+   *
+   * @param context The context used for initialization.
+   */
   private suspend fun populateModelData(context: Context) {
     userRepository.initializeUserData(context)
     householdRepository.initializeHouseholds(
-        userRepository.user.value?.householdUIDs ?: emptyList(),
-        userRepository.user.value?.selectedHouseholdUID)
+      userRepository.user.value?.householdUIDs ?: emptyList(),
+      userRepository.user.value?.selectedHouseholdUID)
     userRepository.user.value?.selectedHouseholdUID?.let { foodItemRepository.getFoodItems(it) }
     userRepository.user.value?.let { recipeRepository.initializeRecipes(it.recipeUIDs, null) }
   }
@@ -73,6 +88,12 @@ constructor(
     firebaseAuth.removeAuthStateListener(authStateListener)
   }
 
+  /**
+   * Signs in the user with Google using the provided ID token.
+   *
+   * @param idToken The ID token from Google Sign-In.
+   * @param context The context used for initialization.
+   */
   fun signInWithGoogle(idToken: String, context: Context) {
     Log.d("SignInViewModel", "signInWithGoogle called")
 
@@ -92,14 +113,20 @@ constructor(
     }
   }
 
+  /**
+   * Signs out the current user and clears the authentication state.
+   *
+   * @param context The context used for sign-out.
+   * @param onSignOutComplete Callback function invoked when sign-out is complete.
+   */
   fun signOutUser(context: Context, onSignOutComplete: () -> Unit) {
     val googleSignInClient =
-        GoogleSignIn.getClient(
-            context,
-            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(context.getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build())
+      GoogleSignIn.getClient(
+        context,
+        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+          .requestIdToken(context.getString(R.string.default_web_client_id))
+          .requestEmail()
+          .build())
 
     googleSignInClient.signOut().addOnCompleteListener { task ->
       if (task.isSuccessful) {
@@ -111,19 +138,37 @@ constructor(
     }
   }
 
+  /**
+   * Sets the sign-in success state for testing purposes.
+   *
+   * @param authResult The AuthResult to set as the success state.
+   */
   fun setSignInSuccessStateForTesting(authResult: AuthResult) {
     _signInState.value = SignInState.Success(authResult = authResult)
   }
 
+  /**
+   * Sets the sign-in state for testing purposes.
+   *
+   * @param state The SignInState to set.
+   */
   fun setSignInStateForTesting(state: SignInState) {
     _signInState.value = state
   }
 
+  /**
+   * Sets the user logged-in state for testing purposes.
+   *
+   * @param isLoggedIn Boolean indicating if the user is logged in.
+   */
   fun setIsUserLoggedInForTesting(isLoggedIn: Boolean) {
     _isUserLoggedIn.value = isLoggedIn
   }
 }
 
+/**
+ * Represents the different states of the sign-in process.
+ */
 sealed class SignInState {
   object Idle : SignInState()
 

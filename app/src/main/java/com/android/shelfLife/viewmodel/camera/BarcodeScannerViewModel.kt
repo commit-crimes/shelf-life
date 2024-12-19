@@ -14,14 +14,15 @@ import kotlinx.coroutines.flow.StateFlow
 /**
  * ViewModel for managing the barcode scanner screen.
  *
- * @property application The application context
+ * @property foodFactsRepository Repository for accessing food facts data.
+ * @property permissionRepository Repository for managing permissions.
  */
 @HiltViewModel
 class BarcodeScannerViewModel
 @Inject
 constructor(
-    private val foodFactsRepository: FoodFactsRepository,
-    private val permissionRepository: PermissionRepository
+  private val foodFactsRepository: FoodFactsRepository,
+  private val permissionRepository: PermissionRepository
 ) : ViewModel() {
 
   private val permissionRequested = permissionRepository.permissionRequested
@@ -37,14 +38,25 @@ constructor(
     }
   }
 
+  /**
+   * Initiates a search for food facts by barcode.
+   *
+   * @param barcode The barcode to search for.
+   */
   fun searchByBarcode(barcode: Long) {
     foodFactsRepository.searchByBarcode(barcode)
   }
 
+  /**
+   * Resets the search status to its initial state.
+   */
   fun resetSearchStatus() {
     foodFactsRepository.resetSearchStatus()
   }
 
+  /**
+   * Sets the search status to failure.
+   */
   fun setFailureStatus() {
     foodFactsRepository.setFailureStatus()
   }
@@ -55,9 +67,9 @@ constructor(
   }
 
   /**
-   * Requests the camera permission.
+   * Handles the result of the camera permission request.
    *
-   * @param isGranted boolean indicating if the permission is granted
+   * @param isGranted Boolean indicating if the permission is granted.
    */
   fun onPermissionResult(isGranted: Boolean) {
     permissionRepository.onPermissionResult(isGranted)

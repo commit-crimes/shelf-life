@@ -13,13 +13,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+/**
+ * ViewModel for managing invitations.
+ *
+ * @property invitationRepository Repository for accessing invitation data.
+ * @property userRepo Repository for accessing user data.
+ * @property houseHoldRepo Repository for accessing household data.
+ */
 @HiltViewModel
 class InvitationViewModel
 @Inject
 constructor(
-    private val invitationRepository: InvitationRepository,
-    private val userRepo: UserRepository,
-    private val houseHoldRepo: HouseHoldRepository
+  private val invitationRepository: InvitationRepository,
+  private val userRepo: UserRepository,
+  private val houseHoldRepo: HouseHoldRepository
 ) : ViewModel() {
 
   private val _invitations = MutableStateFlow<List<Invitation>>(emptyList())
@@ -33,22 +40,35 @@ constructor(
     }
   }
 
+  /**
+   * Accepts an invitation and updates the user's household data.
+   *
+   * @param selectedInvitation The invitation to accept.
+   */
   suspend fun acceptInvitation(selectedInvitation: Invitation) {
     userRepo.deleteInvitationUID(selectedInvitation.invitationId)
     invitationRepository.acceptInvitation(selectedInvitation)
     userRepo.addCurrentUserToHouseHold(
-        selectedInvitation.householdId, selectedInvitation.invitedUserId)
+      selectedInvitation.householdId, selectedInvitation.invitedUserId)
     houseHoldRepo.getHousehold(selectedInvitation.householdId)
     Log.d("InvitationViewModel", "before adding new household to user : ${userRepo.user.value}")
     refreshInvitations()
   }
 
+  /**
+   * Declines an invitation and updates the invitation list.
+   *
+   * @param selectedInvitation The invitation to decline.
+   */
   suspend fun declineInvitation(selectedInvitation: Invitation) {
     userRepo.deleteInvitationUID(selectedInvitation.invitationId)
     invitationRepository.declineInvitation(selectedInvitation)
     refreshInvitations()
   }
 
+  /**
+   * Refreshes the list of invitations.
+   */
   internal suspend fun refreshInvitations() {
     val invitationUIDs = userRepo.invitations.value
     if (invitationUIDs.isNotEmpty()) {
