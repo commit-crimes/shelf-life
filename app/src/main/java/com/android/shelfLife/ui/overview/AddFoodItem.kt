@@ -21,7 +21,6 @@ import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.ui.utils.DateField
 import com.android.shelfLife.ui.utils.FoodNameField
-import com.android.shelfLife.ui.utils.NewLocationDropdownField
 import com.android.shelfLife.ui.utils.UnitDropdownField
 import com.android.shelfLife.viewmodel.overview.FoodItemViewModel
 import kotlinx.coroutines.launch
@@ -100,7 +99,7 @@ fun AddFoodItemScreen(
             }
 
             item(key = "location") {
-                NewLocationDropdownField(
+                LocationDropdownField(
                     location = foodItemViewModel.location,
                     onLocationChange = { foodItemViewModel.location = it },
                     locationExpanded = foodItemViewModel.locationExpanded,
