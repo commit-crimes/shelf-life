@@ -53,5 +53,5 @@ interface FoodItemRepository {
 
   fun setisQuickAdd(value: Boolean)
 
-  suspend fun uploadImageToFirebaseStorage(uri: Uri, context: Context ):String?
+  suspend fun uploadImageToFirebaseStorage(uri: Uri, context: Context): String?
 }

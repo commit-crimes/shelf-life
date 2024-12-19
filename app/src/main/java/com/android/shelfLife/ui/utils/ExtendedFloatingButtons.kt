@@ -18,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.viewmodel.overview.FoodItemViewModel
@@ -45,11 +44,11 @@ fun ExtendedActionButtons(
           text = { Text(firstScreenText) },
           icon = { Icon(firstIcon, contentDescription = firstScreenText) },
           onClick = {
-              // Navigate to Generate Recipe screen
-              if(firstScreen == Screen.FIRST_FOOD_ITEM){
-                  foodItemViewModel!!.setIsQuickAdd(true)
-                  foodItemViewModel!!.resetSelectFoodItem()
-              }
+            // Navigate to Generate Recipe screen
+            if (firstScreen == Screen.FIRST_FOOD_ITEM) {
+              foodItemViewModel!!.setIsQuickAdd(true)
+              foodItemViewModel!!.resetSelectFoodItem()
+            }
             navigationActions.navigateTo(firstScreen)
             fabExpanded.value = false
           },
@@ -64,9 +63,9 @@ fun ExtendedActionButtons(
         onClick = {
           if (fabExpanded.value) {
             // Navigate to Add Recipe screen
-              if(secondScreen == Screen.ADD_FOOD){
-                  foodItemViewModel!!.setIsQuickAdd(false)
-              }
+            if (secondScreen == Screen.ADD_FOOD) {
+              foodItemViewModel!!.setIsQuickAdd(false)
+            }
             navigationActions.navigateTo(secondScreen)
             fabExpanded.value = false
           } else {
