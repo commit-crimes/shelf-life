@@ -12,6 +12,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -208,7 +209,9 @@ fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit, on
                     if (localShortDuration) "Short" else "Long",
                     modifier = Modifier.padding(end = 8.dp))
                 Switch(
-                    checked = !localShortDuration, onCheckedChange = { localShortDuration = !it })
+                    checked = !localShortDuration,
+                    onCheckedChange = { localShortDuration = !it },
+                    modifier = Modifier.testTag("shortLongDurationSwitch"))
               }
 
           // Toggle for only household items
@@ -218,7 +221,8 @@ fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit, on
                 Text("Only household ingredients", modifier = Modifier.weight(1f))
                 Switch(
                     checked = localOnlyHouseHoldItems,
-                    onCheckedChange = { localOnlyHouseHoldItems = it })
+                    onCheckedChange = { localOnlyHouseHoldItems = it },
+                    modifier = Modifier.testTag("onlyHouseholdItemsSwitch"))
               }
 
           // Toggle for prioritise soon to expire
@@ -228,7 +232,8 @@ fun RecipeInputStep(viewModel: RecipeGenerationViewModel, onNext: () -> Unit, on
                 Text("Use expiring ingredients first", modifier = Modifier.weight(1f))
                 Switch(
                     checked = localPrioritiseSoonToExpire,
-                    onCheckedChange = { localPrioritiseSoonToExpire = it })
+                    onCheckedChange = { localPrioritiseSoonToExpire = it },
+                    modifier = Modifier.testTag("prioritiseExpiringItemsSwitch"))
               }
         }
       }
