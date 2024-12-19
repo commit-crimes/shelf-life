@@ -688,7 +688,7 @@
             <mxPoint x="939" y="360" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="AiOB0Xk0WnozjZ-xZyYD-29" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Consume ingredients&lt;/h3&gt;&lt;h3 style=&quot;font-size: 15px;&quot;&gt;&lt;ul style=&quot;padding-left: 20px;&quot;&gt;&lt;li&gt;&lt;span style=&quot;font-size: 13px; text-align: left; background-color: initial; font-weight: normal;&quot;&gt;Foreach recipe ingredient, chose relevant household food item&lt;/span&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
+        <mxCell id="AiOB0Xk0WnozjZ-xZyYD-29" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Consume ingredients&lt;/h3&gt;&lt;h3 style=&quot;font-size: 15px;&quot;&gt;&lt;ul style=&quot;padding-left: 20px;&quot;&gt;&lt;li&gt;&lt;span style=&quot;font-size: 13px; text-align: left; background-color: initial; font-weight: normal;&quot;&gt;Foreach recipe ingredient, consume a relevant household food item&lt;/span&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;" vertex="1" parent="1">
           <mxGeometry x="845" y="334" width="190" height="108" as="geometry" />
         </mxCell>
         <mxCell id="AiOB0Xk0WnozjZ-xZyYD-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;sketch=1;curveFitting=1;jiggle=2;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="AiOB0Xk0WnozjZ-xZyYD-29">
