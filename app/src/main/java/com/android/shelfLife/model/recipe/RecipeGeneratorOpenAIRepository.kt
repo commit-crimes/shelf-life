@@ -187,44 +187,44 @@ class RecipeGeneratorOpenAIRepository @Inject constructor(private val openai: Op
                 toolChoice = ToolChoice.Auto // Automatically selects the tool
             }
 
-            // Send the request to OpenAI and retrieve the tool call response
-            val response = openai.chatCompletion(request)
-            val message = response.choices.firstOrNull()?.message
-            message?.toolCalls?.firstOrNull()?.let { toolCall ->
-                require(toolCall is ToolCall.Function) { "Tool call is not a function" }
-                val toolResponse = toolCall.execute()
-                // Construct the final Recipe object from the tool response
-                val generatedRecipe =
-                    Recipe(
-                        uid = "placeholder", // Placeholder UID
-                        name = recipePrompt.name,
-                        instructions = toolResponse["instructions"] as List<String>,
-                        servings = (toolResponse["servings"] as Int).toFloat(),
-                        time = (toolResponse["time"] as Long).minutes,
-                        workInProgress = true,
-                        ingredients =
-                        (toolResponse["ingredients"] as List<Map<String, Any>>).map { ingredient ->
-                            Ingredient(
-                                name = ingredient["name"] as String, // Access the map value for "name"
-                                quantity =
-                                Quantity(
-                                    amount =
-                                    ingredient["quantity"]
-                                            as Double, // Access the map value for "quantity"
-                                    unit =
-                                    ingredient["unit"]
-                                            as FoodUnit // Access the map value for "unit"
-                                ),
-                                macros = NutritionFacts() // Default macros
-                            )
-                        },
-                        recipeType = recipePrompt.recipeType)
-                return generatedRecipe // Return the generated recipe
-            } ?: return null
-        } catch (e: Exception) {
-            return null
-        }
+      // Send the request to OpenAI and retrieve the tool call response
+      val response = openai.chatCompletion(request)
+      val message = response.choices.firstOrNull()?.message
+      message?.toolCalls?.firstOrNull()?.let { toolCall ->
+        require(toolCall is ToolCall.Function) { "Tool call is not a function" }
+        val toolResponse = toolCall.execute()
+        // Construct the final Recipe object from the tool response
+        val generatedRecipe =
+            Recipe(
+                uid = "placeholder", // Placeholder UID
+                name = recipePrompt.name,
+                instructions = toolResponse["instructions"] as List<String>,
+                servings = (toolResponse["servings"] as Int).toFloat(),
+                time = (toolResponse["time"] as Long).seconds,
+                workInProgress = true,
+                ingredients =
+                    (toolResponse["ingredients"] as List<Map<String, Any>>).map { ingredient ->
+                      Ingredient(
+                          name = ingredient["name"] as String, // Access the map value for "name"
+                          quantity =
+                              Quantity(
+                                  amount =
+                                      ingredient["quantity"]
+                                          as Double, // Access the map value for "quantity"
+                                  unit =
+                                      ingredient["unit"]
+                                          as FoodUnit // Access the map value for "unit"
+                                  ),
+                          macros = NutritionFacts() // Default macros
+                          )
+                    },
+                recipeType = recipePrompt.recipeType)
+        return generatedRecipe // Return the generated recipe
+      } ?: return null
+    } catch (e: Exception) {
+      return null
     }
+  }
 
     private val availableFunctions = mapOf("_createRecipeFunction" to ::_createRecipeFunction)
 

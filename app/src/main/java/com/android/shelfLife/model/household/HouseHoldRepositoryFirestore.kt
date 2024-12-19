@@ -21,20 +21,20 @@ constructor(
     private val db: FirebaseFirestore,
 ) : HouseHoldRepository {
 
-    private val collectionPath = "households"
+  private val collectionPath = "households"
 
-    // Local cache for households
-    private val _households = MutableStateFlow<List<HouseHold>>(emptyList())
-    override val households: StateFlow<List<HouseHold>> = _households.asStateFlow()
+  // Local cache for households
+  private val _households = MutableStateFlow<List<HouseHold>>(emptyList())
+  override val households: StateFlow<List<HouseHold>> = _households.asStateFlow()
 
-    private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
-    override val selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
+  private val _selectedHousehold = MutableStateFlow<HouseHold?>(null)
+  override val selectedHousehold: StateFlow<HouseHold?> = _selectedHousehold.asStateFlow()
 
-    private val _householdToEdit = MutableStateFlow<HouseHold?>(null)
-    override val householdToEdit: StateFlow<HouseHold?> = _householdToEdit.asStateFlow()
+  private val _householdToEdit = MutableStateFlow<HouseHold?>(null)
+  override val householdToEdit: StateFlow<HouseHold?> = _householdToEdit.asStateFlow()
 
-    // Listener registration for real-time updates
-    private var householdsListenerRegistration: ListenerRegistration? = null
+  // Listener registration for real-time updates
+  private var householdsListenerRegistration: ListenerRegistration? = null
 
     /** Generates a new unique ID for a household. */
     override fun getNewUid(): String {
@@ -86,15 +86,18 @@ constructor(
                         return@addSnapshotListener
                     }
 
-                    val households =
-                        querySnapshot?.documents?.mapNotNull { convertToHousehold(it) } ?: emptyList()
-                    _households.value += households
-                    Log.d("HouseholdRepository", "Households: ${_households.value}")
-                }
-        } catch (e: Exception) {
-            Log.e("HouseholdRepository", "Error getting household", e)
-        }
+            val households =
+                querySnapshot?.documents?.mapNotNull { convertToHousehold(it) } ?: emptyList()
+
+            if (_households.value.contains(households.first())) {
+              _households.value += households.first()
+            }
+            Log.d("HouseholdRepository", "Households: ${_households.value}")
+          }
+    } catch (e: Exception) {
+      Log.e("HouseholdRepository", "Error getting household", e)
     }
+  }
 
     /**
      * Initializes households by fetching them from Firestore and updating the local cache.
