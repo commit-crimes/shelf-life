@@ -19,7 +19,7 @@ import kotlinx.coroutines.tasks.await
 
 @Singleton
 class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFirestore) :
-    RecipeRepository {
+  RecipeRepository {
 
   companion object {
     private const val COLLECTION_PATH = "recipes"
@@ -58,7 +58,7 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
     }
     try {
       val querySnapshot =
-          db.collection(COLLECTION_PATH).whereIn(FieldPath.documentId(), recipeIds).get().await()
+        db.collection(COLLECTION_PATH).whereIn(FieldPath.documentId(), recipeIds).get().await()
 
       val fetchedRecipes = querySnapshot.documents.mapNotNull { convertToRecipe(it) }
       _recipes.value = fetchedRecipes
@@ -83,10 +83,10 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
     }
     return try {
       val querySnapshot =
-          db.collection(COLLECTION_PATH)
-              .whereIn(FieldPath.documentId(), listUserRecipeUid)
-              .get()
-              .await()
+        db.collection(COLLECTION_PATH)
+          .whereIn(FieldPath.documentId(), listUserRecipeUid)
+          .get()
+          .await()
       querySnapshot.documents.mapNotNull { convertToRecipe(it) }
     } catch (e: Exception) {
       Log.e("RecipeRepository", "Error fetching recipes", e)
@@ -170,17 +170,17 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
 
     // Perform Firebase operation
     db.collection(COLLECTION_PATH)
-        .document(recipeId)
-        .delete()
-        .addOnSuccessListener { deleteUID(recipeId) }
-        .addOnFailureListener { exception ->
-          Log.e("RecipeRepository", "Error deleting recipe", exception)
-          // Rollback: Add the recipe back to the local cache
-          deletedRecipe?.let {
-            val rollbackRecipes = _recipes.value.toMutableList().apply { add(it) }
-            _recipes.value = rollbackRecipes
-          }
+      .document(recipeId)
+      .delete()
+      .addOnSuccessListener { deleteUID(recipeId) }
+      .addOnFailureListener { exception ->
+        Log.e("RecipeRepository", "Error deleting recipe", exception)
+        // Rollback: Add the recipe back to the local cache
+        deletedRecipe?.let {
+          val rollbackRecipes = _recipes.value.toMutableList().apply { add(it) }
+          _recipes.value = rollbackRecipes
         }
+      }
   }
 
   /**
@@ -208,19 +208,19 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
     }
 
     recipesListenerRegistration =
-        db.collection(COLLECTION_PATH)
-            .whereIn(FieldPath.documentId(), recipeIds)
-            .addSnapshotListener { snapshot, error ->
-              if (error != null) {
-                Log.e("RecipeRepository", "Error fetching recipes", error)
-                _recipes.value = emptyList()
-                return@addSnapshotListener
-              }
-              if (snapshot != null) {
-                val updatedRecipes = snapshot.documents.mapNotNull { convertToRecipe(it) }
-                _recipes.value = updatedRecipes
-              }
-            }
+      db.collection(COLLECTION_PATH)
+        .whereIn(FieldPath.documentId(), recipeIds)
+        .addSnapshotListener { snapshot, error ->
+          if (error != null) {
+            Log.e("RecipeRepository", "Error fetching recipes", error)
+            _recipes.value = emptyList()
+            return@addSnapshotListener
+          }
+          if (snapshot != null) {
+            val updatedRecipes = snapshot.documents.mapNotNull { convertToRecipe(it) }
+            _recipes.value = updatedRecipes
+          }
+        }
   }
 
   /** (Optional) Stops listening for real-time updates to recipes. */
@@ -243,13 +243,13 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
 
       Log.d("RecipeRepository", "Name of recipe: $name")
       Recipe(
-          uid = uid,
-          name = name,
-          instructions = instructions,
-          servings = servings,
-          time = time,
-          ingredients = ingredients.map { convertToIngredient(it) },
-          recipeType = convertToSearchType(recipeType))
+        uid = uid,
+        name = name,
+        instructions = instructions,
+        servings = servings,
+        time = time,
+        ingredients = ingredients.map { convertToIngredient(it) },
+        recipeType = convertToSearchType(recipeType))
     } catch (e: Exception) {
       Log.e("RecipeRepository", "Error converting document to Recipe", e)
       null
@@ -276,14 +276,14 @@ class RecipeRepositoryFirestore @Inject constructor(private val db: FirebaseFire
 
       val quantity = Quantity(amount = amount, unit = FoodUnit.valueOf(unit))
       val macros =
-          NutritionFacts(
-              energyKcal = (macrosMap["energyKcal"] as? Long)?.toInt() ?: 0,
-              fat = (macrosMap["fat"] as? Double) ?: 0.0,
-              saturatedFat = (macrosMap["saturatedFat"] as? Double) ?: 0.0,
-              carbohydrates = (macrosMap["carbohydrates"] as? Double) ?: 0.0,
-              sugars = (macrosMap["sugars"] as? Double) ?: 0.0,
-              proteins = (macrosMap["proteins"] as? Double) ?: 0.0,
-              salt = (macrosMap["salt"] as? Double) ?: 0.0)
+        NutritionFacts(
+          energyKcal = (macrosMap["energyKcal"] as? Long)?.toInt() ?: 0,
+          fat = (macrosMap["fat"] as? Double) ?: 0.0,
+          saturatedFat = (macrosMap["saturatedFat"] as? Double) ?: 0.0,
+          carbohydrates = (macrosMap["carbohydrates"] as? Double) ?: 0.0,
+          sugars = (macrosMap["sugars"] as? Double) ?: 0.0,
+          proteins = (macrosMap["proteins"] as? Double) ?: 0.0,
+          salt = (macrosMap["salt"] as? Double) ?: 0.0)
 
       Ingredient(name = name, quantity = quantity, macros = macros)
     } catch (e: Exception) {
