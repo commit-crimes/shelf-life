@@ -32,7 +32,7 @@ interface HouseHoldRepository {
   fun addHousehold(household: HouseHold)
 
   /** Updates an existing household in the repository. */
-  fun updateHousehold(household: HouseHold, function: (String) -> Unit = {})
+  fun updateHousehold(household: HouseHold, onSuccess: (String) -> Unit = {})
 
   /** Deletes a household by its unique ID. */
   fun deleteHouseholdById(id: String, onSuccess: (String) -> Unit = {})

@@ -125,7 +125,7 @@ constructor(
    *
    * @param household The household with updated data.
    */
-  override fun updateHousehold(household: HouseHold, function: (String) -> Unit) {
+  override fun updateHousehold(household: HouseHold, onSuccess: (String) -> Unit) {
     var originalItem: HouseHold? = null
     val householdData =
         mapOf(
@@ -153,7 +153,7 @@ constructor(
     db.collection(collectionPath)
         .document(household.uid)
         .set(householdData)
-        .addOnSuccessListener { function(household.uid) }
+        .addOnSuccessListener { onSuccess(household.uid) }
         .addOnFailureListener { exception ->
           Log.e("HouseholdRepository", "Error updating household", exception)
           // Rollback: Restore the original item in the local cache
