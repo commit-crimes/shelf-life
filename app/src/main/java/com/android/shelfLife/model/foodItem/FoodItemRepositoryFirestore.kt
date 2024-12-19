@@ -1,20 +1,19 @@
 package com.android.shelfLife.model.foodItem
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
-import androidx.compose.ui.platform.LocalContext
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
-import android.content.Context
-import android.net.Uri
 
 class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFirestore) :
     FoodItemRepository {
@@ -83,8 +82,7 @@ class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFi
     _isQuickAdd.value = value
   }
 
-
-    override fun setFoodItems(householdId: String, value: List<FoodItem>) {
+  override fun setFoodItems(householdId: String, value: List<FoodItem>) {
     try {
       // Update the local cache
       _foodItems.value = value
@@ -230,25 +228,25 @@ class FoodItemRepositoryFirestore @Inject constructor(private val db: FirebaseFi
             }
   }
 
+  override suspend fun uploadImageToFirebaseStorage(uri: Uri, context: Context): String? {
+    try {
+      // Create a reference to Firebase Storage
+      val storageReference =
+          FirebaseStorage.getInstance("gs://shelf-life-687aa.firebasestorage.app").reference
 
-    override suspend fun uploadImageToFirebaseStorage(uri: Uri, context: Context): String? {
-        try {
-            // Create a reference to Firebase Storage
-            val storageReference = FirebaseStorage.getInstance("gs://shelf-life-687aa.firebasestorage.app").reference
+      val fileName = "images/${System.currentTimeMillis()}.jpg"
+      val imageReference: StorageReference = storageReference.child(fileName)
 
-            val fileName = "images/${System.currentTimeMillis()}.jpg"
-            val imageReference: StorageReference = storageReference.child(fileName)
+      // Upload the file to Firebase Storage
+      imageReference.putFile(uri).await()
 
-            // Upload the file to Firebase Storage
-            imageReference.putFile(uri).await()
-
-            // Get the download URL
-            return imageReference.downloadUrl.await().toString()
-        } catch (e: Exception) {
-            Toast.makeText(context, "Error uploading image", Toast.LENGTH_SHORT).show()
-            return null
-        }
+      // Get the download URL
+      return imageReference.downloadUrl.await().toString()
+    } catch (e: Exception) {
+      Toast.makeText(context, "Error uploading image", Toast.LENGTH_SHORT).show()
+      return null
     }
+  }
 
   /** Stops listening for real-time updates. */
   fun stopListeningForFoodItems() {

@@ -31,7 +31,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 
-
 @HiltViewModel
 class FoodItemViewModel
 @Inject
@@ -49,9 +48,8 @@ constructor(
   var isQuickAdd by mutableStateOf(false)
   val searchStatus: StateFlow<SearchStatus> = foodFactsRepository.searchStatus
   val foodFactsSuggestions: StateFlow<List<FoodFacts>> = foodFactsRepository.foodFactsSuggestions
-var isLoading by mutableStateOf(false)
-    var capturedImageUri by mutableStateOf<Uri?>(null)
-
+  var isLoading by mutableStateOf(false)
+  var capturedImageUri by mutableStateOf<Uri?>(null)
 
   var foodName by mutableStateOf("")
   var amount by mutableStateOf("")
@@ -135,7 +133,6 @@ var isLoading by mutableStateOf(false)
     foodName = newFoodName
     foodNameErrorResId = validateString(foodName)
   }
-
 
   fun changeAmount(newAmount: String) {
     amount = newAmount
@@ -276,9 +273,9 @@ var isLoading by mutableStateOf(false)
     return foodItemRepository.isQuickAdd.value ?: false
   }
 
-    suspend fun uploadImageToFirebaseStorage(uri: Uri, context: Context): String?{
-        return foodItemRepository.uploadImageToFirebaseStorage(uri, context)
-    }
+  suspend fun uploadImageToFirebaseStorage(uri: Uri, context: Context): String? {
+    return foodItemRepository.uploadImageToFirebaseStorage(uri, context)
+  }
 
   fun resetForScanner() {
     location = FoodStorageLocation.PANTRY

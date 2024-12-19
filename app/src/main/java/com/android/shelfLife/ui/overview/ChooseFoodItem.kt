@@ -1,7 +1,6 @@
 package com.android.shelfLife.ui.newoverview
 
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -46,12 +45,8 @@ import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
-import com.android.shelfLife.viewmodel.camera.BarcodeScannerViewModel
 import com.android.shelfLife.viewmodel.overview.FoodItemViewModel
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 @Composable
 fun ChooseFoodItem(
@@ -67,34 +62,31 @@ fun ChooseFoodItem(
         foodItemViewModel.capturedImageUri = uri
       }
 
-    LaunchedEffect(foodItemViewModel.capturedImageUri) {
-        foodItemViewModel.capturedImageUri?.let { uri ->
-            foodItemViewModel.isLoading = true
-            val uploadedUrl = foodItemViewModel.uploadImageToFirebaseStorage(uri, context)
-            if (uploadedUrl != null) {
-                foodItemViewModel.selectedImage = FoodFacts(
-                    name = "",
-                    quantity = Quantity(1.0, FoodUnit.GRAM),
-                    imageUrl = uploadedUrl
-                )
-                Toast.makeText(context, "Image uploaded successfully", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(context, "Failed to upload image", Toast.LENGTH_SHORT).show()
-            }
-            foodItemViewModel.isLoading = false
-            foodItemViewModel.capturedImageUri = null // Reset the URI
-        }
+  LaunchedEffect(foodItemViewModel.capturedImageUri) {
+    foodItemViewModel.capturedImageUri?.let { uri ->
+      foodItemViewModel.isLoading = true
+      val uploadedUrl = foodItemViewModel.uploadImageToFirebaseStorage(uri, context)
+      if (uploadedUrl != null) {
+        foodItemViewModel.selectedImage =
+            FoodFacts(name = "", quantity = Quantity(1.0, FoodUnit.GRAM), imageUrl = uploadedUrl)
+        Toast.makeText(context, "Image uploaded successfully", Toast.LENGTH_SHORT).show()
+      } else {
+        Toast.makeText(context, "Failed to upload image", Toast.LENGTH_SHORT).show()
+      }
+      foodItemViewModel.isLoading = false
+      foodItemViewModel.capturedImageUri = null // Reset the URI
     }
+  }
 
-
-    Scaffold(
+  Scaffold(
       topBar = {
         CustomTopAppBar(
             onClick = {
-                foodItemViewModel.selectedImage = null
-                foodItemViewModel.setFoodItem(null)
-                foodItemViewModel.resetSearchStatus()
-                navigationActions.goBack() },
+              foodItemViewModel.selectedImage = null
+              foodItemViewModel.setFoodItem(null)
+              foodItemViewModel.resetSearchStatus()
+              navigationActions.goBack()
+            },
             title = stringResource(R.string.choose_food_item_title),
             titleTestTag = "chooseFoodItemTitle")
       },
@@ -201,19 +193,19 @@ fun ChooseFoodItem(
                                               color = Color.Gray,
                                               shape = RoundedCornerShape(8.dp))
                                           .clickable {
-                                              if (!foodItemViewModel.isLoading) selectImageLauncher.launch("image/*")
+                                            if (!foodItemViewModel.isLoading)
+                                                selectImageLauncher.launch("image/*")
                                           }
                                           .testTag("uploadImage"),
                                   contentAlignment = Alignment.Center) {
-                                  if (foodItemViewModel.isLoading) {
+                                    if (foodItemViewModel.isLoading) {
                                       CircularProgressIndicator() // Show loading during upload
-                                  } else {
+                                    } else {
                                       Icon(
                                           imageVector = Icons.Default.Upload,
                                           contentDescription = "Upload Image",
-                                          modifier = Modifier.size(48.dp)
-                                      )
-                                  }
+                                          modifier = Modifier.size(48.dp))
+                                    }
                                   }
                             }
                           }
@@ -264,25 +256,21 @@ fun ChooseFoodItem(
                     },
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(id = R.string.cancel_button),
-
                     button2OnClick = {
-                        if(!foodItemViewModel.isLoading){
+                      if (!foodItemViewModel.isLoading) {
                         foodItemViewModel.selectedImage?.let { selectedImage ->
-                            selectedImage.name = foodItemViewModel.selectedFood?.foodFacts?.name ?: ""
-                            foodItemViewModel.setFoodItem(
-                                //This is a temporary food item to remember the state of the Food Item at this screen
-                                FoodItem(
-                                    foodFacts = selectedImage, owner = "", uid = ""
-                                )
-                            )
-                            navigationActions.navigateTo(Screen.EDIT_FOOD)
-                            }
+                          selectedImage.name = foodItemViewModel.selectedFood?.foodFacts?.name ?: ""
+                          foodItemViewModel.setFoodItem(
+                              // This is a temporary food item to remember the state of the Food
+                              // Item at this screen
+                              FoodItem(foodFacts = selectedImage, owner = "", uid = ""))
+                          navigationActions.navigateTo(Screen.EDIT_FOOD)
                         }
+                      }
                     },
                     button2TestTag = "foodSave",
                     button2Text = stringResource(id = R.string.submit_button_text))
               }
             }
       })
-
 }
