@@ -4,11 +4,13 @@ import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import com.android.shelfLife.HiltTestActivity
 import com.android.shelfLife.model.foodFacts.*
+import com.android.shelfLife.model.permission.PermissionRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.viewmodel.camera.BarcodeScannerViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import helpers.PermissionRepositoryTestHelper
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,6 +29,9 @@ class BarcodeScannerScreenTest {
   @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
 
   @Inject lateinit var foodFactsRepository: FoodFactsRepository
+  @Inject lateinit var permissionRepository: PermissionRepository
+
+  private lateinit var permissionRepositoryTestHelper: PermissionRepositoryTestHelper
 
   private lateinit var instrumentationContext: android.content.Context
   private lateinit var navigationActions: NavigationActions
@@ -40,18 +45,24 @@ class BarcodeScannerScreenTest {
     hiltRule.inject()
     navigationActions = mock()
 
+    permissionRepositoryTestHelper = PermissionRepositoryTestHelper(permissionRepository)
+
     // Mock repository flows
     whenever(foodFactsRepository.searchStatus).thenReturn(searchStatusFlow.asStateFlow())
     whenever(foodFactsRepository.foodFactsSuggestions)
         .thenReturn(foodFactsSuggestionsFlow.asStateFlow())
+
+    whenever(permissionRepository.onPermissionResult(any())).then {
+      permissionRepositoryTestHelper.setPermissionGranted(false)
+      permissionRepositoryTestHelper.setPermissionRequested(true)
+    }
   }
 
   private fun createViewModel(): BarcodeScannerViewModel {
     val applicationContext = composeTestRule.activity.applicationContext
     assertNotNull("Application context should not be null", applicationContext)
     return BarcodeScannerViewModel(
-        application = applicationContext as android.app.Application,
-        foodFactsRepository = foodFactsRepository)
+        foodFactsRepository = foodFactsRepository, permissionRepository = permissionRepository)
   }
 
   private fun setContent(viewModel: BarcodeScannerViewModel) {
@@ -75,6 +86,7 @@ class BarcodeScannerScreenTest {
     val viewModel = createViewModel()
     // Simulate permission denied
     runBlocking { viewModel.onPermissionResult(false) }
+    composeTestRule.waitForIdle()
     setContent(viewModel)
 
     // Verify navigation to permission handler
