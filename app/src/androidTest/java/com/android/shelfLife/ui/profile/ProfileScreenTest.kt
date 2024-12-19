@@ -17,7 +17,6 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import io.mockk.mockk
 import io.mockk.verify
-import javax.inject.Inject
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
