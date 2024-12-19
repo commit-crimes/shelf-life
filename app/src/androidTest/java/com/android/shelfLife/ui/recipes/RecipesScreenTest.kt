@@ -226,7 +226,6 @@ class RecipesScreenTest {
 
     composeTestRule.onNodeWithTag("addRecipeFab").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addRecipeFab").performClick()
-
     composeTestRule.onNodeWithTag("addRecipeFab").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addRecipeFab").performClick()
 
@@ -239,7 +238,6 @@ class RecipesScreenTest {
 
     composeTestRule.onNodeWithTag("addRecipeFab").assertIsDisplayed()
     composeTestRule.onNodeWithTag("addRecipeFab").performClick()
-
     composeTestRule.onNodeWithTag("generateRecipeFab").assertIsDisplayed()
     composeTestRule.onNodeWithTag("generateRecipeFab").performClick()
 

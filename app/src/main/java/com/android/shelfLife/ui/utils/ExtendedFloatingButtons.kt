@@ -33,7 +33,7 @@ fun ExtendedActionButtons(
     secondScreen: String = Screen.ADD_RECIPE,
     firstScreenTestTag: String = "generateRecipeFab",
     secondScreenTestTag: String = "addRecipeFab",
-    foodItemViewModel: FoodItemViewModel = hiltViewModel()
+    foodItemViewModel: FoodItemViewModel? = null
 ) {
   Column(
       horizontalAlignment = Alignment.End,
@@ -45,9 +45,11 @@ fun ExtendedActionButtons(
           text = { Text(firstScreenText) },
           icon = { Icon(firstIcon, contentDescription = firstScreenText) },
           onClick = {
-            // Navigate to Generate Recipe screen
-            foodItemViewModel.setIsQuickAdd(true)
-            foodItemViewModel.resetSelectFoodItem()
+              // Navigate to Generate Recipe screen
+              if(firstScreen == Screen.FIRST_FOOD_ITEM){
+                  foodItemViewModel!!.setIsQuickAdd(true)
+                  foodItemViewModel!!.resetSelectFoodItem()
+              }
             navigationActions.navigateTo(firstScreen)
             fabExpanded.value = false
           },
@@ -62,7 +64,9 @@ fun ExtendedActionButtons(
         onClick = {
           if (fabExpanded.value) {
             // Navigate to Add Recipe screen
-            foodItemViewModel.setIsQuickAdd(false)
+              if(secondScreen == Screen.ADD_FOOD){
+                  foodItemViewModel!!.setIsQuickAdd(false)
+              }
             navigationActions.navigateTo(secondScreen)
             fabExpanded.value = false
           } else {
