@@ -1,4 +1,4 @@
-package com.android.shelflife.model.foodFacts
+package com.android.shelflife.model
 
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodSearchInput
