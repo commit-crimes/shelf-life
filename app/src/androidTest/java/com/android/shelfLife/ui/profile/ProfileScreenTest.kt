@@ -13,92 +13,87 @@ import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.viewmodel.profile.ProfileScreenViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import kotlinx.coroutines.flow.MutableStateFlow
+import helpers.UserRepositoryTestHelper
+import javax.inject.Inject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
-import javax.inject.Inject
-
 
 @HiltAndroidTest
 class ProfileScreenTest {
 
-    @get:Rule(order = 0)
-    val hiltRule = HiltAndroidRule(this)
+  @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
 
-    @get:Rule(order = 1)
-    val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
+  @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
 
-    private lateinit var mockViewModel: ProfileScreenViewModel
-    @Inject
-    lateinit var userRepository: UserRepository
-    private lateinit var navigationActions: NavigationActions
+  private lateinit var mockViewModel: ProfileScreenViewModel
+  @Inject lateinit var userRepository: UserRepository
+  private lateinit var navigationActions: NavigationActions
 
-    @Before
-    fun setUp() {
-        hiltRule.inject()
+  private lateinit var userRepositoryTestHelper: UserRepositoryTestHelper
 
-        navigationActions = mock(NavigationActions::class.java)
+  @Before
+  fun setUp() {
+    hiltRule.inject()
 
-        whenever (userRepository.user).thenReturn(
-            MutableStateFlow(
-                User(
-                    "currentUserId",
-                    "Current User",
-                    "currentuser@gmail.com",
-                    null,
-                    "",
-                    emptyList(),
-                    emptyList()))
-        )
-        whenever (userRepository.invitations).thenReturn(MutableStateFlow(emptyList()))
-        mockViewModel = ProfileScreenViewModel(userRepository)
+    navigationActions = mock(NavigationActions::class.java)
+
+    userRepositoryTestHelper = UserRepositoryTestHelper(userRepository)
+
+    userRepositoryTestHelper.setUser(
+        User(
+            "currentUserId",
+            "Current User",
+            "currentuser@gmail.com",
+            null,
+            "",
+            emptyList(),
+            emptyList()))
+
+    mockViewModel = ProfileScreenViewModel(userRepository)
+  }
+
+  @Test
+  fun testProfileNameDisplaysCorrectly() {
+    composeTestRule.setContent {
+      ProfileScreen(
+          navigationActions = navigationActions,
+          context = composeTestRule.activity.applicationContext,
+          profileViewModel = mockViewModel)
     }
 
-    @Test
-    fun testProfileNameDisplaysCorrectly() {
-        composeTestRule.setContent {
-            ProfileScreen(
-                navigationActions = navigationActions,
-                context = composeTestRule.activity.applicationContext,
-                profileViewModel = mockViewModel
-            )
-        }
+    // Verify that the name is displayed
+    composeTestRule
+        .onNodeWithTag("profileNameText")
+        .assertIsDisplayed()
+        .assertTextEquals("Current User")
+  }
 
-        // Verify that the name is displayed
-        composeTestRule.onNodeWithTag("profileNameText")
-            .assertIsDisplayed()
-            .assertTextEquals("Current User")
+  @Test
+  fun testLogoutButtonNavigatesToAuth() {
+    composeTestRule.setContent {
+      ProfileScreen(
+          navigationActions = navigationActions,
+          context = composeTestRule.activity.applicationContext,
+          profileViewModel = mockViewModel)
     }
 
-    @Test
-    fun testLogoutButtonNavigatesToAuth() {
-        composeTestRule.setContent {
-            ProfileScreen(
-                navigationActions = navigationActions,
-                context = composeTestRule.activity.applicationContext,
-                profileViewModel = mockViewModel
-            )
-        }
+    composeTestRule.onNodeWithTag("logoutButton").performClick()
 
-        composeTestRule.onNodeWithTag("logoutButton").performClick()
+    verify(navigationActions).navigateToAndClearBackStack(Screen.AUTH)
+  }
 
-        verify(navigationActions).navigateToAndClearBackStack(Screen.AUTH)
+  @Test
+  fun testProfilePictureIsDisplayed() {
+    composeTestRule.setContent {
+      ProfileScreen(
+          navigationActions = navigationActions,
+          context = composeTestRule.activity.applicationContext,
+          profileViewModel = mockViewModel)
     }
 
-    @Test
-    fun testProfilePictureIsDisplayed() {
-        composeTestRule.setContent {
-            ProfileScreen(
-                navigationActions = navigationActions,
-                context = composeTestRule.activity.applicationContext,
-                profileViewModel = mockViewModel
-            )
-        }
-
-        composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
-    }
+    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
+  }
 }

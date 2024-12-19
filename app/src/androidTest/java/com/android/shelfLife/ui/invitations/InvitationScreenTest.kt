@@ -8,6 +8,7 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.printToLog
 import com.android.shelfLife.HiltTestActivity
+import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.invitations.Invitation
 import com.android.shelfLife.model.invitations.InvitationRepository
 import com.android.shelfLife.model.user.User
@@ -17,10 +18,11 @@ import com.android.shelfLife.viewmodel.invitations.InvitationViewModel
 import com.google.firebase.Timestamp
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import helpers.HouseholdRepositoryTestHelper
+import helpers.UserRepositoryTestHelper
+import io.mockk.verify
 import java.util.Date
 import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -35,19 +37,20 @@ class InvitationScreenTest {
 
   @Inject lateinit var invitationRepository: InvitationRepository
   @Inject lateinit var userRepository: UserRepository
+  @Inject lateinit var houseHoldRepository: HouseHoldRepository
+
+  private lateinit var householdRepositoryTestHelper: HouseholdRepositoryTestHelper
+  private lateinit var userRepositoryTestHelper: UserRepositoryTestHelper
 
   private lateinit var navigationActions: NavigationActions
-
-  // Flows for test data
-  private val userInvitationsFlow = MutableStateFlow<List<String>>(emptyList())
 
   @Before
   fun setUp() {
     hiltRule.inject()
     navigationActions = mock()
 
-    // Default mocks: Initially no invitations
-    whenever(userRepository.invitations).thenReturn(userInvitationsFlow.asStateFlow())
+    householdRepositoryTestHelper = HouseholdRepositoryTestHelper(houseHoldRepository)
+    userRepositoryTestHelper = UserRepositoryTestHelper(userRepository)
 
     // Provide a real user
     val realUser =
@@ -59,8 +62,7 @@ class InvitationScreenTest {
             householdUIDs = emptyList(),
             selectedHouseholdUID = null,
             recipeUIDs = emptyList())
-    val userFlow = MutableStateFlow(realUser)
-    whenever(userRepository.user).thenReturn(userFlow.asStateFlow())
+    userRepositoryTestHelper.setUser(realUser)
 
     // By default, return empty list for any getInvitationsBatch() call
     runBlocking {
@@ -70,13 +72,13 @@ class InvitationScreenTest {
 
   private fun createViewModel(): InvitationViewModel {
     // Create the ViewModel after we set the userInvitationsFlow and mocks
-    return InvitationViewModel(invitationRepository, userRepository)
+    return InvitationViewModel(invitationRepository, userRepository, houseHoldRepository)
   }
 
   @Test
   fun noInvitationsDisplaysNoPendingMessage(): Unit = runBlocking {
     // No invitations scenario
-    userInvitationsFlow.value = emptyList()
+    userRepositoryTestHelper.setInvitations(emptyList())
     whenever(invitationRepository.getInvitationsBatch(emptyList())).thenReturn(emptyList())
 
     // Create ViewModel after setting flows and mocks
@@ -105,7 +107,7 @@ class InvitationScreenTest {
             timestamp = Timestamp(Date()))
 
     // Before creating ViewModel, set userInvitationsFlow and mocks
-    userInvitationsFlow.value = listOf(invitationId)
+    userRepositoryTestHelper.setInvitations(listOf(invitationId))
     whenever(invitationRepository.getInvitationsBatch(listOf(invitationId)))
         .thenReturn(listOf(invitation))
 
@@ -136,7 +138,7 @@ class InvitationScreenTest {
             timestamp = Timestamp(Date()))
 
     // Set up data before ViewModel creation
-    userInvitationsFlow.value = listOf(invitationId)
+    userRepositoryTestHelper.setInvitations(listOf(invitationId))
     whenever(invitationRepository.getInvitationsBatch(listOf(invitationId)))
         .thenReturn(listOf(invitation))
 
@@ -150,9 +152,9 @@ class InvitationScreenTest {
     composeTestRule.onRoot().printToLog("UI-TREE")
     composeTestRule.onNodeWithText("Accept").assertIsDisplayed().performClick()
 
-    verify(userRepository).deleteInvitationUID(invitationId)
+    verify { userRepository.deleteInvitationUID(invitationId) }
     verify(invitationRepository).acceptInvitation(invitation)
-    verify(userRepository).addCurrentUserToHouseHold("house123", "user123")
+    verify { userRepository.addCurrentUserToHouseHold("house123", "user123") }
     verify(navigationActions).goBack()
   }
 
@@ -169,7 +171,7 @@ class InvitationScreenTest {
             timestamp = Timestamp(Date()))
 
     // Set up data before ViewModel creation
-    userInvitationsFlow.value = listOf(invitationId)
+    userRepositoryTestHelper.setInvitations(listOf(invitationId))
     whenever(invitationRepository.getInvitationsBatch(listOf(invitationId)))
         .thenReturn(listOf(invitation))
 
@@ -183,7 +185,7 @@ class InvitationScreenTest {
     composeTestRule.onRoot().printToLog("UI-TREE")
     composeTestRule.onNodeWithText("Decline").assertIsDisplayed().performClick()
 
-    verify(userRepository).deleteInvitationUID(invitationId)
+    verify { userRepository.deleteInvitationUID(invitationId) }
     verify(invitationRepository).declineInvitation(invitation)
     verify(navigationActions).goBack()
   }
