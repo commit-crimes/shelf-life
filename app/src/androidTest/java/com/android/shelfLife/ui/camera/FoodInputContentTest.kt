@@ -6,6 +6,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.android.shelfLife.HiltTestActivity
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.FoodFactsRepository
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
@@ -35,6 +36,7 @@ class FoodInputContentTest {
 
   @Inject lateinit var foodItemRepository: FoodItemRepository
   @Inject lateinit var userRepository: UserRepository
+  @Inject lateinit var foodFactsRepository: FoodFactsRepository
 
   private lateinit var instrumentationContext: android.content.Context
   private lateinit var navigationActions: NavigationActions
@@ -78,7 +80,7 @@ class FoodInputContentTest {
 
   private fun createViewModel(): FoodItemViewModel {
     // After all flows and mocks are set, create the viewModel
-    return FoodItemViewModel(foodItemRepository, userRepository)
+    return FoodItemViewModel(foodItemRepository, userRepository, foodFactsRepository = foodFactsRepository)
   }
 
   // Helper to set content and return callbacks spies
