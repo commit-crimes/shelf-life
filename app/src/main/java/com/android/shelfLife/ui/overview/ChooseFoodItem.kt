@@ -1,10 +1,9 @@
-package com.android.shelfLife.ui.newoverview
+package com.android.shelfLife.ui.overview
 
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.launch
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -46,14 +45,12 @@ import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.utils.CustomButtons
 import com.android.shelfLife.ui.utils.CustomTopAppBar
 import com.android.shelfLife.viewmodel.overview.FoodItemViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun ChooseFoodItem(
     navigationActions: NavigationActions,
     foodItemViewModel: FoodItemViewModel = hiltViewModel(),
 ) {
-  val coroutineScope = rememberCoroutineScope()
   val context = LocalContext.current
 
   val selectImageLauncher =

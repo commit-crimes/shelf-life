@@ -10,6 +10,7 @@ import com.android.shelfLife.model.invitations.InvitationRepository
 import com.android.shelfLife.model.user.User
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
+import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.viewmodel.overview.HouseholdCreationScreenViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -89,7 +90,6 @@ class HouseHoldCreationScreenTest {
   fun houseHoldCreationScreen_displaysInitialUI() {
     setContent()
 
-    // Assert main UI components
     composeTestRule.onNodeWithTag("HouseHoldNameTextField").assertIsDisplayed()
     composeTestRule.onNodeWithText("Household Members").assertIsDisplayed()
     composeTestRule.onNodeWithTag("AddEmailFab").assertIsDisplayed()
@@ -101,15 +101,51 @@ class HouseHoldCreationScreenTest {
   fun houseHoldCreationScreen_handlesCloseButton() {
     setContent()
 
-    // Click close button
     composeTestRule.onNodeWithTag("CloseButton").performClick()
-
-    // Verify navigation back
     verify(navigationActions).goBack()
   }
 
-  // For delete button:
-  // If we set householdToEdit to non-null, then a delete button shows
+  @Test
+  fun houseHoldCreationScreen_handlesAddEmail() {
+    setContent()
+
+    composeTestRule.onNodeWithTag("AddEmailFab").performClick()
+    composeTestRule.onNodeWithTag("EmailInputField").performTextInput("friend@example.com")
+    composeTestRule.onNodeWithTag("AddEmailButton").performClick()
+
+    composeTestRule.onNodeWithText("friend@example.com").assertIsDisplayed()
+  }
+
+  @Test
+  fun houseHoldCreationScreen_handlesRemoveEmail() {
+    setContent()
+    composeTestRule.onNodeWithTag("AddEmailFab").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("EmailInputField").performTextInput("friend@example.com")
+    composeTestRule.onNodeWithTag("AddEmailButton").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithText("friend@example.com").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("RemoveEmailButton").performClick()
+
+    composeTestRule.onNodeWithText("friend@example.com").assertDoesNotExist()
+  }
+
+  @Test
+  fun houseHoldCreationScreen_handlesInvalidHouseholdName() {
+    setContent()
+
+    composeTestRule.onNodeWithTag("ConfirmButton").performClick()
+    composeTestRule.onNodeWithText("Household name already exists or is empty").assertIsDisplayed()
+  }
+
+  @Test
+  fun houseHoldCreationScreen_handlesValidHouseholdName() {
+    setContent()
+
+    composeTestRule.onNodeWithTag("HouseHoldNameTextField").performTextInput("New Household")
+    composeTestRule.onNodeWithTag("ConfirmButton").performClick()
+
+    verify(navigationActions).navigateTo(Screen.OVERVIEW)
+  }
+
   @Test
   fun houseHoldCreationScreen_handlesDeleteButton() {
     runBlocking {
@@ -127,25 +163,10 @@ class HouseHoldCreationScreenTest {
     createViewModel()
     setContent()
 
-    // Click delete button
     composeTestRule.onNodeWithTag("DeleteButton").performClick()
-
-    // Verify confirmation dialog is displayed
-    // The dialog text may differ. If the dialog text is not "Are you sure...",
-    // check the actual code in DeletionConfirmationPopUp
-    // The code uses a generic DeletionConfirmationPopUp. You must ensure the text matches that
-    // logic.
-    // If it does not, adjust:
-    // Here we guess it says "Delete Household"
     composeTestRule.onNodeWithText("Delete Household").assertIsDisplayed()
-
-    // Confirm deletion (Look for the text that pops up after confirm)
-    // The DeletionConfirmationPopUp used a "sign out" logic in previous code. Check that code
-    // carefully.
-    // It's missing from your snippet. Let's assume it says "Yes" to confirm:
     composeTestRule.onNodeWithTag("confirmDeleteHouseholdButton").performClick()
 
-    // Verify navigation back
     verify(navigationActions).goBack()
   }
 }
