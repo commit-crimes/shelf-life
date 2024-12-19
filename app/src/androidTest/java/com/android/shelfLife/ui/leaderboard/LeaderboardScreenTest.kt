@@ -36,7 +36,6 @@ class LeaderboardScreenTest {
   private lateinit var navigationActions: NavigationActions
   private lateinit var leaderboardViewModel: LeaderboardViewModel
 
-  // Mocked state flows
   private val selectedHousehold = MutableStateFlow<HouseHold?>(null)
 
   @Before
@@ -47,7 +46,6 @@ class LeaderboardScreenTest {
     householdRepositoryTestHelper = HouseholdRepositoryTestHelper(houseHoldRepository)
     userRepositoryTestHelper = UserRepositoryTestHelper(userRepository)
 
-    // Create a real User instance
     val realUser =
         User(
             uid = "currentUserId",
@@ -57,17 +55,15 @@ class LeaderboardScreenTest {
             householdUIDs = emptyList(),
             selectedHouseholdUID = null,
             recipeUIDs = emptyList())
-
     userRepositoryTestHelper.setUser(realUser)
 
-    // Initialize the ViewModel now that all dependencies are set up
     leaderboardViewModel =
         LeaderboardViewModel(
             houseHoldRepository = houseHoldRepository, userRepository = userRepository)
   }
 
   @Test
-  fun leaderboardScreenDisplaysTopBarAndNoDataMessageIfEmpty(): Unit = runBlocking {
+  fun leaderboardScreen_displaysTopBarAndNoDataMessageIfEmpty(): Unit = runBlocking {
     selectedHousehold.value =
         HouseHold(
             uid = "house1",
@@ -81,120 +77,36 @@ class LeaderboardScreenTest {
       LeaderboardScreen(navigationActions = navigationActions, viewModel = leaderboardViewModel)
     }
 
-    // Verify the title and no data message
     composeTestRule.onNodeWithText("Leaderboards").assertIsDisplayed()
     composeTestRule.onNodeWithText("No data available").assertIsDisplayed()
   }
-  //
-  //    @Test
-  //    fun clickingTopBarBackButtonCallsGoBack() {
-  //        selectedHousehold.value = HouseHold(
-  //            uid = "house1",
-  //            name = "TestHouse",
-  //            members = listOf("user1", "user2"),
-  //            sharedRecipes = emptyList(),
-  //            ratPoints = mapOf("user1" to 10L),
-  //            stinkyPoints = emptyMap()
-  //        )
-  //
-  //        composeTestRule.setContent {
-  //            LeaderboardScreen(navigationActions = navigationActions, viewModel =
-  // leaderboardViewModel)
-  //        }
-  //
-  //        // Assuming CustomTopAppBar or back arrow icon has a testTag "backArrowIcon"
-  //        composeTestRule.onNodeWithTag("backArrowIcon").performClick()
-  //        verify(navigationActions).goBack()
-  //    }
-  //
-  //    @Test
-  //    fun leaderboardDisplaysTopLeaderAndOthers(): Unit = runBlocking {
-  //        selectedHousehold.value = HouseHold(
-  //            uid = "house1",
-  //            name = "TestHouse",
-  //            members = listOf("user1", "user2", "user3"),
-  //            sharedRecipes = emptyList(),
-  //            ratPoints = mapOf("user1" to 50L, "user2" to 30L, "user3" to 10L),
-  //            stinkyPoints = emptyMap()
-  //        )
-  //
-  //        whenever(userRepository.getUserNames(any())).thenReturn(
-  //            mapOf("user1" to "Alice", "user2" to "Bob", "user3" to "Charlie")
-  //        )
-  //
-  //        composeTestRule.setContent {
-  //            LeaderboardScreen(navigationActions = navigationActions, viewModel =
-  // leaderboardViewModel)
-  //        }
-  //
-  //        // Verify top leader
-  //        composeTestRule.onNodeWithText("Alice 👑").assertIsDisplayed()
-  //        composeTestRule.onNodeWithText("50 points").assertIsDisplayed()
-  //
-  //        // Verify other leaders
-  //        composeTestRule.onNodeWithText("Bob").assertIsDisplayed()
-  //        composeTestRule.onNodeWithText("30").assertIsDisplayed()
-  //        composeTestRule.onNodeWithText("Charlie").assertIsDisplayed()
-  //        composeTestRule.onNodeWithText("10").assertIsDisplayed()
-  //    }
 
-  //    @Test
-  //    fun modeToggleChangesMode(): Unit = runBlocking {
-  //        selectedHousehold.value = HouseHold(
-  //            uid = "house1",
-  //            name = "TestHouse",
-  //            members = listOf("user1"),
-  //            sharedRecipes = emptyList(),
-  //            ratPoints = mapOf("user1" to 50L),
-  //            stinkyPoints = mapOf("user1" to 20L)
-  //        )
-  //
-  //        runBlocking {
-  //            // This ensures for any user IDs, we return a non-null map.
-  //            whenever(userRepository.getUserNames(any())).thenAnswer { invocation ->
-  //                val userIds = invocation.getArgument<List<String>>(0)
-  //                userIds.associateWith { "Alice" }
-  //            }
-  //        }
-  //
-  //        composeTestRule.setContent {
-  //            LeaderboardScreen(navigationActions = navigationActions, viewModel =
-  // leaderboardViewModel)
-  //        }
-  //
-  //        // Initial mode is RAT
-  //        composeTestRule.onNodeWithText("Alice 👑").assertIsDisplayed()
-  //        composeTestRule.onNodeWithText("50 points").assertIsDisplayed()
-  //
-  //        // Toggle mode to Stinky
-  //        composeTestRule.onNodeWithText("Stinky Leaderboard").performClick()
-  //        composeTestRule.waitForIdle()
-  //
-  //        // Verify stinky points (still "Alice")
-  //        composeTestRule.onNodeWithText("20 points").assertIsDisplayed()
-  //    }
+  @Test
+  fun leaderboardScreen_clickingTopBarBackButton_callsGoBack() {
+    composeTestRule.setContent {
+      LeaderboardScreen(navigationActions = navigationActions, viewModel = leaderboardViewModel)
+    }
 
-  //    @Test
-  //    fun ifUserIsKingPrizeButtonAppears(): Unit = runBlocking {
-  //        selectedHousehold.value = HouseHold(
-  //            uid = "house1",
-  //            name = "TestHouse",
-  //            members = listOf("currentUserId", "user2"),
-  //            sharedRecipes = emptyList(),
-  //            ratPoints = mapOf("currentUserId" to 100L, "user2" to 50L),
-  //            stinkyPoints = emptyMap()
-  //        )
-  //
-  //        whenever(userRepository.getUserNames(any())).thenReturn(
-  //            mapOf("currentUserId" to "KingUser", "user2" to "Bob")
-  //        )
-  //
-  //        composeTestRule.setContent {
-  //            LeaderboardScreen(navigationActions = navigationActions, viewModel =
-  // leaderboardViewModel)
-  //        }
-  //
-  //        // Verify the prize button is displayed
-  //        composeTestRule.onNodeWithText("Receive Your Prize").assertIsDisplayed()
-  //    }
+    composeTestRule.onNodeWithText("Leaderboards").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("goBackArrow").performClick()
+    verify(navigationActions).goBack()
+  }
+
+  @Test
+  fun leaderboardScreen_handlesEmptyLeaderListGracefully(): Unit = runBlocking {
+    selectedHousehold.value =
+        HouseHold(
+            uid = "house1",
+            name = "TestHouse",
+            members = emptyList(),
+            sharedRecipes = emptyList(),
+            ratPoints = emptyMap(),
+            stinkyPoints = emptyMap())
+
+    composeTestRule.setContent {
+      LeaderboardScreen(navigationActions = navigationActions, viewModel = leaderboardViewModel)
+    }
+
+    composeTestRule.onNodeWithText("No data available").assertIsDisplayed()
+  }
 }
