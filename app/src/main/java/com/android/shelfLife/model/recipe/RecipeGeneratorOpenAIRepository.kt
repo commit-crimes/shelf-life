@@ -183,7 +183,7 @@ class RecipeGeneratorOpenAIRepository @Inject constructor(private val openai: Op
                 name = recipePrompt.name,
                 instructions = toolResponse["instructions"] as List<String>,
                 servings = (toolResponse["servings"] as Int).toFloat(),
-                time = (toolResponse["time"] as Long).minutes,
+                time = (toolResponse["time"] as Long).seconds,
                 workInProgress = true,
                 ingredients =
                     (toolResponse["ingredients"] as List<Map<String, Any>>).map { ingredient ->
