@@ -88,8 +88,8 @@ class AddFoodItemScreenTest {
 
     // Check the buttons
     composeTestRule
-      .onNodeWithTag("addFoodItemScreen")
-      .performScrollToNode(hasTestTag("cancelButton"))
+        .onNodeWithTag("addFoodItemScreen")
+        .performScrollToNode(hasTestTag("cancelButton"))
     composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("foodSave").performScrollTo().assertIsDisplayed()
   }
@@ -97,8 +97,8 @@ class AddFoodItemScreenTest {
   @Test
   fun cancelButtonNavigatesBack() {
     composeTestRule
-      .onNodeWithTag("addFoodItemScreen")
-      .performScrollToNode(hasTestTag("cancelButton"))
+        .onNodeWithTag("addFoodItemScreen")
+        .performScrollToNode(hasTestTag("cancelButton"))
     composeTestRule.onNodeWithTag("cancelButton").performClick()
     verify(navigationActions).goBack()
   }
@@ -106,9 +106,7 @@ class AddFoodItemScreenTest {
   @Test
   fun submitEmptyFieldsShowsErrorToastAndDoesNotNavigateBack() {
     // Make sure fields are empty
-    composeTestRule
-      .onNodeWithTag("addFoodItemScreen")
-      .performScrollToNode(hasTestTag("foodSave"))
+    composeTestRule.onNodeWithTag("addFoodItemScreen").performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").performScrollTo().performClick()
 
     // Since all are empty, we should see error validations.
@@ -165,9 +163,7 @@ class AddFoodItemScreenTest {
     composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextInput("20122025")
 
     // Now click Save
-    composeTestRule
-      .onNodeWithTag("addFoodItemScreen")
-      .performScrollToNode(hasTestTag("foodSave"))
+    composeTestRule.onNodeWithTag("addFoodItemScreen").performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").performScrollTo().performClick()
 
     // With valid data, the ViewModel should return success and we navigate back
@@ -195,8 +191,8 @@ class AddFoodItemScreenTest {
     assert(foodItemViewModel.openDate == "20241230")
 
     composeTestRule
-      .onNodeWithTag("addFoodItemScreen")
-      .performScrollToNode(hasTestTag("inputFoodBuyDate"))
+        .onNodeWithTag("addFoodItemScreen")
+        .performScrollToNode(hasTestTag("inputFoodBuyDate"))
 
     composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextClearance()
     composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextInput("20240101")
@@ -250,9 +246,7 @@ class AddFoodItemScreenTest {
     composeTestRule.onNodeWithTag("inputFoodAmount").performTextInput("abc")
 
     // Submit
-    composeTestRule
-      .onNodeWithTag("addFoodItemScreen")
-      .performScrollToNode(hasTestTag("foodSave"))
+    composeTestRule.onNodeWithTag("addFoodItemScreen").performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").performClick()
 
     // Check error state in the ViewModel
@@ -266,9 +260,7 @@ class AddFoodItemScreenTest {
     composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextInput("00000000") // invalid
 
     // Submit
-    composeTestRule
-      .onNodeWithTag("addFoodItemScreen")
-      .performScrollToNode(hasTestTag("foodSave"))
+    composeTestRule.onNodeWithTag("addFoodItemScreen").performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").performClick()
 
     // Check if error is set
