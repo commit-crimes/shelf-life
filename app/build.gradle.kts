@@ -16,10 +16,9 @@ android {
     namespace = "com.android.shelfLife"
     compileSdk = 34
 
+    val isCI = System.getenv("GITHUB_ACTIONS")?.toBoolean() ?: false
 
     var openAIApiKey: String = System.getenv("OPENAI_API_KEY") ?: ""
-
-    val isCI = System.getenv("GITHUB_ACTIONS")?.toBoolean() ?: false
     if(!isCI) { //if not on CI load from local properties
         // Load the API key from local.properties
         val localProperties = Properties()
