@@ -22,6 +22,8 @@ interface FoodFactsRepository {
 
   fun resetSearchStatus()
 
+  fun setFailureStatus()
+
   val foodFactsSuggestions: StateFlow<List<FoodFacts>>
 
   /**

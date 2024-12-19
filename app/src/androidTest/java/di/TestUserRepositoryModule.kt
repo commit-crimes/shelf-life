@@ -7,11 +7,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.components.SingletonComponent
 import dagger.hilt.testing.TestInstallIn
+import io.mockk.every
+import io.mockk.mockk
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import org.mockito.Mockito.mock
-import org.mockito.kotlin.whenever
 
 @Module
 @TestInstallIn(components = [SingletonComponent::class], replaces = [UserRepositoryModule::class])
@@ -20,9 +20,9 @@ object TestUserRepositoryModule {
   @Provides
   fun provideUserRepository(): UserRepository {
     Log.d("TestUserRepositoryModule", "provideUserRepository")
-    val userRepository = mock(UserRepository::class.java)
-    val bypassLogin = MutableStateFlow<Boolean>(true)
-    whenever(userRepository.bypassLogin).thenReturn(bypassLogin.asStateFlow())
+    val userRepository = mockk<UserRepository>(relaxed = true)
+    val bypassLogin = MutableStateFlow(true)
+    every { userRepository.bypassLogin } returns bypassLogin.asStateFlow()
     return userRepository
   }
 }

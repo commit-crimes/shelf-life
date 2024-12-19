@@ -78,11 +78,14 @@ constructor(
     return selectedRecipe!!.instructions
   }
 
-  suspend fun deleteSelectedRecipe() {
+  fun deselectRecipe() {
+    recipeRepository.selectRecipe(null)
+  }
+
+  fun deleteSelectedRecipe() {
     if (selectedRecipe != null) {
-      val isDeleted = recipeRepository.deleteRecipe(selectedRecipe!!.uid)
-      if (isDeleted) {
-        userRepository.deleteRecipeUID(selectedRecipe!!.uid)
+      recipeRepository.deleteRecipe(selectedRecipe!!.uid) { recipeUID ->
+        userRepository.deleteRecipeUID(recipeUID)
       }
     }
   }

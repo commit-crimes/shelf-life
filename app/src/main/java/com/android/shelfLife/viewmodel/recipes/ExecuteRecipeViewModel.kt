@@ -7,6 +7,7 @@ import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.recipe.RecipeRepository
+import com.android.shelfLife.model.user.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +24,7 @@ constructor(
     private val houseHoldRepository: HouseHoldRepository,
     private val foodItemsRepository: FoodItemRepository,
     private val recipeRepositoryFirestore: RecipeRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
   companion object {
     private const val TAG = "ExecuteRecipeViewModel"
@@ -31,6 +33,8 @@ constructor(
   // Current state of the recipe execution
   private val _state = MutableStateFlow<RecipeExecutionState>(RecipeExecutionState.SelectServings)
   val state: StateFlow<RecipeExecutionState> = _state
+
+  private val currentUser = userRepository.user.value
 
   private val originalSelectedRecipe = recipeRepositoryFirestore.selectedRecipe
 
@@ -110,7 +114,6 @@ constructor(
         _availableFoodItems.value.mapNotNull { currentItem ->
           if (currentItem.uid == foodItem.uid) {
             val remainingAmount = currentItem.foodFacts.quantity.amount - amount
-
             if (remainingAmount > 0) {
               Log.d(
                   TAG,
@@ -132,6 +135,22 @@ constructor(
   fun consumeSelectedItems() {
     if (householdUid != null) {
       foodItemsRepository.setFoodItems(householdId = householdUid, _availableFoodItems.value)
+      selectedFoodItemsForIngredients.value.values.forEach { foodItems ->
+        foodItems.forEach { foodItem ->
+          if (foodItem.owner != currentUser?.uid) {
+            val newRatPoints =
+                houseHoldRepository.selectedHousehold.value!!.ratPoints.toMutableMap()
+            if (!newRatPoints.contains(currentUser?.uid!!)) {
+              newRatPoints[currentUser.uid] = foodItem.foodFacts.quantity.amount.toLong()
+            } else {
+              newRatPoints[currentUser.uid] =
+                  foodItem.foodFacts.quantity.amount.toLong() + newRatPoints[currentUser.uid]!!
+            }
+
+            houseHoldRepository.updateRatPoints(householdUid, newRatPoints)
+          }
+        }
+      }
       Log.d(TAG, "Consumed selected items and updated Firestore for household: $householdUid")
     } else {
       Log.e(TAG, "Household ID is null. Cannot consume selected items.")

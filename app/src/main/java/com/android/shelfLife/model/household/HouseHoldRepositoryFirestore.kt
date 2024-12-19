@@ -49,22 +49,17 @@ constructor(
     return _households.value.any { it.name == houseHoldName }
   }
 
-  override suspend fun getHouseholds(listOfHouseHoldUid: List<String>): List<HouseHold> {
-    if (listOfHouseHoldUid.isEmpty()) {
-      return emptyList()
-    }
-    return try {
+  override suspend fun getHousehold(householdId: String) {
+    try {
       val querySnapshot =
           db.collection(collectionPath)
-              .whereIn(FieldPath.documentId(), listOfHouseHoldUid)
+              .whereIn(FieldPath.documentId(), listOf(householdId))
               .get()
               .await()
-
-      val fetchedHouseholds = querySnapshot.documents.mapNotNull { convertToHousehold(it) }
-      fetchedHouseholds
+      val household = querySnapshot.documents.mapNotNull { convertToHousehold(it) }
+      _households.value = _households.value.plus(household)
     } catch (e: Exception) {
       Log.e("HouseholdRepository", "Error fetching households", e)
-      emptyList()
     }
   }
 
@@ -98,7 +93,7 @@ constructor(
    *
    * @param household The household to add.
    */
-  override suspend fun addHousehold(household: HouseHold) {
+  override fun addHousehold(household: HouseHold) {
     val householdData =
         mapOf(
             "name" to household.name,
@@ -106,20 +101,17 @@ constructor(
             "sharedRecipes" to household.sharedRecipes,
             "ratPoints" to household.ratPoints,
             "stinkyPoints" to household.stinkyPoints)
-    try {
-      // Update local cache
-      Log.d("HouseholdRepository", "Added household: $household")
-      val currentHouseholds = _households.value.toMutableList()
-      currentHouseholds.add(household)
-      _households.value = currentHouseholds
 
-      db.collection(collectionPath)
-          .document(household.uid) // Use the household UID as the document ID
-          .set(householdData)
-    } catch (e: Exception) {
-      val updatedHouseHolds = _households.value.filterNot { it.uid == household.uid }
-      _households.value = updatedHouseHolds
-      Log.e("HouseholdRepository", "Error adding household", e)
+    // Optimistically update local cache
+    val currentHouseholds = _households.value.toMutableList().apply { add(household) }
+    _households.value = currentHouseholds
+
+    // Perform Firebase operation
+    db.collection(collectionPath).document(household.uid).set(householdData).addOnFailureListener {
+        exception ->
+      Log.e("HouseholdRepository", "Error adding household", exception)
+      // Rollback: Remove the household from the local cache
+      _households.value = _households.value.filterNot { it.uid == household.uid }
     }
   }
 
@@ -128,7 +120,7 @@ constructor(
    *
    * @param household The household with updated data.
    */
-  override suspend fun updateHousehold(household: HouseHold) {
+  override fun updateHousehold(household: HouseHold, onSuccess: (String) -> Unit) {
     var originalItem: HouseHold? = null
     val householdData =
         mapOf(
@@ -137,56 +129,67 @@ constructor(
             "sharedRecipes" to household.sharedRecipes,
             "ratPoints" to household.ratPoints,
             "stinkyPoints" to household.stinkyPoints)
-    try {
-      // Update local cache
-      val currentHouseholds = _households.value.toMutableList()
-      val index = currentHouseholds.indexOfFirst { it.uid == household.uid }
-      if (index != -1) {
-        originalItem = currentHouseholds[index]
-        currentHouseholds[index] = household
-      } else {
-        currentHouseholds.add(household)
-      }
-      Log.d("HouseholdRepository", "Updated household: $household")
-      _households.value = currentHouseholds
 
-      db.collection(collectionPath).document(household.uid).set(householdData)
-    } catch (e: Exception) {
-      // Rollback: Restore the original item in the local cache
-      originalItem?.let {
-        val currentHouseholds = _households.value.toMutableList()
-        val index = currentHouseholds.indexOfFirst { it.uid == household.uid }
-        if (index != -1) {
-          currentHouseholds[index] = it
-          _households.value = currentHouseholds
-        } else if (index == currentHouseholds.lastIndex) {
-          currentHouseholds.removeAt(index)
-          _households.value = currentHouseholds
-        }
-      }
-      Log.e("HouseholdRepository", "Error updating household", e)
+    // Optimistically update local cache
+    val currentHouseholds = _households.value.toMutableList()
+    val index = currentHouseholds.indexOfFirst { it.uid == household.uid }
+    if (index != -1) {
+      originalItem = currentHouseholds[index]
+      println("we here $index")
+      currentHouseholds[index] = household
+      println("$currentHouseholds")
+    } else {
+      currentHouseholds.add(household)
+      println("we there")
     }
+    _households.value = currentHouseholds
+
+    // Perform Firebase operation
+    db.collection(collectionPath)
+        .document(household.uid)
+        .set(householdData)
+        .addOnSuccessListener { onSuccess(household.uid) }
+        .addOnFailureListener { exception ->
+          Log.e("HouseholdRepository", "Error updating household", exception)
+          // Rollback: Restore the original item in the local cache
+          originalItem?.let {
+            val rollbackHouseholds = _households.value.toMutableList()
+            val rollbackIndex = rollbackHouseholds.indexOfFirst { it.uid == household.uid }
+            if (rollbackIndex != -1) {
+              rollbackHouseholds[rollbackIndex] = it
+            } else {
+              rollbackHouseholds.remove(household)
+            }
+            _households.value = rollbackHouseholds
+          }
+        }
   }
 
-  override suspend fun deleteHouseholdById(id: String) {
-    var deletedHouseHold: HouseHold? = null
-    try {
-      // Find the household to be deleted
-      deletedHouseHold = _households.value.find { it.uid == id }
-      // Update local cache
-      val currentHouseholds = _households.value.filterNot { it.uid == id }
-      _households.value = currentHouseholds
+  override fun deleteHouseholdById(id: String, onSuccess: (String) -> Unit) {
+    // Find the household to be deleted
+    val deletedHouseHold = _households.value.find { it.uid == id }
 
-      db.collection(collectionPath).document(id).delete()
-    } catch (e: Exception) {
-      // Rollback: Restore the deleted household in the local cache
-      deletedHouseHold?.let {
-        val currentHouseholds = _households.value.toMutableList()
-        currentHouseholds.add(it)
-        _households.value = currentHouseholds
-      }
-      Log.e("HouseholdRepository", "Error deleting household", e)
-    }
+    // Optimistically update local cache
+    val currentHouseholds = _households.value.filterNot { it.uid == id }
+    _households.value = currentHouseholds
+
+    // Perform Firebase operation
+    db.collection(collectionPath)
+        .document(id)
+        .delete()
+        .addOnSuccessListener {
+          onSuccess(id)
+          Log.d("HouseholdRepository", "Successfully deleted household: $id")
+        }
+        .addOnFailureListener { exception ->
+          Log.e("HouseholdRepository", "Error deleting household", exception)
+          // Rollback: Restore the deleted household in the local cache
+          deletedHouseHold?.let {
+            val rollbackHouseholds = _households.value.toMutableList()
+            rollbackHouseholds.add(it)
+            _households.value = rollbackHouseholds
+          }
+        }
   }
 
   override suspend fun getHouseholdMembers(householdId: String): List<String> {
@@ -224,28 +227,62 @@ constructor(
             }
   }
 
-  override suspend fun updateStinkyPoints(householdId: String, stinkyPoints: Map<String, Long>) {
-    try {
-      _selectedHousehold.value = _selectedHousehold.value?.copy(stinkyPoints = stinkyPoints)
-      db.collection(collectionPath).document(householdId).update("stinkyPoints", stinkyPoints)
-    } catch (e: Exception) {
-      Log.e("HouseholdRepository", "Error updating stinky points", e)
-    }
-  }
-
-  override suspend fun updateRatPoints(householdId: String, ratPoints: Map<String, Long>) {
-    try {
-      _selectedHousehold.value = _selectedHousehold.value?.copy(ratPoints = ratPoints)
-      db.collection(collectionPath).document(householdId).update("ratPoints", ratPoints)
-    } catch (e: Exception) {
-      Log.e("HouseholdRepository", "Error updating rat points", e)
-    }
-  }
-
   /** Stops listening for real-time updates. */
   fun stopListeningForHouseholds() {
     householdsListenerRegistration?.remove()
     householdsListenerRegistration = null
+  }
+
+  override fun updateStinkyPoints(householdId: String, stinkyPoints: Map<String, Long>) {
+    // Save the original points for rollback
+    val originalStinkyPoints = _selectedHousehold.value?.stinkyPoints
+
+    // Optimistically update local cache
+    _selectedHousehold.value = _selectedHousehold.value?.copy(stinkyPoints = stinkyPoints)
+
+    // Perform Firebase operation
+    db.collection(collectionPath)
+        .document(householdId)
+        .update("stinkyPoints", stinkyPoints)
+        .addOnSuccessListener {
+          Log.d(
+              "HouseholdRepository",
+              "Successfully updated stinky points for household: $householdId")
+        }
+        .addOnFailureListener { exception ->
+          Log.e("HouseholdRepository", "Error updating stinky points", exception)
+          // Rollback: Restore the original stinky points
+          _selectedHousehold.value =
+              _selectedHousehold.value?.copy(stinkyPoints = originalStinkyPoints.orEmpty())
+        }
+  }
+
+  override fun updateRatPoints(householdId: String, ratPoints: Map<String, Long>) {
+    // Save the original points for rollback
+    val originalRatPoints = _selectedHousehold.value?.ratPoints
+
+    // Optimistically update local cache
+    _selectedHousehold.value = _selectedHousehold.value?.copy(ratPoints = ratPoints)
+
+    // Perform Firebase operation
+    db.collection(collectionPath)
+        .document(householdId)
+        .update("ratPoints", ratPoints)
+        .addOnSuccessListener {
+          Log.d(
+              "HouseholdRepository", "Successfully updated rat points for household: $householdId")
+        }
+        .addOnFailureListener { exception ->
+          Log.e("HouseholdRepository", "Error updating rat points", exception)
+          // Rollback: Restore the original rat points
+          _selectedHousehold.value =
+              _selectedHousehold.value?.copy(ratPoints = originalRatPoints.orEmpty())
+        }
+  }
+
+  override fun deleteHouseholdFromLocalList(householdId: String) {
+    val currentHouseholds = _households.value.filterNot { it.uid == householdId }
+    _households.value = currentHouseholds
   }
 
   /**
