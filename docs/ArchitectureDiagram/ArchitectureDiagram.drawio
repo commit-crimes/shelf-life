@@ -330,7 +330,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="LTJ_Gl-xL_AbH-kLbHSW" name="Total View">
-    <mxGraphModel dx="1509" dy="777" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+    <mxGraphModel dx="1687" dy="868" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -364,7 +364,7 @@
           <mxGeometry x="300" y="81.88" width="150" height="95" as="geometry" />
         </mxCell>
         <mxCell id="R4IhuIYSp7rkftoty3vs-3" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Household D&lt;span style=&quot;background-color: initial;&quot;&gt;ata&lt;/span&gt;&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
-          <mxGeometry x="327.5" y="619.42" width="95" height="80" as="geometry" />
+          <mxGeometry x="350" y="619.42" width="95" height="80" as="geometry" />
         </mxCell>
         <mxCell id="R4IhuIYSp7rkftoty3vs-6" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Food items Data&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
           <mxGeometry x="667.5" y="620.12" width="106" height="80" as="geometry" />
@@ -471,7 +471,7 @@
         <mxCell id="KqWvt1sPVI4VYO-I-6gQ-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;sketch=1;curveFitting=1;jiggle=2;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="KqWvt1sPVI4VYO-I-6gQ-12" target="KqWvt1sPVI4VYO-I-6gQ-25" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="KqWvt1sPVI4VYO-I-6gQ-25" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Non-expired food items&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
+        <mxCell id="KqWvt1sPVI4VYO-I-6gQ-25" value="&lt;h3 style=&quot;font-size: 15px;&quot;&gt;Select food items&lt;/h3&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fillStyle=hatch;strokeWidth=3;perimeterSpacing=0;sketch=1;curveFitting=1;jiggle=2;" parent="1" vertex="1">
           <mxGeometry x="1432.5" y="431.98" width="116" height="81.87" as="geometry" />
         </mxCell>
         <mxCell id="KqWvt1sPVI4VYO-I-6gQ-26" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=2;sketch=1;curveFitting=1;jiggle=2;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="KqWvt1sPVI4VYO-I-6gQ-25" edge="1">
@@ -622,7 +622,7 @@
             <mxPoint x="540" y="460" as="targetPoint" />
             <Array as="points">
               <mxPoint x="213" y="740" />
-              <mxPoint x="375" y="740" />
+              <mxPoint x="398" y="740" />
             </Array>
           </mxGeometry>
         </mxCell>
@@ -633,7 +633,7 @@
         </mxCell>
         <mxCell id="AiOB0Xk0WnozjZ-xZyYD-17" value="&lt;font color=&quot;#d7817d&quot; style=&quot;font-size: 10px;&quot;&gt;user data&lt;/font&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="AiOB0Xk0WnozjZ-xZyYD-13">
           <mxGeometry x="0.4886" y="-2" relative="1" as="geometry">
-            <mxPoint x="147" y="-32" as="offset" />
+            <mxPoint x="129" y="-32" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="AiOB0Xk0WnozjZ-xZyYD-18" value="&lt;font color=&quot;#d7817d&quot; style=&quot;font-size: 10px;&quot;&gt;recipe uids&lt;/font&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="AiOB0Xk0WnozjZ-xZyYD-13">
@@ -643,7 +643,7 @@
         </mxCell>
         <mxCell id="AiOB0Xk0WnozjZ-xZyYD-21" value="&lt;font color=&quot;#d7817d&quot; style=&quot;font-size: 10px;&quot;&gt;invitation uids&lt;/font&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="AiOB0Xk0WnozjZ-xZyYD-13">
           <mxGeometry x="0.4886" y="-2" relative="1" as="geometry">
-            <mxPoint x="137" y="-22" as="offset" />
+            <mxPoint x="119" y="-22" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="AiOB0Xk0WnozjZ-xZyYD-14" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fillColor=#f8cecc;strokeColor=#b85450;" edge="1" parent="1" target="R4IhuIYSp7rkftoty3vs-11">
