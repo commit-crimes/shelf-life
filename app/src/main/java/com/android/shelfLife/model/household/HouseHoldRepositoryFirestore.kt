@@ -61,7 +61,10 @@ constructor(
 
             val households =
                 querySnapshot?.documents?.mapNotNull { convertToHousehold(it) } ?: emptyList()
-            _households.value += households
+
+            if (_households.value.contains(households.first())) {
+              _households.value += households.first()
+            }
             Log.d("HouseholdRepository", "Households: ${_households.value}")
           }
     } catch (e: Exception) {
