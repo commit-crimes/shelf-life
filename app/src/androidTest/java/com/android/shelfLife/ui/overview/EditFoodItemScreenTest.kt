@@ -112,7 +112,7 @@ class EditFoodItemScreenTest {
 
     // Buttons
     composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("foodSave").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("foodSave").performScrollTo().assertIsDisplayed()
 
     // Delete Icon
     composeTestRule.onNodeWithTag("deleteFoodItem").assertIsDisplayed()
@@ -141,7 +141,7 @@ class EditFoodItemScreenTest {
     composeTestRule.onNodeWithTag("editFoodAmount").performTextInput("abc") // invalid amount
 
     // Submit
-    composeTestRule.onNodeWithTag("foodSave").performClick()
+    composeTestRule.onNodeWithTag("foodSave").performScrollTo().performClick()
 
     // Check error state in the ViewModel
     runBlocking { assert(foodItemViewModel.amountErrorResId != null) }
@@ -171,7 +171,7 @@ class EditFoodItemScreenTest {
     composeTestRule.onNodeWithTag("editFoodOpenDate").performTextInput("20122025")
 
     // Submit
-    composeTestRule.onNodeWithTag("foodSave").performClick()
+    composeTestRule.onNodeWithTag("foodSave").performScrollTo().performClick()
 
     verify(navigationActions).navigateTo(eq(com.android.shelfLife.ui.navigation.Route.OVERVIEW))
   }
@@ -207,6 +207,7 @@ class EditFoodItemScreenTest {
   fun testLocationDropdownExpansionAndSelection() {
     assert(foodItemViewModel.location != null)
 
+
     composeTestRule.onNodeWithTag("editFoodLocation").performClick()
 
     // Select a different location, e.g., "Pantry"
@@ -219,7 +220,7 @@ class EditFoodItemScreenTest {
     composeTestRule.onNodeWithTag("editFoodBuyDate").performTextClearance()
     composeTestRule.onNodeWithTag("editFoodBuyDate").performTextInput("00000000") // invalid
 
-    composeTestRule.onNodeWithTag("foodSave").performClick()
+    composeTestRule.onNodeWithTag("foodSave").performScrollTo().performClick()
 
     assert(foodItemViewModel.buyDateErrorResId != null)
   }

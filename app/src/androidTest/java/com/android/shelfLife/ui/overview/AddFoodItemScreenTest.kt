@@ -88,7 +88,7 @@ class AddFoodItemScreenTest {
 
     // Check the buttons
     composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("foodSave").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("foodSave").performScrollTo().assertIsDisplayed()
   }
 
   @Test
@@ -100,7 +100,7 @@ class AddFoodItemScreenTest {
   @Test
   fun submitEmptyFieldsShowsErrorToastAndDoesNotNavigateBack() {
     // Make sure fields are empty
-    composeTestRule.onNodeWithTag("foodSave").performClick()
+    composeTestRule.onNodeWithTag("foodSave").performScrollTo().performClick()
 
     // Since all are empty, we should see error validations.
     // It's tricky to directly assert Toasts in UI tests, but we can check for UI error states.
@@ -156,7 +156,7 @@ class AddFoodItemScreenTest {
     composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextInput("20122025")
 
     // Now click Save
-    composeTestRule.onNodeWithTag("foodSave").performClick()
+    composeTestRule.onNodeWithTag("foodSave").performScrollTo().performClick()
 
     // With valid data, the ViewModel should return success and we navigate back
     verify(navigationActions).goBack()
@@ -234,7 +234,7 @@ class AddFoodItemScreenTest {
     composeTestRule.onNodeWithTag("inputFoodAmount").performTextInput("abc")
 
     // Submit
-    composeTestRule.onNodeWithTag("foodSave").performClick()
+    composeTestRule.onNodeWithTag("foodSave").performScrollTo().performClick()
 
     // Check error state in the ViewModel
     assert(foodItemViewModel.amountErrorResId != null)
@@ -247,7 +247,7 @@ class AddFoodItemScreenTest {
     composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextInput("00000000") // invalid
 
     // Submit
-    composeTestRule.onNodeWithTag("foodSave").performClick()
+    composeTestRule.onNodeWithTag("foodSave").performScrollTo().performClick()
 
     // Check if error is set
     assert(foodItemViewModel.buyDateErrorResId != null)
