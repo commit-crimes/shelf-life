@@ -30,9 +30,8 @@ import kotlinx.coroutines.launch
  * Composable function to display the Add Food Item screen.
  *
  * @param navigationActions The navigation actions to be used in the screen.
- * @param foodItemRepository The food item model.
- * @param userRepository The user model.
  * @param paddingValues The padding values to be applied to the screen.
+ * @param foodItemViewModel The ViewModel for managing the state of the food item.
  */
 @Composable
 fun AddFoodItemScreen(
@@ -41,66 +40,66 @@ fun AddFoodItemScreen(
     foodItemViewModel: FoodItemViewModel = hiltViewModel()
 ) {
 
-  val coroutineScope = rememberCoroutineScope()
+    val coroutineScope = rememberCoroutineScope()
 
-  val context = LocalContext.current
+    val context = LocalContext.current
 
-  Scaffold(
-      modifier = Modifier.fillMaxSize(),
-      topBar = {
-        CustomTopAppBar(
-            onClick = { navigationActions.goBack() },
-            title = stringResource(id = R.string.add_food_item_title),
-            titleTestTag = "addFoodItemTitle")
-      }) { innerPadding ->
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            CustomTopAppBar(
+                onClick = { navigationActions.goBack() },
+                title = stringResource(id = R.string.add_food_item_title),
+                titleTestTag = "addFoodItemTitle")
+        }) { innerPadding ->
         LazyColumn(
             modifier =
-                Modifier.fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(innerPadding)
-                    .testTag("addFoodItemScreen"),
+            Modifier.fillMaxSize()
+                .padding(paddingValues)
+                .padding(innerPadding)
+                .testTag("addFoodItemScreen"),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top) {
-              item(key = "foodName") {
+            item(key = "foodName") {
                 FoodNameField(
                     foodName = foodItemViewModel.foodName,
                     onFoodNameChange = { newValue -> foodItemViewModel.changeFoodName(newValue) },
                     foodNameErrorResId = foodItemViewModel.foodNameErrorResId)
                 Spacer(modifier = Modifier.height(16.dp))
-              }
+            }
 
-              item(key = "amountAndUnit") {
+            item(key = "amountAndUnit") {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically) {
-                      AmountField(
-                          amount = foodItemViewModel.amount,
-                          onAmountChange = { newValue -> foodItemViewModel.changeAmount(newValue) },
-                          amountErrorResId = foodItemViewModel.amountErrorResId,
-                          modifier = Modifier.weight(1f),
-                          testTag = "inputFoodAmount")
-                      Spacer(modifier = Modifier.width(8.dp))
-                      UnitDropdownField(
-                          unit = foodItemViewModel.unit,
-                          onUnitChange = { foodItemViewModel.unit = it },
-                          unitExpanded = foodItemViewModel.unitExpanded,
-                          onUnitExpandedChange = { foodItemViewModel.unitExpanded = it },
-                          modifier = Modifier.weight(1f),
-                          testTag = "inputFoodUnit")
-                    }
+                    AmountField(
+                        amount = foodItemViewModel.amount,
+                        onAmountChange = { newValue -> foodItemViewModel.changeAmount(newValue) },
+                        amountErrorResId = foodItemViewModel.amountErrorResId,
+                        modifier = Modifier.weight(1f),
+                        testTag = "inputFoodAmount")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    UnitDropdownField(
+                        unit = foodItemViewModel.unit,
+                        onUnitChange = { foodItemViewModel.unit = it },
+                        unitExpanded = foodItemViewModel.unitExpanded,
+                        onUnitExpandedChange = { foodItemViewModel.unitExpanded = it },
+                        modifier = Modifier.weight(1f),
+                        testTag = "inputFoodUnit")
+                }
                 Spacer(modifier = Modifier.height(16.dp))
-              }
+            }
 
-              item(key = "category") {
+            item(key = "category") {
                 CategoryDropdownField(
                     category = foodItemViewModel.category,
                     onCategoryChange = { foodItemViewModel.category = it },
                     categoryExpanded = foodItemViewModel.categoryExpanded,
                     onCategoryExpandedChange = { foodItemViewModel.categoryExpanded = it })
                 Spacer(modifier = Modifier.height(16.dp))
-              }
+            }
 
-              item(key = "location") {
+            item(key = "location") {
                 NewLocationDropdownField(
                     location = foodItemViewModel.location,
                     onLocationChange = { foodItemViewModel.location = it },
@@ -108,9 +107,9 @@ fun AddFoodItemScreen(
                     onExpandedChange = { foodItemViewModel.locationExpanded = it },
                     testTag = "inputFoodLocation")
                 Spacer(modifier = Modifier.height(16.dp))
-              }
+            }
 
-              item(key = "expireDate") {
+            item(key = "expireDate") {
                 DateField(
                     date = foodItemViewModel.expireDate,
                     onDateChange = { newValue -> foodItemViewModel.changeExpiryDate(newValue) },
@@ -118,9 +117,9 @@ fun AddFoodItemScreen(
                     labelResId = R.string.expire_date_hint,
                     testTag = "inputFoodExpireDate")
                 Spacer(modifier = Modifier.height(16.dp))
-              }
+            }
 
-              item(key = "openDate") {
+            item(key = "openDate") {
                 DateField(
                     date = foodItemViewModel.openDate,
                     onDateChange = { newValue -> foodItemViewModel.changeOpenDate(newValue) },
@@ -128,9 +127,9 @@ fun AddFoodItemScreen(
                     labelResId = R.string.open_date_hint,
                     testTag = "inputFoodOpenDate")
                 Spacer(modifier = Modifier.height(16.dp))
-              }
+            }
 
-              item(key = "buyDate") {
+            item(key = "buyDate") {
                 DateField(
                     date = foodItemViewModel.buyDate,
                     onDateChange = { newValue -> foodItemViewModel.changeBuyDate(newValue) },
@@ -138,29 +137,29 @@ fun AddFoodItemScreen(
                     labelResId = R.string.buy_date_hint,
                     testTag = "inputFoodBuyDate")
                 Spacer(modifier = Modifier.height(32.dp))
-              }
+            }
 
-              item(key = "buttons") {
+            item(key = "buttons") {
                 CustomButtons(
                     button1OnClick = { navigationActions.goBack() },
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(R.string.cancel_button),
                     button2OnClick = {
-                      coroutineScope.launch {
-                        val success = foodItemViewModel.submitFoodItem()
-                        if (success) {
-                          // foodFactsViewModel.clearFoodFactsSuggestions()
-                          navigationActions.goBack()
-                        } else {
-                          Toast.makeText(
-                                  context, R.string.submission_error_message, Toast.LENGTH_SHORT)
-                              .show()
+                        coroutineScope.launch {
+                            val success = foodItemViewModel.submitFoodItem()
+                            if (success) {
+                                // foodFactsViewModel.clearFoodFactsSuggestions()
+                                navigationActions.goBack()
+                            } else {
+                                Toast.makeText(
+                                    context, R.string.submission_error_message, Toast.LENGTH_SHORT)
+                                    .show()
+                            }
                         }
-                      }
                     },
                     button2TestTag = "foodSave",
                     button2Text = stringResource(R.string.submit_button_text))
-              }
             }
-      }
+        }
+    }
 }

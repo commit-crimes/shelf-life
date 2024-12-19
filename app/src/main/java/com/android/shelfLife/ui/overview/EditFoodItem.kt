@@ -32,9 +32,8 @@ import kotlinx.coroutines.launch
  * Composable function to display the Edit Food Item screen.
  *
  * @param navigationActions The navigation actions to be used in the screen.
- * @param foodItemRepository The food item model.
- * @param userRepository The user model.
  * @param paddingValues The padding values to be applied to the screen.
+ * @param foodItemViewModel The ViewModel for managing the state of the food item.
  */
 @Composable
 fun EditFoodItemScreen(
@@ -43,66 +42,66 @@ fun EditFoodItemScreen(
     foodItemViewModel: FoodItemViewModel = hiltViewModel()
 ) {
 
-  val context = LocalContext.current
-  val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
-  Scaffold(
-      modifier = Modifier.fillMaxSize(),
-      topBar = {
-        CustomTopAppBar(
-            onClick = { navigationActions.goBack() },
-            title =
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            CustomTopAppBar(
+                onClick = { navigationActions.goBack() },
+                title =
                 stringResource(
                     id =
-                        if (!foodItemViewModel.getIsQuickAdd()) R.string.edit_food_item_title
-                        else R.string.finalize_food_item_title),
-            titleTestTag = "editFoodItemTitle",
-            actions = {
-              IconButton(
-                  onClick = {
-                    coroutineScope.launch {
-                      foodItemViewModel.deleteFoodItem()
-                      navigationActions.navigateTo(Route.OVERVIEW)
+                    if (!foodItemViewModel.getIsQuickAdd()) R.string.edit_food_item_title
+                    else R.string.finalize_food_item_title),
+                titleTestTag = "editFoodItemTitle",
+                actions = {
+                    IconButton(
+                        onClick = {
+                            coroutineScope.launch {
+                                foodItemViewModel.deleteFoodItem()
+                                navigationActions.navigateTo(Route.OVERVIEW)
+                            }
+                        },
+                        modifier = Modifier.testTag("deleteFoodItem")) {
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
                     }
-                  },
-                  modifier = Modifier.testTag("deleteFoodItem")) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Icon")
-                  }
-            })
-      }) { innerPadding ->
+                })
+        }) { innerPadding ->
         LazyColumn(
             modifier =
-                Modifier.fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(innerPadding)
-                    .testTag("editFoodItemScreen"),
+            Modifier.fillMaxSize()
+                .padding(paddingValues)
+                .padding(innerPadding)
+                .testTag("editFoodItemScreen"),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top) {
-              item(key = "amountAndUnit") {
+            item(key = "amountAndUnit") {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically) {
-                      AmountField(
-                          amount = foodItemViewModel.amount,
-                          onAmountChange = { newValue -> foodItemViewModel.changeAmount(newValue) },
-                          amountErrorResId = foodItemViewModel.amountErrorResId,
-                          modifier = Modifier.weight(1f),
-                          testTag = "editFoodAmount")
-                      Spacer(modifier = Modifier.width(8.dp))
-                      // Display unit as card (non-editable)
-                      Card(
-                          border = CardDefaults.outlinedCardBorder(),
-                          shape = MaterialTheme.shapes.large,
-                          modifier = Modifier.weight(1f).testTag("editFoodUnit")) {
-                            Text(
-                                text = foodItemViewModel.unit.name,
-                                modifier = Modifier.padding(12.dp))
-                          }
+                    AmountField(
+                        amount = foodItemViewModel.amount,
+                        onAmountChange = { newValue -> foodItemViewModel.changeAmount(newValue) },
+                        amountErrorResId = foodItemViewModel.amountErrorResId,
+                        modifier = Modifier.weight(1f),
+                        testTag = "editFoodAmount")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    // Display unit as card (non-editable)
+                    Card(
+                        border = CardDefaults.outlinedCardBorder(),
+                        shape = MaterialTheme.shapes.large,
+                        modifier = Modifier.weight(1f).testTag("editFoodUnit")) {
+                        Text(
+                            text = foodItemViewModel.unit.name,
+                            modifier = Modifier.padding(12.dp))
                     }
+                }
                 Spacer(modifier = Modifier.height(16.dp))
-              }
+            }
 
-              item(key = "location") {
+            item(key = "location") {
                 NewLocationDropdownField(
                     location = foodItemViewModel.location,
                     onLocationChange = { foodItemViewModel.location = it },
@@ -110,9 +109,9 @@ fun EditFoodItemScreen(
                     onExpandedChange = { foodItemViewModel.locationExpanded = it },
                     testTag = "editFoodLocation")
                 Spacer(modifier = Modifier.height(16.dp))
-              }
+            }
 
-              item(key = "expireDate") {
+            item(key = "expireDate") {
                 DateField(
                     date = foodItemViewModel.expireDate,
                     onDateChange = { newValue -> foodItemViewModel.changeExpiryDate(newValue) },
@@ -120,9 +119,9 @@ fun EditFoodItemScreen(
                     labelResId = R.string.expire_date_hint,
                     testTag = "editFoodExpireDate")
                 Spacer(modifier = Modifier.height(16.dp))
-              }
+            }
 
-              item(key = "openDate") {
+            item(key = "openDate") {
                 DateField(
                     date = foodItemViewModel.openDate,
                     onDateChange = { newValue -> foodItemViewModel.changeOpenDate(newValue) },
@@ -130,9 +129,9 @@ fun EditFoodItemScreen(
                     labelResId = R.string.open_date_hint,
                     testTag = "editFoodOpenDate")
                 Spacer(modifier = Modifier.height(16.dp))
-              }
+            }
 
-              item(key = "buyDate") {
+            item(key = "buyDate") {
                 DateField(
                     date = foodItemViewModel.buyDate,
                     onDateChange = { newValue -> foodItemViewModel.changeBuyDate(newValue) },
@@ -140,49 +139,49 @@ fun EditFoodItemScreen(
                     labelResId = R.string.buy_date_hint,
                     testTag = "editFoodBuyDate")
                 Spacer(modifier = Modifier.height(32.dp))
-              }
+            }
 
-              // Only if its in Edit Food Item and not in Add Food Item
-              if (foodItemViewModel.isSelected) {
+            // Only if its in Edit Food Item and not in Add Food Item
+            if (foodItemViewModel.isSelected) {
                 item {
-                  foodItemViewModel.selectedImage?.let {
-                    Text(
-                        stringResource(id = R.string.selected_image_label),
-                        modifier = Modifier.testTag("selectedImageText"))
-                    Image(
-                        painter = rememberAsyncImagePainter(it.imageUrl),
-                        contentDescription = null,
-                        modifier = Modifier.size(150.dp).padding(8.dp).testTag("selectedImage"))
-                    Spacer(modifier = Modifier.height(16.dp))
-                  }
+                    foodItemViewModel.selectedImage?.let {
+                        Text(
+                            stringResource(id = R.string.selected_image_label),
+                            modifier = Modifier.testTag("selectedImageText"))
+                        Image(
+                            painter = rememberAsyncImagePainter(it.imageUrl),
+                            contentDescription = null,
+                            modifier = Modifier.size(150.dp).padding(8.dp).testTag("selectedImage"))
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
-              }
+            }
 
-              item(key = "buttons") {
+            item(key = "buttons") {
                 CustomButtons(
                     button1OnClick = {
-                      foodItemViewModel.setFoodItem(null)
-                      foodItemViewModel.resetSearchStatus()
-                      navigationActions.navigateTo(Route.OVERVIEW)
+                        foodItemViewModel.setFoodItem(null)
+                        foodItemViewModel.resetSearchStatus()
+                        navigationActions.navigateTo(Route.OVERVIEW)
                     },
                     button1TestTag = "cancelButton",
                     button1Text = stringResource(R.string.cancel_button),
                     button2OnClick = {
-                      coroutineScope.launch {
-                        val success = foodItemViewModel.submitFoodItem()
-                        if (success) {
-                          navigationActions.navigateTo(Route.OVERVIEW)
-                        } else {
+                        coroutineScope.launch {
+                            val success = foodItemViewModel.submitFoodItem()
+                            if (success) {
+                                navigationActions.navigateTo(Route.OVERVIEW)
+                            } else {
 
-                          Toast.makeText(
-                                  context, R.string.submission_error_message, Toast.LENGTH_SHORT)
-                              .show()
+                                Toast.makeText(
+                                    context, R.string.submission_error_message, Toast.LENGTH_SHORT)
+                                    .show()
+                            }
                         }
-                      }
                     },
                     button2TestTag = "foodSave",
                     button2Text = stringResource(R.string.submit_button_text))
-              }
             }
-      }
+        }
+    }
 }
