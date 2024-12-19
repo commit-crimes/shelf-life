@@ -20,6 +20,8 @@ import com.android.shelfLife.ui.leaderboard.LeaderboardScreen
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.ui.newoverview.ChooseFoodItem
+import com.android.shelfLife.ui.newoverview.FirstFoodItem
 import com.android.shelfLife.ui.overview.AddFoodItemScreen
 import com.android.shelfLife.ui.overview.EditFoodItemScreen
 import com.android.shelfLife.ui.overview.FirstTimeWelcomeScreen
@@ -62,9 +64,12 @@ fun ShelfLifeApp() {
     }
     navigation(startDestination = Screen.OVERVIEW, route = Route.OVERVIEW) {
       composable(Screen.OVERVIEW) { OverviewScreen(navigationActions) }
+      composable(Screen.FIRST_TIME_USER) { FirstTimeWelcomeScreen(navigationActions) }
       composable(Screen.ADD_FOOD) { AddFoodItemScreen(navigationActions) }
       composable(Screen.EDIT_FOOD) { EditFoodItemScreen(navigationActions) }
       composable(Screen.HOUSEHOLD_CREATION) { HouseHoldCreationScreen(navigationActions) }
+      composable(Screen.FIRST_FOOD_ITEM) { FirstFoodItem(navigationActions) }
+      composable(Screen.CHOOSE_FOOD_ITEM) { ChooseFoodItem(navigationActions) }
       composable(Screen.INDIVIDUAL_FOOD_ITEM) { IndividualFoodItemScreen(navigationActions) }
       composable(Screen.LEADERBOARD) { LeaderboardScreen(navigationActions) }
     }
@@ -89,9 +94,6 @@ fun ShelfLifeApp() {
     navigation(startDestination = Screen.PROFILE, route = Route.PROFILE) {
       composable(Screen.PROFILE) { ProfileScreen(navigationActions, context) }
       composable(Route.INVITATIONS) { InvitationScreen(navigationActions) }
-    }
-    navigation(startDestination = Screen.FIRST_TIME_USER, route = Route.FIRST_TIME_USER) {
-      composable(Screen.FIRST_TIME_USER) { FirstTimeWelcomeScreen(navigationActions) }
     }
     navigation(startDestination = Screen.EASTER_EGG, route = Route.EASTEREGG) {
       composable(Screen.EASTER_EGG) { EasterEggScreen(navigationActions) }

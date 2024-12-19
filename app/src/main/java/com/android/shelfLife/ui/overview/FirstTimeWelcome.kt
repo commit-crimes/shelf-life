@@ -1,5 +1,6 @@
 package com.android.shelfLife.ui.overview
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -13,13 +14,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Screen
+import com.android.shelfLife.viewmodel.overview.FirstTimeWelcomeScreenViewModel
 import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 
 /**
@@ -29,13 +30,16 @@ import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
  * @param navigationActions The actions to navigate between screens.
  */
 @Composable
-fun FirstTimeWelcomeScreen(navigationActions: NavigationActions) {
-  val overviewScreenViewModel = hiltViewModel<OverviewScreenViewModel>()
-  val currentContext = LocalContext.current
-  Column(
-      modifier = Modifier.fillMaxSize().padding(16.dp).testTag("firstTimeWelcomeScreen"),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally) {
+fun FirstTimeWelcomeScreen(
+    navigationActions: NavigationActions,
+    overviewScreenViewModel: FirstTimeWelcomeScreenViewModel = hiltViewModel()
+) {
+
+    Log.d("FirstTimeWelcomeScreen", "FirstTimeWelcomeScreen")
+    Column(
+        modifier = Modifier.fillMaxSize().padding(16.dp).testTag("firstTimeWelcomeScreen"),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally) {
         // Welcome Text
         Text(
             text = "Welcome to ShelfLife!",
@@ -58,12 +62,13 @@ fun FirstTimeWelcomeScreen(navigationActions: NavigationActions) {
         // Create Household Button
         Button(
             onClick = {
-              overviewScreenViewModel.selectHouseholdToEdit(null)
-              navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
+                overviewScreenViewModel.selectHouseholdToEdit(null)
+                navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
             },
             modifier = Modifier.fillMaxWidth(0.6f).height(48.dp).testTag("householdNameSaveButton"),
             shape = MaterialTheme.shapes.medium) {
-              Text(text = "Create Household", style = MaterialTheme.typography.labelLarge)
-            }
-      }
+            Text(text = "Create Household", style = MaterialTheme.typography.labelLarge)
+        }
+    }
 }
+

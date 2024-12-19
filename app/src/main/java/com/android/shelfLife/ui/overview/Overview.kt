@@ -5,13 +5,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -27,6 +28,7 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.Route
 import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.ui.navigation.TopNavigationBar
+import com.android.shelfLife.ui.newutils.ExtendedActionButtons
 import com.android.shelfLife.ui.utils.CustomSearchBar
 import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 import kotlinx.coroutines.launch
@@ -53,13 +55,15 @@ fun OverviewScreen(
 
   val drawerState by overviewScreenViewModel.drawerState.collectAsState()
   val scope = rememberCoroutineScope()
-
+  Log.d("OverviewScreen", "selectedHousehold: $selectedHousehold")
+  Log.d("OverviewScreen", "households: $households")
   HouseHoldSelectionDrawer(
       scope = scope, drawerState = drawerState, navigationActions = navigationActions) {
         if (selectedHousehold == null && households.isEmpty()) {
           Log.d("OverviewScreen", households.toString())
-          navigationActions.navigateTo(Screen.FIRST_TIME_USER)
+          LaunchedEffect(Unit) { navigationActions.navigateTo(Screen.FIRST_TIME_USER) }
         } else {
+          Log.d("OverviewScreen", "selectedHousehold: $selectedHousehold")
           Scaffold(
               modifier = Modifier.testTag("overviewScreen"),
               topBar = {
@@ -93,7 +97,10 @@ fun OverviewScreen(
                     ) {
                       // Leaderboard
                       FloatingActionButton(
-                          onClick = { navigationActions.navigateTo(Screen.LEADERBOARD) },
+                          onClick = {
+                            overviewScreenViewModel.selectFoodItem(null)
+                            navigationActions.navigateTo(Screen.LEADERBOARD)
+                          },
                           containerColor = MaterialTheme.colorScheme.secondaryContainer,
                           modifier = Modifier.testTag("leaderboardFab")) {
                             Icon(
@@ -104,12 +111,16 @@ fun OverviewScreen(
                           }
 
                       // Add
-                      FloatingActionButton(
-                          onClick = { navigationActions.navigateTo(Screen.ADD_FOOD) },
-                          containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                          modifier = Modifier.testTag("addFoodFab")) {
-                            Icon(Icons.Default.Add, contentDescription = "Add")
-                          }
+                      ExtendedActionButtons(
+                          fabExpanded = overviewScreenViewModel.fabExpanded,
+                          navigationActions = navigationActions,
+                          firstIcon = Icons.Default.Search,
+                          firstScreenText = "Quick Add",
+                          firstScreen = Screen.FIRST_FOOD_ITEM,
+                          secondScreen = Screen.ADD_FOOD,
+                          firstScreenTestTag = "addFirstName",
+                          secondScreenTestTag = "addFoodFab",
+                          foodItemViewModel = hiltViewModel())
                     }
               },
           ) { paddingValues ->

@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,7 +36,7 @@ fun CameraPermissionHandler(
   val context = LocalContext.current
   val activity = context as Activity
 
-  val permissionGranted = viewModel.permissionGranted
+  val permissionGranted by viewModel.permissionGranted.collectAsState()
 
   // For triggering permission requests
   val launcher =

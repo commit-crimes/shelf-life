@@ -1,14 +1,18 @@
 package com.android.shelfLife.viewmodel.overview
 
+import android.content.Context
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
+import com.android.shelfLife.model.foodFacts.FoodFactsRepository
 import com.android.shelfLife.model.foodFacts.FoodUnit
 import com.android.shelfLife.model.foodFacts.NutritionFacts
 import com.android.shelfLife.model.foodFacts.Quantity
+import com.android.shelfLife.model.foodFacts.SearchStatus
 import com.android.shelfLife.model.foodItem.FoodItem
 import com.android.shelfLife.model.foodItem.FoodItemRepository
 import com.android.shelfLife.model.foodItem.FoodStatus
@@ -24,13 +28,16 @@ import com.android.shelfLife.ui.utils.validateString
 import com.google.firebase.Timestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 
 @HiltViewModel
 class FoodItemViewModel
 @Inject
 constructor(
     private val foodItemRepository: FoodItemRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val foodFactsRepository: FoodFactsRepository
 ) : ViewModel() {
 
   var selectedFood by mutableStateOf<FoodItem?>(null)
@@ -38,6 +45,11 @@ constructor(
   var isSelected by mutableStateOf(false)
 
   var isScanned by mutableStateOf(false)
+  var isQuickAdd by mutableStateOf(false)
+  val searchStatus: StateFlow<SearchStatus> = foodFactsRepository.searchStatus
+  val foodFactsSuggestions: StateFlow<List<FoodFacts>> = foodFactsRepository.foodFactsSuggestions
+  var isLoading by mutableStateOf(false)
+  var capturedImageUri by mutableStateOf<Uri?>(null)
 
   var foodName by mutableStateOf("")
   var amount by mutableStateOf("")
@@ -71,6 +83,7 @@ constructor(
       expireDate = selectedFood!!.expiryDate?.let { formatTimestampToDate(it) } ?: ""
       openDate = selectedFood!!.openDate?.let { formatTimestampToDate(it) } ?: ""
       buyDate = selectedFood!!.buyDate?.let { formatTimestampToDate(it) } ?: ""
+      selectedImage = selectedFood!!.foodFacts
     } else {
       isSelected = false
     }
@@ -149,6 +162,16 @@ constructor(
         validateOpenDate(openDate, buyDate, buyDateErrorResId, expireDate, expireDateErrorResId)
   }
 
+  suspend fun submbitFoodName(): Boolean {
+    foodNameErrorResId = validateString(foodName)
+    val isFoodNameValid = foodNameErrorResId == null
+    if (isFoodNameValid) {
+      return true
+    } else {
+      return false
+    }
+  }
+
   suspend fun submitFoodItem(scannedFoodFacts: FoodFacts? = null): Boolean {
     validateAllFieldsWhenSubmitButton()
     val isExpireDateValid = expireDateErrorResId == null && expireDate.isNotEmpty()
@@ -156,11 +179,9 @@ constructor(
     val isBuyDateValid = buyDateErrorResId == null && buyDate.isNotEmpty()
     val isFoodNameValid = foodNameErrorResId == null
     val isAmountValid = amountErrorResId == null
-
     val expiryTimestamp = formatDateToTimestamp(expireDate)
     val openTimestamp = if (openDate.isNotEmpty()) formatDateToTimestamp(openDate) else null
     val buyTimestamp = formatDateToTimestamp(buyDate)
-
     if (isExpireDateValid &&
         isOpenDateValid &&
         isBuyDateValid &&
@@ -169,35 +190,52 @@ constructor(
         expiryTimestamp != null &&
         buyTimestamp != null) {
       val foodFacts =
-          if (isScanned) scannedFoodFacts!!
-          else
-              FoodFacts(
-                  name = foodName,
-                  barcode =
-                      if (isSelected) selectedFood!!.foodFacts.barcode
-                      else selectedImage?.barcode ?: "",
-                  quantity = Quantity(amount.toDouble(), unit),
-                  category = category,
-                  nutritionFacts =
-                      if (isSelected) selectedFood!!.foodFacts.nutritionFacts
-                      else selectedImage?.nutritionFacts ?: NutritionFacts(),
-                  imageUrl =
-                      if (isSelected) selectedFood!!.foodFacts.imageUrl
-                      else selectedImage?.imageUrl ?: FoodFacts.DEFAULT_IMAGE_URL)
+          if (isScanned) {
+            scannedFoodFacts!!
+          } else if (!isQuickAdd) {
+            FoodFacts(
+                name = foodName,
+                barcode =
+                    if (isSelected) selectedFood!!.foodFacts.barcode
+                    else selectedImage?.barcode ?: "",
+                quantity = Quantity(amount.toDouble(), unit),
+                category = category,
+                nutritionFacts =
+                    if (isSelected) selectedFood!!.foodFacts.nutritionFacts
+                    else selectedImage?.nutritionFacts ?: NutritionFacts(),
+                imageUrl =
+                    if (isSelected) selectedFood!!.foodFacts.imageUrl
+                    else selectedImage?.imageUrl ?: FoodFacts.DEFAULT_IMAGE_URL)
+          } else {
+            selectedImage
+          }
       val newFoodItem =
           FoodItem(
-              uid = if (isSelected) selectedFood!!.uid else foodItemRepository.getNewUid(),
-              foodFacts = foodFacts,
+              uid =
+                  if (isSelected && !foodItemRepository.isQuickAdd.first()) selectedFood!!.uid
+                  else foodItemRepository.getNewUid(),
+              foodFacts = foodFacts!!,
               location = location,
               expiryDate = expiryTimestamp,
               openDate = openTimestamp,
               buyDate = buyTimestamp,
-              status = if (isSelected) selectedFood!!.status else FoodStatus.UNOPENED,
+              status =
+                  if (isSelected && !foodItemRepository.isQuickAdd.first()) selectedFood!!.status
+                  else FoodStatus.UNOPENED,
               owner =
-                  if (isSelected) selectedFood!!.owner else userRepository.user.value?.uid ?: "")
+                  if (isSelected && !foodItemRepository.isQuickAdd.first()) selectedFood!!.owner
+                  else userRepository.user.value?.uid ?: "")
+
+      resetSearchStatus()
       if (isSelected) {
-        foodItemRepository.selectFoodItem(newFoodItem)
-        editFoodItem(newFoodItem)
+        if (foodItemRepository.isQuickAdd.first()) {
+          foodItemRepository.selectFoodItem(null)
+          addFoodItem(newFoodItem)
+        } else {
+          foodItemRepository.selectFoodItem(null)
+          foodItemRepository.setisQuickAdd(false)
+          editFoodItem(newFoodItem)
+        }
       } else {
         addFoodItem(newFoodItem)
       }
@@ -205,6 +243,38 @@ constructor(
     } else {
       return false
     }
+  }
+
+  fun resetSearchStatus() {
+    foodFactsRepository.resetSearchStatus()
+  }
+
+  fun searchByQuery(query: String) {
+    foodFactsRepository.searchByQuery(query)
+  }
+
+  fun resetSelectFoodItem() {
+    foodItemRepository.selectFoodItem(
+        FoodItem(
+            uid = "",
+            foodFacts = FoodFacts(name = "", quantity = Quantity(0.0, FoodUnit.GRAM)),
+            owner = ""))
+  }
+
+  fun setIsQuickAdd(isQuickAdd: Boolean) {
+    foodItemRepository.setisQuickAdd(isQuickAdd)
+  }
+
+  fun setFoodItem(foodItem: FoodItem?) {
+    foodItemRepository.selectFoodItem(foodItem)
+  }
+
+  fun getIsQuickAdd(): Boolean {
+    return foodItemRepository.isQuickAdd.value ?: false
+  }
+
+  suspend fun uploadImageToFirebaseStorage(uri: Uri, context: Context): String? {
+    return foodItemRepository.uploadImageToFirebaseStorage(uri, context)
   }
 
   fun resetForScanner() {

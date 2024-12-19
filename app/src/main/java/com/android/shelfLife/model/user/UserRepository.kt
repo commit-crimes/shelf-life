@@ -16,6 +16,8 @@ interface UserRepository {
 
   var currentAudioMode: StateFlow<LeaderboardMode?>
 
+  var bypassLogin: StateFlow<Boolean>
+
   /** Generates a new unique ID for a user. */
   fun getNewUid(): String
 
@@ -30,25 +32,25 @@ interface UserRepository {
   fun setCurrentAudioMode(mode: LeaderboardMode?)
 
   // Other suspend functions for updating user data
-  suspend fun addHouseholdUID(householdUID: String)
+  fun addHouseholdUID(householdUID: String)
 
-  suspend fun deleteHouseholdUID(uid: String)
+  fun deleteHouseholdUID(uid: String)
 
-  suspend fun updateSelectedHouseholdUID(householdUID: String)
+  fun updateSelectedHouseholdUID(householdUID: String)
 
-  suspend fun addRecipeUID(recipeUID: String)
+  fun addRecipeUID(recipeUID: String)
 
-  suspend fun deleteRecipeUID(uid: String)
+  fun deleteRecipeUID(uid: String)
 
   fun deleteInvitationUID(uid: String)
 
-  suspend fun updateUsername(username: String)
+  fun updateUsername(username: String)
 
-  suspend fun updateImage(url: String)
+  fun updateImage(url: String)
 
-  suspend fun updateEmail(email: String)
+  fun updateEmail(email: String)
 
-  suspend fun updateSelectedHousehold(selectedHouseholdUID: String)
+  fun updateSelectedHousehold(selectedHouseholdUID: String)
 
   /** @param userEmails - The set of user emails to get the user IDs for. */
   suspend fun getUserIds(userEmails: Set<String?>): Map<String, String>
@@ -56,14 +58,14 @@ interface UserRepository {
   /** @param userIds - The list of user IDs to get the emails for. */
   suspend fun getUserEmails(userIds: List<String>): Map<String, String>
 
-  suspend fun addCurrentUserToHouseHold(householdUID: String, userUID: String)
+  fun addCurrentUserToHouseHold(householdUID: String, userUID: String)
   /**
    * Selects a household and saves it to the user's data. VIEW MODELS NEED TO MANUALLY SELECT THE
    * LIST OF FOOD ITEMS!!!
    *
    * @param householdUid - The household to select.
    */
-  suspend fun selectHousehold(householdUid: String?)
+  fun selectHousehold(householdUid: String?)
 
   suspend fun getUserNames(userIds: List<String>): Map<String, String>
 }

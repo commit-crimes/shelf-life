@@ -145,6 +145,7 @@ constructor(
       houseHoldRepository.selectHousehold(household)
       userRepository.selectHousehold(household.uid)
       Log.d("HouseholdViewModel", "Selected new household: ${household.name}")
+      foodItemRepository.getFoodItems(household.uid)
 
       if (friendEmails.isNotEmpty()) {
         val emailToUid = userRepository.getUserIds(friendEmails)

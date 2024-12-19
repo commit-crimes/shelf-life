@@ -74,7 +74,6 @@ class OverviewScreenViewModelTest {
                 stinkyPoints = emptyMap()))
     every { mockHouseHoldRepository.selectedHousehold } returns householdFlow
 
-    coEvery { mockHouseHoldRepository.getHouseholds(any()) } returns emptyList()
     every { mockHouseHoldRepository.households } returns MutableStateFlow(emptyList())
 
     // Mock food item repository
