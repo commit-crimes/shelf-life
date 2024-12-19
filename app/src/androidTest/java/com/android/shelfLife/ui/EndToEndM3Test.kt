@@ -313,8 +313,10 @@ class EndToEndM3Test {
 
     // User navigates to the add food item screen
     composeTestRule.onNodeWithTag("addFoodFab").assertIsDisplayed().performClick()
+    composeTestRule.onNodeWithTag("addFoodFab").assertIsDisplayed().performClick()
     composeTestRule.onNodeWithTag("addFoodItemScreen").assertIsDisplayed()
 
+    composeTestRule.waitForIdle()
     // User adds a food item manually
     // Scroll to and interact with the input fields
     val scrollableNode = composeTestRule.onNodeWithTag("addFoodItemScreen")
