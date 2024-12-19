@@ -138,6 +138,7 @@ fun ServingsSelector(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.padding(vertical = 8.dp)) {
               IconButton(
+                  modifier = Modifier.testTag("decreaseButton"),
                   onClick = {
                     Log.d("ServingsSelector", "Decrease button clicked")
                     onDecrease()
@@ -147,9 +148,12 @@ fun ServingsSelector(
                         contentDescription = "Decrease Servings")
                   }
 
-              Text(text = servings.toString(), modifier = Modifier.padding(horizontal = 16.dp))
+              Text(
+                  text = servings.toString(),
+                  modifier = Modifier.padding(horizontal = 16.dp).testTag("servingsText"))
 
               IconButton(
+                  modifier = Modifier.testTag("increaseButton"),
                   onClick = {
                     Log.d("ServingsSelector", "Increase button clicked")
                     onIncrease()

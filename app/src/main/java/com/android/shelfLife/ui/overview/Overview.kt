@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Leaderboard
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.FloatingActionButton
@@ -56,7 +55,8 @@ fun OverviewScreen(
 
   val drawerState by overviewScreenViewModel.drawerState.collectAsState()
   val scope = rememberCoroutineScope()
-
+  Log.d("OverviewScreen", "selectedHousehold: $selectedHousehold")
+  Log.d("OverviewScreen", "households: $households")
   HouseHoldSelectionDrawer(
       scope = scope, drawerState = drawerState, navigationActions = navigationActions) {
         if (selectedHousehold == null && households.isEmpty()) {
@@ -119,7 +119,8 @@ fun OverviewScreen(
                           firstScreen = Screen.FIRST_FOOD_ITEM,
                           secondScreen = Screen.ADD_FOOD,
                           firstScreenTestTag = "addFirstName",
-                          secondScreenTestTag = "addFoodFab")
+                          secondScreenTestTag = "addFoodFab",
+                          foodItemViewModel = hiltViewModel())
                     }
               },
           ) { paddingValues ->

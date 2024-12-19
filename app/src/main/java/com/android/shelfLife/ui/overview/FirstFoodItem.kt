@@ -42,9 +42,10 @@ fun FirstFoodItem(
       topBar = {
         CustomTopAppBar(
             onClick = {
-                foodItemViewModel.setFoodItem(null)
-                foodItemViewModel.resetSearchStatus()
-                navigationActions.goBack() },
+              foodItemViewModel.setFoodItem(null)
+              foodItemViewModel.resetSearchStatus()
+              navigationActions.goBack()
+            },
             title = stringResource(id = R.string.first_food_item_title),
             titleTestTag = "firstFoodItemTitle")
       },
@@ -70,9 +71,9 @@ fun FirstFoodItem(
                 CustomButtons(
                     button1OnClick = {
                       foodItemViewModel.foodName = ""
-                        foodItemViewModel.selectedImage = null
-                        foodItemViewModel.setFoodItem(null)
-                        foodItemViewModel.resetSearchStatus()
+                      foodItemViewModel.selectedImage = null
+                      foodItemViewModel.setFoodItem(null)
+                      foodItemViewModel.resetSearchStatus()
                       foodItemViewModel.resetSelectFoodItem()
                       navigationActions.navigateTo(Route.OVERVIEW)
                     },
@@ -84,7 +85,8 @@ fun FirstFoodItem(
                         if (success) {
                           foodItemViewModel.searchByQuery(foodItemViewModel.foodName)
                           foodItemViewModel.setFoodItem(
-                              //This is a temporary food item to remember the state of the Food Item at this screen
+                              // This is a temporary food item to remember the state of the Food
+                              // Item at this screen
                               FoodItem(
                                   foodFacts =
                                       FoodFacts(

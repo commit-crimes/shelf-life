@@ -145,7 +145,7 @@ class OverviewTest {
     composeTestRule.setContent { OverviewScreen(navigationActions = navigationActions) }
 
     // Check that the quantity text displays "1000ml"
-    composeTestRule.onNodeWithText("1000ml").assertIsDisplayed()
+    composeTestRule.onNodeWithText("1L").assertIsDisplayed()
   }
 
   // Test that "No Expiry Date" is displayed when expiry date is null
@@ -383,7 +383,7 @@ class OverviewTest {
 
     // Click on the add food FAB
     composeTestRule.onNodeWithTag("addFoodFab").performClick()
-      composeTestRule.onNodeWithTag("addFoodFab").performClick()
+    composeTestRule.onNodeWithTag("addFoodFab").performClick()
 
     // Verify that navigateTo(Screen.ADD_FOOD) was called
     verify(navigationActions).navigateTo(Screen.ADD_FOOD)

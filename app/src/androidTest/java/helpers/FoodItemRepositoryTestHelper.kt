@@ -16,6 +16,7 @@ class FoodItemRepositoryTestHelper(private val foodItemRepository: FoodItemRepos
     whenever(foodItemRepository.foodItems).thenReturn(foodItems.asStateFlow())
     whenever(foodItemRepository.selectedFoodItem).thenReturn(selectedFoodItem.asStateFlow())
     whenever(foodItemRepository.errorMessage).thenReturn(errorMessage.asStateFlow())
+    whenever(foodItemRepository.getNewUid()).thenReturn("mockedUID")
   }
 
   fun setFoodItems(foodItemsList: List<FoodItem>) {

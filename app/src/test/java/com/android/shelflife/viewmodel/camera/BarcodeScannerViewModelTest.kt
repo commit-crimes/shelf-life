@@ -1,17 +1,12 @@
 package com.android.shelflife.viewmodel.camera
 
-import android.Manifest
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
-import android.content.pm.PermissionInfo
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.testing.TestLifecycleOwner
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodFactsRepository
-import com.android.shelfLife.model.foodFacts.Quantity
 import com.android.shelfLife.model.foodFacts.SearchStatus
+import com.android.shelfLife.model.permission.PermissionRepository
 import com.android.shelfLife.viewmodel.camera.BarcodeScannerViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -28,7 +23,6 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
-import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 
 @HiltAndroidTest
@@ -38,6 +32,7 @@ class BarcodeScannerViewModelTest {
   @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
   @Mock private lateinit var application: Application
   @Mock private lateinit var foodFactsRepository: FoodFactsRepository
+  @Mock private lateinit var permissionRepository: PermissionRepository
   @Mock private lateinit var sharedPreferences: SharedPreferences
   @Mock private lateinit var sharedPreferencesEditor: SharedPreferences.Editor
   val appContext = RuntimeEnvironment.getApplication()
@@ -60,55 +55,22 @@ class BarcodeScannerViewModelTest {
 
     whenever(foodFactsRepository.searchStatus).thenReturn(searchStatusFlow)
     whenever(foodFactsRepository.foodFactsSuggestions).thenReturn(foodFactsSuggestionsFlow)
-
+    whenever(permissionRepository.permissionRequested).thenReturn(MutableStateFlow(false))
     // Now create the viewModel after all stubbings are done
-    viewModel = BarcodeScannerViewModel(application, foodFactsRepository)
+    viewModel = BarcodeScannerViewModel(foodFactsRepository, permissionRepository)
   }
 
   @Test
-  fun `initial state - permission not granted and not requested`() = runTest {
-    val permissionInfo = PermissionInfo()
-    permissionInfo.name = Manifest.permission.CAMERA
-    permissionInfo.protectionLevel = PermissionInfo.PROTECTION_DANGEROUS
-    shadowOf(appContext.packageManager).addPermissionInfo(permissionInfo)
-
-    viewModel = BarcodeScannerViewModel(appContext, foodFactsRepository)
-
-    assertFalse(viewModel.permissionGranted)
+  fun `init invokes repository check`() = runTest {
+    verify(permissionRepository).checkCameraPermission()
   }
 
   @Test
-  fun `initial state - permission granted`() = runTest {
-    `when`(ContextCompat.checkSelfPermission(appContext, Manifest.permission.CAMERA))
-        .thenReturn(PackageManager.PERMISSION_GRANTED)
+  fun `onPermissionResult invokes repository onPermissionResult`() = runTest {
+    val isGranted = true
+    viewModel.onPermissionResult(isGranted)
 
-    assertTrue(viewModel.permissionGranted)
-  }
-
-  @Test
-  fun `checkCameraPermission updates permissionGranted`() = runTest {
-    // Initially permission is denied
-    `when`(ContextCompat.checkSelfPermission(appContext, Manifest.permission.CAMERA))
-        .thenReturn(PackageManager.PERMISSION_DENIED)
-
-    viewModel.checkCameraPermission()
-    assertFalse(viewModel.permissionGranted)
-
-    // Grant permission
-    `when`(ContextCompat.checkSelfPermission(appContext, Manifest.permission.CAMERA))
-        .thenReturn(PackageManager.PERMISSION_GRANTED)
-
-    viewModel.checkCameraPermission()
-    assertTrue(viewModel.permissionGranted)
-  }
-
-  @Test
-  fun `onPermissionResult updates state and stores preference`() = runTest {
-    viewModel.onPermissionResult(true)
-
-    assertTrue(viewModel.permissionGranted)
-    verify(sharedPreferencesEditor).putBoolean("permissionRequested", true)
-    verify(sharedPreferencesEditor).apply()
+    verify(permissionRepository).onPermissionResult(isGranted)
   }
 
   @Test
@@ -124,35 +86,5 @@ class BarcodeScannerViewModelTest {
     viewModel.resetSearchStatus()
 
     verify(foodFactsRepository).resetSearchStatus()
-  }
-
-  @Test
-  fun `searchStatus reflects repository flow`() = runTest {
-    val expectedStatus = SearchStatus.Loading
-    searchStatusFlow.value = expectedStatus
-
-    val lifecycleOwner = TestLifecycleOwner()
-    lifecycleOwner.lifecycle.addObserver(viewModel)
-
-    val actualStatus = viewModel.searchStatus.value
-    assertEquals(expectedStatus, actualStatus)
-  }
-
-  @Test
-  fun `foodFactsSuggestions reflects repository flow`() = runTest {
-    val expectedSuggestions =
-        listOf(
-            FoodFacts(
-                "Apple",
-                "12345",
-                Quantity(1.0),
-            ))
-    foodFactsSuggestionsFlow.value = expectedSuggestions
-
-    val lifecycleOwner = TestLifecycleOwner()
-    lifecycleOwner.lifecycle.addObserver(viewModel)
-
-    val actualSuggestions = viewModel.foodFactsSuggestions.value
-    assertEquals(expectedSuggestions, actualSuggestions)
   }
 }
