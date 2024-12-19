@@ -1,6 +1,7 @@
 package com.android.shelfLife.model.foodItem
 
-import com.android.shelfLife.utils.*
+import com.android.shelfLife.utilities.toFoodFacts
+import com.android.shelfLife.utilities.toMap
 import com.google.firebase.firestore.DocumentSnapshot
 
 // Convert FoodItem to a Map for Firestore

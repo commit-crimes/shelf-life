@@ -70,6 +70,23 @@ fun ProfileScreen(
 
   val thresholdTime = 500 // Time in milliseconds between successive clicks
 
+  fun easterEggOnClickCount() {
+    val currentTime = System.currentTimeMillis()
+    if (currentTime - lastClickTime <= thresholdTime) {
+      // Increment the click count for quick successive clicks
+      clickCount++
+    } else {
+      // Reset the count if time exceeded threshold
+      clickCount = 1
+    }
+    lastClickTime = currentTime
+    // Check if the count has reached 5
+    if (clickCount == 5) {
+      navigationActions.navigateTo(Screen.EASTER_EGG)
+      clickCount = 0 // Reset the counter after navigating
+    }
+  }
+
   Scaffold(
       modifier = Modifier.testTag("profileScaffold"),
       bottomBar = {
@@ -94,23 +111,7 @@ fun ProfileScreen(
                         Modifier.size(100.dp)
                             .clip(CircleShape)
                             .testTag("profilePicture")
-                            .clickable {
-                              val currentTime = System.currentTimeMillis()
-                              if (currentTime - lastClickTime <= thresholdTime) {
-                                // Increment the click count for quick successive clicks
-                                clickCount++
-                              } else {
-                                // Reset the count if time exceeded threshold
-                                clickCount = 1
-                              }
-                              lastClickTime = currentTime
-
-                              // Check if the count has reached 5
-                              if (clickCount == 5) {
-                                navigationActions.navigateTo(Screen.EASTER_EGG)
-                                clickCount = 0 // Reset the counter after navigating
-                              }
-                            },
+                            .clickable { easterEggOnClickCount() },
                     contentScale = ContentScale.Crop)
               } else {
                 AsyncImage(
@@ -120,23 +121,7 @@ fun ProfileScreen(
                         Modifier.size(100.dp)
                             .clip(CircleShape)
                             .testTag("profilePicture")
-                            .clickable {
-                              val currentTime = System.currentTimeMillis()
-                              if (currentTime - lastClickTime <= thresholdTime) {
-                                // Increment the click count for quick successive clicks
-                                clickCount++
-                              } else {
-                                // Reset the count if time exceeded threshold
-                                clickCount = 1
-                              }
-                              lastClickTime = currentTime
-
-                              // Check if the count has reached 5
-                              if (clickCount == 5) {
-                                navigationActions.navigateTo(Screen.EASTER_EGG)
-                                clickCount = 0 // Reset the counter after navigating
-                              }
-                            },
+                            .clickable { easterEggOnClickCount() },
                     contentScale = ContentScale.Crop)
               }
               Spacer(modifier = Modifier.height(32.dp))
@@ -174,7 +159,7 @@ fun ProfileScreen(
                         optionLabel = { option ->
                           (optionLabels[option] ?: "System Default") + " Mode"
                         },
-                        modifier = Modifier.padding(horizontal = 16.dp))
+                        modifier = Modifier.padding(horizontal = 16.dp).testTag("themeToggler"))
                   }
               Spacer(modifier = Modifier.height(16.dp))
               // Show pending invitations
@@ -182,10 +167,13 @@ fun ProfileScreen(
                 Text(
                     text = "Pending Invitations",
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.align(Alignment.Start))
+                    modifier = Modifier.align(Alignment.Start).testTag("pendingInvitations"))
                 Button(
                     onClick = { navigationActions.navigateTo(Route.INVITATIONS) },
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .testTag("pendingInvitationsButton")) {
                       Text("You have ${invitations.size} pending invitations")
                     }
               }
