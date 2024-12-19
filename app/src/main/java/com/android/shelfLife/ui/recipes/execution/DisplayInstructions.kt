@@ -94,6 +94,7 @@ fun InstructionScreen(
                   },
                   modifier = Modifier.weight(1f).padding(16.dp)) { instruction ->
                     Text(
+                        modifier = Modifier.testTag("instructionText"),
                         text = instruction ?: "No instructions available",
                         style = MaterialTheme.typography.bodyLarge.copy(fontSize = 20.sp))
                   }

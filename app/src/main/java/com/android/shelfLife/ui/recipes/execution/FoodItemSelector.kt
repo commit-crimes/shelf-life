@@ -27,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.model.foodItem.FoodItem
@@ -62,6 +63,7 @@ fun SelectFoodItemsForIngredientScreen(
   }
 
   Scaffold(
+      modifier = Modifier.testTag("selectFoodItemsScreen"),
       topBar = {
         TopAppBar(
             title = { Text("Select Items for $ingredientName") },
@@ -89,6 +91,7 @@ fun SelectFoodItemsForIngredientScreen(
       },
       floatingActionButton = {
         FloatingActionButton(
+            modifier = Modifier.testTag("doneButton"),
             onClick = {
               Log.d("SelectFoodItemsScreen", "Floating action button clicked.")
 
@@ -159,7 +162,10 @@ fun FoodItemSelectionCard(
     onAmountChange: (Float) -> Unit
 ) {
   androidx.compose.material3.Card(
-      modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp).clickable { onCardClick() }) {
+      modifier =
+          Modifier.fillMaxWidth().padding(horizontal = 8.dp).testTag("foodItemCard").clickable {
+            onCardClick()
+          }) {
         Column(modifier = Modifier.padding(16.dp)) {
           // Display the name of the food item
           Text(text = foodItem.foodFacts.name, style = MaterialTheme.typography.titleMedium)
@@ -178,6 +184,7 @@ fun FoodItemSelectionCard(
                 modifier = Modifier.padding(top = 16.dp)) {
                   Text(text = "Adjust amount:")
                   androidx.compose.material3.Slider(
+                      modifier = Modifier.testTag("amountSlider"),
                       value = amount,
                       onValueChange = { newVal ->
                         Log.d(

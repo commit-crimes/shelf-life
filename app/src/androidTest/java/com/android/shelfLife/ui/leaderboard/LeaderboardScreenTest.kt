@@ -8,13 +8,13 @@ import com.android.shelfLife.model.household.HouseHoldRepository
 import com.android.shelfLife.model.user.User
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.ui.navigation.NavigationActions
-import com.android.shelfLife.viewmodel.leaderboard.LeaderboardMode
 import com.android.shelfLife.viewmodel.leaderboard.LeaderboardViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import helpers.HouseholdRepositoryTestHelper
+import helpers.UserRepositoryTestHelper
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -30,6 +30,9 @@ class LeaderboardScreenTest {
   @Inject lateinit var houseHoldRepository: HouseHoldRepository
   @Inject lateinit var userRepository: UserRepository
 
+  private lateinit var householdRepositoryTestHelper: HouseholdRepositoryTestHelper
+  private lateinit var userRepositoryTestHelper: UserRepositoryTestHelper
+
   private lateinit var navigationActions: NavigationActions
   private lateinit var leaderboardViewModel: LeaderboardViewModel
 
@@ -41,8 +44,8 @@ class LeaderboardScreenTest {
     hiltAndroidTestRule.inject()
     navigationActions = mock()
 
-    // Mock the household flow
-    whenever(houseHoldRepository.selectedHousehold).thenReturn(selectedHousehold.asStateFlow())
+    householdRepositoryTestHelper = HouseholdRepositoryTestHelper(houseHoldRepository)
+    userRepositoryTestHelper = UserRepositoryTestHelper(userRepository)
 
     // Create a real User instance
     val realUser =
@@ -55,15 +58,7 @@ class LeaderboardScreenTest {
             selectedHouseholdUID = null,
             recipeUIDs = emptyList())
 
-    val userFlow = MutableStateFlow(realUser)
-    whenever(userRepository.user).thenReturn(userFlow.asStateFlow())
-
-    // Mock audio playing flows
-    val isAudioPlayingFlow = MutableStateFlow(false)
-    val currentAudioModeFlow = MutableStateFlow<LeaderboardMode?>(null)
-
-    whenever(userRepository.isAudioPlaying).thenReturn(isAudioPlayingFlow)
-    whenever(userRepository.currentAudioMode).thenReturn(currentAudioModeFlow)
+    userRepositoryTestHelper.setUser(realUser)
 
     // Initialize the ViewModel now that all dependencies are set up
     leaderboardViewModel =

@@ -152,12 +152,12 @@ fun FoodItemCard(
             Column(modifier = Modifier.weight(1f)) {
               Text(text = foodItem.foodFacts.name, fontSize = 16.sp, fontWeight = FontWeight.Bold)
               if (!isSelectedItemsList) {
-                Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}$unit", fontSize = 12.sp)
+                Text(text = foodItem.foodFacts.quantity.toString(), fontSize = 12.sp)
               }
               Text(text = expiryDateMessage, fontSize = 12.sp)
             }
             if (isSelectedItemsList) {
-              Text(text = "${foodItem.foodFacts.quantity.amount.toInt()}$unit", fontSize = 12.sp)
+              Text(text = foodItem.foodFacts.quantity.toString(), fontSize = 12.sp)
             }
 
             Spacer(modifier = Modifier.width(8.dp))

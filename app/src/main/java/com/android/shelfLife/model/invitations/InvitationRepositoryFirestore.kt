@@ -49,7 +49,7 @@ constructor(private val db: FirebaseFirestore, private val auth: FirebaseAuth) :
    *
    * @param invitation The invitation to accept.
    */
-  override suspend fun acceptInvitation(invitation: Invitation) {
+  override fun acceptInvitation(invitation: Invitation) {
     db.collection(invitationPath).document(invitation.invitationId).delete()
     db.collection("households")
         .document(invitation.householdId)
@@ -62,11 +62,14 @@ constructor(private val db: FirebaseFirestore, private val auth: FirebaseAuth) :
    *
    * @param invitation The invitation to decline.
    */
-  override suspend fun declineInvitation(invitation: Invitation) {
+  override fun declineInvitation(invitation: Invitation) {
     db.collection(invitationPath).document(invitation.invitationId).delete()
   }
 
   override suspend fun getInvitationsBatch(invitationUIDs: List<String>): List<Invitation> {
+    if (invitationUIDs.isEmpty()) {
+      return emptyList()
+    }
     val querySnapshot =
         db.collection("invitations").whereIn(FieldPath.documentId(), invitationUIDs).get().await()
     return querySnapshot.documents.mapNotNull { doc -> convertToInvitation(doc) }

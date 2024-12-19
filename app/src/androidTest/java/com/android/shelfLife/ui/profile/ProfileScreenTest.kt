@@ -15,6 +15,7 @@ import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.viewmodel.profile.ProfileScreenViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import helpers.UserRepositoryTestHelper
 import io.mockk.mockk
 import io.mockk.verify
 import javax.inject.Inject
@@ -38,25 +39,27 @@ class ProfileScreenTest {
   @Inject lateinit var userRepository: UserRepository
   private lateinit var navigationActions: NavigationActions
 
+  private lateinit var userRepositoryTestHelper: UserRepositoryTestHelper
+
   @Before
   fun setUp() {
     hiltRule.inject()
 
     navigationActions = mock(NavigationActions::class.java)
 
-    whenever(userRepository.user)
-        .thenReturn(
-            MutableStateFlow(
-                User(
-                    "currentUserId",
-                    "Current User",
-                    "currentuser@gmail.com",
-                    "",
-                    "",
-                    emptyList(),
-                    emptyList())))
-    whenever(userRepository.invitations).thenReturn(MutableStateFlow(emptyList()))
-    viewModel = ProfileScreenViewModel(userRepository)
+    userRepositoryTestHelper = UserRepositoryTestHelper(userRepository)
+
+    userRepositoryTestHelper.setUser(
+        User(
+            "currentUserId",
+            "Current User",
+            "currentuser@gmail.com",
+            "",
+            "",
+            emptyList(),
+            emptyList()))
+
+    mockViewModel = ProfileScreenViewModel(userRepository)
   }
 
   @Test

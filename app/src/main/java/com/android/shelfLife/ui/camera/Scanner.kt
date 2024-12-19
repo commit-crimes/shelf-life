@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.shelfLife.model.foodFacts.FoodCategory
@@ -51,7 +52,7 @@ fun BarcodeScannerScreen(
     cameraViewModel: BarcodeScannerViewModel = hiltViewModel()
 ) {
   val context = LocalContext.current
-  val permissionGranted = cameraViewModel.permissionGranted
+  val permissionGranted by cameraViewModel.permissionGranted.collectAsState()
 
   // Create a Saver for FoodFacts. We'll store it as a Map<String, Any?>.
   val FoodFactsSaver =
@@ -207,7 +208,9 @@ fun BarcodeScannerScreen(
             },
             sheetPeekHeight = 240.dp,
             modifier =
-                Modifier.padding(innerPadding) // Apply the inner padding from the parent Scaffold
+                Modifier.padding(innerPadding)
+                    .testTag(
+                        "bottomSheetScaffold") // Apply the inner padding from the parent Scaffold
             ) {
               Box(
                   modifier =
@@ -250,9 +253,15 @@ fun BarcodeScannerScreen(
 
   // Handle barcode scanning and search
   val currentBarcode = barcodeScanned.value
-  // TODO check if barcode can be converted to long before passing to searchByBarcode
   if (searchInProgress.value && currentBarcode != null) {
-    LaunchedEffect(currentBarcode) { cameraViewModel.searchByBarcode(currentBarcode.toLong()) }
+    val barcodeLong = currentBarcode.toLongOrNull()
+    LaunchedEffect(barcodeLong) {
+      if (barcodeLong == null) {
+        cameraViewModel.setFailureStatus()
+      } else {
+        cameraViewModel.searchByBarcode(barcodeLong)
+      }
+    }
   }
 
   // Observe searchStatus and update foodScanned.value
@@ -267,6 +276,7 @@ fun BarcodeScannerScreen(
           coroutineScope.launch { sheetScaffoldState.bottomSheetState.partialExpand() }
         } else {
           Toast.makeText(context, "Food Not Found in Database", Toast.LENGTH_SHORT).show()
+
           navigationActions.navigateTo(Screen.ADD_FOOD)
         }
         // Reset states
@@ -275,7 +285,10 @@ fun BarcodeScannerScreen(
         cameraViewModel.resetSearchStatus()
       }
       is SearchStatus.Failure -> {
-        Toast.makeText(context, "Search failed, check internet connection", Toast.LENGTH_SHORT)
+        Toast.makeText(
+                context,
+                "Search failed, scan again or check your internet connection",
+                Toast.LENGTH_SHORT)
             .show()
         showFailureDialog.value = true
         barcodeScanned.value = null
@@ -338,7 +351,11 @@ fun PermissionDeniedScreen(navigationActions: NavigationActions) {
             horizontalAlignment = Alignment.CenterHorizontally) {
               Text(
                   text = "Camera permission is required to scan barcodes.",
-                  modifier = Modifier.semantics { testTag = "permissionDeniedMessage" })
+                  modifier =
+                      Modifier.padding(horizontal = 10.dp, vertical = 5.dp).semantics {
+                        testTag = "permissionDeniedMessage"
+                      },
+                  textAlign = TextAlign.Center)
               Spacer(modifier = Modifier.height(16.dp))
               Button(
                   onClick = {

@@ -53,6 +53,7 @@ firebaseDatabaseKtx = "21.0.0"
 firebaseFirestore = "25.1.1"
 firebaseUiAuth = "8.0.0"
 firebaseBom = "33.5.1"
+firebaseStor="21.0.1"
 
 # Google Service and Maps
 playServicesAuth = "21.2.0"
@@ -65,7 +66,7 @@ junit = "4.13.2"
 mockitoCore = "5.13.0"
 mockitoInline = "3.12.4"
 mockitoKotlin = "5.4.0"
-mockk = "1.13.7"
+mockk = "1.13.8"
 
 # Testing UI
 espressoCore = "3.6.1"
@@ -73,8 +74,8 @@ junitVersion = "1.2.1"
 kaspresso = "1.5.5"
 kaspressoAllureSupport = "1.4.3"
 kaspressoComposeSupport = "1.5.5"
-mockkAgent = "1.13.7"
-mockkAndroid = "1.13.7"
+mockkAgent = "1.13.8"
+mockkAndroid = "1.13.8"
 navigationCompose = "2.8.5"
 robolectric = "4.11.1"
 
@@ -134,6 +135,7 @@ firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx", version.
 firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx", version.ref = "firebaseDatabaseKtx" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore", version.ref = "firebaseFirestore" }
 firebase-ui-auth = { module = "com.firebaseui:firebase-ui-auth", version.ref = "firebaseUiAuth" }
+firebase-storage = {module = "com.google.firebase:firebase-storage-ktx", version.ref = "firebaseStor"}
 hamcrest-hamcrest = { module = "org.hamcrest:hamcrest", version.ref = "hamcrestHamcrest" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }

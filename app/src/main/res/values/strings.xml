@@ -8,6 +8,9 @@
     <!-- Screen Titles -->
     <string name="add_food_item_title">Add Food Item</string>
     <string name="edit_food_item_title">Edit Food Item</string>
+    <string name="first_food_item_title">Choose Food Item Name</string>
+    <string name="choose_food_item_title">Choose Food Item Image</string>
+    <string name="finalize_food_item_title">Finalize Food Item</string>
     <string name="easteregg_title">How did you get here ?</string>
 
     <!-- Input Field Hints -->
@@ -50,6 +53,7 @@
     <string name="date_invalid_format_error">Date must be in ddMMyyyy format</string>
     <string name="date_invalid_error">Invalid date</string>
     <string name="date_incomplete_error">Incomplete date</string>
+    <string name= "image_not_loading_error">Could not fetch Images, please check your connection and try again later</string>
 
     <!-- Toast Messages -->
     <string name="food_added_message">Food item added.</string>
@@ -70,6 +74,9 @@
 
 
     <!-- Food Item Details -->
+    <string name="food_item_details_title">What is the food item you want to add today?</string>
+    <string name="food_item_choose_manual">Not happy with any of the choices :( . Try manually entering the details</string>
+    <string name="food_item_manual_alternative">"Enter Details Manually"</string>
     <string name="food_item_no_expiry_date">No Expiry Date</string>
     <string name="food_item_not_opened">Not Opened</string>
     <string name="food_item_category_label">Category: %1$s</string>
@@ -80,7 +87,7 @@
     <string name="food_item_buy_date_label">Buy Date: %1$s</string>
     <string name="food_item_energy_label">Energy: %1$d Kcal</string>
     <string name="food_item_proteins_label">Proteins: %1$s g</string>
-    <string name="food_item_quantity_label">Quantity: %1$s %2$s</string>
+    <string name="food_item_quantity_label">Quantity: </string>
 
     <string name="title_of_AddRecipeScreen">Add your own recipe</string>
     <string name="title_of_recipe">Recipe title</string>

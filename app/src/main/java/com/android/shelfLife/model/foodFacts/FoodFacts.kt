@@ -15,7 +15,7 @@ package com.android.shelfLife.model.foodFacts
  * @property nutritionFacts Detailed nutritional information per 100g/ml of the product.
  */
 data class FoodFacts(
-    val name: String, // Name of the food item
+    var name: String, // Name of the food item
     val barcode: String = "", // Barcode number
     val quantity: Quantity, // Quantity of the food item
     val category: FoodCategory = FoodCategory.OTHER, // Default category is OTHER
@@ -41,7 +41,32 @@ data class Quantity(
     val unit: FoodUnit = FoodUnit.GRAM // Unit of the quantity
 ) {
   override fun toString(): String {
-    return "$amount ${unit.name.lowercase()}"
+    return when (unit) {
+      FoodUnit.GRAM -> {
+        if (amount >= 1000) {
+          val convertedAmount = amount / 1000
+          "${convertedAmount.toIntIfWhole()}kg"
+        } else {
+          "${amount.toIntIfWhole()}g"
+        }
+      }
+      FoodUnit.ML -> {
+        if (amount >= 1000) {
+          val convertedAmount = amount / 1000
+          "${convertedAmount.toIntIfWhole()}L"
+        } else {
+          "${amount.toIntIfWhole()}ml"
+        }
+      }
+      FoodUnit.COUNT -> {
+        "${amount.toInt()} in stock"
+      }
+    }
+  }
+
+  // Helper extension to display whole numbers without ".0"
+  private fun Double.toIntIfWhole(): String {
+    return if (this % 1.0 == 0.0) this.toInt().toString() else this.toString()
   }
 }
 

@@ -15,9 +15,8 @@ import com.android.shelfLife.ui.profile.ProfileScreen
 import com.android.shelfLife.viewmodel.profile.ProfileScreenViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import helpers.UserRepositoryTestHelper
 import javax.inject.Inject
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -33,11 +32,10 @@ class BottomNavigationMenuTest {
   @Inject lateinit var userRepository: UserRepository
   @Inject lateinit var invitationRepository: InvitationRepository
 
+  private lateinit var userRepositoryTestHelper: UserRepositoryTestHelper
+
   private lateinit var navigationActions: NavigationActions
   private lateinit var instrumentationContext: android.content.Context
-
-  // Flow for test data
-  private val userInvitationsFlow = MutableStateFlow<List<String>>(emptyList())
 
   @Before
   fun setUp() {
@@ -47,7 +45,7 @@ class BottomNavigationMenuTest {
     instrumentationContext = InstrumentationRegistry.getInstrumentation().context
 
     // Mock userRepository to return userInvitationsFlow
-    whenever(userRepository.invitations).thenReturn(userInvitationsFlow.asStateFlow())
+    userRepositoryTestHelper = UserRepositoryTestHelper(userRepository)
 
     // Provide a real user
     val realUser =
@@ -59,9 +57,7 @@ class BottomNavigationMenuTest {
             householdUIDs = emptyList(),
             selectedHouseholdUID = null,
             recipeUIDs = emptyList())
-    val userFlow = MutableStateFlow(realUser)
-    whenever(userRepository.user).thenReturn(userFlow.asStateFlow())
-
+    userRepositoryTestHelper.setUser(realUser)
     // By default, no invitations are returned
     runBlocking {
       whenever(invitationRepository.getInvitationsBatch(any())).thenReturn(emptyList())
@@ -80,7 +76,7 @@ class BottomNavigationMenuTest {
   fun testBottomNavigationMenuFromProfileToOverview() = runBlocking {
     // For this test, we might simulate that user has no invitations or some scenario.
     // Set the flows and mocks as needed before creating the ViewModel.
-    userInvitationsFlow.value = emptyList()
+    userRepositoryTestHelper.setInvitations(emptyList())
 
     // Create the ViewModel after data is set
     val profileViewModel = createViewModel()
