@@ -120,7 +120,7 @@ constructor(
    *
    * @param household The household with updated data.
    */
-  override fun updateHousehold(household: HouseHold, function: (String) -> Unit) {
+  override fun updateHousehold(household: HouseHold, onSuccess: (String) -> Unit) {
     var originalItem: HouseHold? = null
     val householdData =
         mapOf(
@@ -148,7 +148,7 @@ constructor(
     db.collection(collectionPath)
         .document(household.uid)
         .set(householdData)
-        .addOnSuccessListener { function(household.uid) }
+        .addOnSuccessListener { onSuccess(household.uid) }
         .addOnFailureListener { exception ->
           Log.e("HouseholdRepository", "Error updating household", exception)
           // Rollback: Restore the original item in the local cache
@@ -165,7 +165,7 @@ constructor(
         }
   }
 
-  override fun deleteHouseholdById(id: String, function: (String) -> Unit) {
+  override fun deleteHouseholdById(id: String, onSuccess: (String) -> Unit) {
     // Find the household to be deleted
     val deletedHouseHold = _households.value.find { it.uid == id }
 
@@ -178,7 +178,7 @@ constructor(
         .document(id)
         .delete()
         .addOnSuccessListener {
-          function(id)
+          onSuccess(id)
           Log.d("HouseholdRepository", "Successfully deleted household: $id")
         }
         .addOnFailureListener { exception ->
@@ -280,7 +280,12 @@ constructor(
         }
   }
 
-  /**
+    override fun deleteHouseholdFromLocalList(householdId: String) {
+        val currentHouseholds = _households.value.filterNot { it.uid == householdId }
+        _households.value = currentHouseholds
+    }
+
+    /**
    * Converts a Firestore document to a HouseHold object.
    *
    * @param doc The Firestore document to convert.

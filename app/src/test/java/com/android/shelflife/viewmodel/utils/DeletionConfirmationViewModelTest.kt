@@ -8,7 +8,6 @@ import com.android.shelfLife.model.user.User
 import com.android.shelfLife.model.user.UserRepository
 import com.android.shelfLife.viewmodel.utils.DeletionConfirmationViewModel
 import dagger.hilt.android.testing.HiltAndroidTest
-import junit.framework.Assert.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -268,34 +267,4 @@ class DeletionConfirmationViewModelTest {
         verify(foodItemRepository, never()).getFoodItems(any())
       }
 
-  /*
-  // This test expects null user handling, but code doesn't handle null user gracefully.
-  // If the code does not handle null user scenario, remove or modify this test.
-  @Test
-  fun `deleteHouseholdById handles user being null gracefully`() = runTest {
-      userFlow.value = null
-
-      val h1 = HouseHold(
-          uid = "h1",
-          name = "HH Null User",
-          sharedRecipes = emptyList(),
-          members = listOf("currentUserUID"),
-          ratPoints = emptyMap(),
-          stinkyPoints = emptyMap()
-      )
-      householdsFlow.value = listOf(h1)
-      selectedHouseholdFlow.value = h1
-
-      viewModel.deleteHouseholdById("h1")
-      advanceUntilIdle()
-
-      // Since user is null, code would NPE in real scenario.
-      // If code is not handling null, this test won't pass.
-      // Remove this test or fix the code to handle null user.
-      verify(houseHoldRepository, never()).updateHousehold(any(), any())
-      verify(houseHoldRepository, never()).deleteHouseholdById(any(), any())
-      verify(userRepository, never()).deleteHouseholdUID(any())
-      verify(foodItemRepository, never()).deleteHouseholdDocument(any())
-  }
-  */
 }

@@ -32,10 +32,10 @@ interface HouseHoldRepository {
   fun addHousehold(household: HouseHold)
 
   /** Updates an existing household in the repository. */
-  fun updateHousehold(household: HouseHold, function: (String) -> Unit = {})
+  fun updateHousehold(household: HouseHold, onSuccess: (String) -> Unit = {})
 
   /** Deletes a household by its unique ID. */
-  fun deleteHouseholdById(id: String, function: (String) -> Unit = {})
+  fun deleteHouseholdById(id: String, onSuccess: (String) -> Unit = {})
 
   /**
    * Fetches the list of members for a specific household.
@@ -75,4 +75,6 @@ interface HouseHoldRepository {
    * @param ratPoints The updated stinky points.
    */
   fun updateRatPoints(householdId: String, ratPoints: Map<String, Long>)
+
+  fun deleteHouseholdFromLocalList(householdId: String)
 }
