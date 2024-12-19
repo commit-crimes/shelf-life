@@ -13,16 +13,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 
 /**
- * Creates a working dropDown menu in which you can choose from different items
+ * Creates a working dropDown menu in which you can choose from different items.
  *
- * @param T: Type
- * @param label: Label of field
- * @param options: Array of elements to be dropped down
- * @param selectedOption: Variable that stores the selected field
- * @param onOptionSelected: Lambda function that describes the behaviour when an element is selected
- * @param expanded: Boolean suggesting if the dropdown is expanded or not
- * @param onExpandedChange: Lambda function that describes the behaviour then the menu changes state
- * @param optionLabel: Option to format how the label is displayed in the UI
+ * @param T The type of the items in the dropdown menu.
+ * @param label The label of the dropdown field.
+ * @param options An array of elements to be displayed in the dropdown menu.
+ * @param selectedOption The currently selected option.
+ * @param onOptionSelected A lambda function that describes the behavior when an element is selected.
+ * @param expanded A boolean indicating if the dropdown is expanded or not.
+ * @param onExpandedChange A lambda function that describes the behavior when the menu changes state.
+ * @param optionLabel A function to format how the label is displayed in the UI.
+ * @param modifier A modifier for the dropdown field.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,8 +37,8 @@ fun <T> DropdownFields(
     optionLabel: (T) -> String,
     modifier: Modifier = Modifier
 ) {
-  ExposedDropdownMenuBox(
-      expanded = expanded, onExpandedChange = onExpandedChange, modifier = modifier) {
+    ExposedDropdownMenuBox(
+        expanded = expanded, onExpandedChange = onExpandedChange, modifier = modifier) {
         TextField(
             readOnly = true,
             value = optionLabel(selectedOption),
@@ -45,19 +46,19 @@ fun <T> DropdownFields(
             label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
             modifier =
-                Modifier.fillMaxWidth()
-                    .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                    .testTag("dropdownMenu_$label"))
+            Modifier.fillMaxWidth()
+                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                .testTag("dropdownMenu_$label"))
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { onExpandedChange(false) }) {
-          options.forEach { selectionOption ->
-            DropdownMenuItem(
-                text = { Text(optionLabel(selectionOption)) },
-                onClick = {
-                  onOptionSelected(selectionOption)
-                  onExpandedChange(false)
-                },
-                modifier = Modifier.testTag("dropDownItem_${optionLabel(selectionOption)}"))
-          }
+            options.forEach { selectionOption ->
+                DropdownMenuItem(
+                    text = { Text(optionLabel(selectionOption)) },
+                    onClick = {
+                        onOptionSelected(selectionOption)
+                        onExpandedChange(false)
+                    },
+                    modifier = Modifier.testTag("dropDownItem_${optionLabel(selectionOption)}"))
+            }
         }
-      }
+    }
 }
