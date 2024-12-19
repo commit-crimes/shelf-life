@@ -113,7 +113,7 @@ class EndToEndM1Test {
     composeTestRule.onNodeWithTag("addFoodFab").assertHasClickAction()
     composeTestRule.onNodeWithTag("addFoodFab").performClick()
 
-      composeTestRule.onNodeWithTag("addFoodFab").performClick()
+    composeTestRule.onNodeWithTag("addFoodFab").performClick()
     composeTestRule.onNodeWithTag("addFoodItemTitle").assertIsDisplayed()
 
     val scrollableNode = composeTestRule.onNodeWithTag("addFoodItemScreen")

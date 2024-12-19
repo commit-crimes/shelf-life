@@ -286,7 +286,7 @@ class EndToEndM3Test {
                 "1", "New New test Household", emptyList(), emptyList(), emptyMap(), emptyMap())))
     composeTestRule.onNodeWithTag("householdElement_1").assertIsNotDisplayed()
 
-      // Close drawer
+    // Close drawer
     Espresso.pressBack()
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
 
