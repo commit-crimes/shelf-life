@@ -98,8 +98,7 @@ fun OverviewScreen(
                       // Leaderboard
                       FloatingActionButton(
                           onClick = {
-                            overviewScreenViewModel.selectFoodItem(null)
-                            navigationActions.navigateTo(Screen.LEADERBOARD)
+                            overviewScreenViewModel.addCustomHouseholdForTesting()
                           },
                           containerColor = MaterialTheme.colorScheme.secondaryContainer,
                           modifier = Modifier.testTag("leaderboardFab")) {
@@ -143,6 +142,7 @@ fun OverviewScreen(
                   onFoodItemLongHold = { selectedFoodItem ->
                     overviewScreenViewModel.selectMultipleFoodItems(selectedFoodItem)
                   })
+
             }
           }
         }

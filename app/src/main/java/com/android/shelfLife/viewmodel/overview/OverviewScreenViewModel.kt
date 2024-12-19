@@ -104,7 +104,7 @@ constructor(
     Log.d("OverviewScreenViewModel", "Init")
   }
 
-  suspend fun addCustomHouseholdForTesting() {
+    fun addCustomHouseholdForTesting() {
     val houseHold =
         HouseHold(
             "testHouseHoldUid",
