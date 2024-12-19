@@ -118,7 +118,8 @@ fun OverviewScreen(
                           firstScreen = Screen.FIRST_FOOD_ITEM,
                           secondScreen = Screen.ADD_FOOD,
                           firstScreenTestTag = "addFirstName",
-                          secondScreenTestTag = "addFoodFab")
+                          secondScreenTestTag = "addFoodFab",
+                          foodItemViewModel = hiltViewModel())
                     }
               },
           ) { paddingValues ->
