@@ -111,6 +111,9 @@ class EditFoodItemScreenTest {
     composeTestRule.onNodeWithTag("editFoodBuyDate").assertIsDisplayed()
 
     // Buttons
+    composeTestRule
+      .onNodeWithTag("editFoodItemScreen")
+      .performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("cancelButton").assertIsDisplayed()
     composeTestRule.onNodeWithTag("foodSave").performScrollTo().assertIsDisplayed()
 
@@ -124,6 +127,9 @@ class EditFoodItemScreenTest {
 
   @Test
   fun cancelButtonNavigatesToOverview() {
+    composeTestRule
+      .onNodeWithTag("editFoodItemScreen")
+      .performScrollToNode(hasTestTag("cancelButton"))
     composeTestRule.onNodeWithTag("cancelButton").performClick()
     verify(navigationActions).navigateTo(eq(com.android.shelfLife.ui.navigation.Route.OVERVIEW))
   }
@@ -141,6 +147,9 @@ class EditFoodItemScreenTest {
     composeTestRule.onNodeWithTag("editFoodAmount").performTextInput("abc") // invalid amount
 
     // Submit
+    composeTestRule
+      .onNodeWithTag("editFoodItemScreen")
+      .performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").performScrollTo().performClick()
 
     // Check error state in the ViewModel
@@ -171,6 +180,9 @@ class EditFoodItemScreenTest {
     composeTestRule.onNodeWithTag("editFoodOpenDate").performTextInput("20122025")
 
     // Submit
+    composeTestRule
+      .onNodeWithTag("editFoodItemScreen")
+      .performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").performScrollTo().performClick()
 
     verify(navigationActions).navigateTo(eq(com.android.shelfLife.ui.navigation.Route.OVERVIEW))
@@ -220,6 +232,9 @@ class EditFoodItemScreenTest {
     composeTestRule.onNodeWithTag("editFoodBuyDate").performTextClearance()
     composeTestRule.onNodeWithTag("editFoodBuyDate").performTextInput("00000000") // invalid
 
+    composeTestRule
+      .onNodeWithTag("editFoodItemScreen")
+      .performScrollToNode(hasTestTag("foodSave"))
     composeTestRule.onNodeWithTag("foodSave").performScrollTo().performClick()
 
     assert(foodItemViewModel.buyDateErrorResId != null)
