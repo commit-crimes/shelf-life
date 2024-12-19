@@ -51,15 +51,21 @@ constructor(
 
   override suspend fun getHousehold(householdId: String) {
     try {
-      val querySnapshot =
-          db.collection(collectionPath)
-              .whereIn(FieldPath.documentId(), listOf(householdId))
-              .get()
-              .await()
-      val household = querySnapshot.documents.mapNotNull { convertToHousehold(it) }
-      _households.value = _households.value.plus(household)
+      db.collection(collectionPath)
+          .whereIn(FieldPath.documentId(), listOf(householdId))
+          .addSnapshotListener { querySnapshot, exception ->
+            if (exception != null) {
+              Log.e("HouseholdRepository", "Error getting household", exception)
+              return@addSnapshotListener
+            }
+
+            val households =
+                querySnapshot?.documents?.mapNotNull { convertToHousehold(it) } ?: emptyList()
+            _households.value += households
+            Log.d("HouseholdRepository", "Households: ${_households.value}")
+          }
     } catch (e: Exception) {
-      Log.e("HouseholdRepository", "Error fetching households", e)
+      Log.e("HouseholdRepository", "Error getting household", e)
     }
   }
 
@@ -172,7 +178,6 @@ constructor(
     // Optimistically update local cache
     val currentHouseholds = _households.value.filterNot { it.uid == id }
     _households.value = currentHouseholds
-
     // Perform Firebase operation
     db.collection(collectionPath)
         .document(id)

@@ -82,8 +82,8 @@ fun InvitationCard(
               coroutineScope.launch {
                 invitationViewModel.acceptInvitation(invitation)
                 Toast.makeText(context, "Invitation accepted", Toast.LENGTH_SHORT).show()
+                navigationActions.goBack()
               }
-              navigationActions.goBack()
             },
             modifier = Modifier.weight(1f)) {
               Text("Accept")
