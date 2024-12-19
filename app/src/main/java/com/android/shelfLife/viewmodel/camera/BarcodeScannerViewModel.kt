@@ -45,6 +45,10 @@ constructor(
     foodFactsRepository.resetSearchStatus()
   }
 
+  fun setFailureStatus() {
+    foodFactsRepository.setFailureStatus()
+  }
+
   /** Checks if the camera permission is granted. */
   fun checkCameraPermission() {
     permissionRepository.checkCameraPermission()

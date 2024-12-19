@@ -29,13 +29,13 @@ interface HouseHoldRepository {
   suspend fun getHouseholds(listOfHouseHoldUid: List<String>): List<HouseHold>
 
   /** Adds a new household to the repository. */
-  suspend fun addHousehold(household: HouseHold)
+  fun addHousehold(household: HouseHold)
 
   /** Updates an existing household in the repository. */
-  suspend fun updateHousehold(household: HouseHold)
+  fun updateHousehold(household: HouseHold, onSuccess: (String) -> Unit = {})
 
   /** Deletes a household by its unique ID. */
-  suspend fun deleteHouseholdById(id: String)
+  fun deleteHouseholdById(id: String, onSuccess: (String) -> Unit = {})
 
   /**
    * Fetches the list of members for a specific household.
@@ -66,7 +66,7 @@ interface HouseHoldRepository {
    * @param householdId The ID of the household.
    * @param stinkyPoints The updated stinky points.
    */
-  suspend fun updateStinkyPoints(householdId: String, stinkyPoints: Map<String, Long>)
+  fun updateStinkyPoints(householdId: String, stinkyPoints: Map<String, Long>)
 
   /**
    * Updates the rat points for a household.
@@ -74,5 +74,7 @@ interface HouseHoldRepository {
    * @param householdId The ID of the household.
    * @param ratPoints The updated stinky points.
    */
-  suspend fun updateRatPoints(householdId: String, ratPoints: Map<String, Long>)
+  fun updateRatPoints(householdId: String, ratPoints: Map<String, Long>)
+
+  fun deleteHouseholdFromLocalList(householdId: String)
 }

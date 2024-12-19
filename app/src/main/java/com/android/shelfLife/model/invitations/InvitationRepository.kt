@@ -10,14 +10,14 @@ interface InvitationRepository {
    *
    * @param invitation The invitation to decline.
    */
-  suspend fun declineInvitation(invitation: Invitation)
+  fun declineInvitation(invitation: Invitation)
 
   /**
    * Accepts an invitation.
    *
    * @param invitation The invitation to accept.
    */
-  suspend fun acceptInvitation(invitation: Invitation)
+  fun acceptInvitation(invitation: Invitation)
 
   /**
    * Sends an invitation to a user to join a household.
