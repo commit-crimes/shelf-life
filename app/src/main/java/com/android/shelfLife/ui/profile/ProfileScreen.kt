@@ -167,10 +167,13 @@ fun ProfileScreen(
                 Text(
                     text = "Pending Invitations",
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.align(Alignment.Start))
+                    modifier = Modifier.align(Alignment.Start).testTag("pendingInvitations"))
                 Button(
                     onClick = { navigationActions.navigateTo(Route.INVITATIONS) },
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .testTag("pendingInvitationsButton")) {
                       Text("You have ${invitations.size} pending invitations")
                     }
               }
