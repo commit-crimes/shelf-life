@@ -1,6 +1,7 @@
 package com.android.shelfLife.viewmodel.profile
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -11,8 +12,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
+import kotlinx.coroutines.flow.StateFlow
 
 @HiltViewModel
 class ProfileScreenViewModel
@@ -23,6 +24,10 @@ constructor(
   var changeThemeMenuState = mutableStateOf(false)
   val invitationUIDS: StateFlow<List<String>> = userRepository.invitations
   val currentUser = userRepository.user
+
+  init {
+    Log.d("ProfileScreenViewModel", "init" + userRepository.invitations.value)
+  }
 
   /** Signs out the user. */
   fun signOut(context: Context) {

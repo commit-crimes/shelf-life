@@ -32,11 +32,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 
 @Composable
-fun SignInScreen(
-    navigationActions: NavigationActions,
-    signInViewModel: SignInViewModel = hiltViewModel()
-) {
+fun SignInScreen(navigationActions: NavigationActions) {
   val context = LocalContext.current
+  val signInViewModel = hiltViewModel<SignInViewModel>()
   val isUserLoggedIn by signInViewModel.isUserLoggedIn.collectAsState()
   val signInState by signInViewModel.signInState.collectAsState()
   val bypassLogin by signInViewModel.bypassLogin.collectAsState()

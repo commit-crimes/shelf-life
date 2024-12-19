@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -32,14 +33,15 @@ import com.android.shelfLife.viewmodel.overview.OverviewScreenViewModel
 @Composable
 fun FirstTimeWelcomeScreen(
     navigationActions: NavigationActions,
-    overviewScreenViewModel: FirstTimeWelcomeScreenViewModel = hiltViewModel()
 ) {
+  val overviewScreenViewModel = hiltViewModel<FirstTimeWelcomeScreenViewModel>()
+  val currentContext = LocalContext.current
 
-    Log.d("FirstTimeWelcomeScreen", "FirstTimeWelcomeScreen")
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp).testTag("firstTimeWelcomeScreen"),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally) {
+  Log.d("FirstTimeWelcomeScreen", "FirstTimeWelcomeScreen")
+  Column(
+      modifier = Modifier.fillMaxSize().padding(16.dp).testTag("firstTimeWelcomeScreen"),
+      verticalArrangement = Arrangement.Center,
+      horizontalAlignment = Alignment.CenterHorizontally) {
         // Welcome Text
         Text(
             text = "Welcome to ShelfLife!",
@@ -62,13 +64,12 @@ fun FirstTimeWelcomeScreen(
         // Create Household Button
         Button(
             onClick = {
-                overviewScreenViewModel.selectHouseholdToEdit(null)
-                navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
+              overviewScreenViewModel.selectHouseholdToEdit(null)
+              navigationActions.navigateTo(Screen.HOUSEHOLD_CREATION)
             },
             modifier = Modifier.fillMaxWidth(0.6f).height(48.dp).testTag("householdNameSaveButton"),
             shape = MaterialTheme.shapes.medium) {
-            Text(text = "Create Household", style = MaterialTheme.typography.labelLarge)
-        }
-    }
+              Text(text = "Create Household", style = MaterialTheme.typography.labelLarge)
+            }
+      }
 }
-

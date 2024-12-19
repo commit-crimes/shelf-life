@@ -13,10 +13,9 @@ import org.mockito.Mockito.mock
 @TestInstallIn(
     components = [SingletonComponent::class], replaces = [FoodFactsRepositoryModule::class])
 object TestFoodFactsRepositoryModule {
-
-  @Provides
   @Singleton
-  fun provideFoodFactsRepository(): FoodFactsRepository {
+  @Provides
+  fun providesFoodFactsRepository(): FoodFactsRepository {
     return mock(FoodFactsRepository::class.java)
   }
 }
