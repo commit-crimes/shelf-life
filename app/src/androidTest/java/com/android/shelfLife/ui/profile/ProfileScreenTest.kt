@@ -15,7 +15,6 @@ import com.android.shelfLife.ui.navigation.Screen
 import com.android.shelfLife.viewmodel.profile.ProfileScreenViewModel
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
-import helpers.UserRepositoryTestHelper
 import io.mockk.mockk
 import io.mockk.verify
 import javax.inject.Inject
@@ -31,168 +30,166 @@ import org.mockito.kotlin.whenever
 @HiltAndroidTest
 class ProfileScreenTest {
 
-  @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
+    @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
 
-  @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
+    @get:Rule(order = 1) val composeTestRule = createAndroidComposeRule<HiltTestActivity>()
 
-  private lateinit var viewModel: ProfileScreenViewModel
-  @Inject lateinit var userRepository: UserRepository
-  private lateinit var navigationActions: NavigationActions
+    private lateinit var viewModel: ProfileScreenViewModel
+    private lateinit var userRepository: UserRepository
+    private lateinit var navigationActions: NavigationActions
 
-  private lateinit var userRepositoryTestHelper: UserRepositoryTestHelper
+    @Before
+    fun setUp() {
+        hiltRule.inject()
 
-  @Before
-  fun setUp() {
-    hiltRule.inject()
-
-    navigationActions = mock(NavigationActions::class.java)
-
-    userRepositoryTestHelper = UserRepositoryTestHelper(userRepository)
-
-    userRepositoryTestHelper.setUser(
-        User(
-            "currentUserId",
-            "Current User",
-            "currentuser@gmail.com",
-            "",
-            "",
-            emptyList(),
-            emptyList()))
-
-    mockViewModel = ProfileScreenViewModel(userRepository)
-  }
-
-  @Test
-  fun testProfileNameDisplaysCorrectly() {
-    composeTestRule.setContent {
-      ProfileScreen(
-          navigationActions = navigationActions,
-          context = composeTestRule.activity.applicationContext,
-          profileViewModel = viewModel)
+        navigationActions = mock(NavigationActions::class.java)
+        userRepository = mock(UserRepository::class.java)
+        whenever(userRepository.user)
+            .thenReturn(
+                MutableStateFlow(
+                    User(
+                        "currentUserId",
+                        "Current User",
+                        "currentuser@gmail.com",
+                        "",
+                        "",
+                        emptyList(),
+                        emptyList())))
+        whenever(userRepository.invitations).thenReturn(MutableStateFlow(emptyList()))
+        viewModel = ProfileScreenViewModel(userRepository)
     }
 
-    // Verify that the name is displayed
-    composeTestRule
-        .onNodeWithTag("profileNameText")
-        .assertIsDisplayed()
-        .assertTextEquals("Current User")
-  }
+    @Test
+    fun testProfileNameDisplaysCorrectly() {
+        composeTestRule.setContent {
+            ProfileScreen(
+                navigationActions = navigationActions,
+                context = composeTestRule.activity.applicationContext,
+                profileViewModel = viewModel)
+        }
 
-  @Test
-  fun testLogoutButtonNavigatesToAuth() {
-    composeTestRule.setContent {
-      ProfileScreen(
-          navigationActions = navigationActions,
-          context = composeTestRule.activity.applicationContext,
-          profileViewModel = viewModel)
+        // Verify that the name is displayed
+        composeTestRule
+            .onNodeWithTag("profileNameText")
+            .assertIsDisplayed()
+            .assertTextEquals("Current User")
     }
 
-    composeTestRule.onNodeWithTag("logoutButton").performClick()
+    @Test
+    fun testLogoutButtonNavigatesToAuth() {
+        composeTestRule.setContent {
+            ProfileScreen(
+                navigationActions = navigationActions,
+                context = composeTestRule.activity.applicationContext,
+                profileViewModel = viewModel)
+        }
 
-    verify(navigationActions).navigateToAndClearBackStack(Screen.AUTH)
-  }
+        composeTestRule.onNodeWithTag("logoutButton").performClick()
 
-  @Test
-  fun testProfilePictureIsDisplayed() {
-    composeTestRule.setContent {
-      ProfileScreen(
-          navigationActions = navigationActions,
-          context = composeTestRule.activity.applicationContext,
-          profileViewModel = viewModel)
+        verify(navigationActions).navigateToAndClearBackStack(Screen.AUTH)
     }
 
-    composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
-  }
+    @Test
+    fun testProfilePictureIsDisplayed() {
+        composeTestRule.setContent {
+            ProfileScreen(
+                navigationActions = navigationActions,
+                context = composeTestRule.activity.applicationContext,
+                profileViewModel = viewModel)
+        }
 
-  @Test
-  fun testEasterEgg() {
-    composeTestRule.setContent {
-      ProfileScreen(
-          navigationActions = navigationActions,
-          context = composeTestRule.activity.applicationContext,
-          profileViewModel = viewModel)
+        composeTestRule.onNodeWithTag("profilePicture").assertIsDisplayed()
     }
 
-    composeTestRule
-        .onNodeWithTag("profilePicture")
-        .assertIsDisplayed()
-        .performClick()
-        .performClick()
-        .performClick()
-        .performClick()
-        .performClick()
+    @Test
+    fun testEasterEgg() {
+        composeTestRule.setContent {
+            ProfileScreen(
+                navigationActions = navigationActions,
+                context = composeTestRule.activity.applicationContext,
+                profileViewModel = viewModel)
+        }
 
-    verify(navigationActions).navigateTo(Screen.EASTER_EGG)
-  }
+        composeTestRule
+            .onNodeWithTag("profilePicture")
+            .assertIsDisplayed()
+            .performClick()
+            .performClick()
+            .performClick()
+            .performClick()
+            .performClick()
 
-  @Test
-  fun testLessThanFiveClicksDoesNotTriggerEasterEgg() {
-    navigationActions = mockk(relaxed = true)
-    composeTestRule.setContent {
-      ProfileScreen(
-          navigationActions = navigationActions,
-          context = composeTestRule.activity.applicationContext,
-          profileViewModel = viewModel)
+        verify(navigationActions).navigateTo(Screen.EASTER_EGG)
     }
 
-    // Simulate 4 clicks on the image
-    repeat(4) { composeTestRule.onNodeWithTag("profilePicture").performClick() }
-    // Verify that navigation to Screen.EASTER_EGG was NOT triggered
-    verify(exactly = 0) { navigationActions.navigateTo(Screen.EASTER_EGG) }
-  }
+    @Test
+    fun testLessThanFiveClicksDoesNotTriggerEasterEgg() {
+        navigationActions = mockk(relaxed = true)
+        composeTestRule.setContent {
+            ProfileScreen(
+                navigationActions = navigationActions,
+                context = composeTestRule.activity.applicationContext,
+                profileViewModel = viewModel)
+        }
 
-  @Test
-  fun themeTogglingTest() {
-    composeTestRule.setContent {
-      ProfileScreen(
-          navigationActions = navigationActions,
-          context = composeTestRule.activity.applicationContext,
-          profileViewModel = viewModel)
+        // Simulate 4 clicks on the image
+        repeat(4) { composeTestRule.onNodeWithTag("profilePicture").performClick() }
+        // Verify that navigation to Screen.EASTER_EGG was NOT triggered
+        verify(exactly = 0) { navigationActions.navigateTo(Screen.EASTER_EGG) }
     }
-    composeTestRule.onNodeWithTag("themeToggler").performClick()
-    assertTrue(viewModel.changeThemeMenuState.value)
-    composeTestRule.onNodeWithText("Dark Mode").assertExists().assertIsDisplayed()
-    composeTestRule.onNodeWithText("Light Mode").assertExists().assertIsDisplayed()
-    composeTestRule.onNodeWithText("Dark Mode").performClick()
-    verify(navigationActions).navigateToAndClearBackStack(Route.PROFILE)
-  }
 
-  @Test
-  fun invitationsPopUp() {
-    whenever(userRepository.user)
-        .thenReturn(
-            MutableStateFlow(
-                User(
-                    uid = "currentUserId",
-                    username = "Current User",
-                    email = "currentuser@gmail.com",
-                    photoUrl = "",
-                    selectedHouseholdUID = "",
-                    invitationUIDs = listOf("i1"))))
-    whenever(userRepository.invitations).thenReturn(MutableStateFlow(listOf("i1")))
-    viewModel = ProfileScreenViewModel(userRepository)
-    composeTestRule.setContent {
-      ProfileScreen(
-          navigationActions = navigationActions,
-          context = composeTestRule.activity.applicationContext,
-          profileViewModel = viewModel)
+    @Test
+    fun themeTogglingTest() {
+        composeTestRule.setContent {
+            ProfileScreen(
+                navigationActions = navigationActions,
+                context = composeTestRule.activity.applicationContext,
+                profileViewModel = viewModel)
+        }
+        composeTestRule.onNodeWithTag("themeToggler").performClick()
+        assertTrue(viewModel.changeThemeMenuState.value)
+        composeTestRule.onNodeWithText("Dark Mode").assertExists().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Light Mode").assertExists().assertIsDisplayed()
+        composeTestRule.onNodeWithText("Dark Mode").performClick()
+        verify(navigationActions).navigateToAndClearBackStack(Route.PROFILE)
     }
-    composeTestRule.onNodeWithTag("pendingInvitations").assertIsDisplayed()
-    composeTestRule.onNodeWithTag("pendingInvitationsButton").assertIsDisplayed().performClick()
-    verify(navigationActions).navigateTo(Route.INVITATIONS)
-  }
 
-  @Test
-  fun guestIsWrittenWhenThereIsNoUser() {
-    whenever(userRepository.user).thenReturn(MutableStateFlow(null))
-    whenever(userRepository.invitations).thenReturn(MutableStateFlow(emptyList()))
-    viewModel = ProfileScreenViewModel(userRepository)
-    composeTestRule.setContent {
-      ProfileScreen(
-          navigationActions = navigationActions,
-          context = composeTestRule.activity.applicationContext,
-          profileViewModel = viewModel)
+    @Test
+    fun invitationsPopUp() {
+        whenever(userRepository.user)
+            .thenReturn(
+                MutableStateFlow(
+                    User(
+                        uid = "currentUserId",
+                        username = "Current User",
+                        email = "currentuser@gmail.com",
+                        photoUrl = "",
+                        selectedHouseholdUID = "",
+                        invitationUIDs = listOf("i1"))))
+        whenever(userRepository.invitations).thenReturn(MutableStateFlow(listOf("i1")))
+        viewModel = ProfileScreenViewModel(userRepository)
+        composeTestRule.setContent {
+            ProfileScreen(
+                navigationActions = navigationActions,
+                context = composeTestRule.activity.applicationContext,
+                profileViewModel = viewModel)
+        }
+        composeTestRule.onNodeWithTag("pendingInvitations").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("pendingInvitationsButton").assertIsDisplayed().performClick()
+        verify(navigationActions).navigateTo(Route.INVITATIONS)
     }
-    composeTestRule.onNodeWithTag("profileNameText").assertIsDisplayed().assertTextEquals("Guest")
-  }
+
+    @Test
+    fun guestIsWrittenWhenThereIsNoUser() {
+        whenever(userRepository.user).thenReturn(MutableStateFlow(null))
+        whenever(userRepository.invitations).thenReturn(MutableStateFlow(emptyList()))
+        viewModel = ProfileScreenViewModel(userRepository)
+        composeTestRule.setContent {
+            ProfileScreen(
+                navigationActions = navigationActions,
+                context = composeTestRule.activity.applicationContext,
+                profileViewModel = viewModel)
+        }
+        composeTestRule.onNodeWithTag("profileNameText").assertIsDisplayed().assertTextEquals("Guest")
+    }
 }
