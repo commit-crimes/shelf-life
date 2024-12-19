@@ -285,7 +285,12 @@ constructor(
         }
   }
 
-  /**
+    override fun deleteHouseholdFromLocalList(householdId: String) {
+        val currentHouseholds = _households.value.filterNot { it.uid == householdId }
+        _households.value = currentHouseholds
+    }
+
+    /**
    * Converts a Firestore document to a HouseHold object.
    *
    * @param doc The Firestore document to convert.

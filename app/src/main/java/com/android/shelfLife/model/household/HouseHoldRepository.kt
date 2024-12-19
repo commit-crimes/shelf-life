@@ -75,4 +75,6 @@ interface HouseHoldRepository {
    * @param ratPoints The updated stinky points.
    */
   fun updateRatPoints(householdId: String, ratPoints: Map<String, Long>)
+
+  fun deleteHouseholdFromLocalList(householdId: String)
 }

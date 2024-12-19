@@ -37,6 +37,7 @@ constructor(
                 householdUID ->
               userRepository.deleteHouseholdUID(householdUID)
             }
+        houseHoldRepository.deleteHouseholdFromLocalList(household.uid)
       } else {
         houseHoldRepository.deleteHouseholdById(householdId) { householdUID ->
           userRepository.deleteHouseholdUID(householdUID)
