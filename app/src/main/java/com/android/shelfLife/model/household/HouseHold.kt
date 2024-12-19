@@ -7,6 +7,8 @@ package com.android.shelfLife.model.household
  * @property name Name of the household
  * @property members List of member IDs in the household
  * @property sharedRecipes List of shared recipe IDs
+ * @property ratPoints Map of member IDs to their respective rat points
+ * @property stinkyPoints Map of member IDs to their respective stinky points
  */
 data class HouseHold(
     val uid: String, // Unique ID of the household
