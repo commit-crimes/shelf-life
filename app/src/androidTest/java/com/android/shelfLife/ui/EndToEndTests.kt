@@ -39,7 +39,7 @@ import org.junit.Rule
 import org.junit.Test
 
 @HiltAndroidTest
-class EndToEndM3Test {
+class EndToEndTests {
   @Inject lateinit var foodItemRepository: FoodItemRepository
   @Inject lateinit var houseHoldRepository: HouseHoldRepository
   @Inject lateinit var userRepository: UserRepository
@@ -425,4 +425,74 @@ class EndToEndM3Test {
     composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
     composeTestRule.onNodeWithTag("foodItemCard").assertIsNotDisplayed()
   }
+
+    @Test
+    fun testEndToEndFlow() {
+        // User starts at the login screen
+        composeTestRule.onNodeWithTag("signInScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("loginButton").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("loginButton").assertHasClickAction()
+        composeTestRule.onNodeWithTag("loginButton").performClick()
+
+        // composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+        // User is now on the overview Screen
+        // User wants to add a new food item
+        composeTestRule.onNodeWithTag("addFoodFab").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("addFoodFab").assertHasClickAction()
+        composeTestRule.onNodeWithTag("addFoodFab").performClick()
+
+        composeTestRule.onNodeWithTag("addFoodFab").performClick()
+        composeTestRule.onNodeWithTag("addFoodItemTitle").assertIsDisplayed()
+
+        val scrollableNode = composeTestRule.onNodeWithTag("addFoodItemScreen")
+
+        scrollableNode.performScrollToNode(hasTestTag("inputFoodName"))
+        composeTestRule.onNodeWithTag("inputFoodName").performTextInput("Apple")
+
+        scrollableNode.performScrollToNode(hasTestTag("inputFoodAmount"))
+        composeTestRule.onNodeWithTag("inputFoodAmount").performTextInput("5")
+
+        scrollableNode.performScrollToNode(hasTestTag("inputFoodExpireDate"))
+        composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextClearance()
+        composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextInput("29102025")
+
+        scrollableNode.performScrollToNode(hasTestTag("inputFoodOpenDate"))
+        composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextClearance()
+        composeTestRule.onNodeWithTag("inputFoodOpenDate").performTextInput("01122025")
+
+        scrollableNode.performScrollToNode(hasTestTag("inputFoodBuyDate"))
+        composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextClearance()
+        composeTestRule.onNodeWithTag("inputFoodBuyDate").performTextInput("30112025")
+
+        // Scroll to and click the submit button
+        scrollableNode.performScrollToNode(hasTestTag("foodSave"))
+        composeTestRule.onNodeWithTag("foodSave").performClick()
+
+        // Correct the expire date
+        scrollableNode.performScrollToNode(hasTestTag("inputFoodExpireDate"))
+        composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextClearance()
+        composeTestRule.onNodeWithTag("inputFoodExpireDate").performTextInput("29122025")
+
+        // Scroll to and click the submit button again
+        scrollableNode.performScrollToNode(hasTestTag("foodSave"))
+
+        // Simulate the user submitting the form
+        foodItemRepositoryTestHelper.setFoodItems(listOf(foodItem))
+
+        composeTestRule.onNodeWithTag("foodSave").performClick()
+
+        composeTestRule.waitForIdle()
+        // User is now on the overview screen
+        composeTestRule.onNodeWithTag("overviewScreen").assertIsDisplayed()
+
+        // User now wants to view the details of the food item
+        composeTestRule.onNodeWithTag("foodItemCard").assertIsDisplayed()
+        foodItemRepositoryTestHelper.setSelectedFoodItem(foodItem)
+        composeTestRule.onNodeWithTag("foodItemCard").assertHasClickAction()
+        composeTestRule.onNodeWithTag("foodItemCard").performClick()
+
+        composeTestRule.onNodeWithTag("IndividualFoodItemScreen").assertIsDisplayed()
+        composeTestRule.onNodeWithTag("IndividualFoodItemName").assertTextContains("Apple")
+    }
 }
