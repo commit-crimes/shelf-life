@@ -1,9 +1,7 @@
 package com.android.shelfLife.ui
 
-import android.content.Context
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
-import androidx.test.core.app.ApplicationProvider
 import com.android.shelfLife.MainActivity
 import com.android.shelfLife.model.foodFacts.FoodCategory
 import com.android.shelfLife.model.foodFacts.FoodFacts
@@ -30,7 +28,6 @@ import javax.inject.Inject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.whenever
 
 @HiltAndroidTest
 class EndToEndM1Test {
@@ -55,13 +52,10 @@ class EndToEndM1Test {
   @Before
   fun setUp() {
     hiltAndroidTestRule.inject()
-    val context = ApplicationProvider.getApplicationContext<Context>()
 
     householdRepositoryTestHelper = HouseholdRepositoryTestHelper(houseHoldRepository)
     foodItemRepositoryTestHelper = FoodItemRepositoryTestHelper(foodItemRepository)
     userRepositoryTestHelper = UserRepositoryTestHelper(userRepository)
-
-    whenever(foodItemRepository.getNewUid()).thenReturn("foodItem1")
 
     // Create a FoodItem to be used in tests
     val foodFacts =
@@ -72,7 +66,7 @@ class EndToEndM1Test {
             category = FoodCategory.FRUIT)
     foodItem =
         FoodItem(
-            uid = "foodItem1",
+            uid = "mockedUID",
             foodFacts = foodFacts,
             expiryDate = Timestamp(Date(System.currentTimeMillis() + 86400000)), // Expires in 1 day
             owner = "John",
@@ -119,7 +113,7 @@ class EndToEndM1Test {
     composeTestRule.onNodeWithTag("addFoodFab").assertHasClickAction()
     composeTestRule.onNodeWithTag("addFoodFab").performClick()
 
-      composeTestRule.onNodeWithTag("addFoodFab").performClick()
+    composeTestRule.onNodeWithTag("addFoodFab").performClick()
     composeTestRule.onNodeWithTag("addFoodItemTitle").assertIsDisplayed()
 
     val scrollableNode = composeTestRule.onNodeWithTag("addFoodItemScreen")

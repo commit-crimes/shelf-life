@@ -1,18 +1,12 @@
 package com.android.shelfLife.viewmodel.camera
 
-import android.Manifest
-import android.app.Application
-import android.content.Context
-import android.content.pm.PackageManager
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.ViewModel
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.FoodFactsRepository
 import com.android.shelfLife.model.foodFacts.SearchStatus
+import com.android.shelfLife.model.permission.PermissionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.StateFlow
@@ -26,28 +20,19 @@ import kotlinx.coroutines.flow.StateFlow
 class BarcodeScannerViewModel
 @Inject
 constructor(
-    private val application: Application,
-    private val foodFactsRepository: FoodFactsRepository
-) : ViewModel(), LifecycleObserver {
+    private val foodFactsRepository: FoodFactsRepository,
+    private val permissionRepository: PermissionRepository
+) : ViewModel() {
 
-  private val sharedPreferences =
-      application.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-
-  var permissionGranted by
-      mutableStateOf(
-          ContextCompat.checkSelfPermission(application, Manifest.permission.CAMERA) ==
-              PackageManager.PERMISSION_GRANTED)
-    private set
-
-  private var permissionRequested by
-      mutableStateOf(sharedPreferences.getBoolean("permissionRequested", false))
+  private val permissionRequested = permissionRepository.permissionRequested
+  val permissionGranted = permissionRepository.permissionGranted
 
   val searchStatus: StateFlow<SearchStatus> = foodFactsRepository.searchStatus
 
   val foodFactsSuggestions: StateFlow<List<FoodFacts>> = foodFactsRepository.foodFactsSuggestions
 
   init {
-    if (!permissionRequested) {
+    if (!permissionRequested.value) {
       checkCameraPermission()
     }
   }
@@ -62,9 +47,7 @@ constructor(
 
   /** Checks if the camera permission is granted. */
   fun checkCameraPermission() {
-    permissionGranted =
-        ContextCompat.checkSelfPermission(application, Manifest.permission.CAMERA) ==
-            PackageManager.PERMISSION_GRANTED
+    permissionRepository.checkCameraPermission()
   }
 
   /**
@@ -73,8 +56,6 @@ constructor(
    * @param isGranted boolean indicating if the permission is granted
    */
   fun onPermissionResult(isGranted: Boolean) {
-    permissionGranted = isGranted
-    permissionRequested = true
-    sharedPreferences.edit().putBoolean("permissionRequested", true).apply()
+    permissionRepository.onPermissionResult(isGranted)
   }
 }

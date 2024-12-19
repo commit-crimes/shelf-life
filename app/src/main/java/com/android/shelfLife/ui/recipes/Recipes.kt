@@ -23,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -75,10 +76,10 @@ fun RecipesScreen(
 
   HouseHoldSelectionDrawer(
       scope = scope, drawerState = drawerState, navigationActions = navigationActions) {
-        if (selectedHousehold == null) {
-          navigationActions.navigateTo(Screen.FIRST_TIME_USER)
+        if (selectedHousehold.value == null) {
+          LaunchedEffect(Unit) { navigationActions.navigateTo(Screen.FIRST_TIME_USER) }
         } else {
-          if (user != null) {
+          if (user.value != null) {
             Scaffold(
                 modifier = Modifier.testTag("recipesScreen"),
                 topBar = {

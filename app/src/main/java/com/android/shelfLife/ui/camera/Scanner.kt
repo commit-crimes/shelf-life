@@ -51,7 +51,7 @@ fun BarcodeScannerScreen(
     cameraViewModel: BarcodeScannerViewModel = hiltViewModel()
 ) {
   val context = LocalContext.current
-  val permissionGranted = cameraViewModel.permissionGranted
+  val permissionGranted by cameraViewModel.permissionGranted.collectAsState()
 
   // Create a Saver for FoodFacts. We'll store it as a Map<String, Any?>.
   val FoodFactsSaver =
@@ -207,7 +207,9 @@ fun BarcodeScannerScreen(
             },
             sheetPeekHeight = 240.dp,
             modifier =
-                Modifier.padding(innerPadding) // Apply the inner padding from the parent Scaffold
+                Modifier.padding(innerPadding)
+                    .testTag(
+                        "bottomSheetScaffold") // Apply the inner padding from the parent Scaffold
             ) {
               Box(
                   modifier =
