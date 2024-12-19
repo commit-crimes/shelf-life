@@ -1,4 +1,4 @@
-package com.android.shelfLife.utils
+package com.android.shelfLife.utilities
 
 import com.android.shelfLife.model.foodFacts.FoodFacts
 import com.android.shelfLife.model.foodFacts.NutritionFacts
