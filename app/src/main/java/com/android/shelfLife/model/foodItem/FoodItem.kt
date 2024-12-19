@@ -16,28 +16,28 @@ import com.google.firebase.Timestamp
  * @property owner UID of the user who added the item.
  */
 data class FoodItem(
-    val uid: String,
-    val foodFacts: FoodFacts,
-    val buyDate: Timestamp? = Timestamp.now(),
-    val expiryDate: Timestamp? = null,
-    val openDate: Timestamp? = null,
-    val location: FoodStorageLocation = FoodStorageLocation.OTHER,
-    val status: FoodStatus = FoodStatus.UNOPENED,
-    val owner: String
+    val uid: String, // Unique identifier for the food item
+    val foodFacts: FoodFacts, // General information about the food product
+    val buyDate: Timestamp? = Timestamp.now(), // Date when the item was purchased
+    val expiryDate: Timestamp? = null, // Date when the item expires
+    val openDate: Timestamp? = null, // Date when the item was opened
+    val location: FoodStorageLocation = FoodStorageLocation.OTHER, // Storage location within the household
+    val status: FoodStatus = FoodStatus.UNOPENED, // Current status of the item
+    val owner: String // UID of the user who added the item
 )
 
 /** Represents the status of a food item. */
 enum class FoodStatus {
-  UNOPENED,
-  OPENED,
-  CONSUMED,
-  EXPIRED
+    UNOPENED, // The item is unopened
+    OPENED, // The item is opened
+    CONSUMED, // The item is consumed
+    EXPIRED // The item is expired
 }
 
 /** Represents storage locations within the household. */
 enum class FoodStorageLocation {
-  PANTRY,
-  FRIDGE,
-  FREEZER,
-  OTHER
+    PANTRY, // The item is stored in the pantry
+    FRIDGE, // The item is stored in the fridge
+    FREEZER, // The item is stored in the freezer
+    OTHER // The item is stored in another location
 }

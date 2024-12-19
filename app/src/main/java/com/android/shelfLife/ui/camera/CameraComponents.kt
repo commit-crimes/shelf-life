@@ -32,49 +32,49 @@ import com.android.shelfLife.utilities.BarcodeAnalyzer
  * @return RectF representing the ROI.
  */
 fun calculateRoiRectF(screenWidth: Float, screenHeight: Float): RectF {
-  val rectWidth = screenWidth * 0.8f
-  val rectHeight = screenHeight * 0.2f
-  val left = (screenWidth - rectWidth) / 2f
-  val top = (screenHeight - rectHeight) / 2f
+    val rectWidth = screenWidth * 0.8f
+    val rectHeight = screenHeight * 0.2f
+    val left = (screenWidth - rectWidth) / 2f
+    val top = (screenHeight - rectHeight) / 2f
 
-  return RectF(
-      left / screenWidth,
-      top / screenHeight,
-      (left + rectWidth) / screenWidth,
-      (top + rectHeight) / screenHeight)
+    return RectF(
+        left / screenWidth,
+        top / screenHeight,
+        (left + rectWidth) / screenWidth,
+        (top + rectHeight) / screenHeight)
 }
 
 /** Composable function to display the scanner overlay. */
 @Composable
 fun ScannerOverlay() {
-  Canvas(modifier = Modifier.fillMaxSize().testTag("scannerOverlay")) {
-    val canvasWidth = size.width
-    val canvasHeight = size.height
+    Canvas(modifier = Modifier.fillMaxSize().testTag("scannerOverlay")) {
+        val canvasWidth = size.width
+        val canvasHeight = size.height
 
-    val rectWidth = canvasWidth * 0.8f
-    val rectHeight = canvasHeight * 0.2f
-    val left = (canvasWidth - rectWidth) / 2f
-    val top = (canvasHeight - rectHeight) / 2f
+        val rectWidth = canvasWidth * 0.8f
+        val rectHeight = canvasHeight * 0.2f
+        val left = (canvasWidth - rectWidth) / 2f
+        val top = (canvasHeight - rectHeight) / 2f
 
-    // Semi-transparent background
-    drawRect(
-        color = Color(0x40ffffff), // low opacity white
-        size = size)
+        // Semi-transparent background
+        drawRect(
+            color = Color(0x40ffffff), // low opacity white
+            size = size)
 
-    // Transparent rectangle in the middle (ROI)
-    drawRect(
-        color = Color.Transparent,
-        topLeft = Offset(left, top),
-        size = Size(rectWidth, rectHeight),
-        blendMode = BlendMode.Clear)
+        // Transparent rectangle in the middle (ROI)
+        drawRect(
+            color = Color.Transparent,
+            topLeft = Offset(left, top),
+            size = Size(rectWidth, rectHeight),
+            blendMode = BlendMode.Clear)
 
-    // Draw border around the rectangle
-    drawRect(
-        color = Color.White,
-        topLeft = Offset(left, top),
-        size = Size(rectWidth, rectHeight),
-        style = Stroke(width = 4.dp.toPx()))
-  }
+        // Draw border around the rectangle
+        drawRect(
+            color = Color.White,
+            topLeft = Offset(left, top),
+            size = Size(rectWidth, rectHeight),
+            style = Stroke(width = 4.dp.toPx()))
+    }
 }
 
 /**
@@ -94,14 +94,14 @@ fun CameraPreviewView(
     roiRect: RectF,
     shouldScan: () -> Boolean
 ) {
-  AndroidView(
-      factory = { context ->
-        val previewView = PreviewView(context)
-        onPreviewViewCreated(previewView)
-        startCamera(context, previewView, onBarcodeScanned, roiRect, shouldScan)
-        previewView
-      },
-      modifier = modifier.fillMaxSize().testTag("cameraPreviewView"))
+    AndroidView(
+        factory = { context ->
+            val previewView = PreviewView(context)
+            onPreviewViewCreated(previewView)
+            startCamera(context, previewView, onBarcodeScanned, roiRect, shouldScan)
+            previewView
+        },
+        modifier = modifier.fillMaxSize().testTag("cameraPreviewView"))
 }
 
 /**
@@ -120,32 +120,32 @@ fun startCamera(
     roiRect: RectF,
     shouldScan: () -> Boolean
 ) {
-  val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+    val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
 
-  cameraProviderFuture.addListener(
-      {
-        val cameraProvider = cameraProviderFuture.get()
+    cameraProviderFuture.addListener(
+        {
+            val cameraProvider = cameraProviderFuture.get()
 
-        val preview =
-            Preview.Builder().build().also { it.setSurfaceProvider(previewView.surfaceProvider) }
+            val preview =
+                Preview.Builder().build().also { it.setSurfaceProvider(previewView.surfaceProvider) }
 
-        // Set up Barcode Analyzer
-        val imageAnalyzer =
-            ImageAnalysis.Builder().build().also {
-              it.setAnalyzer(
-                  ContextCompat.getMainExecutor(context),
-                  BarcodeAnalyzer(onBarcodeScanned, roiRect, shouldScan))
+            // Set up Barcode Analyzer
+            val imageAnalyzer =
+                ImageAnalysis.Builder().build().also {
+                    it.setAnalyzer(
+                        ContextCompat.getMainExecutor(context),
+                        BarcodeAnalyzer(onBarcodeScanned, roiRect, shouldScan))
+                }
+
+            val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+            try {
+                cameraProvider.unbindAll()
+                cameraProvider.bindToLifecycle(
+                    context as LifecycleOwner, cameraSelector, preview, imageAnalyzer)
+            } catch (exc: Exception) {
+                Log.e("CameraX", "Use case binding failed", exc)
             }
-
-        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
-        try {
-          cameraProvider.unbindAll()
-          cameraProvider.bindToLifecycle(
-              context as LifecycleOwner, cameraSelector, preview, imageAnalyzer)
-        } catch (exc: Exception) {
-          Log.e("CameraX", "Use case binding failed", exc)
-        }
-      },
-      ContextCompat.getMainExecutor(context))
+        },
+        ContextCompat.getMainExecutor(context))
 }

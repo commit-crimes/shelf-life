@@ -27,82 +27,88 @@ import com.android.shelfLife.ui.utils.FoodNameField
 import com.android.shelfLife.viewmodel.overview.FoodItemViewModel
 import kotlinx.coroutines.launch
 
+/**
+ * Composable function to display the First Food Item screen.
+ *
+ * @param navigationActions The navigation actions to be used in the screen.
+ * @param foodItemViewModel The ViewModel for managing the state of the food item.
+ */
 @Composable
 fun FirstFoodItem(
     navigationActions: NavigationActions,
     foodItemViewModel: FoodItemViewModel = hiltViewModel(),
 ) {
 
-  val coroutineScope = rememberCoroutineScope()
-  val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
-  Scaffold(
-      topBar = {
-        CustomTopAppBar(
-            onClick = {
-              foodItemViewModel.setFoodItem(null)
-              foodItemViewModel.resetSearchStatus()
-              navigationActions.goBack()
-            },
-            title = stringResource(id = R.string.first_food_item_title),
-            titleTestTag = "firstFoodItemTitle")
-      },
-      content = { paddingValues ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally) {
-              item {
-                Text(
-                    text = stringResource(R.string.food_item_details_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(bottom = 16.dp).testTag("firstFoodItemTitle"))
-              }
-              item {
-                FoodNameField(
-                    foodItemViewModel.foodName,
-                    onFoodNameChange = { newValue -> foodItemViewModel.changeFoodName(newValue) },
-                    foodNameErrorResId = foodItemViewModel.foodNameErrorResId,
-                    modifier = Modifier.padding(bottom = 16.dp).testTag("inputFoodName"))
-              }
-              item {
-                CustomButtons(
-                    button1OnClick = {
-                      foodItemViewModel.foodName = ""
-                      foodItemViewModel.selectedImage = null
-                      foodItemViewModel.setFoodItem(null)
-                      foodItemViewModel.resetSearchStatus()
-                      foodItemViewModel.resetSelectFoodItem()
-                      navigationActions.navigateTo(Route.OVERVIEW)
-                    },
-                    button1TestTag = "cancelButton",
-                    button1Text = stringResource(R.string.cancel_button),
-                    button2OnClick = {
-                      coroutineScope.launch {
-                        val success = foodItemViewModel.submbitFoodName()
-                        if (success) {
-                          foodItemViewModel.searchByQuery(foodItemViewModel.foodName)
-                          foodItemViewModel.setFoodItem(
-                              // This is a temporary food item to remember the state of the Food
-                              // Item at this screen
-                              FoodItem(
-                                  foodFacts =
-                                      FoodFacts(
-                                          name = foodItemViewModel.foodName,
-                                          quantity = Quantity(1.0, FoodUnit.GRAM)),
-                                  owner = "",
-                                  uid = ""))
-                          navigationActions.navigateTo(Screen.CHOOSE_FOOD_ITEM)
-                        } else {
-                          Toast.makeText(
-                                  context, R.string.submission_error_message, Toast.LENGTH_SHORT)
-                              .show()
-                        }
-                      }
-                    },
-                    button2TestTag = "submitButton",
-                    button2Text = stringResource(R.string.submit_button_text))
-              }
+    Scaffold(
+        topBar = {
+            CustomTopAppBar(
+                onClick = {
+                    foodItemViewModel.setFoodItem(null)
+                    foodItemViewModel.resetSearchStatus()
+                    navigationActions.goBack()
+                },
+                title = stringResource(id = R.string.first_food_item_title),
+                titleTestTag = "firstFoodItemTitle")
+        },
+        content = { paddingValues ->
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                item {
+                    Text(
+                        text = stringResource(R.string.food_item_details_title),
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(bottom = 16.dp).testTag("firstFoodItemTitle"))
+                }
+                item {
+                    FoodNameField(
+                        foodItemViewModel.foodName,
+                        onFoodNameChange = { newValue -> foodItemViewModel.changeFoodName(newValue) },
+                        foodNameErrorResId = foodItemViewModel.foodNameErrorResId,
+                        modifier = Modifier.padding(bottom = 16.dp).testTag("inputFoodName"))
+                }
+                item {
+                    CustomButtons(
+                        button1OnClick = {
+                            foodItemViewModel.foodName = ""
+                            foodItemViewModel.selectedImage = null
+                            foodItemViewModel.setFoodItem(null)
+                            foodItemViewModel.resetSearchStatus()
+                            foodItemViewModel.resetSelectFoodItem()
+                            navigationActions.navigateTo(Route.OVERVIEW)
+                        },
+                        button1TestTag = "cancelButton",
+                        button1Text = stringResource(R.string.cancel_button),
+                        button2OnClick = {
+                            coroutineScope.launch {
+                                val success = foodItemViewModel.submbitFoodName()
+                                if (success) {
+                                    foodItemViewModel.searchByQuery(foodItemViewModel.foodName)
+                                    foodItemViewModel.setFoodItem(
+                                        // This is a temporary food item to remember the state of the Food
+                                        // Item at this screen
+                                        FoodItem(
+                                            foodFacts =
+                                            FoodFacts(
+                                                name = foodItemViewModel.foodName,
+                                                quantity = Quantity(1.0, FoodUnit.GRAM)),
+                                            owner = "",
+                                            uid = ""))
+                                    navigationActions.navigateTo(Screen.CHOOSE_FOOD_ITEM)
+                                } else {
+                                    Toast.makeText(
+                                        context, R.string.submission_error_message, Toast.LENGTH_SHORT)
+                                        .show()
+                                }
+                            }
+                        },
+                        button2TestTag = "submitButton",
+                        button2Text = stringResource(R.string.submit_button_text))
+                }
             }
-      })
+        })
 }

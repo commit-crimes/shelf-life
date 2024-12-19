@@ -29,20 +29,20 @@ fun FoodNameField(
     foodNameErrorResId: Int?,
     modifier: Modifier = Modifier
 ) {
-  OutlinedTextField(
-      value = foodName,
-      onValueChange = onFoodNameChange,
-      label = { Text(stringResource(id = R.string.food_name_hint)) },
-      isError = foodNameErrorResId != null,
-      modifier = modifier.fillMaxWidth().testTag("inputFoodName"))
-  if (foodNameErrorResId != null) {
-    Text(
-        text = stringResource(id = foodNameErrorResId),
-        color = MaterialTheme.colorScheme.error,
-        style = MaterialTheme.typography.bodySmall,
-        modifier = Modifier.fillMaxWidth(),
-        textAlign = TextAlign.Start)
-  }
+    OutlinedTextField(
+        value = foodName,
+        onValueChange = onFoodNameChange,
+        label = { Text(stringResource(id = R.string.food_name_hint)) },
+        isError = foodNameErrorResId != null,
+        modifier = modifier.fillMaxWidth().testTag("inputFoodName"))
+    if (foodNameErrorResId != null) {
+        Text(
+            text = stringResource(id = foodNameErrorResId),
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Start)
+    }
 }
 
 /**
@@ -62,23 +62,23 @@ fun AmountField(
     modifier: Modifier = Modifier,
     testTag: String = ""
 ) {
-  Column(modifier = modifier) {
-    OutlinedTextField(
-        value = amount,
-        onValueChange = onAmountChange,
-        label = { Text(stringResource(id = R.string.amount_hint)) },
-        isError = amountErrorResId != null,
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        modifier = Modifier.fillMaxWidth().testTag(testTag))
-    if (amountErrorResId != null) {
-      Text(
-          text = stringResource(id = amountErrorResId),
-          color = MaterialTheme.colorScheme.error,
-          style = MaterialTheme.typography.bodySmall,
-          modifier = Modifier.fillMaxWidth(),
-          textAlign = TextAlign.Start)
+    Column(modifier = modifier) {
+        OutlinedTextField(
+            value = amount,
+            onValueChange = onAmountChange,
+            label = { Text(stringResource(id = R.string.amount_hint)) },
+            isError = amountErrorResId != null,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            modifier = Modifier.fillMaxWidth().testTag(testTag))
+        if (amountErrorResId != null) {
+            Text(
+                text = stringResource(id = amountErrorResId),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start)
+        }
     }
-  }
 }
 
 /**
@@ -100,15 +100,15 @@ fun UnitDropdownField(
     modifier: Modifier = Modifier,
     testTag: String = ""
 ) {
-  DropdownFields(
-      label = stringResource(id = R.string.unit_label),
-      options = FoodUnit.entries.toTypedArray(),
-      selectedOption = unit,
-      onOptionSelected = onUnitChange,
-      expanded = unitExpanded,
-      onExpandedChange = onUnitExpandedChange,
-      optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-      modifier = modifier.testTag(testTag))
+    DropdownFields(
+        label = stringResource(id = R.string.unit_label),
+        options = FoodUnit.entries.toTypedArray(),
+        selectedOption = unit,
+        onOptionSelected = onUnitChange,
+        expanded = unitExpanded,
+        onExpandedChange = onUnitExpandedChange,
+        optionLabel = { fromCapitalStringToLowercaseString(it.name) },
+        modifier = modifier.testTag(testTag))
 }
 
 /**
@@ -128,15 +128,15 @@ fun CategoryDropdownField(
     onCategoryExpandedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-  DropdownFields(
-      label = stringResource(id = R.string.category_label),
-      options = FoodCategory.entries.toTypedArray(),
-      selectedOption = category,
-      onOptionSelected = onCategoryChange,
-      expanded = categoryExpanded,
-      onExpandedChange = onCategoryExpandedChange,
-      optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-      modifier = modifier.fillMaxWidth().testTag("inputFoodCategory"))
+    DropdownFields(
+        label = stringResource(id = R.string.category_label),
+        options = FoodCategory.entries.toTypedArray(),
+        selectedOption = category,
+        onOptionSelected = onCategoryChange,
+        expanded = categoryExpanded,
+        onExpandedChange = onCategoryExpandedChange,
+        optionLabel = { fromCapitalStringToLowercaseString(it.name) },
+        modifier = modifier.fillMaxWidth().testTag("inputFoodCategory"))
 }
 
 /**
@@ -158,36 +158,15 @@ fun LocationDropdownField(
     modifier: Modifier = Modifier,
     testTag: String = "",
 ) {
-  DropdownFields(
-      label = stringResource(id = R.string.location_label),
-      options = FoodStorageLocation.entries.toTypedArray(),
-      selectedOption = location,
-      onOptionSelected = onLocationChange,
-      expanded = locationExpanded,
-      onExpandedChange = onExpandedChange,
-      optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-      modifier = modifier.testTag(testTag))
-}
-
-// TODO Delete this after everything is compatible
-@Composable
-fun NewLocationDropdownField(
-    location: FoodStorageLocation,
-    onLocationChange: (FoodStorageLocation) -> Unit,
-    locationExpanded: Boolean,
-    onExpandedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-    testTag: String = "",
-) {
-  DropdownFields(
-      label = stringResource(id = R.string.location_label),
-      options = FoodStorageLocation.entries.toTypedArray(),
-      selectedOption = location,
-      onOptionSelected = onLocationChange,
-      expanded = locationExpanded,
-      onExpandedChange = onExpandedChange,
-      optionLabel = { fromCapitalStringToLowercaseString(it.name) },
-      modifier = modifier.testTag(testTag))
+    DropdownFields(
+        label = stringResource(id = R.string.location_label),
+        options = FoodStorageLocation.entries.toTypedArray(),
+        selectedOption = location,
+        onOptionSelected = onLocationChange,
+        expanded = locationExpanded,
+        onExpandedChange = onExpandedChange,
+        optionLabel = { fromCapitalStringToLowercaseString(it.name) },
+        modifier = modifier.testTag(testTag))
 }
 
 /**
@@ -209,21 +188,21 @@ fun DateField(
     modifier: Modifier = Modifier,
     testTag: String = ""
 ) {
-  OutlinedTextField(
-      value = date,
-      onValueChange = onDateChange,
-      label = { Text(stringResource(id = labelResId)) },
-      placeholder = { Text(stringResource(id = R.string.date_placeholder)) },
-      isError = dateErrorResId != null,
-      visualTransformation = DateVisualTransformation(),
-      keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-      modifier = modifier.fillMaxWidth().testTag(testTag))
-  if (dateErrorResId != null) {
-    Text(
-        text = stringResource(id = dateErrorResId),
-        color = MaterialTheme.colorScheme.error,
-        style = MaterialTheme.typography.bodySmall,
-        modifier = Modifier.fillMaxWidth(),
-        textAlign = TextAlign.Start)
-  }
+    OutlinedTextField(
+        value = date,
+        onValueChange = onDateChange,
+        label = { Text(stringResource(id = labelResId)) },
+        placeholder = { Text(stringResource(id = R.string.date_placeholder)) },
+        isError = dateErrorResId != null,
+        visualTransformation = DateVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+        modifier = modifier.fillMaxWidth().testTag(testTag))
+    if (dateErrorResId != null) {
+        Text(
+            text = stringResource(id = dateErrorResId),
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Start)
+    }
 }

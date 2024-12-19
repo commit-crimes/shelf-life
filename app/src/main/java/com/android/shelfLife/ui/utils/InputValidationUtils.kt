@@ -6,6 +6,8 @@ import com.android.shelfLife.R
  * Validates the food name.
  *
  * @param string The food name to validate.
+ * @param errorMessage1 The resource ID of the error message for an empty food name. Defaults to R.string.food_name_empty_error.
+ * @param errorMessage2 The resource ID of the error message for an invalid food name. Defaults to R.string.food_name_invalid_error.
  * @return The resource ID of the error message if the food name is invalid, null otherwise.
  */
 fun validateString(
@@ -13,18 +15,21 @@ fun validateString(
     errorMessage1: Int = R.string.food_name_empty_error,
     errorMessage2: Int = R.string.food_name_invalid_error
 ): Int? {
-  val namePattern = Regex("^[a-zA-Z0-9\\s\\-,'()]+\$")
-  return when {
-    string.isBlank() -> errorMessage1
-    !namePattern.matches(string) -> errorMessage2
-    else -> null
-  }
+    val namePattern = Regex("^[a-zA-Z0-9\\s\\-,'()]+\$")
+    return when {
+        string.isBlank() -> errorMessage1
+        !namePattern.matches(string) -> errorMessage2
+        else -> null
+    }
 }
 
 /**
  * Validates the amount.
  *
  * @param amount The amount to validate.
+ * @param errorMessage1 The resource ID of the error message for an empty amount. Defaults to R.string.amount_empty_error.
+ * @param errorMessage2 The resource ID of the error message for a non-numeric amount. Defaults to R.string.amount_not_number_error.
+ * @param errorMessage3 The resource ID of the error message for a negative amount. Defaults to R.string.amount_negative_error.
  * @return The resource ID of the error message if the amount is invalid, null otherwise.
  */
 fun validateNumber(
@@ -33,12 +38,12 @@ fun validateNumber(
     errorMessage2: Int = R.string.amount_not_number_error,
     errorMessage3: Int = R.string.amount_negative_error
 ): Int? {
-  return when {
-    amount.isBlank() -> errorMessage1
-    amount.toDoubleOrNull() == null -> errorMessage2
-    amount.toDouble() <= 0 -> errorMessage3
-    else -> null
-  }
+    return when {
+        amount.isBlank() -> errorMessage1
+        amount.toDoubleOrNull() == null -> errorMessage2
+        amount.toDouble() <= 0 -> errorMessage3
+        else -> null
+    }
 }
 
 /**
@@ -48,7 +53,7 @@ fun validateNumber(
  * @return The resource ID of the error message if the buy date is invalid, null otherwise.
  */
 fun validateBuyDate(buyDate: String): Int? {
-  return getDateErrorMessageResId(buyDate)
+    return getDateErrorMessageResId(buyDate)
 }
 
 /**
@@ -60,15 +65,15 @@ fun validateBuyDate(buyDate: String): Int? {
  * @return The resource ID of the error message if the expire date is invalid, null otherwise.
  */
 fun validateExpireDate(expireDate: String, buyDate: String, buyDateErrorResId: Int?): Int? {
-  var errorResId = getDateErrorMessageResId(expireDate)
-  if (errorResId == null && buyDateErrorResId == null) {
-    if (!isDateAfterOrEqual(expireDate, buyDate)) {
-      errorResId = R.string.expire_date_before_buy_date_error
-    } else if (!isValidDateNotPast(expireDate)) {
-      errorResId = R.string.expire_date_in_past_error
+    var errorResId = getDateErrorMessageResId(expireDate)
+    if (errorResId == null && buyDateErrorResId == null) {
+        if (!isDateAfterOrEqual(expireDate, buyDate)) {
+            errorResId = R.string.expire_date_before_buy_date_error
+        } else if (!isValidDateNotPast(expireDate)) {
+            errorResId = R.string.expire_date_in_past_error
+        }
     }
-  }
-  return errorResId
+    return errorResId
 }
 
 /**
@@ -88,16 +93,16 @@ fun validateOpenDate(
     expireDate: String,
     expireDateErrorResId: Int?
 ): Int? {
-  var errorResId = getDateErrorMessageResId(openDate, isRequired = false)
-  if (errorResId == null &&
-      openDate.isNotEmpty() &&
-      buyDateErrorResId == null &&
-      expireDateErrorResId == null) {
-    if (!isDateAfterOrEqual(openDate, buyDate)) {
-      errorResId = R.string.open_date_before_buy_date_error
-    } else if (!isDateAfterOrEqual(expireDate, openDate)) {
-      errorResId = R.string.open_date_after_expire_date_error
+    var errorResId = getDateErrorMessageResId(openDate, isRequired = false)
+    if (errorResId == null &&
+        openDate.isNotEmpty() &&
+        buyDateErrorResId == null &&
+        expireDateErrorResId == null) {
+        if (!isDateAfterOrEqual(openDate, buyDate)) {
+            errorResId = R.string.open_date_before_buy_date_error
+        } else if (!isDateAfterOrEqual(expireDate, openDate)) {
+            errorResId = R.string.open_date_after_expire_date_error
+        }
     }
-  }
-  return errorResId
+    return errorResId
 }
