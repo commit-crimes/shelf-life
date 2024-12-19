@@ -23,10 +23,14 @@ import com.android.shelfLife.ui.navigation.NavigationActions
 import com.android.shelfLife.ui.navigation.TopLevelDestinations
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import helpers.FoodItemRepositoryTestHelper
+import helpers.HouseholdRepositoryTestHelper
+import helpers.RecipeRepositoryTestHelper
+import helpers.UserRepositoryTestHelper
+import io.mockk.verify
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -45,12 +49,16 @@ class RecipeExecutionScreenTest {
   @Inject lateinit var userRepository: UserRepository
   @Inject lateinit var recipeRepository: RecipeRepository
 
+  private lateinit var userRepositoryTestHelper: UserRepositoryTestHelper
+  private lateinit var houseHoldRepositoryTestHelper: HouseholdRepositoryTestHelper
+  private lateinit var recipeRepositoryTestHelper: RecipeRepositoryTestHelper
+  private lateinit var foodItemRepositoryTestHelper: FoodItemRepositoryTestHelper
+
   private lateinit var instrumentationContext: android.content.Context
   private lateinit var navigationActions: NavigationActions
 
   // Mocked Flows
-  private val userFlow = MutableStateFlow<User?>(null)
-  private val selectedHouseholdFlow = MutableStateFlow<HouseHold?>(null)
+
   private val foodItemsFlow = MutableStateFlow<List<FoodItem>>(emptyList())
   private val selectedRecipeFlow = MutableStateFlow<Recipe?>(null)
 
@@ -59,6 +67,11 @@ class RecipeExecutionScreenTest {
     hiltRule.inject()
     navigationActions = mock()
     instrumentationContext = InstrumentationRegistry.getInstrumentation().context
+
+    userRepositoryTestHelper = UserRepositoryTestHelper(userRepository)
+    houseHoldRepositoryTestHelper = HouseholdRepositoryTestHelper(houseHoldRepository)
+    recipeRepositoryTestHelper = RecipeRepositoryTestHelper(recipeRepository)
+    foodItemRepositoryTestHelper = FoodItemRepositoryTestHelper(foodItemRepository)
 
     // Provide a user
     val realUser =
@@ -70,8 +83,7 @@ class RecipeExecutionScreenTest {
             householdUIDs = listOf("household123"),
             selectedHouseholdUID = "household123",
             recipeUIDs = emptyList())
-    userFlow.value = realUser
-    whenever(userRepository.user).thenReturn(userFlow.asStateFlow())
+    userRepositoryTestHelper.setUser(realUser)
 
     // Provide a selected household
     val exampleSelectedHousehold =
@@ -82,8 +94,7 @@ class RecipeExecutionScreenTest {
             sharedRecipes = emptyList(),
             ratPoints = mapOf("currentUserId" to 10),
             stinkyPoints = mapOf("member2" to 5))
-    selectedHouseholdFlow.value = exampleSelectedHousehold
-    whenever(houseHoldRepository.selectedHousehold).thenReturn(selectedHouseholdFlow.asStateFlow())
+    houseHoldRepositoryTestHelper.selectHousehold(exampleSelectedHousehold)
 
     // Provide food items
     val testFoodItem =
@@ -98,8 +109,8 @@ class RecipeExecutionScreenTest {
                     nutritionFacts = NutritionFacts()),
             expiryDate = null,
             owner = "currentUserId")
-    foodItemsFlow.value = listOf(testFoodItem)
-    whenever(foodItemRepository.foodItems).thenReturn(foodItemsFlow.asStateFlow())
+
+    foodItemRepositoryTestHelper.setFoodItems(listOf(testFoodItem))
 
     val testRecipe =
         Recipe(
@@ -116,9 +127,8 @@ class RecipeExecutionScreenTest {
                         )),
             recipeType = RecipeType.PERSONAL, // optional since it defaults to PERSONAL
             workInProgress = false)
-    selectedRecipeFlow.value = testRecipe
-    whenever(recipeRepository.selectedRecipe).thenReturn(selectedRecipeFlow.asStateFlow())
 
+    recipeRepositoryTestHelper.setSelectedRecipe(testRecipe)
     // Since we use hiltViewModel in the UI,
     // the ExecuteRecipeViewModel will be constructed with these flows
   }
