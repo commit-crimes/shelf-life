@@ -1,0 +1,23 @@
+# Xcode build output
+build/
+DerivedData/
+*.xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# Swift Package Manager cache
+.build/
+*.resolved
+
+# CocoaPods (not used, but just in case)
+Pods/
+Podfile.lock
+
+# Firebase config (contains secrets — each dev adds their own)
+ShelfLife/ShelfLife/GoogleService-Info.plist
+
+# API keys / secrets
+*.xcconfig.local
+Secrets.swift
+
+# macOS
+.DS_Store
